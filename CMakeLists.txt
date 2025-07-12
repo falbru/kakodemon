@@ -6,15 +6,22 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "GLFW lib only")
 set(GLFW_INSTALL OFF CACHE BOOL "GLFW lib only")
-
 add_subdirectory(vendor/glfw)
+
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+add_subdirectory(vendor/nlohmann_json)
 
 set(SRC
     src/main.cpp
+    src/controller/editorcontroller.cpp
+    src/model/kakouneclientprocess.cpp
+    src/model/line.cpp
+    src/model/atom.cpp
+    src/model/face.cpp
     vendor/glad/src/glad.c
 )
 
 add_executable(editor ${SRC})
 
 target_include_directories(editor PRIVATE vendor/glad/include)
-target_link_libraries(editor glfw)
+target_link_libraries(editor glfw nlohmann_json::nlohmann_json)

@@ -1,10 +1,13 @@
-// test.c
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <memory>
+
+#include "controller/editorcontroller.hpp"
+
 int main(void)
 {
-    GLFWwindow* window;
+    GLFWwindow *window;
 
     /* Initialize the library */
     if (!glfwInit())
@@ -22,13 +25,18 @@ int main(void)
     glfwMakeContextCurrent(window);
 
     /* Init Glad */
-    gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
+    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+
+    std::unique_ptr<EditorController> editor_controller = std::make_unique<EditorController>();
+    editor_controller->init();
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
+
+        editor_controller->update();
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
