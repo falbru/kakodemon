@@ -18,6 +18,7 @@ set(SRC
     src/model/line.cpp
     src/model/atom.cpp
     src/model/face.cpp
+    src/view/triangleview.cpp
     vendor/glad/src/glad.c
 )
 

@@ -12,8 +12,9 @@ EditorController::~EditorController()
 {
 }
 
-void EditorController::init()
+void EditorController::init(std::shared_ptr<TriangleView> triangle_view)
 {
+    m_triangle_view = triangle_view;
     m_kak_proc->start();
 }
 
@@ -41,4 +42,6 @@ void EditorController::update()
             break;
         }
     }
+
+    m_triangle_view->render();
 }
