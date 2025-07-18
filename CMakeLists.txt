@@ -28,5 +28,5 @@ set(SRC
 
 add_executable(editor ${SRC})
 
-target_include_directories(editor PRIVATE vendor/glad/include)
+target_include_directories(editor PRIVATE src/ vendor/glad/include)
 target_link_libraries(editor glfw glm::glm nlohmann_json::nlohmann_json Freetype::Freetype)

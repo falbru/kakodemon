@@ -3,8 +3,8 @@
 
 #include <memory>
 
-#include "../model/kakouneclient.hpp"
-#include "../view/kakounecontentview.hpp"
+#include "model/kakouneclient.hpp"
+#include "view/kakounecontentview.hpp"
 
 class EditorController
 {

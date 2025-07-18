@@ -1,5 +1,3 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 #include <iostream>
 #include <memory>
@@ -7,6 +5,7 @@
 #include "controller/editorcontroller.hpp"
 #include "model/kakouneclient.hpp"
 #include "model/kakouneclientprocess.hpp"
+#include "opengl.hpp"
 #include "view/kakounecontentview.hpp"
 
 std::shared_ptr<KakouneContentView> kakoune_content_view;

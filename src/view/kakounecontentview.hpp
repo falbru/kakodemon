@@ -3,16 +3,14 @@
 
 #include <map>
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
-#include "../model/line.hpp"
+#include "model/line.hpp"
+#include "opengl.hpp"
 #include <ft2build.h>
 #include <vector>
 #include FT_FREETYPE_H
