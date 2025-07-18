@@ -1,0 +1,35 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build-format-lint:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Initialize submodules
+      run: git submodule update --init --recursive
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake build-essential libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libwayland-dev libxkbcommon-dev libfreetype-dev clang-format clang-tidy
+
+    - name: Configure CMake
+      run: |
+        cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+    - name: Build with CMake
+      run: |
+        cmake --build build --config Release
+
+    - name: Run clang-format check
+      run: |
+        find src/ -name '*.cpp' -o -name '*.hpp' -exec clang-format --style=Microsoft --dry-run --Werror {} \;
+
+    - name: Run clang-tidy
+      run: |
+        find src/ -name '*.cpp' -o -name '*.hpp' -exec clang-tidy -p build {} \;
