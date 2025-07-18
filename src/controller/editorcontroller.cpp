@@ -1,6 +1,5 @@
 #include "editorcontroller.hpp"
 
-#include <iostream>
 #include <memory>
 
 EditorController::EditorController()
@@ -20,9 +19,9 @@ void EditorController::init(std::shared_ptr<KakouneClient> kakoune_client,
 
 void EditorController::update()
 {
-    m_kakoune_client->process->pollForRequests();
+    m_kakoune_client->pollForRequests();
 
-    std::optional<KakouneClientRequest> request = m_kakoune_client->process->getNextRequest();
+    std::optional<KakouneClientRequest> request = m_kakoune_client->getNextRequest();
 
     if (request.has_value())
     {
@@ -31,7 +30,7 @@ void EditorController::update()
         {
         case KakouneRequestType::DRAW: {
             KakouneDrawRequestData &draw_data = std::get<KakouneDrawRequestData>(request_value.data);
-            m_kakoune_client->window_content = draw_data.lines;
+            m_kakoune_client->setWindowContent(draw_data.lines);
             break;
         }
         default:
@@ -39,5 +38,5 @@ void EditorController::update()
         }
     }
 
-    m_kakoune_content_view->render(m_kakoune_client->window_content, 0.0f, 0.0f);
+    m_kakoune_content_view->render(m_kakoune_client->getWindowContent(), 0.0f, 0.0f);
 }

@@ -91,7 +91,6 @@ std::optional<KakouneClientRequest> KakouneClientProcess::getNextRequest()
     m_request_queue.pop();
 
     auto request = KakouneClientRequest();
-    std::cout << data["method"] << "\n";
     if (data["method"] == "draw")
     {
         request.type = KakouneRequestType::DRAW;

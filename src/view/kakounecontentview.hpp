@@ -28,9 +28,9 @@ class KakouneContentView
   public:
     KakouneContentView();
 
-    void init();
+    void init(int width, int height);
     void render(const std::vector<Line> &lines, float x, float y);
-    void setSize(int width, int height);
+    void onWindowResize(int width, int height);
 
   private:
     void renderLine(const Line &line, float x, float y);

@@ -17,7 +17,9 @@ find_package(Freetype)
 
 set(SRC
     src/main.cpp
+    src/application.cpp
     src/controller/editorcontroller.cpp
+    src/model/kakouneclient.cpp
     src/model/kakouneclientprocess.cpp
     src/model/line.cpp
     src/model/atom.cpp

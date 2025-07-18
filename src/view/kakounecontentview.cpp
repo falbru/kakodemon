@@ -31,7 +31,7 @@ KakouneContentView::KakouneContentView() : m_shader_program(0), m_vao(0), m_vbo(
 {
 }
 
-void KakouneContentView::init()
+void KakouneContentView::init(int width, int height)
 {
     FT_Face face;
     FT_Library ft;
@@ -121,9 +121,7 @@ void KakouneContentView::init()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glm::mat4 projection = glm::ortho(0.0f, 800.0f, 0.0f, 800.0f);
-    glUseProgram(m_shader_program);
-    glUniformMatrix4fv(glGetUniformLocation(m_shader_program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+    onWindowResize(width, height);
 
     glGenVertexArrays(1, &m_vao);
     glGenBuffers(1, &m_vbo);
@@ -196,7 +194,7 @@ void KakouneContentView::render(const std::vector<Line> &lines, float x, float y
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void KakouneContentView::setSize(int width, int height)
+void KakouneContentView::onWindowResize(int width, int height)
 {
     glm::mat4 projection = glm::ortho(0.0f, (float)width, (float)height, 0.0f);
     glUseProgram(m_shader_program);
