@@ -3,8 +3,8 @@
 
 #include <memory>
 
-#include "../model/kakouneclientprocess.hpp"
-#include "../view/triangleview.hpp"
+#include "../model/kakouneclient.hpp"
+#include "../view/kakounecontentview.hpp"
 
 class EditorController
 {
@@ -12,13 +12,12 @@ class EditorController
     EditorController();
     ~EditorController();
 
-    void init(std::shared_ptr<TriangleView> triangle_view);
+    void init(std::shared_ptr<KakouneClient> kakoune_client, std::shared_ptr<KakouneContentView> kakoune_content_view);
     void update();
 
   private:
-    std::shared_ptr<TriangleView> m_triangle_view;
-
-    std::unique_ptr<KakouneClientProcess> m_kak_proc;
+    std::shared_ptr<KakouneClient> m_kakoune_client;
+    std::shared_ptr<KakouneContentView> m_kakoune_content_view;
 };
 
 #endif

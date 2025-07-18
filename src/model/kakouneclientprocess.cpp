@@ -1,5 +1,6 @@
 #include "kakouneclientprocess.hpp"
 
+#include <iostream>
 #include <sys/poll.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -47,53 +48,56 @@ void KakouneClientProcess::start()
     }
 }
 
-bool KakouneClientProcess::pollForRequest()
+void KakouneClientProcess::pollForRequests()
 {
     int poll_result = poll(&m_pollfd, 1, 10);
-    if (poll_result == 0)
+    if (poll_result <= 0)
     {
-        return false;
+        return;
     }
 
-    ssize_t bytes_read;
-    std::string line = m_remainder;
-
-    while ((bytes_read = read(m_pipefd[0], m_buffer, sizeof(m_buffer) - 1)) > 0)
+    std::string request_stream = m_request_remainder;
+    ssize_t bytes_read = read(m_pipefd[0], m_buffer, sizeof(m_buffer) - 1);
+    if (bytes_read > 0)
     {
         m_buffer[bytes_read] = '\0';
-        line += m_buffer;
+        request_stream += m_buffer;
 
-        size_t newline_pos = line.find('\n');
-        if (newline_pos != std::string::npos)
+        size_t newline_pos;
+        while ((newline_pos = request_stream.find('\n')) != std::string::npos)
         {
-            std::string json_line = line.substr(0, newline_pos);
+            std::string json_request = request_stream.substr(0, newline_pos);
 
-            m_remainder = line.substr(newline_pos + 1);
-
-            if (nlohmann::json::accept(json_line))
+            if (!json_request.empty() && nlohmann::json::accept(json_request))
             {
-                m_request = json_line;
-                return true;
+                m_request_queue.push(json_request);
             }
 
-            // error
-            return false;
+            request_stream = request_stream.substr(newline_pos + 1);
         }
     }
 
-    return false;
+    m_request_remainder = request_stream;
 }
 
-KakouneClientRequest KakouneClientProcess::getRequest()
+std::optional<KakouneClientRequest> KakouneClientProcess::getNextRequest()
 {
-    nlohmann::json data = nlohmann::json::parse(m_request);
+    if (m_request_queue.empty())
+    {
+        return std::nullopt;
+    }
+
+    nlohmann::json data = nlohmann::json::parse(m_request_queue.front());
+    m_request_queue.pop();
 
     auto request = KakouneClientRequest();
+    std::cout << data["method"] << "\n";
     if (data["method"] == "draw")
     {
         request.type = KakouneRequestType::DRAW;
         request.data = KakouneDrawRequestData{data["params"][0].get<std::vector<Line>>()};
+        return request;
     }
 
-    return request;
+    return std::nullopt;
 }

@@ -5,7 +5,17 @@
 #include <memory>
 
 #include "controller/editorcontroller.hpp"
-#include "view/triangleview.hpp"
+#include "model/kakouneclient.hpp"
+#include "model/kakouneclientprocess.hpp"
+#include "view/kakounecontentview.hpp"
+
+std::shared_ptr<KakouneContentView> kakoune_content_view;
+
+void framebuffer_size_callback(GLFWwindow *window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+    kakoune_content_view->setSize(width, height);
+}
 
 int main(void)
 {
@@ -31,13 +41,20 @@ int main(void)
 
     std::shared_ptr<EditorController> editor_controller = std::make_shared<EditorController>();
 
-    std::shared_ptr<TriangleView> triangle_view = std::make_shared<TriangleView>();
-    triangle_view->init();
+    std::shared_ptr<KakouneClient> kakoune_client = std::make_shared<KakouneClient>();
+    kakoune_client->process = std::make_unique<KakouneClientProcess>("editor");
+    kakoune_client->process->start();
 
-    editor_controller->init(triangle_view);
+    kakoune_content_view = std::make_shared<KakouneContentView>();
+    kakoune_content_view->init();
+    kakoune_content_view->setSize(640, 480);
+
+    editor_controller->init(kakoune_client, kakoune_content_view);
 
     double lastTime = glfwGetTime();
     int frameCount = 0;
+
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -46,7 +63,8 @@ int main(void)
         frameCount++;
 
         // Print FPS every second
-        if (currentTime - lastTime >= 1.0) {
+        if (currentTime - lastTime >= 1.0)
+        {
             std::cout << "FPS: " << frameCount << std::endl;
             frameCount = 0;
             lastTime = currentTime;

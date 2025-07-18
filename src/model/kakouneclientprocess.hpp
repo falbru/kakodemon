@@ -1,6 +1,7 @@
 #ifndef KAKOUNECLIENTPROCESS_HPP_INCLUDED
 #define KAKOUNECLIENTPROCESS_HPP_INCLUDED
 
+#include <queue>
 #include <sys/poll.h>
 
 #include <string>
@@ -48,8 +49,8 @@ class KakouneClientProcess
     ~KakouneClientProcess();
 
     void start();
-    bool pollForRequest();
-    KakouneClientRequest getRequest();
+    void pollForRequests();
+    std::optional<KakouneClientRequest> getNextRequest();
 
   private:
     std::string m_session_name;
@@ -58,8 +59,8 @@ class KakouneClientProcess
     pollfd m_pollfd;
     char m_buffer[8192];
 
-    std::string m_remainder;
-    std::string m_request;
+    std::queue<std::string> m_request_queue;
+    std::string m_request_remainder;
 };
 
 #endif
