@@ -17,7 +17,7 @@ void KakouneClient::pollForRequests() {
     m_process->pollForRequests();
 }
 
-std::optional<KakouneClientRequest> KakouneClient::getNextRequest() {
+std::optional<IncomingRequest> KakouneClient::getNextRequest() {
     return m_process->getNextRequest();
 
 }
@@ -28,4 +28,8 @@ void KakouneClient::setWindowContent(const std::vector<Line>& line) {
 
 const std::vector<Line>& KakouneClient::getWindowContent() const {
     return m_window_content;
+}
+
+void KakouneClient::sendRequest(const OutgoingRequest& request) {
+    m_process->sendRequest(request);
 }

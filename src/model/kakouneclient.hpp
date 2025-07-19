@@ -13,10 +13,12 @@ struct KakouneClient
     void init();
 
     void pollForRequests();
-    std::optional<KakouneClientRequest> getNextRequest();
+    std::optional<IncomingRequest> getNextRequest();
 
     void setWindowContent(const std::vector<Line> &line);
     const std::vector<Line> &getWindowContent() const;
+
+    void sendRequest(const OutgoingRequest &request);
 
   private:
     std::vector<Line> m_window_content;

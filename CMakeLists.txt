@@ -21,6 +21,7 @@ set(SRC
     src/main.cpp
     src/application.cpp
     src/controller/editorcontroller.cpp
+    src/controller/inputcontroller.cpp
     src/model/kakouneclient.cpp
     src/model/kakouneclientprocess.cpp
     src/model/line.cpp

@@ -10,7 +10,7 @@
 
 #include "line.hpp"
 
-enum class KakouneRequestType
+enum class IncomingRequestType
 {
     DRAW,
     DRAW_STATUS,
@@ -24,22 +24,40 @@ enum class KakouneRequestType
     REFRESH
 };
 
-struct KakouneDrawRequestData
+struct DrawRequestData
 {
     std::vector<Line> lines;
 };
 
-struct KakouneRefreshRequestData
+struct RefreshRequestData
 {
     bool force;
 };
 
-using KakouneRequestData = std::variant<KakouneDrawRequestData, KakouneRefreshRequestData>;
+using IncomingRequestData = std::variant<DrawRequestData, RefreshRequestData>;
 
-struct KakouneClientRequest
+struct IncomingRequest
 {
-    KakouneRequestType type;
-    KakouneRequestData data;
+    IncomingRequestType type;
+    IncomingRequestData data;
+};
+
+enum class OutgoingRequestType
+{
+    KEYS
+};
+
+struct KeysRequestData
+{
+    std::vector<std::string> keys;
+};
+
+using OutgoingRequestData = std::variant<KeysRequestData>;
+
+struct OutgoingRequest
+{
+    OutgoingRequestType type;
+    OutgoingRequestData data;
 };
 
 class KakouneClientProcess
@@ -49,13 +67,18 @@ class KakouneClientProcess
     ~KakouneClientProcess();
 
     void start();
+
     void pollForRequests();
-    std::optional<KakouneClientRequest> getNextRequest();
+    std::optional<IncomingRequest> getNextRequest();
+
+    void sendRequest(const OutgoingRequest &request);
 
   private:
     std::string m_session_name;
 
-    int m_pipefd[2];
+    int m_stdout_pipefd[2];
+    int m_stdin_pipefd[2];
+
     pollfd m_pollfd;
     char m_buffer[8192];
 

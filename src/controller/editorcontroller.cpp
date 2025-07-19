@@ -1,4 +1,6 @@
 #include "editorcontroller.hpp"
+#include "model/kakouneclientprocess.hpp"
+#include <spdlog/spdlog.h>
 
 #include <memory>
 
@@ -21,15 +23,15 @@ void EditorController::update()
 {
     m_kakoune_client->pollForRequests();
 
-    std::optional<KakouneClientRequest> request = m_kakoune_client->getNextRequest();
+    std::optional<IncomingRequest> request = m_kakoune_client->getNextRequest();
 
     if (request.has_value())
     {
-        KakouneClientRequest request_value = request.value();
+        IncomingRequest request_value = request.value();
         switch (request_value.type)
         {
-        case KakouneRequestType::DRAW: {
-            KakouneDrawRequestData &draw_data = std::get<KakouneDrawRequestData>(request_value.data);
+        case IncomingRequestType::DRAW: {
+            DrawRequestData &draw_data = std::get<DrawRequestData>(request_value.data);
             m_kakoune_client->setWindowContent(draw_data.lines);
             break;
         }
