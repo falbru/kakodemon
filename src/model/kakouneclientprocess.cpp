@@ -1,6 +1,5 @@
 #include "kakouneclientprocess.hpp"
 
-#include <iostream>
 #include <sys/poll.h>
 #include <sys/wait.h>
 #include <unistd.h>

@@ -15,6 +15,8 @@ add_subdirectory(vendor/nlohmann_json)
 
 find_package(Freetype)
 
+add_subdirectory(vendor/spdlog)
+
 set(SRC
     src/main.cpp
     src/application.cpp
@@ -31,4 +33,4 @@ set(SRC
 add_executable(editor ${SRC})
 
 target_include_directories(editor PRIVATE src/ vendor/glad/include)
-target_link_libraries(editor glfw glm::glm nlohmann_json::nlohmann_json Freetype::Freetype)
+target_link_libraries(editor glfw glm::glm nlohmann_json::nlohmann_json Freetype::Freetype spdlog::spdlog)

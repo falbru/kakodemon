@@ -1,10 +1,9 @@
 #include "kakounecontentview.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "kakounecontentview.hpp"
+#include "spdlog/spdlog.h"
 #include <freetype/freetype.h>
 #include <glm/mat4x4.hpp>
-
-#include <iostream>
 
 const char *vertexShaderSource = "#version 330 core\n"
                                  "layout (location = 0) in vec4 vertex; // <vec2 pos, vec2 tex>\n"
@@ -37,12 +36,12 @@ void KakouneContentView::init(int width, int height)
     FT_Library ft;
     if (FT_Init_FreeType(&ft)) // only init once
     {
-        std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+        spdlog::error("ERROR::FREETYPE: Could not init FreeType Library");
     }
 
     if (FT_New_Face(ft, "/home/falk/.fonts/MonoLisa/ttf/MonoLisa-Regular.ttf", 0, &face))
     {
-        std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
+        spdlog::error("ERROR::FREETYPE: Failed to load font");
     }
     FT_Set_Pixel_Sizes(face, 0, 14);
 
@@ -54,7 +53,7 @@ void KakouneContentView::init(int width, int height)
         // load character glyph
         if (FT_Load_Char(face, c, FT_LOAD_RENDER))
         {
-            std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+            spdlog::error("ERROR::FREETYTPE: Failed to load Glyph");
             continue;
         }
         // generate texture
@@ -90,7 +89,7 @@ void KakouneContentView::init(int width, int height)
     if (!success)
     {
         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+        spdlog::error("ERROR::SHADER::VERTEX::COMPILATION_FAILED: {}", infoLog);
     }
     // fragment shader
     unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -101,7 +100,7 @@ void KakouneContentView::init(int width, int height)
     if (!success)
     {
         glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+        spdlog::error("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED:", infoLog);
     }
     // link shaders
     m_shader_program = glCreateProgram();
@@ -113,7 +112,7 @@ void KakouneContentView::init(int width, int height)
     if (!success)
     {
         glGetProgramInfoLog(m_shader_program, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+        spdlog::error("ERROR::SHADER::PROGRAM::LINKING_FAILED", infoLog);
     }
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
