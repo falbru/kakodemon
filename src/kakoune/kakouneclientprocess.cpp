@@ -87,9 +87,13 @@ void KakouneClientProcess::pollForRequests()
         {
             std::string json_request = request_stream.substr(0, newline_pos);
 
-            if (!json_request.empty() && nlohmann::json::accept(json_request))
+            if (!json_request.empty())
             {
-                m_request_queue.push(json_request);
+                std::optional<IncomingRequest> request = parseRequest(json_request);
+                if (request.has_value())
+                {
+                    m_request_queue.push(request.value());
+                }
             }
 
             request_stream = request_stream.substr(newline_pos + 1);
@@ -101,23 +105,14 @@ void KakouneClientProcess::pollForRequests()
 
 std::optional<IncomingRequest> KakouneClientProcess::getNextRequest()
 {
-    if (m_request_queue.empty())
-    {
+    if (m_request_queue.empty()) {
         return std::nullopt;
     }
 
-    nlohmann::json data = nlohmann::json::parse(m_request_queue.front());
+    auto request = m_request_queue.front();
     m_request_queue.pop();
 
-    auto request = IncomingRequest(); // TODO just use json deserialization
-    if (data["method"] == "draw")
-    {
-        request.type = IncomingRequestType::DRAW;
-        request.data = DrawRequestData{data["params"][0].get<std::vector<Line>>()};
-        return request;
-    }
-
-    return std::nullopt;
+    return request;
 }
 
 void KakouneClientProcess::sendRequest(const OutgoingRequest& request)
@@ -137,4 +132,27 @@ void KakouneClientProcess::sendRequest(const OutgoingRequest& request)
     {
         spdlog::error("Failed to write to Kakoune client");
     }
+}
+
+std::optional<IncomingRequest> KakouneClientProcess::parseRequest(std::string request) {
+    nlohmann::json data = nlohmann::json::parse(request);
+
+    std::string method = data["method"];
+    nlohmann::json params = data["params"];
+
+    auto parsed_request = IncomingRequest(); // TODO just use json deserialization
+    if (method == "draw")
+    {
+        parsed_request.type = IncomingRequestType::DRAW;
+        parsed_request.data = DrawRequestData{params[0].get<std::vector<Line>>()};
+        return parsed_request;
+    }
+    if (method == "refresh")
+    {
+        parsed_request.type = IncomingRequestType::REFRESH;
+        parsed_request.data = RefreshRequestData{params[0].get<bool>()};
+        return parsed_request;
+    }
+
+    return std::nullopt;
 }

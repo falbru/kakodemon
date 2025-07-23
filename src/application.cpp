@@ -65,13 +65,14 @@ void Application::initMVC() {
 
     m_editor_controller = std::make_shared<EditorController>();
     m_input_controller = std::make_shared<InputController>();
-    m_kakoune_client = std::make_shared<KakouneClient>("editor");
+    m_kakoune_client = std::make_shared<KakouneClient>();
+    m_kakoune_process = std::make_shared<KakouneClientProcess>("default");
     m_kakoune_content_view = std::make_shared<KakouneContentView>();
 
-    m_editor_controller->init(m_kakoune_client, m_kakoune_content_view);
-    m_input_controller->init(m_kakoune_client);
+    m_editor_controller->init(m_kakoune_client, m_kakoune_process, m_kakoune_content_view);
+    m_input_controller->init(m_kakoune_client, m_kakoune_process);
     m_kakoune_content_view->init(width, height);
-    m_kakoune_client->init();
+    m_kakoune_process->start();
 }
 
 void Application::run()

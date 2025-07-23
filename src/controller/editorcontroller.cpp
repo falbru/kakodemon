@@ -1,44 +1,27 @@
 #include "editorcontroller.hpp"
-#include "model/kakouneclientprocess.hpp"
-#include <spdlog/spdlog.h>
-
-#include <memory>
 
 EditorController::EditorController()
 {
 }
 
-EditorController::~EditorController()
-{
-}
-
 void EditorController::init(std::shared_ptr<KakouneClient> kakoune_client,
+                            std::shared_ptr<KakouneClientProcess> kakoune_process,
                             std::shared_ptr<KakouneContentView> kakoune_content_view)
 {
     m_kakoune_client = kakoune_client;
     m_kakoune_content_view = kakoune_content_view;
+
+    m_frame_state_manager = std::make_unique<KakouneFrameStateManager>(kakoune_process);
 }
 
 void EditorController::update()
 {
-    m_kakoune_client->pollForRequests();
+    m_frame_state_manager->update();
 
-    std::optional<IncomingRequest> request = m_kakoune_client->getNextRequest();
-
-    if (request.has_value())
-    {
-        IncomingRequest request_value = request.value();
-        switch (request_value.type)
-        {
-        case IncomingRequestType::DRAW: {
-            DrawRequestData &draw_data = std::get<DrawRequestData>(request_value.data);
-            m_kakoune_client->setWindowContent(draw_data.lines);
-            break;
-        }
-        default:
-            break;
-        }
+    auto frame_state = m_frame_state_manager->getNextFrameState();
+    if (frame_state.has_value()) {
+        m_kakoune_client->window_content = frame_state.value().draw.lines;
     }
 
-    m_kakoune_content_view->render(m_kakoune_client->getWindowContent(), 0.0f, 0.0f);
+    m_kakoune_content_view->render(m_kakoune_client->window_content, 0.0f, 0.0f);
 }

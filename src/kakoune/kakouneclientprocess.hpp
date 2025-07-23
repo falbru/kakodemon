@@ -74,6 +74,8 @@ class KakouneClientProcess
     void sendRequest(const OutgoingRequest &request);
 
   private:
+    std::optional<IncomingRequest> parseRequest(std::string request);
+
     std::string m_session_name;
 
     int m_stdout_pipefd[2];
@@ -82,7 +84,7 @@ class KakouneClientProcess
     pollfd m_pollfd;
     char m_buffer[8192];
 
-    std::queue<std::string> m_request_queue;
+    std::queue<IncomingRequest> m_request_queue;
     std::string m_request_remainder;
 };
 

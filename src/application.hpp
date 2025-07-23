@@ -30,6 +30,7 @@ class Application
     std::shared_ptr<EditorController> m_editor_controller;
     std::shared_ptr<InputController> m_input_controller;
     std::shared_ptr<KakouneClient> m_kakoune_client;
+    std::shared_ptr<KakouneClientProcess> m_kakoune_process;
     std::shared_ptr<KakouneContentView> m_kakoune_content_view;
 
     const int DEFAULT_WINDOW_WIDTH = 640;

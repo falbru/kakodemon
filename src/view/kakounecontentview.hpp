@@ -9,7 +9,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
-#include "model/line.hpp"
+#include "kakoune/line.hpp"
 #include "opengl.hpp"
 #include <ft2build.h>
 #include <vector>

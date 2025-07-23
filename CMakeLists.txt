@@ -22,12 +22,12 @@ set(SRC
     src/application.cpp
     src/controller/editorcontroller.cpp
     src/controller/inputcontroller.cpp
-    src/model/kakouneclient.cpp
-    src/model/kakouneclientprocess.cpp
-    src/model/line.cpp
-    src/model/atom.cpp
-    src/model/face.cpp
     src/view/kakounecontentview.cpp
+    src/kakoune/kakouneframestatemanager.cpp
+    src/kakoune/kakouneclientprocess.cpp
+    src/kakoune/line.cpp
+    src/kakoune/atom.cpp
+    src/kakoune/face.cpp
     vendor/glad/src/glad.c
 )
 
