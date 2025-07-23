@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(editor)
+project(kakodemon)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -31,7 +31,7 @@ set(SRC
     vendor/glad/src/glad.c
 )
 
-add_executable(editor ${SRC})
+add_executable(kakod ${SRC})
 
-target_include_directories(editor PRIVATE src/ vendor/glad/include)
-target_link_libraries(editor glfw glm::glm nlohmann_json::nlohmann_json Freetype::Freetype spdlog::spdlog)
+target_include_directories(kakod PRIVATE src/ vendor/glad/include)
+target_link_libraries(kakod glfw glm::glm nlohmann_json::nlohmann_json Freetype::Freetype spdlog::spdlog)
