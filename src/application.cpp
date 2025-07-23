@@ -69,10 +69,11 @@ void Application::initMVC() {
     m_kakoune_process = std::make_shared<KakouneClientProcess>("default");
     m_kakoune_content_view = std::make_shared<KakouneContentView>();
 
-    m_editor_controller->init(m_kakoune_client, m_kakoune_process, m_kakoune_content_view);
     m_input_controller->init(m_kakoune_client, m_kakoune_process);
     m_kakoune_content_view->init(width, height);
     m_kakoune_process->start();
+    m_editor_controller->init(m_kakoune_client, m_kakoune_process, m_kakoune_content_view);
+    m_editor_controller->onWindowResize(width, height);
 }
 
 void Application::run()
@@ -92,6 +93,7 @@ void Application::onWindowResize(int width, int height)
 {
     glViewport(0, 0, width, height);
     m_kakoune_content_view->onWindowResize(width, height);
+    m_editor_controller->onWindowResize(width, height);
 }
 
 std::string utf32_to_utf8(unsigned int codepoint) {  // TODO fix

@@ -123,6 +123,11 @@ void KakouneClientProcess::sendRequest(const OutgoingRequest& request)
     if (request.type == OutgoingRequestType::KEYS) {
         data["method"] = "keys";
         data["params"] = std::get<KeysRequestData>(request.data).keys;
+    }else if (request.type == OutgoingRequestType::RESIZE) {
+        auto resize_data = std::get<ResizeRequestData>(request.data);
+
+        data["method"] = "resize";
+        data["params"] = {resize_data.rows, resize_data.columns};
     }
 
     std::string json_str = data.dump();

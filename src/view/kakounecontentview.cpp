@@ -199,3 +199,11 @@ void KakouneContentView::onWindowResize(int width, int height)
     glUseProgram(m_shader_program);
     glUniformMatrix4fv(glGetUniformLocation(m_shader_program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 }
+
+int KakouneContentView::getCharWidth() {
+    return Characters['A'].Advance >> 6;
+}
+
+int KakouneContentView::getCharHeight() {
+    return m_line_height;
+}

@@ -44,7 +44,8 @@ struct IncomingRequest
 
 enum class OutgoingRequestType
 {
-    KEYS
+    KEYS,
+    RESIZE
 };
 
 struct KeysRequestData
@@ -52,7 +53,13 @@ struct KeysRequestData
     std::vector<std::string> keys;
 };
 
-using OutgoingRequestData = std::variant<KeysRequestData>;
+struct ResizeRequestData
+{
+    int rows;
+    int columns;
+};
+
+using OutgoingRequestData = std::variant<KeysRequestData, ResizeRequestData>;
 
 struct OutgoingRequest
 {

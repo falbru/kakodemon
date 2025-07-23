@@ -32,6 +32,9 @@ class KakouneContentView
     void render(const std::vector<Line> &lines, float x, float y);
     void onWindowResize(int width, int height);
 
+    int getCharWidth();
+    int getCharHeight();
+
   private:
     void renderLine(const Line &line, float x, float y);
     unsigned int m_shader_program;
