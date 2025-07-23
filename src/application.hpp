@@ -23,7 +23,11 @@ class Application
     void initMVC();
 
     void onWindowResize(int width, int height);
-    void onCharacterInsert(unsigned int codepoint);
+    void onKeyInput(int key, int scancode, int action, int mods);
+    void onCharacterInsert(unsigned int codepoint, int mods);
+
+    std::optional<KeyEvent> glfwSpecialKeyToKeyEvent(int key, int mods);
+    KeyEvent glfwCharToKeyEvent(unsigned int codepoint, int mods);
 
     GLFWwindow *m_window;
 

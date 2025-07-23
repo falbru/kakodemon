@@ -1,4 +1,5 @@
 #include "application.hpp"
+#include "input/keys.hpp"
 #include "opengl.hpp"
 #include "controller/editorcontroller.hpp"
 #include "controller/inputcontroller.hpp"
@@ -53,9 +54,14 @@ void Application::initGLFW()
         app->onWindowResize(width, height);
     });
 
-    glfwSetCharCallback(m_window, [](GLFWwindow* window, unsigned int codepoint) {
+    glfwSetCharModsCallback(m_window, [](GLFWwindow* window, unsigned int codepoint, int mods) {
         Application* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
-        app->onCharacterInsert(codepoint);
+        app->onCharacterInsert(codepoint, mods);
+    });
+
+    glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+        Application* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
+        app->onKeyInput(key, scancode, action, mods);
     });
 }
 
@@ -96,33 +102,119 @@ void Application::onWindowResize(int width, int height)
     m_editor_controller->onWindowResize(width, height);
 }
 
-std::string utf32_to_utf8(unsigned int codepoint) {  // TODO fix
-    std::string result;
-
-    if (codepoint <= 0x7F) {
-        // 1-byte sequence
-        result += static_cast<char>(codepoint);
-    } else if (codepoint <= 0x7FF) {
-        // 2-byte sequence
-        result += static_cast<char>(0xC0 | (codepoint >> 6));
-        result += static_cast<char>(0x80 | (codepoint & 0x3F));
-    } else if (codepoint <= 0xFFFF) {
-        // 3-byte sequence
-        result += static_cast<char>(0xE0 | (codepoint >> 12));
-        result += static_cast<char>(0x80 | ((codepoint >> 6) & 0x3F));
-        result += static_cast<char>(0x80 | (codepoint & 0x3F));
-    } else if (codepoint <= 0x10FFFF) {
-        // 4-byte sequence
-        result += static_cast<char>(0xF0 | (codepoint >> 18));
-        result += static_cast<char>(0x80 | ((codepoint >> 12) & 0x3F));
-        result += static_cast<char>(0x80 | ((codepoint >> 6) & 0x3F));
-        result += static_cast<char>(0x80 | (codepoint & 0x3F));
+void Application::onKeyInput(int key, int scancode, int action, int mods)
+{
+    if (action != GLFW_PRESS) {
+        return;
     }
 
-    return result;
+    std::optional<KeyEvent> event = glfwSpecialKeyToKeyEvent(key, mods);
+
+    if (event.has_value()) {
+        m_input_controller->onKeyInput(event.value());
+    }
 }
 
-void Application::onCharacterInsert(unsigned int codepoint)
+void Application::onCharacterInsert(unsigned int codepoint, int mods)
 {
-    m_input_controller->onCharacterInsert(utf32_to_utf8(codepoint));
+    m_input_controller->onKeyInput(glfwCharToKeyEvent(codepoint, mods));
+}
+
+std::optional<KeyEvent> Application::glfwSpecialKeyToKeyEvent(int key, int mods) {
+    static const std::unordered_map<int, SpecialKey> glfw_special_keys = {
+        {GLFW_KEY_ESCAPE, ESCAPE},
+        {GLFW_KEY_TAB, TAB},
+        {GLFW_KEY_ENTER, RETURN},
+        {GLFW_KEY_BACKSPACE, BACKSPACE},
+        {GLFW_KEY_DELETE, DELETE},
+        {GLFW_KEY_LEFT, LEFT},
+        {GLFW_KEY_RIGHT, RIGHT},
+        {GLFW_KEY_UP, UP},
+        {GLFW_KEY_DOWN, DOWN},
+        {GLFW_KEY_HOME, HOME},
+        {GLFW_KEY_END, END},
+        {GLFW_KEY_PAGE_UP, PAGE_UP},
+        {GLFW_KEY_PAGE_DOWN, PAGE_DOWN},
+        {GLFW_KEY_INSERT, INSERT}
+    };
+
+    auto it = glfw_special_keys.find(key);
+    if (it == glfw_special_keys.end()) {
+        return std::nullopt;
+    }
+
+    KeyEvent event;
+    event.key = it->second;
+
+    event.modifiers = 0;
+    if (mods & GLFW_MOD_CONTROL) {
+        event.modifiers |= CONTROL;
+    }
+    if (mods & GLFW_MOD_SHIFT) {
+        event.modifiers |= SHIFT;
+    }
+    if (mods & GLFW_MOD_ALT) {
+        event.modifiers |= ALT;
+    }
+
+    return event;
+}
+
+std::string utf8_encode(unsigned int utf)
+{
+    if (utf <= 0x7F) {
+        // Plain ASCII
+        return std::string(1, (char) utf);
+    }
+    else if (utf <= 0x07FF) {
+        // 2-byte unicode
+        std::string result;
+        result += (char) (((utf >> 6) & 0x1F) | 0xC0);
+        result += (char) (((utf >> 0) & 0x3F) | 0x80);
+        return result;
+    }
+    else if (utf <= 0xFFFF) {
+        // 3-byte unicode
+        std::string result;
+        result += (char) (((utf >> 12) & 0x0F) | 0xE0);
+        result += (char) (((utf >> 6) & 0x3F) | 0x80);
+        result += (char) (((utf >> 0) & 0x3F) | 0x80);
+        return result;
+    }
+    else if (utf <= 0x10FFFF) {
+        // 4-byte unicode
+        std::string result;
+        result += (char) (((utf >> 18) & 0x07) | 0xF0);
+        result += (char) (((utf >> 12) & 0x3F) | 0x80);
+        result += (char) (((utf >> 6) & 0x3F) | 0x80);
+        result += (char) (((utf >> 0) & 0x3F) | 0x80);
+        return result;
+    }
+    else {
+        // error - use replacement character
+        std::string result;
+        result += (char) 0xEF;
+        result += (char) 0xBF;
+        result += (char) 0xBD;
+        return result;
+    }
+}
+
+KeyEvent Application::glfwCharToKeyEvent(unsigned int codepoint, int mods) {
+    KeyEvent event;
+
+    event.modifiers = 0;
+    if (mods & GLFW_MOD_CONTROL) {
+        event.modifiers |= CONTROL;
+    }
+    if (mods & GLFW_MOD_SHIFT) {
+        event.modifiers |= SHIFT;
+    }
+    if (mods & GLFW_MOD_ALT) {
+        event.modifiers |= ALT;
+    }
+
+    event.key = utf8_encode(codepoint);
+
+    return event;
 }
