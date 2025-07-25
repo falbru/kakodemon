@@ -104,7 +104,7 @@ void Application::onWindowResize(int width, int height)
 
 void Application::onKeyInput(int key, int scancode, int action, int mods)
 {
-    if (action != GLFW_PRESS) {
+    if (action != GLFW_PRESS && action != GLFW_REPEAT) {
         return;
     }
 
