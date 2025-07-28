@@ -68,6 +68,11 @@ void KakouneClientProcess::start()
     }
 }
 
+void KakouneClientProcess::setRequestCallback(std::function<void(const IncomingRequest&)> callback)
+{
+    m_request_callback = callback;
+}
+
 void KakouneClientProcess::pollForRequests()
 {
     int poll_result = poll(&m_pollfd, 1, 10);
@@ -91,9 +96,9 @@ void KakouneClientProcess::pollForRequests()
             if (!json_request.empty())
             {
                 std::optional<IncomingRequest> request = parseRequest(json_request);
-                if (request.has_value())
+                if (request.has_value() && m_request_callback)
                 {
-                    m_request_queue.push(request.value());
+                    m_request_callback(request.value());
                 }
             }
 
@@ -102,18 +107,6 @@ void KakouneClientProcess::pollForRequests()
     }
 
     m_request_remainder = request_stream;
-}
-
-std::optional<IncomingRequest> KakouneClientProcess::getNextRequest()
-{
-    if (m_request_queue.empty()) {
-        return std::nullopt;
-    }
-
-    auto request = m_request_queue.front();
-    m_request_queue.pop();
-
-    return request;
 }
 
 void KakouneClientProcess::sendRequest(const OutgoingRequest& request)

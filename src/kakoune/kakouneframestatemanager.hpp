@@ -21,6 +21,8 @@ class KakouneFrameStateManager
     std::optional<FrameState> getNextFrameState();
 
   private:
+    void onRequest(const IncomingRequest& request);
+
     std::shared_ptr<KakouneClientProcess> m_process;
 
     FrameState m_next_frame_state;
