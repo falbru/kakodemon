@@ -4,6 +4,9 @@
 #include "face.hpp"
 #include "nlohmann/json.hpp"
 
+namespace kakoune
+{
+
 struct Atom
 {
     Face face;
@@ -12,5 +15,7 @@ struct Atom
 
 void to_json(nlohmann::json &j, const Atom &atom);
 void from_json(const nlohmann::json &j, Atom &atom);
+
+} // namespace kakoune
 
 #endif

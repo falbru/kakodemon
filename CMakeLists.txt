@@ -28,6 +28,7 @@ set(SRC
     src/kakoune/line.cpp
     src/kakoune/atom.cpp
     src/kakoune/face.cpp
+    src/kakoune/color.cpp
     vendor/glad/src/glad.c
 )
 

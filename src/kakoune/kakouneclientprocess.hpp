@@ -26,7 +26,8 @@ enum class IncomingRequestType
 
 struct DrawRequestData
 {
-    std::vector<Line> lines;
+    std::vector<kakoune::Line> lines;
+    kakoune::Face default_face;
 };
 
 struct RefreshRequestData

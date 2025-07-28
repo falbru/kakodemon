@@ -9,6 +9,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
+#include "kakoune/face.hpp"
 #include "kakoune/line.hpp"
 #include "opengl.hpp"
 #include <ft2build.h>
@@ -29,16 +30,18 @@ class KakouneContentView
     KakouneContentView();
 
     void init(int width, int height);
-    void render(const std::vector<Line> &lines, float x, float y);
+    void render(const std::vector<kakoune::Line> &lines, const kakoune::Face &default_face, float x, float y);
     void onWindowResize(int width, int height);
 
     int getCharWidth();
     int getCharHeight();
 
   private:
-    void renderLine(const Line &line, float x, float y);
+    void renderLine(const kakoune::Line &line, const kakoune::Face &default_face, float x, float y);
+
     unsigned int m_shader_program;
     unsigned int m_vao, m_vbo;
+    unsigned int m_rect_vao, m_rect_vbo;
 
     float m_ascender;
     float m_line_height;

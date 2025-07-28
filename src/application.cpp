@@ -1,4 +1,5 @@
 #include "application.hpp"
+#include "core/color.hpp"
 #include "input/keys.hpp"
 #include "opengl.hpp"
 #include "controller/editorcontroller.hpp"
@@ -86,7 +87,11 @@ void Application::run()
 {
     while (!glfwWindowShouldClose(m_window))
     {
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        if (m_kakoune_client->window_default_face.bg.color_string != "") { // TODO no need to parse everytime. should be done in a controller somehow
+            core::Color background_color = m_kakoune_client->window_default_face.bg.toCoreColor(std::nullopt, false);
+            glClearColor(background_color.r, background_color.g, background_color.b, 1.0f);
+        }
 
         m_editor_controller->update();
 

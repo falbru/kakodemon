@@ -6,6 +6,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include "kakoune/face.hpp"
 #include "line.hpp"
 #include "spdlog/spdlog.h"
 
@@ -149,7 +150,7 @@ std::optional<IncomingRequest> KakouneClientProcess::parseRequest(std::string re
     if (method == "draw")
     {
         parsed_request.type = IncomingRequestType::DRAW;
-        parsed_request.data = DrawRequestData{params[0].get<std::vector<Line>>()};
+        parsed_request.data = DrawRequestData{params[0].get<std::vector<kakoune::Line>>(), params[1].get<kakoune::Face>()};
         return parsed_request;
     }
     if (method == "refresh")

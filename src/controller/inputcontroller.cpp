@@ -87,7 +87,5 @@ std::string InputController::keyEventToKakouneKey(const KeyEvent& event) {
         result = key_name;
     }
 
-    spdlog::info("KEY: {}", result);
-
     return result;
 }

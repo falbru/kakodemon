@@ -5,26 +5,43 @@
 #include <freetype/freetype.h>
 #include <glm/mat4x4.hpp>
 
-const char *vertexShaderSource = "#version 330 core\n"
-                                 "layout (location = 0) in vec4 vertex; // <vec2 pos, vec2 tex>\n"
-                                 "out vec2 TexCoords;\n"
-                                 "uniform mat4 projection;\n"
-                                 "void main()\n"
-                                 "{\n"
-                                 "gl_Position = projection * vec4(vertex.xy, 0.0, 1.0);\n"
-                                 "TexCoords = vertex.zw;\n"
-                                 "}\n";
+const char *vertexShaderSource = R"(
+#version 330 core
+layout (location = 0) in vec2 position;
+layout (location = 1) in vec2 texCoords;
+uniform int renderMode; // 0 = rectangle, 1 = text
+out vec2 TexCoords;
+uniform mat4 projection;
 
-const char *fragmentShaderSource = "#version 330 core\n"
-                                   "in vec2 TexCoords;\n"
-                                   "out vec4 color;\n"
-                                   "uniform sampler2D text;\n"
-                                   "uniform vec3 textColor;\n"
-                                   "void main()\n"
-                                   "{    \n"
-                                   "    vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, TexCoords).r);\n"
-                                   "    color = vec4(textColor, 1.0) * sampled;\n"
-                                   "} \n";
+void main()
+{
+    gl_Position = projection * vec4(position, 0.0, 1.0);
+    TexCoords = texCoords;
+}
+)";
+
+const char *fragmentShaderSource = R"(
+#version 330 core
+in vec2 TexCoords;
+out vec4 color;
+
+uniform sampler2D text;
+uniform vec4 textColor;
+uniform vec4 rectColor;
+uniform int renderMode; // 0 = rectangle, 1 = text
+
+void main()
+{
+   if (renderMode == 0) {
+       // Rectangle rendering
+       color = rectColor;
+   } else {
+       // Text rendering
+       vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, TexCoords).r);
+       color = textColor * sampled;
+   }
+}
+)";
 
 KakouneContentView::KakouneContentView() : m_shader_program(0), m_vao(0), m_vbo(0)
 {
@@ -128,64 +145,108 @@ void KakouneContentView::init(int width, int height)
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // After your existing VAO setup, add:
+    glGenVertexArrays(1, &m_rect_vao);
+    glGenBuffers(1, &m_rect_vbo);
+    glBindVertexArray(m_rect_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, m_rect_vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 2, NULL, GL_DYNAMIC_DRAW); // 6 vertices, 2 floats each
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    // Don't enable attribute 1 for rectangles
     glBindVertexArray(0);
     // set up vertex data (an
 }
 
-void KakouneContentView::renderLine(const Line &line, float x, float y)
+void KakouneContentView::renderLine(const kakoune::Line &line, const kakoune::Face& default_face, float x, float y)
 {
     float scale = 1.0f;
 
-    std::string text;
     for (auto atom : line.atoms)
     {
-        text += atom.contents;
-    }
+        auto color = atom.face.fg.toCoreColor(default_face.fg, true);
+        glUniform4f(glGetUniformLocation(m_shader_program, "textColor"), color.r, color.g, color.b, color.a);
+        std::string text = atom.contents;
 
-    // iterate through all characters
-    std::string::const_iterator c;
-    for (c = text.begin(); c != text.end(); c++)
-    {
-        Character ch = Characters[*c];
+        std::string::const_iterator c;
+        float start_x = x;
 
-        float xpos = x + ch.Bearing.x;
-        float ypos = y + m_ascender - ch.Bearing.y;
+        glUniform1i(glGetUniformLocation(m_shader_program, "renderMode"), 1);
+        for (c = text.begin(); c != text.end(); c++)
+        {
+            Character ch = Characters[*c];
+            // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
+            x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64)
+        }
 
-        float w = ch.Size.x * scale;
-        float h = ch.Size.y * scale;
-        // update VBO for each character
-        float vertices[6][4] = {
-            {xpos, ypos, 0.0f, 0.0f}, {xpos, ypos + h, 0.0f, 1.0f},     {xpos + w, ypos + h, 1.0f, 1.0f},
+        // render background
+        float h = m_line_height;
+        float vertices[6][2] = {
+            {start_x, y}, {start_x, y + h},     {x, y + h},
+            {start_x, y}, {x, y + h}, {x, y}};
+        // float vertices[6][2] = {
+        //     {0.0f, 0.0f}, {0.0f, 0.0f + 20.0f},     {20.0f, 0.0f + 20.0f},
+        //     {0.0f, 0.0f}, {20.0f, 0.0f + 20.0f}, {20.0f, 0.0f}};
 
-            {xpos, ypos, 0.0f, 0.0f}, {xpos + w, ypos + h, 1.0f, 1.0f}, {xpos + w, ypos, 1.0f, 0.0f}};
-        // render glyph texture over quad
-        glBindTexture(GL_TEXTURE_2D, ch.TextureID);
-        // update content of VBO memory
-        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+        glBindVertexArray(m_rect_vao);
+        color = atom.face.bg.toCoreColor(default_face.bg, false);
+        glUniform4f(glGetUniformLocation(m_shader_program, "rectColor"), color.r, color.g, color.b, 1.0f);
+        glUniform1i(glGetUniformLocation(m_shader_program, "renderMode"), 0);
+        glBindBuffer(GL_ARRAY_BUFFER, m_rect_vbo);  // Use m_rect_vbo instead of m_vbo
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        // render quad
         glDrawArrays(GL_TRIANGLES, 0, 6);
-        // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-        x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64)
+
+        glUniform1i(glGetUniformLocation(m_shader_program, "renderMode"), 1);
+        x = start_x;
+        for (c = text.begin(); c != text.end(); c++)
+        {
+            if (*c == '\n') continue; // TODO clean way of stripping the last newline?
+
+            Character ch = Characters[*c];
+
+            float xpos = x + ch.Bearing.x;
+            float ypos = y + m_ascender - ch.Bearing.y;
+
+            float w = ch.Size.x * scale;
+            float h = ch.Size.y * scale;
+            // update VBO for each character
+            float vertices[6][4] = {
+                {xpos, ypos, 0.0f, 0.0f}, {xpos, ypos + h, 0.0f, 1.0f},     {xpos + w, ypos + h, 1.0f, 1.0f},
+
+                {xpos, ypos, 0.0f, 0.0f}, {xpos + w, ypos + h, 1.0f, 1.0f}, {xpos + w, ypos, 1.0f, 0.0f}};
+            glBindVertexArray(m_vao);
+            // render glyph texture over quad
+            glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+            // update content of VBO memory
+            glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            // render quad
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
+            x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64)
+        }
     }
 }
 
-void KakouneContentView::render(const std::vector<Line> &lines, float x, float y)
+void KakouneContentView::render(const std::vector<kakoune::Line> &lines, const kakoune::Face& default_face, float x, float y)
 {
     glm::vec3 color = glm::vec3(1.0f);
 
     glUseProgram(m_shader_program);
-    glUniform3f(glGetUniformLocation(m_shader_program, "textColor"), color.x, color.y, color.z);
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(m_vao);
 
     float y_it = y;
     for (auto line : lines)
     {
-        renderLine(line, x, y_it);
+        renderLine(line, default_face, x, y_it);
         y_it += m_line_height;
     }
 

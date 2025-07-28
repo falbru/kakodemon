@@ -23,9 +23,10 @@ void EditorController::update()
     auto frame_state = m_frame_state_manager->getNextFrameState();
     if (frame_state.has_value()) {
         m_kakoune_client->window_content = frame_state.value().draw.lines;
+        m_kakoune_client->window_default_face = frame_state.value().draw.default_face;
     }
 
-    m_kakoune_content_view->render(m_kakoune_client->window_content, 0.0f, 0.0f);
+    m_kakoune_content_view->render(m_kakoune_client->window_content, m_kakoune_client->window_default_face, 0.0f, 0.0f);
 }
 
 void EditorController::onWindowResize(int width, int height) {
