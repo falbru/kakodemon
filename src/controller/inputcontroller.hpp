@@ -1,7 +1,7 @@
 #ifndef INPUTCONTROLLER_HPP_INCLUDED
 #define INPUTCONTROLLER_HPP_INCLUDED
 
-#include "input/keys.hpp"
+#include "core/keys.hpp"
 #include "kakoune/kakouneclientprocess.hpp"
 #include "model/kakouneclient.hpp"
 #include <memory>

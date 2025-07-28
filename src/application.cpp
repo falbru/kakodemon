@@ -1,6 +1,6 @@
 #include "application.hpp"
 #include "core/color.hpp"
-#include "input/keys.hpp"
+#include "core/keys.hpp"
 #include "controller/editorcontroller.hpp"
 #include "controller/inputcontroller.hpp"
 #include "model/kakouneclient.hpp"
