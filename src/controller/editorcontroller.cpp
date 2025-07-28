@@ -29,8 +29,8 @@ void EditorController::update()
 }
 
 void EditorController::onWindowResize(int width, int height) {
-    int rows = height / m_kakoune_content_view->getCharHeight();
-    int columns = width / m_kakoune_content_view->getCharWidth();
+    int rows = height / m_kakoune_content_view->getCellHeight();
+    int columns = width / m_kakoune_content_view->getCellWidth();
 
     if (rows != m_rows || columns != m_columns) {
         m_kakoune_process->sendRequest(OutgoingRequest{

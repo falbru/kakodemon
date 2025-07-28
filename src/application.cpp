@@ -1,10 +1,10 @@
 #include "application.hpp"
 #include "core/color.hpp"
 #include "input/keys.hpp"
-#include "opengl.hpp"
 #include "controller/editorcontroller.hpp"
 #include "controller/inputcontroller.hpp"
 #include "model/kakouneclient.hpp"
+#include "opengl/renderer.hpp"
 #include "view/kakounecontentview.hpp"
 #include <memory>
 
@@ -70,6 +70,9 @@ void Application::initMVC() {
     int width, height;
     glfwGetWindowSize(m_window, &width, &height);
 
+    m_renderer = std::make_shared<opengl::Renderer>();
+    m_renderer->init(width, height);
+
     m_editor_controller = std::make_shared<EditorController>();
     m_input_controller = std::make_shared<InputController>();
     m_kakoune_client = std::make_shared<KakouneClient>();
@@ -77,10 +80,10 @@ void Application::initMVC() {
     m_kakoune_content_view = std::make_shared<KakouneContentView>();
 
     m_input_controller->init(m_kakoune_client, m_kakoune_process);
-    m_kakoune_content_view->init(width, height);
+    m_kakoune_content_view->init(m_renderer);
     m_kakoune_process->start();
     m_editor_controller->init(m_kakoune_client, m_kakoune_process, m_kakoune_content_view);
-    m_editor_controller->onWindowResize(width, height);
+    m_editor_controller->onWindowResize(width, height); // TODO move to init
 }
 
 void Application::run()
@@ -103,7 +106,7 @@ void Application::run()
 void Application::onWindowResize(int width, int height)
 {
     glViewport(0, 0, width, height);
-    m_kakoune_content_view->onWindowResize(width, height);
+    m_renderer->onWindowResize(width, height);
     m_editor_controller->onWindowResize(width, height);
 }
 

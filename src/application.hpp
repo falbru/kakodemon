@@ -6,7 +6,8 @@
 #include "controller/editorcontroller.hpp"
 #include "controller/inputcontroller.hpp"
 #include "model/kakouneclient.hpp"
-#include "opengl.hpp"
+#include "opengl/opengl.hpp"
+#include "opengl/renderer.hpp"
 #include "view/kakounecontentview.hpp"
 
 class Application
@@ -36,6 +37,8 @@ class Application
     std::shared_ptr<KakouneClient> m_kakoune_client;
     std::shared_ptr<KakouneClientProcess> m_kakoune_process;
     std::shared_ptr<KakouneContentView> m_kakoune_content_view;
+
+    std::shared_ptr<opengl::Renderer> m_renderer;
 
     const int DEFAULT_WINDOW_WIDTH = 640;
     const int DEFAULT_WINDOW_HEIGHT = 480;

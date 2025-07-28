@@ -29,6 +29,9 @@ set(SRC
     src/kakoune/atom.cpp
     src/kakoune/face.cpp
     src/kakoune/color.cpp
+    src/opengl/renderer.cpp
+    src/opengl/shaderprogram.cpp
+    src/opengl/font.cpp
     vendor/glad/src/glad.c
 )
 

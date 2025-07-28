@@ -1,8 +1,6 @@
 #ifndef KAKOUNECONTENTVIEW_HPP_INCLUDED
 #define KAKOUNECONTENTVIEW_HPP_INCLUDED
 
-#include <map>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -11,41 +9,28 @@
 
 #include "kakoune/face.hpp"
 #include "kakoune/line.hpp"
-#include "opengl.hpp"
+#include "opengl/font.hpp"
+#include "opengl/opengl.hpp"
+#include "opengl/renderer.hpp"
 #include <ft2build.h>
 #include <vector>
 #include FT_FREETYPE_H
-
-struct Character
-{
-    unsigned int TextureID;
-    glm::ivec2 Size;
-    glm::ivec2 Bearing;
-    long Advance;
-};
 
 class KakouneContentView
 {
   public:
     KakouneContentView();
 
-    void init(int width, int height);
-    void render(const std::vector<kakoune::Line> &lines, const kakoune::Face &default_face, float x, float y);
-    void onWindowResize(int width, int height);
+    void init(std::shared_ptr<opengl::Renderer> renderer);
 
-    int getCharWidth();
-    int getCharHeight();
+    void render(const std::vector<kakoune::Line> &lines, const kakoune::Face &default_face, float x, float y);
+
+    int getCellWidth();
+    int getCellHeight();
 
   private:
-    void renderLine(const kakoune::Line &line, const kakoune::Face &default_face, float x, float y);
-
-    unsigned int m_shader_program;
-    unsigned int m_vao, m_vbo;
-    unsigned int m_rect_vao, m_rect_vbo;
-
-    float m_ascender;
-    float m_line_height;
-    std::map<char, Character> Characters;
+    std::shared_ptr<opengl::Renderer> m_renderer;
+    opengl::Font m_font;
 };
 
 #endif
