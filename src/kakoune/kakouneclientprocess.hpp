@@ -77,7 +77,7 @@ class KakouneClientProcess
     void start();
 
     void pollForRequests();
-    void setRequestCallback(std::function<void(const IncomingRequest&)> callback);
+    void setRequestCallback(std::function<void(const IncomingRequest &)> callback);
 
     void sendRequest(const OutgoingRequest &request);
 
@@ -92,7 +92,7 @@ class KakouneClientProcess
     pollfd m_pollfd;
     char m_buffer[8192];
 
-    std::function<void(const IncomingRequest&)> m_request_callback;
+    std::function<void(const IncomingRequest &)> m_request_callback;
     std::string m_request_remainder;
 };
 

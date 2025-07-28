@@ -14,12 +14,11 @@ void EditorController::init(std::shared_ptr<KakouneClient> kakoune_client,
     m_kakoune_content_view = kakoune_content_view;
 
     m_frame_state_manager = std::make_unique<KakouneFrameStateManager>(m_kakoune_process);
+    m_frame_state_manager->start();
 }
 
 void EditorController::update()
 {
-    m_frame_state_manager->update();
-
     auto frame_state = m_frame_state_manager->getNextFrameState();
     if (frame_state.has_value()) {
         m_kakoune_client->window_content = frame_state.value().draw.lines;
