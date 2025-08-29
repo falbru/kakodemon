@@ -4,6 +4,8 @@
 #include <memory>
 #include <vector>
 
+#include "core/alignment.hpp"
+#include "core/color.hpp"
 #include "kakoune/face.hpp"
 #include "kakoune/line.hpp"
 #include "opengl/font.hpp"
@@ -21,10 +23,15 @@ class Renderer
     void onWindowResize(int width, int height);
 
     void renderLine(Font &font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y) const;
+    void renderLine(Font &font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y,
+                    const core::Alignment &alignment) const;
     void renderLines(Font &font, const std::vector<kakoune::Line> &lines, const kakoune::Face &default_face, float x,
                      float y) const;
 
   private:
+    void _renderLine(Font &font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y,
+                     const core::Alignment &alignment) const;
+    void _renderRect(const core::Color color, float x, float y, float width, float height) const;
     std::unique_ptr<ShaderProgram> m_shader_program;
 
     unsigned int m_text_vao, m_text_vbo;

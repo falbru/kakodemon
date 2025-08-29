@@ -23,6 +23,8 @@ set(SRC
     src/controller/editorcontroller.cpp
     src/controller/inputcontroller.cpp
     src/view/kakounecontentview.cpp
+    src/view/statusbar.cpp
+    src/core/alignment.cpp
     src/kakoune/kakouneframestatemanager.cpp
     src/kakoune/kakouneclientprocess.cpp
     src/kakoune/line.cpp

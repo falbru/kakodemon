@@ -11,6 +11,7 @@
 struct FrameState
 {
     DrawRequestData draw;
+    DrawStatusRequestData draw_status;
 };
 
 class KakouneFrameStateManager

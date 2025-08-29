@@ -1,6 +1,8 @@
 #include "renderer.hpp"
+#include "core/alignment.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "opengl/font.hpp"
+#include "spdlog/spdlog.h"
 
 opengl::Renderer::Renderer() {
 }
@@ -39,45 +41,92 @@ void opengl::Renderer::onWindowResize(int width, int height) {
 }
 
 void opengl::Renderer::renderLine(Font& font, const kakoune::Line& line, const kakoune::Face& default_face, float x, float y) const {
-    for (auto atom : line.atoms)
+    renderLine(font, line, default_face, x, y, core::Alignment());
+}
+
+void opengl::Renderer::renderLine(Font &font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y, const core::Alignment& alignment) const
+{
+    m_shader_program->use();
+    glBindVertexArray(m_text_vao);
+
+    _renderLine(font, line, default_face, x, y, alignment);
+
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void opengl::Renderer::renderLines(Font& font, const std::vector<kakoune::Line>& lines, const kakoune::Face& default_face, float x, float y) const {
+    m_shader_program->use();
+    glBindVertexArray(m_text_vao);
+
+    float y_it = y;
+    for (auto line : lines)
     {
-        auto color = atom.face.fg.toCoreColor(default_face.fg, true);
-        m_shader_program->setVector4f("textColor", color.r, color.g, color.b, color.a);
-        std::string text = atom.contents;
+        _renderLine(font, line, default_face, x, y_it, core::Alignment());
+        y_it += font.getLineHeight();
+    }
 
-        std::string::const_iterator c;
-        float start_x = x;
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
 
-        for (c = text.begin(); c != text.end(); c++)
-        {
-            auto ch = font.getCharacter(*c);
-            x += ch.Advance >> 6;
+void opengl::Renderer::_renderLine(Font& font, const kakoune::Line& line, const kakoune::Face& default_face, float x, float y, const core::Alignment& alignment) const {
+    std::string::const_iterator c;
+
+    float start_x = x;
+    float start_y = y;
+
+    if (alignment.h == core::Alignment::HorizontalAlignment::Right) {
+        float width = 0;
+        for (auto atom : line.atoms) {
+            for (c = atom.contents.begin(); c != atom.contents.end(); c++) {
+                auto ch = font.getCharacter(*c);
+                width += ch.Advance >> 6;
+            }
         }
 
-        // render background
-        float h = font.getLineHeight();
-        float vertices[6][2] = {
-            {start_x, y}, {start_x, y + h},     {x, y + h},
-            {start_x, y}, {x, y + h}, {x, y}};
+        start_x -= width;
+    }
 
-        glBindVertexArray(m_rect_vao);
-        color = atom.face.bg.toCoreColor(default_face.bg, false);
-        m_shader_program->setVector4f("rectColor", color.r, color.g, color.b, 1.0f);
-        m_shader_program->setInt("renderType", 1);
-        glBindBuffer(GL_ARRAY_BUFFER, m_rect_vbo);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+    if (alignment.v == core::Alignment::VerticalAlignment::Bottom) {
+        start_y -= font.getLineHeight();
+    }
 
+    float x_it = start_x;
+    float y_it = start_y;
+    for (auto atom : line.atoms)
+    {
+        std::string text = atom.contents;
+
+
+        float height = font.getLineHeight();
+        float width = 0;
+        for (c = text.begin(); c != text.end(); c++)
+        {
+            if (!font.hasCharacter(*c)) {
+                font.loadCharacter(*c);
+            }
+            auto ch = font.getCharacter(*c);
+            width += ch.Advance >> 6;
+        }
+
+        // Background color
+        _renderRect(atom.face.bg.toCoreColor(default_face.bg, false), x_it, y_it, width, height);
+
+        auto color = atom.face.fg.toCoreColor(default_face.fg, true);
+        m_shader_program->setVector4f("textColor", color.r, color.g, color.b, color.a);
         m_shader_program->setInt("renderType", 0);
-        x = start_x;
         for (c = text.begin(); c != text.end(); c++)
         {
             if (*c == '\n') continue; // TODO clean way of stripping the last newline?
 
+            if (!font.hasCharacter(*c)) {
+                font.loadCharacter(*c);
+            }
             auto ch = font.getCharacter(*c);
 
-            float xpos = x + ch.Bearing.x;
-            float ypos = y + font.getAscender() - ch.Bearing.y;
+            float xpos = x_it + ch.Bearing.x;
+            float ypos = y_it + font.getAscender() - ch.Bearing.y;
 
             float w = ch.Size.x;
             float h = ch.Size.y;
@@ -96,22 +145,20 @@ void opengl::Renderer::renderLine(Font& font, const kakoune::Line& line, const k
             // render quad
             glDrawArrays(GL_TRIANGLES, 0, 6);
             // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-            x += ch.Advance >> 6; // bitshift by 6 to get value in pixels (2^6 = 64)
+            x_it += ch.Advance >> 6; // bitshift by 6 to get value in pixels (2^6 = 64)
         }
     }
 }
 
-void opengl::Renderer::renderLines(Font& font, const std::vector<kakoune::Line>& lines, const kakoune::Face& default_face, float x, float y) const {
-    m_shader_program->use();
-    glBindVertexArray(m_text_vao);
+void opengl::Renderer::_renderRect(const core::Color color, float x, float y, float width, float height) const {
+    float vertices[6][2] = {
+        {x, y}, {x, y + height},     {x + width, y + height},
+        {x, y}, {x + width, y + height}, {x + width, y}};
 
-    float y_it = y;
-    for (auto line : lines)
-    {
-        renderLine(font, line, default_face, x, y_it);
-        y_it += font.getLineHeight();
-    }
-
-    glBindVertexArray(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindVertexArray(m_rect_vao);
+    m_shader_program->setVector4f("rectColor", color.r, color.g, color.b, 1.0f);
+    m_shader_program->setInt("renderType", 1);
+    glBindBuffer(GL_ARRAY_BUFFER, m_rect_vbo);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }

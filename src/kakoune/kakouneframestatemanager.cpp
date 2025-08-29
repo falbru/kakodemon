@@ -1,4 +1,5 @@
 #include "kakouneframestatemanager.hpp"
+#include "kakoune/kakouneclientprocess.hpp"
 
 KakouneFrameStateManager::KakouneFrameStateManager(std::shared_ptr<KakouneClientProcess> process)
     : m_process(process), m_next_frame_state_ready(false), m_running(false) {
@@ -42,6 +43,10 @@ void KakouneFrameStateManager::onRequest(const IncomingRequest& request)
     {
     case IncomingRequestType::DRAW: {
         m_next_frame_state.draw = std::get<DrawRequestData>(request.data);
+        break;
+    }
+    case IncomingRequestType::DRAW_STATUS: {
+        m_next_frame_state.draw_status = std::get<DrawStatusRequestData>(request.data);
         break;
     }
     case IncomingRequestType::REFRESH: {

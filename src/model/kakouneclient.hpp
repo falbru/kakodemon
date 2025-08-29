@@ -9,6 +9,9 @@ struct KakouneClient
 {
     std::vector<kakoune::Line> window_content;
     kakoune::Face window_default_face;
+    kakoune::Line status_line;
+    kakoune::Line mode_line;
+    kakoune::Face status_default_face;
     std::unique_ptr<KakouneClientProcess> process;
 };
 

@@ -30,12 +30,19 @@ struct DrawRequestData
     kakoune::Face default_face;
 };
 
+struct DrawStatusRequestData
+{
+    kakoune::Line status_line;
+    kakoune::Line mode_line;
+    kakoune::Face default_face;
+};
+
 struct RefreshRequestData
 {
     bool force;
 };
 
-using IncomingRequestData = std::variant<DrawRequestData, RefreshRequestData>;
+using IncomingRequestData = std::variant<DrawRequestData, DrawStatusRequestData, RefreshRequestData>;
 
 struct IncomingRequest
 {

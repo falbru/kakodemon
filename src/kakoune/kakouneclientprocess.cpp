@@ -146,6 +146,12 @@ std::optional<IncomingRequest> KakouneClientProcess::parseRequest(std::string re
         parsed_request.data = DrawRequestData{params[0].get<std::vector<kakoune::Line>>(), params[1].get<kakoune::Face>()};
         return parsed_request;
     }
+    if (method == "draw_status")
+    {
+        parsed_request.type = IncomingRequestType::DRAW_STATUS;
+        parsed_request.data = DrawStatusRequestData{params[0].get<kakoune::Line>(), params[1].get<kakoune::Line>(), params[2].get<kakoune::Face>()};
+        return parsed_request;
+    }
     if (method == "refresh")
     {
         parsed_request.type = IncomingRequestType::REFRESH;
