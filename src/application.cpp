@@ -6,6 +6,7 @@
 #include "model/kakouneclient.hpp"
 #include "opengl/renderer.hpp"
 #include "view/kakounecontentview.hpp"
+#include "view/menu.hpp"
 #include "view/statusbar.hpp"
 #include <memory>
 
@@ -80,12 +81,14 @@ void Application::initMVC() {
     m_kakoune_process = std::make_shared<KakouneClientProcess>("default");
     m_kakoune_content_view = std::make_shared<KakouneContentView>();
     m_status_bar = std::make_shared<StatusBarView>();
+    m_menu = std::make_shared<MenuView>();
 
     m_input_controller->init(m_kakoune_client, m_kakoune_process);
     m_kakoune_content_view->init(m_renderer);
     m_status_bar->init(m_renderer);
+    m_menu->init(m_renderer);
     m_kakoune_process->start();
-    m_editor_controller->init(m_kakoune_client, m_kakoune_process, m_kakoune_content_view, m_status_bar);
+    m_editor_controller->init(m_kakoune_client, m_kakoune_process, m_kakoune_content_view, m_status_bar, m_menu);
     m_editor_controller->onWindowResize(width, height); // TODO move to init
 }
 

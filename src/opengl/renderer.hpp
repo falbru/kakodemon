@@ -22,6 +22,7 @@ class Renderer
     void init(int width, int height);
     void onWindowResize(int width, int height);
 
+    void renderRect(const core::Color color, float x, float y, float width, float height) const;
     void renderLine(Font &font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y) const;
     void renderLine(Font &font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y,
                     const core::Alignment &alignment) const;

@@ -12,6 +12,8 @@ struct FrameState
 {
     DrawRequestData draw;
     DrawStatusRequestData draw_status;
+    std::optional<MenuShowData> menu;
+    int menu_selected_index;
 };
 
 class KakouneFrameStateManager

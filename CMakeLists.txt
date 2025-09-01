@@ -24,9 +24,12 @@ set(SRC
     src/controller/inputcontroller.cpp
     src/view/kakounecontentview.cpp
     src/view/statusbar.cpp
+    src/view/menu.cpp
     src/core/alignment.cpp
     src/kakoune/kakouneframestatemanager.cpp
     src/kakoune/kakouneclientprocess.cpp
+    src/kakoune/coord.cpp
+    src/kakoune/menustyle.cpp
     src/kakoune/line.cpp
     src/kakoune/atom.cpp
     src/kakoune/face.cpp

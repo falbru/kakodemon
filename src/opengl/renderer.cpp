@@ -55,6 +55,15 @@ void opengl::Renderer::renderLine(Font &font, const kakoune::Line &line, const k
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void opengl::Renderer::renderRect(const core::Color color, float x, float y, float width, float height) const
+{
+    m_shader_program->use();
+
+    _renderRect(color, x, y, width, height);
+
+    glBindVertexArray(0);
+}
+
 void opengl::Renderer::renderLines(Font& font, const std::vector<kakoune::Line>& lines, const kakoune::Face& default_face, float x, float y) const {
     m_shader_program->use();
     glBindVertexArray(m_text_vao);

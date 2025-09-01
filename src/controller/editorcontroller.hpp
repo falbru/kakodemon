@@ -7,6 +7,7 @@
 #include "kakoune/kakouneframestatemanager.hpp"
 #include "model/kakouneclient.hpp"
 #include "view/kakounecontentview.hpp"
+#include "view/menu.hpp"
 #include "view/statusbar.hpp"
 
 class EditorController // TODO rename to KakouneContentViewController or something?
@@ -15,7 +16,7 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
     EditorController();
 
     void init(std::shared_ptr<KakouneClient> kakoune_client, std::shared_ptr<KakouneClientProcess> kakoune_process,
-              std::shared_ptr<KakouneContentView> kakoune_content_view, std::shared_ptr<StatusBarView> status_bar_view);
+              std::shared_ptr<KakouneContentView> kakoune_content_view, std::shared_ptr<StatusBarView> status_bar_view, std::shared_ptr<MenuView> menu_view);
     void update();
 
     void onWindowResize(int width, int height);
@@ -25,6 +26,7 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
     std::shared_ptr<KakouneClientProcess> m_kakoune_process;
     std::shared_ptr<KakouneContentView> m_kakoune_content_view;
     std::shared_ptr<StatusBarView> m_status_bar_view;
+    std::shared_ptr<MenuView> m_menu_view;
 
     std::unique_ptr<KakouneFrameStateManager> m_frame_state_manager;
 
