@@ -44,6 +44,7 @@ void Application::initGLFW()
     }
 
     glfwMakeContextCurrent(m_window);
+    glfwSwapInterval( 0 );
     glfwSetWindowUserPointer(m_window, this);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
