@@ -24,7 +24,7 @@ void MenuView::render(const KakouneClient& kakoune_client,
     float y_it = menu_y;
     float width_it = menu_width;
 
-    m_renderer->renderRect(kakoune_client.menu_face.bg.toCoreColor(kakoune_client.window_default_face.bg, false), x_it, y_it, width_it, height / 2);
+    m_renderer->renderRectWithShadow(kakoune_client.menu_face.bg.toCoreColor(kakoune_client.window_default_face.bg, false), x_it, y_it, width_it, height / 2, 15.0f);
 
     x_it += padding;
     y_it += padding;

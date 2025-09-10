@@ -28,13 +28,31 @@ uniform vec4 textColor;
 uniform vec4 rectColor;
 uniform int renderType;
 
+uniform vec4 rectBounds;
+uniform float shadowRadius; // Shadow blur radius in pixels
+
+float sdBox(vec2 p, vec2 b) {
+    vec2 d = abs(p) - b;
+    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+
 void main()
 {
    if (renderType == 0) { // Text
        vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, TexCoords).r);
        color = textColor * sampled;
-   } else { // Rectangle
+   } else if (renderType == 1) { // Rectangle
        color = rectColor;
+   } else { // Shadow
+      vec2 rectPos = rectBounds.xy + rectBounds.zw * 0.5;
+      vec2 rectSize = rectBounds.zw;
+      vec2 pixelPos = gl_FragCoord.xy;
+      vec2 localPos = pixelPos - rectPos;
+
+      float dist = sdBox(localPos, rectSize * 0.5);
+      float shadowAlpha = 1.0 - smoothstep(0.0, shadowRadius, dist);
+
+      color = vec4(vec3(0.0), 0.5 * shadowAlpha);
    }
 }
 )";
@@ -65,7 +83,7 @@ bool opengl::ShaderProgram::compile() {
     if (!success)
     {
         glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        spdlog::error("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED:", infoLog);
+        spdlog::error("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED: {}", infoLog);
         return false;
     }
     // link shaders
@@ -92,6 +110,11 @@ bool opengl::ShaderProgram::compile() {
 
 void opengl::ShaderProgram::use() {
     glUseProgram(m_shader_program);
+}
+
+void opengl::ShaderProgram::setFloat(const std::string &name, float value, bool useShader) {
+    if (useShader) use();
+    glUniform1f(glGetUniformLocation(m_shader_program, name.c_str()), value);
 }
 
 void opengl::ShaderProgram::setInt(const std::string& name, int value, bool useShader) {

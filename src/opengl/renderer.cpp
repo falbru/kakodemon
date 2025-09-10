@@ -38,6 +38,8 @@ void opengl::Renderer::init(int width, int height) {
 void opengl::Renderer::onWindowResize(int width, int height) {
     glm::mat4 projection = glm::ortho(0.0f, (float)width, (float)height, 0.0f);
     m_shader_program->setMatrix4("projection", projection, true);
+    m_screen_width = width;
+    m_screen_height = height;
 }
 
 void opengl::Renderer::renderLine(Font& font, const kakoune::Line& line, const kakoune::Face& default_face, float x, float y) const {
@@ -59,6 +61,16 @@ void opengl::Renderer::renderRect(const core::Color color, float x, float y, flo
 {
     m_shader_program->use();
 
+    _renderRect(color, x, y, width, height);
+
+    glBindVertexArray(0);
+}
+
+void opengl::Renderer::renderRectWithShadow(const core::Color color, float x, float y, float width, float height, float shadowRadius) const
+{
+    m_shader_program->use();
+
+    _renderShadow(color, x, y, width, height, shadowRadius);
     _renderRect(color, x, y, width, height);
 
     glBindVertexArray(0);
@@ -157,6 +169,20 @@ void opengl::Renderer::_renderLine(Font& font, const kakoune::Line& line, const 
             x_it += ch.Advance >> 6; // bitshift by 6 to get value in pixels (2^6 = 64)
         }
     }
+}
+
+void opengl::Renderer::_renderShadow(const core::Color color, float x, float y, float width, float height, float shadowRadius) const {
+    float vertices[6][2] = {
+        {x - shadowRadius, y - shadowRadius}, {x - shadowRadius, y + height + shadowRadius},     {x + width + shadowRadius, y + height + shadowRadius},
+        {x - shadowRadius, y - shadowRadius}, {x + width + shadowRadius, y + height + shadowRadius}, {x + width + shadowRadius, y - shadowRadius}};
+
+    glBindVertexArray(m_rect_vao);
+    m_shader_program->setInt("renderType", 2);
+    m_shader_program->setFloat("shadowRadius", shadowRadius);
+    m_shader_program->setVector4f("rectBounds", x, (float)m_screen_height - y - height, width, height);
+    glBindBuffer(GL_ARRAY_BUFFER, m_rect_vbo);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void opengl::Renderer::_renderRect(const core::Color color, float x, float y, float width, float height) const {
