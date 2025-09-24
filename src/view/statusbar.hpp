@@ -11,8 +11,7 @@ class StatusBarView
 
     void init(std::shared_ptr<opengl::Renderer> renderer);
 
-    void render(const kakoune::Line &status, const kakoune::Line &mode, const kakoune::Face &default_face, float width,
-                float height);
+    void render(const kakoune::Line &mode, const kakoune::Face &default_face, float width, float height);
 
     int getCellWidth();
     int getCellHeight();

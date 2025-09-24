@@ -50,7 +50,6 @@ struct MenuShowData
 
 struct MenuHideData
 {
-
 };
 
 struct MenuSelectData
@@ -63,7 +62,8 @@ struct RefreshRequestData
     bool force;
 };
 
-using IncomingRequestData = std::variant<DrawRequestData, DrawStatusRequestData, RefreshRequestData, MenuShowData, MenuHideData, MenuSelectData>;
+using IncomingRequestData = std::variant<DrawRequestData, DrawStatusRequestData, RefreshRequestData, MenuShowData,
+                                         MenuHideData, MenuSelectData>;
 
 struct IncomingRequest
 {

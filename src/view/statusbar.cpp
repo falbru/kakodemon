@@ -10,9 +10,8 @@ void StatusBarView::init(std::shared_ptr<opengl::Renderer> renderer) {
 
 }
 
-void StatusBarView::render(const kakoune::Line &status, const kakoune::Line &mode, const kakoune::Face &default_face, float width, float height) {
+void StatusBarView::render(const kakoune::Line &mode, const kakoune::Face &default_face, float width, float height) {
     m_renderer->renderLine(m_font, mode, default_face, width, height, core::Alignment::bottomRight());
-    m_renderer->renderLine(m_font, status, default_face, 0, height, core::Alignment::bottomLeft());
 }
 
 int StatusBarView::getCellWidth() {

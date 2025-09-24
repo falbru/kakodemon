@@ -49,7 +49,7 @@ void EditorController::update()
     }
 
     m_kakoune_content_view->render(m_kakoune_client->window_content, m_kakoune_client->window_default_face, 0.0f, 0.0f);
-    m_status_bar_view->render(m_kakoune_client->status_line, m_kakoune_client->mode_line, m_kakoune_client->status_default_face, m_width, m_height);
+    m_status_bar_view->render(m_kakoune_client->mode_line, m_kakoune_client->status_default_face, m_width, m_height);
     m_menu_view->render(*m_kakoune_client,
                            m_width,
                            m_height);

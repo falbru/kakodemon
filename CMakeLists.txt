@@ -25,6 +25,7 @@ set(SRC
     src/view/kakounecontentview.cpp
     src/view/statusbar.cpp
     src/view/menu.cpp
+    src/view/layoutmanager.cpp
     src/core/alignment.cpp
     src/kakoune/kakouneframestatemanager.cpp
     src/kakoune/kakouneclientprocess.cpp

@@ -16,7 +16,8 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
     EditorController();
 
     void init(std::shared_ptr<KakouneClient> kakoune_client, std::shared_ptr<KakouneClientProcess> kakoune_process,
-              std::shared_ptr<KakouneContentView> kakoune_content_view, std::shared_ptr<StatusBarView> status_bar_view, std::shared_ptr<MenuView> menu_view);
+              std::shared_ptr<KakouneContentView> kakoune_content_view, std::shared_ptr<StatusBarView> status_bar_view,
+              std::shared_ptr<MenuView> menu_view);
     void update();
 
     void onWindowResize(int width, int height);

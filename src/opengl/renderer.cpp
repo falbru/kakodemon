@@ -101,6 +101,9 @@ void opengl::Renderer::_renderLine(Font& font, const kakoune::Line& line, const 
         float width = 0;
         for (auto atom : line.atoms) {
             for (c = atom.contents.begin(); c != atom.contents.end(); c++) {
+                if (!font.hasCharacter(*c)) {
+                    font.loadCharacter(*c);
+                }
                 auto ch = font.getCharacter(*c);
                 width += ch.Advance >> 6;
             }
