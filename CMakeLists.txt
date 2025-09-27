@@ -22,9 +22,11 @@ set(SRC
     src/application.cpp
     src/controller/editorcontroller.cpp
     src/controller/inputcontroller.cpp
+    src/controller/menucontroller.cpp
     src/view/kakounecontentview.cpp
     src/view/statusbar.cpp
-    src/view/menu.cpp
+    src/view/promptmenu.cpp
+    src/view/inlinemenu.cpp
     src/view/layoutmanager.cpp
     src/view/widgets/input.cpp
     src/view/widgets/scrollbar.cpp

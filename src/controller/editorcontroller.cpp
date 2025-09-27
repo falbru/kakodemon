@@ -10,16 +10,13 @@ EditorController::EditorController()
 void EditorController::init(std::shared_ptr<KakouneClient> kakoune_client,
                             std::shared_ptr<KakouneClientProcess> kakoune_process,
                             std::shared_ptr<KakouneContentView> kakoune_content_view,
-                            std::shared_ptr<StatusBarView> status_bar_view,
-                            std::shared_ptr<MenuView> menu_view
-                            )
+                            std::shared_ptr<StatusBarView> status_bar_view)
 {
     m_kakoune_client = kakoune_client;
     m_kakoune_process = kakoune_process;
 
     m_kakoune_content_view = kakoune_content_view;
     m_status_bar_view = status_bar_view;
-    m_menu_view = menu_view;
 
     m_frame_state_manager = std::make_unique<KakouneFrameStateManager>(m_kakoune_process);
     m_frame_state_manager->start();
@@ -51,9 +48,6 @@ void EditorController::update()
 
     m_kakoune_content_view->render(m_kakoune_client->window_content, m_kakoune_client->window_default_face, 0.0f, 0.0f);
     m_status_bar_view->render(m_kakoune_client->mode_line, m_kakoune_client->status_default_face, m_width, m_height);
-    m_menu_view->render(*m_kakoune_client,
-                           m_width,
-                           m_height);
 }
 
 void EditorController::onWindowResize(int width, int height) {
@@ -74,4 +68,12 @@ void EditorController::onWindowResize(int width, int height) {
     m_columns = columns;
     m_width = width;
     m_height = height;
+}
+
+int EditorController::width() const {
+    return m_width;
+}
+
+int EditorController::height() const {
+    return m_height;
 }

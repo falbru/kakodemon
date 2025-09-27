@@ -5,11 +5,13 @@
 
 #include "controller/editorcontroller.hpp"
 #include "controller/inputcontroller.hpp"
+#include "controller/menucontroller.hpp"
 #include "model/kakouneclient.hpp"
 #include "opengl/opengl.hpp"
 #include "opengl/renderer.hpp"
+#include "view/inlinemenu.hpp"
 #include "view/kakounecontentview.hpp"
-#include "view/menu.hpp"
+#include "view/promptmenu.hpp"
 #include "view/statusbar.hpp"
 
 class Application
@@ -36,11 +38,13 @@ class Application
 
     std::shared_ptr<EditorController> m_editor_controller;
     std::shared_ptr<InputController> m_input_controller;
+    std::shared_ptr<MenuController> m_menu_controller;
     std::shared_ptr<KakouneClient> m_kakoune_client;
     std::shared_ptr<KakouneClientProcess> m_kakoune_process;
     std::shared_ptr<KakouneContentView> m_kakoune_content_view;
     std::shared_ptr<StatusBarView> m_status_bar;
-    std::shared_ptr<MenuView> m_menu;
+    std::shared_ptr<PromptMenuView> m_prompt_menu;
+    std::shared_ptr<InlineMenuView> m_inline_menu;
 
     std::shared_ptr<opengl::Renderer> m_renderer;
 
