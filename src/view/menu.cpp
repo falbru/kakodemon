@@ -21,6 +21,9 @@ void MenuView::init(std::shared_ptr<opengl::Renderer> renderer, std::shared_ptr<
 }
 
 void MenuView::render(const KakouneClient &kakoune_client, float width, float height) {
+  if (!kakoune_client.menu_visible) {
+      m_orientation = false;
+  }
   if (!kakoune_client.menu_visible && kakoune_client.menu_style != kakoune::MenuStyle::PROMPT) // Special case for Prompt.
     return;
 
@@ -83,13 +86,19 @@ void MenuView::renderInlineStyle(const KakouneClient &kakoune_client, float widt
   }
 
   auto menu_position = m_kakoune_content_view->coordToPixels(kakoune_client.menu_anchor);
-  float menu_x = menu_position.first,
-        menu_y = menu_position.second +
-                 m_kakoune_content_view->getCellHeight() + SPACING_MEDIUM;
+  float menu_x = menu_position.first;
 
   float menu_width = 2 * SPACING_MEDIUM + max_item_length * m_kakoune_content_view->getCellWidth() + SPACING_MEDIUM + m_scroll_bar->width();
   float items_size = std::min(MAX_INLINE_ITEMS, (int)kakoune_client.menu_items.size());
   float menu_height = m_font->getLineHeight() * items_size;
+
+  float menu_y = menu_position.second + SPACING_SMALL + m_font->getLineHeight();
+  if (menu_y + menu_height > height) {
+      m_orientation = true;
+  }
+  if (m_orientation) {
+      menu_y = menu_position.second - SPACING_SMALL - menu_height;
+  }
 
   LayoutManager layout(menu_x, menu_y, menu_width, menu_height);
 

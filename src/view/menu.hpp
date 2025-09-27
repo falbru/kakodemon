@@ -31,6 +31,7 @@ class MenuView
     std::unique_ptr<ScrollBar> m_scroll_bar;
 
     int m_scroll_offset;
+    bool m_orientation = false;
     const int MAX_PROMPT_ITEMS = 25;
     const int MAX_INLINE_ITEMS = 12;
 

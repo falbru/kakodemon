@@ -12,7 +12,7 @@ void ScrollBar::setValue(float value, float max_value, float visible_range) {
 }
 
 void ScrollBar::render(std::shared_ptr<opengl::Renderer> renderer, core::Color color, LayoutManager &layout) const {
-    float height = (m_visible_range / m_max_value) * layout.current().height;
+    float height = (m_visible_range / (m_max_value + m_visible_range)) * layout.current().height;
     float x = layout.current().x + layout.current().width - WIDTH;
     float y = layout.current().y + (m_value / m_max_value) * (layout.current().height - height);
 
