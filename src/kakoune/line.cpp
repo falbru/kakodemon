@@ -9,3 +9,11 @@ void kakoune::from_json(const nlohmann::json &j, Line &l)
 {
     l.atoms = j.get<std::vector<Atom>>();
 }
+
+int kakoune::Line::size() const {
+    int size = 0;
+    for (int i = 0; i < atoms.size(); i++) {
+        size += atoms[i].contents.size();
+    }
+    return size;
+}

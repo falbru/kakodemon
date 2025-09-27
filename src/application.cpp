@@ -88,7 +88,7 @@ void Application::initMVC() {
     m_input_controller->init(m_kakoune_client, m_kakoune_process);
     m_kakoune_content_view->init(m_renderer);
     m_status_bar->init(m_renderer);
-    m_menu->init(m_renderer);
+    m_menu->init(m_renderer, m_kakoune_content_view);
     m_kakoune_process->start();
     m_editor_controller->init(m_kakoune_client, m_kakoune_process, m_kakoune_content_view, m_status_bar, m_menu);
     m_editor_controller->onWindowResize(width, height); // TODO move to init

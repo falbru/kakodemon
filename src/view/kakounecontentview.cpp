@@ -17,10 +17,16 @@ void KakouneContentView::render(const std::vector<kakoune::Line> &lines, const k
     m_renderer->renderLines(m_font, lines, default_face, x, y);
 }
 
-int KakouneContentView::getCellWidth() {
+float KakouneContentView::getCellWidth() const {
     return m_font.getCharacter('A').Advance >> 6;
 }
 
-int KakouneContentView::getCellHeight() {
+float KakouneContentView::getCellHeight() const {
     return m_font.getLineHeight();
+}
+
+std::pair<float, float> KakouneContentView::coordToPixels(const kakoune::Coord& coord) const {
+    float x = getCellWidth() * coord.column;
+    float y = coord.line > 0 ? (m_font.getAscender() + getCellHeight() * (coord.line - 1)) : 0;
+    return std::make_pair(x, y);
 }
