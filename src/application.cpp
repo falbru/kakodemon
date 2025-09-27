@@ -4,6 +4,7 @@
 #include "controller/editorcontroller.hpp"
 #include "controller/inputcontroller.hpp"
 #include "model/kakouneclient.hpp"
+#include "opengl/font.hpp"
 #include "opengl/renderer.hpp"
 #include "view/kakounecontentview.hpp"
 #include "view/menu.hpp"

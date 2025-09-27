@@ -20,6 +20,7 @@ class LayoutManager
     LayoutManager copy() const;
 
     void pad(float padding);
+    void pad(float paddingY, float paddingX);
     void border(float border_size);
 
     void gapX(float gap_size);

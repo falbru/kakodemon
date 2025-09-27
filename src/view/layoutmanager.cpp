@@ -15,10 +15,15 @@ LayoutManager LayoutManager::copy() const {
 }
 
 void LayoutManager::pad(float padding) {
-    m_current.x += padding;
-    m_current.y += padding;
-    m_current.width -= padding * 2;
-    m_current.height -= padding * 2;
+    pad(padding, padding);
+}
+
+void LayoutManager::pad(float paddingY, float paddingX) {
+    m_current.x += paddingX;
+    m_current.y += paddingY;
+    m_current.width -= paddingX * 2;
+    m_current.height -= paddingY * 2;
+
 }
 
 void LayoutManager::border(float border_size) {

@@ -16,6 +16,7 @@ void EditorController::init(std::shared_ptr<KakouneClient> kakoune_client,
 {
     m_kakoune_client = kakoune_client;
     m_kakoune_process = kakoune_process;
+
     m_kakoune_content_view = kakoune_content_view;
     m_status_bar_view = status_bar_view;
     m_menu_view = menu_view;
