@@ -22,6 +22,7 @@ void InlineMenuView::render(const KakouneClient &kakoune_client, float width, fl
       max_item_length = item_length;
     }
   }
+  max_item_length = std::min(MAX_ITEM_LENGTH, max_item_length);
 
   auto menu_position = m_kakoune_content_view->coordToPixels(kakoune_client.menu_anchor);
   float menu_x = menu_position.first;
@@ -61,6 +62,15 @@ void InlineMenuView::renderScrolledContent(const KakouneClient &kakoune_client,
 
   for (int i = m_scroll_offset; i < m_scroll_offset + max_items && i < kakoune_client.menu_items.size(); i++) {
     auto item = kakoune_client.menu_items.at(i);
+
+    std::string trimmed = item.atoms[0].contents;
+    trimmed.erase(trimmed.find_last_not_of(" \t\n\r\f\v") + 1);
+    trimmed.erase(0, trimmed.find_first_not_of(" \t\n\r\f\v"));
+    if (trimmed.size() > MAX_ITEM_LENGTH) {
+        item.atoms[0].contents = trimmed.substr(0, MAX_ITEM_LENGTH - 3) + "...";
+    } else {
+        item.atoms[0].contents = item.atoms[0].contents.substr(0, MAX_ITEM_LENGTH);
+    }
 
     if (i == selected_index) {
       m_renderer->renderRect(kakoune_client.menu_selected_face.bg.toCoreColor(

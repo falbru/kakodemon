@@ -18,6 +18,7 @@ private:
     int m_scroll_offset;
 
     const int MAX_VISIBLE_ITEMS = 12;
+    const int MAX_ITEM_LENGTH = 50;
 
     void renderScrolledContent(const KakouneClient &kakoune_client, LayoutManager &layout, int max_items);
 
