@@ -1,4 +1,5 @@
 #include "view/inlinemenu.hpp"
+#include "core/utf8string.hpp"
 #include "view/styling.hpp"
 
 InlineMenuView::InlineMenuView() {
@@ -63,13 +64,14 @@ void InlineMenuView::renderScrolledContent(const KakouneClient &kakoune_client,
   for (int i = m_scroll_offset; i < m_scroll_offset + max_items && i < kakoune_client.menu_items.size(); i++) {
     auto item = kakoune_client.menu_items.at(i);
 
-    std::string trimmed = item.atoms[0].contents;
-    trimmed.erase(trimmed.find_last_not_of(" \t\n\r\f\v") + 1);
-    trimmed.erase(0, trimmed.find_first_not_of(" \t\n\r\f\v"));
+    UTF8String trimmed = item.atoms[0].contents;
+    trimmed.trim(TrimDirection::Right);
     if (trimmed.size() > MAX_ITEM_LENGTH) {
-        item.atoms[0].contents = trimmed.substr(0, MAX_ITEM_LENGTH - 3) + "...";
+        item.atoms[0].contents = trimmed.substring(0, MAX_ITEM_LENGTH - 1);
+        item.atoms[0].contents.trim(TrimDirection::Right);
+        item.atoms[0].contents.addCodepoint(0x2026); // …
     } else {
-        item.atoms[0].contents = item.atoms[0].contents.substr(0, MAX_ITEM_LENGTH);
+        item.atoms[0].contents = item.atoms[0].contents.substring(0, MAX_ITEM_LENGTH);
     }
 
     if (i == selected_index) {

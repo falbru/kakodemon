@@ -15,7 +15,7 @@ void StatusBarView::render(const kakoune::Line &mode, const kakoune::Face &defau
 }
 
 int StatusBarView::getCellWidth() {
-    return m_font.getCharacter('A').Advance >> 6;
+    return m_font.getGlyph('A').Advance >> 6;
 
 }
 

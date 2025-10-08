@@ -2,6 +2,7 @@
 #define ATOM_HPP_INCLUDED
 
 #include "face.hpp"
+#include "core/utf8string.hpp"
 #include "nlohmann/json.hpp"
 
 namespace kakoune
@@ -10,7 +11,7 @@ namespace kakoune
 struct Atom
 {
     Face face;
-    std::string contents;
+    UTF8String contents;
 };
 
 void to_json(nlohmann::json &j, const Atom &atom);

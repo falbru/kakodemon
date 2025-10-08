@@ -31,6 +31,7 @@ set(SRC
     src/view/widgets/input.cpp
     src/view/widgets/scrollbar.cpp
     src/core/alignment.cpp
+    src/core/utf8string.cpp
     src/kakoune/kakouneframestatemanager.cpp
     src/kakoune/kakouneclientprocess.cpp
     src/kakoune/coord.cpp

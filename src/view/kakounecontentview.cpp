@@ -18,7 +18,7 @@ void KakouneContentView::render(const std::vector<kakoune::Line> &lines, const k
 }
 
 float KakouneContentView::getCellWidth() const {
-    return m_font.getCharacter('A').Advance >> 6;
+    return m_font.getGlyph('A').Advance >> 6;
 }
 
 float KakouneContentView::getCellHeight() const {

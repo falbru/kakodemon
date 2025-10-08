@@ -92,7 +92,6 @@ void opengl::Renderer::renderLines(Font& font, const std::vector<kakoune::Line>&
 }
 
 void opengl::Renderer::_renderLine(Font& font, const kakoune::Line& line, const kakoune::Face& default_face, float x, float y, const core::Alignment& alignment) const {
-    std::string::const_iterator c;
 
     float start_x = x;
     float start_y = y;
@@ -100,11 +99,13 @@ void opengl::Renderer::_renderLine(Font& font, const kakoune::Line& line, const 
     if (alignment.h == core::Alignment::HorizontalAlignment::Right) {
         float width = 0;
         for (auto atom : line.atoms) {
-            for (c = atom.contents.begin(); c != atom.contents.end(); c++) {
-                if (!font.hasCharacter(*c)) {
-                    font.loadCharacter(*c);
+            for (int i = 0; i < atom.contents.size(); i++) {
+                Codepoint c = atom.contents.at(i);
+
+                if (!font.hasGlyph(c)) {
+                    font.loadGlyph(c);
                 }
-                auto ch = font.getCharacter(*c);
+                auto ch = font.getGlyph(c);
                 width += ch.Advance >> 6;
             }
         }
@@ -120,17 +121,17 @@ void opengl::Renderer::_renderLine(Font& font, const kakoune::Line& line, const 
     float y_it = start_y;
     for (auto atom : line.atoms)
     {
-        std::string text = atom.contents;
-
+        UTF8String text = atom.contents;
 
         float height = font.getLineHeight();
         float width = 0;
-        for (c = text.begin(); c != text.end(); c++)
+        for (int i = 0; i < text.size(); i++)
         {
-            if (!font.hasCharacter(*c)) {
-                font.loadCharacter(*c);
+            Codepoint c = text.at(i);
+            if (!font.hasGlyph(c)) {
+                font.loadGlyph(c);
             }
-            auto ch = font.getCharacter(*c);
+            auto ch = font.getGlyph(c);
             width += ch.Advance >> 6;
         }
 
@@ -140,20 +141,21 @@ void opengl::Renderer::_renderLine(Font& font, const kakoune::Line& line, const 
         auto color = atom.face.fg.toCoreColor(default_face.fg, true);
         m_shader_program->setVector4f("textColor", color.r, color.g, color.b, color.a);
         m_shader_program->setInt("renderType", 0);
-        for (c = text.begin(); c != text.end(); c++)
+        for (int i = 0; i < text.size(); i++ )
         {
-            if (*c == '\n') continue; // TODO clean way of stripping the last newline?
+            Codepoint c = text.at(i);
+            if (c == '\n') continue; // TODO clean way of stripping the last newline?
 
-            if (!font.hasCharacter(*c)) {
-                font.loadCharacter(*c);
+            if (!font.hasGlyph(c)) {
+                font.loadGlyph(c);
             }
-            auto ch = font.getCharacter(*c);
+            auto glyph = font.getGlyph(c);
 
-            float xpos = x_it + ch.Bearing.x;
-            float ypos = y_it + font.getAscender() - ch.Bearing.y;
+            float xpos = x_it + glyph.Bearing.x;
+            float ypos = y_it + font.getAscender() - glyph.Bearing.y;
 
-            float w = ch.Size.x;
-            float h = ch.Size.y;
+            float w = glyph.Size.x;
+            float h = glyph.Size.y;
             // update VBO for each character
             float vertices[6][4] = {
                 {xpos, ypos, 0.0f, 0.0f}, {xpos, ypos + h, 0.0f, 1.0f},     {xpos + w, ypos + h, 1.0f, 1.0f},
@@ -161,7 +163,7 @@ void opengl::Renderer::_renderLine(Font& font, const kakoune::Line& line, const 
                 {xpos, ypos, 0.0f, 0.0f}, {xpos + w, ypos + h, 1.0f, 1.0f}, {xpos + w, ypos, 1.0f, 0.0f}};
             glBindVertexArray(m_text_vao);
             // render glyph texture over quad
-            glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+            glBindTexture(GL_TEXTURE_2D, glyph.TextureID);
             // update content of VBO memory
             glBindBuffer(GL_ARRAY_BUFFER, m_text_vbo);
             glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
@@ -169,7 +171,7 @@ void opengl::Renderer::_renderLine(Font& font, const kakoune::Line& line, const 
             // render quad
             glDrawArrays(GL_TRIANGLES, 0, 6);
             // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-            x_it += ch.Advance >> 6; // bitshift by 6 to get value in pixels (2^6 = 64)
+            x_it += glyph.Advance >> 6; // bitshift by 6 to get value in pixels (2^6 = 64)
         }
     }
 }

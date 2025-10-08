@@ -37,7 +37,7 @@ void Input::render(std::shared_ptr<opengl::Renderer> renderer,
 
 float Input::width() const {
   return BORDER * 2 + PADDING * 2 +
-         m_content.size() * (m_font->getCharacter('A').Advance >> 6);
+         m_content.size() * (m_font->getGlyph('A').Advance >> 6);
 }
 
 float Input::height() const {

@@ -1,4 +1,5 @@
 #include "font.hpp"
+#include "core/utf8string.hpp"
 
 #include <spdlog/spdlog.h>
 
@@ -16,9 +17,9 @@ opengl::Font::Font(const std::string& font_path, int font_size) {
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-    for (unsigned char c = 0; c < 128; c++)
+    for (Codepoint c = 0; c < 128; c++)
     {
-        loadCharacter(c);
+        loadGlyph(c);
     }
 
     m_ascender = m_face->size->metrics.ascender >> 6;
@@ -30,15 +31,15 @@ opengl::Font::~Font() {
     FT_Done_FreeType(m_ft);
 }
 
-bool opengl::Font::hasCharacter(char c) const {
-    return m_characters.find(c) != m_characters.end();
+bool opengl::Font::hasGlyph(Codepoint c) const {
+    return m_glyphs.find(c) != m_glyphs.end();
 }
 
-const opengl::Character& opengl::Font::getCharacter(char c) const {
-    return m_characters.at(c);
+const opengl::Glyph& opengl::Font::getGlyph(Codepoint c) const {
+    return m_glyphs.at(c);
 }
 
-void opengl::Font::loadCharacter(char c) {
+void opengl::Font::loadGlyph(Codepoint c) {
     if (FT_Load_Char(m_face, c, FT_LOAD_RENDER))
     {
         spdlog::error("ERROR::FREETYTPE: Failed to load Glyph");
@@ -55,9 +56,9 @@ void opengl::Font::loadCharacter(char c) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    Character character = {texture, glm::ivec2(m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows),
+    Glyph glyph = {texture, glm::ivec2(m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows),
                            glm::ivec2(m_face->glyph->bitmap_left, m_face->glyph->bitmap_top), m_face->glyph->advance.x};
-    m_characters.insert(std::pair<char, Character>(c, character));
+    m_glyphs.insert(std::pair<Codepoint, Glyph>(c, glyph));
 }
 
 float opengl::Font::getAscender() const {
