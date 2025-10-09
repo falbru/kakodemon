@@ -1,4 +1,5 @@
 #include "line.hpp"
+#include "kakoune/atom.hpp"
 
 void kakoune::to_json(nlohmann::json &j, const Line &l)
 {
@@ -16,4 +17,14 @@ int kakoune::Line::size() const {
         size += atoms[i].contents.size();
     }
     return size;
+}
+
+UTF8String kakoune::Line::toUTF8String() const {
+    UTF8String string;
+    for (int i = 0; i < atoms.size(); i++) {
+        for (int j = 0; j < atoms[i].contents.size(); j++) {
+            string.addCodepoint(atoms[i].contents.at(j));
+        }
+    }
+    return string;
 }

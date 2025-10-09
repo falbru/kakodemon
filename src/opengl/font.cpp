@@ -68,3 +68,13 @@ float opengl::Font::getAscender() const {
 float opengl::Font::getLineHeight() const {
     return m_line_height;
 }
+
+float opengl::Font::width(UTF8String string) {
+    float w = 0;
+    for (unsigned int i = 0;i < string.size(); i++) {
+        if (hasGlyph(string.at(i))) {
+            w += getGlyph(string.at(i)).Advance >> 6;
+        }
+    }
+    return w;
+}

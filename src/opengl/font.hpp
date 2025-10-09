@@ -34,6 +34,8 @@ class Font
     float getAscender() const;
     float getLineHeight() const;
 
+    float width(UTF8String string);
+
   private:
     FT_Library m_ft;
     FT_Face m_face;

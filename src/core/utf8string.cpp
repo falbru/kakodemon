@@ -102,6 +102,11 @@ void UTF8String::addCodepoint(Codepoint codepoint)
     m_codepoints.push_back(codepoint);
 }
 
+void UTF8String::insertCodepoint(int index, Codepoint codepoint)
+{
+    m_codepoints.insert(m_codepoints.begin() + index, codepoint);
+}
+
 bool isWhitespace(Codepoint cp)
 {
     return cp == 0x09 || cp == 0x0A || cp == 0x0B || cp == 0x0C || cp == 0x0D || cp == 0x20 || cp == 0x85 ||

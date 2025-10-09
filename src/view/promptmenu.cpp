@@ -65,6 +65,26 @@ void PromptMenuView::renderScrolledContent(const KakouneClient &kakoune_client,
   for (int i = m_scroll_offset; i < m_scroll_offset + max_items && i < kakoune_client.menu_items.size(); i++) {
     auto item = kakoune_client.menu_items.at(i);
 
+    if (m_font->width(item.toUTF8String()) > items_layout.current().width) {
+        UTF8String contents;
+        contents.addCodepoint(0x2026); // …
+        float w = (m_font->hasGlyph(0x2026) ? (m_font->getGlyph(0x2026).Advance >> 6) : 0);
+        int j = 0;
+        Codepoint next = item.atoms[0].contents.at(j);
+
+        while (w + (m_font->hasGlyph(next) ? (m_font->getGlyph(next).Advance >> 6) : 0) < items_layout.current().width) {
+            contents.insertCodepoint(j, next);
+            w += m_font->hasGlyph(next) ? m_font->getGlyph(next).Advance >> 6 : 0;
+            j++;
+            if (j >= item.atoms[0].contents.size()) {
+                break;
+            }
+            next = item.atoms[0].contents.at(j);
+        }
+
+        item.atoms[0].contents = contents;
+    }
+
     if (i == selected_index) {
       m_renderer->renderRect(kakoune_client.menu_selected_face.bg.toCoreColor(
                                  kakoune_client.window_default_face.bg, false),
@@ -77,6 +97,7 @@ void PromptMenuView::renderScrolledContent(const KakouneClient &kakoune_client,
       m_renderer->renderLine(*m_font, item, kakoune_client.menu_face,
                              items_layout.current().x, items_layout.current().y);
     }
+
     items_layout.sliceTop(line_height);
   }
 

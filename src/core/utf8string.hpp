@@ -20,6 +20,7 @@ public:
     std::string toString() const;
 
     void addCodepoint(Codepoint codepoint);
+    void insertCodepoint(int index, Codepoint codepoint);
 
     int size() const;
     Codepoint at(unsigned int index) const;
