@@ -1,5 +1,7 @@
 #include "view/inlinemenu.hpp"
+#include "core/alignment.hpp"
 #include "core/utf8string.hpp"
+#include "spdlog/spdlog.h"
 #include "view/styling.hpp"
 
 InlineMenuView::InlineMenuView() {
@@ -15,15 +17,7 @@ void InlineMenuView::init(std::shared_ptr<opengl::Renderer> renderer, std::share
 void InlineMenuView::render(const KakouneClient &kakoune_client, float width, float height) {
   auto anchor = kakoune_client.menu_anchor;
 
-  int max_item_length = 0;
-  for (const auto &item : kakoune_client.menu_items) {
-    int item_length = item.size();
-
-    if (item_length > max_item_length) {
-      max_item_length = item_length;
-    }
-  }
-  max_item_length = std::min(MAX_ITEM_LENGTH, max_item_length);
+  auto max_item_length = MAX_ITEM_LENGTH;
 
   auto menu_position = m_kakoune_content_view->coordToPixels(kakoune_client.menu_anchor);
   float menu_x = menu_position.first;
@@ -50,6 +44,8 @@ void InlineMenuView::render(const KakouneClient &kakoune_client, float width, fl
 void InlineMenuView::renderScrolledContent(const KakouneClient &kakoune_client,
                                      LayoutManager &layout, int max_items) {
   auto items_layout = layout.copy();
+  items_layout.padRight(SPACING_MEDIUM + m_scroll_bar->width());
+
   float line_height = m_font->getLineHeight();
 
   int selected_index = kakoune_client.menu_selected_index;
@@ -64,28 +60,39 @@ void InlineMenuView::renderScrolledContent(const KakouneClient &kakoune_client,
   for (int i = m_scroll_offset; i < m_scroll_offset + max_items && i < kakoune_client.menu_items.size(); i++) {
     auto item = kakoune_client.menu_items.at(i);
 
-    UTF8String trimmed = item.atoms[0].contents;
-    trimmed.trim(TrimDirection::Right);
-    if (trimmed.size() > MAX_ITEM_LENGTH) {
-        item.atoms[0].contents = trimmed.substring(0, MAX_ITEM_LENGTH - 1);
-        item.atoms[0].contents.trim(TrimDirection::Right);
-        item.atoms[0].contents.addCodepoint(0x2026); // …
+    auto left = kakoune::Line();
+    auto right = kakoune::Line();
+    left.atoms = {item.atoms[0]};
+    left.atoms[0].contents.trim(TrimDirection::Right);
+    if (item.atoms.size() > 1) {
+        right.atoms = {item.atoms[1]};
+        right.atoms[0].contents.trim(TrimDirection::Left);
+    }
+    if (left.size() + right.size() > MAX_ITEM_LENGTH) {
+        left.atoms[0].contents = left.atoms[0].contents.substring(0, MAX_ITEM_LENGTH - right.size() - 1);
+        left.atoms[0].contents.trim(TrimDirection::Right);
+        left.atoms[0].contents.addCodepoint(0x2026); // …
     } else {
-        item.atoms[0].contents = item.atoms[0].contents.substring(0, MAX_ITEM_LENGTH);
+        left.atoms[0].contents = left.atoms[0].contents.substring(0, MAX_ITEM_LENGTH - right.size());
     }
 
     if (i == selected_index) {
       m_renderer->renderRect(kakoune_client.menu_selected_face.bg.toCoreColor(
                                  kakoune_client.window_default_face.bg, false),
-                             items_layout.current().x - SPACING_MEDIUM, items_layout.current().y, items_layout.current().width + SPACING_MEDIUM * 2,
+                             items_layout.current().x - SPACING_MEDIUM, items_layout.current().y, items_layout.current().width + SPACING_MEDIUM * 3 + m_scroll_bar->width(),
                              line_height);
 
-      m_renderer->renderLine(*m_font, item, kakoune_client.menu_selected_face,
+      m_renderer->renderLine(*m_font, left, kakoune_client.menu_selected_face,
                              items_layout.current().x, items_layout.current().y);
+      m_renderer->renderLine(*m_font, right, kakoune_client.menu_selected_face,
+                             items_layout.current().x + items_layout.current().width, items_layout.current().y, core::Alignment::topRight());
     } else {
-      m_renderer->renderLine(*m_font, item, kakoune_client.menu_face,
+      m_renderer->renderLine(*m_font, left, kakoune_client.menu_face,
                              items_layout.current().x, items_layout.current().y);
+      m_renderer->renderLine(*m_font, right, kakoune_client.menu_face,
+                             items_layout.current().x + items_layout.current().width, items_layout.current().y, core::Alignment::topRight());
     }
+
     items_layout.sliceTop(line_height);
   }
 

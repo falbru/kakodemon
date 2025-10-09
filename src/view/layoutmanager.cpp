@@ -26,6 +26,25 @@ void LayoutManager::pad(float paddingY, float paddingX) {
 
 }
 
+void LayoutManager::padLeft(float padding) {
+    m_current.x += padding;
+    m_current.width -= padding;
+}
+
+void LayoutManager::padRight(float padding) {
+    m_current.width -= padding;
+}
+
+void LayoutManager::padUp(float padding) {
+    m_current.y += padding;
+    m_current.height -= padding;
+
+}
+
+void LayoutManager::padDown(float padding) {
+    m_current.height -= padding;
+}
+
 void LayoutManager::border(float border_size) {
     m_current.x += border_size;
     m_current.y += border_size;

@@ -21,6 +21,11 @@ class LayoutManager
 
     void pad(float padding);
     void pad(float paddingY, float paddingX);
+    void padLeft(float padding);
+    void padRight(float padding);
+    void padUp(float padding);
+    void padDown(float padding);
+
     void border(float border_size);
 
     void gapX(float gap_size);
