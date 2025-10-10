@@ -31,6 +31,7 @@ set(SRC
     src/view/glyphsequence.cpp
     src/view/widgets/input.cpp
     src/view/widgets/scrollbar.cpp
+    src/view/widgets/scrolledmenuitems.cpp
     src/core/alignment.cpp
     src/core/utf8string.cpp
     src/kakoune/kakouneframestatemanager.cpp
