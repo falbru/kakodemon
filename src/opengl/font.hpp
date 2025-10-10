@@ -14,10 +14,13 @@ namespace opengl
 {
 struct Glyph
 {
+    Codepoint codepoint;
     unsigned int TextureID;
     glm::ivec2 Size;
     glm::ivec2 Bearing;
     long Advance;
+
+    float width() const;
 };
 
 class Font
@@ -30,6 +33,7 @@ class Font
     const Glyph &getGlyph(Codepoint c) const;
 
     void loadGlyph(Codepoint c);
+    const Glyph &ensureGlyph(Codepoint c);
 
     float getAscender() const;
     float getLineHeight() const;

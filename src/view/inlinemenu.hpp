@@ -17,8 +17,8 @@ public:
 private:
     int m_scroll_offset;
 
+    const float MAX_MENU_WIDTH = 700;
     const int MAX_VISIBLE_ITEMS = 12;
-    const int MAX_ITEM_LENGTH = 75;
 
     void renderScrolledContent(const KakouneClient &kakoune_client, LayoutManager &layout, int max_items);
 

@@ -28,6 +28,7 @@ set(SRC
     src/view/promptmenu.cpp
     src/view/inlinemenu.cpp
     src/view/layoutmanager.cpp
+    src/view/glyphsequence.cpp
     src/view/widgets/input.cpp
     src/view/widgets/scrollbar.cpp
     src/core/alignment.cpp

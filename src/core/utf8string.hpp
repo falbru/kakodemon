@@ -15,6 +15,7 @@ enum class TrimDirection {
 class UTF8String {
 public:
     UTF8String();
+    UTF8String(std::vector<Codepoint>);
     UTF8String(std::string string);
 
     std::string toString() const;
@@ -27,7 +28,7 @@ public:
 
     UTF8String substring(size_t start) const;
     UTF8String substring(size_t start, size_t length) const;
-    void trim(TrimDirection direction = TrimDirection::Both);
+    UTF8String trim(TrimDirection direction = TrimDirection::Both) const;
 private:
     std::vector<Codepoint> m_codepoints;
 };

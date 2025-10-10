@@ -3,6 +3,10 @@
 
 #include <spdlog/spdlog.h>
 
+float opengl::Glyph::width() const {
+    return Advance >> 6;
+}
+
 opengl::Font::Font(const std::string& font_path, int font_size) {
     if (FT_Init_FreeType(&m_ft))
     {
@@ -56,9 +60,17 @@ void opengl::Font::loadGlyph(Codepoint c) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    Glyph glyph = {texture, glm::ivec2(m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows),
+    Glyph glyph = {c, texture, glm::ivec2(m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows),
                            glm::ivec2(m_face->glyph->bitmap_left, m_face->glyph->bitmap_top), m_face->glyph->advance.x};
     m_glyphs.insert(std::pair<Codepoint, Glyph>(c, glyph));
+}
+
+const opengl::Glyph& opengl::Font::ensureGlyph(Codepoint c) {
+    if (!hasGlyph(c)) {
+        loadGlyph(c);
+    }
+
+    return getGlyph(c);
 }
 
 float opengl::Font::getAscender() const {

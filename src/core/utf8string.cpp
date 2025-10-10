@@ -4,6 +4,10 @@ UTF8String::UTF8String()
 {
 }
 
+UTF8String::UTF8String(std::vector<Codepoint> codepoints) : m_codepoints(codepoints)
+{
+}
+
 // Use kakoune's utf8 encoding and decoding for reference:
 // https://github.com/mawww/kakoune/blob/e3263887653ce5ec817c1aad51389c9600dfeabe/src/utf8.hh
 
@@ -114,10 +118,10 @@ bool isWhitespace(Codepoint cp)
            cp == 0x202F || cp == 0x205F || cp == 0x3000;
 }
 
-void UTF8String::trim(TrimDirection direction)
+UTF8String UTF8String::trim(TrimDirection direction) const
 {
     if (m_codepoints.empty())
-        return;
+        return UTF8String();
 
     size_t start = 0;
     size_t end = m_codepoints.size();
@@ -140,8 +144,10 @@ void UTF8String::trim(TrimDirection direction)
 
     if (start > 0 || end < m_codepoints.size())
     {
-        m_codepoints = std::vector<Codepoint>(m_codepoints.begin() + start, m_codepoints.begin() + end);
+        return UTF8String(std::vector<Codepoint>(m_codepoints.begin() + start, m_codepoints.begin() + end));
     }
+
+    return UTF8String(m_codepoints);
 }
 
 UTF8String UTF8String::substring(size_t start, size_t length) const
