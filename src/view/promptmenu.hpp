@@ -7,15 +7,16 @@
 #include "view/widgets/input.hpp"
 #include "view/widgets/scrollbar.hpp"
 
-class PromptMenuView {
-public:
+class PromptMenuView
+{
+  public:
     PromptMenuView();
 
     void init(std::shared_ptr<opengl::Renderer> renderer, std::shared_ptr<KakouneContentView> kakoune_content_view);
 
     void render(const KakouneClient &kakoune_client, float width, float height);
 
-private:
+  private:
     int m_scroll_offset;
 
     const float Y = 60.0f;

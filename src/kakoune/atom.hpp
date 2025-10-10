@@ -1,8 +1,8 @@
 #ifndef ATOM_HPP_INCLUDED
 #define ATOM_HPP_INCLUDED
 
-#include "face.hpp"
 #include "core/utf8string.hpp"
+#include "face.hpp"
 #include "nlohmann/json.hpp"
 
 namespace kakoune

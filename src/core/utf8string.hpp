@@ -6,14 +6,16 @@
 
 typedef unsigned int Codepoint;
 
-enum class TrimDirection {
+enum class TrimDirection
+{
     Left,
     Right,
     Both
 };
 
-class UTF8String {
-public:
+class UTF8String
+{
+  public:
     UTF8String();
     UTF8String(std::vector<Codepoint>);
     UTF8String(std::string string);
@@ -29,7 +31,8 @@ public:
     UTF8String substring(size_t start) const;
     UTF8String substring(size_t start, size_t length) const;
     UTF8String trim(TrimDirection direction = TrimDirection::Both) const;
-private:
+
+  private:
     std::vector<Codepoint> m_codepoints;
 };
 

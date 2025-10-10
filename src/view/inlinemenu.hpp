@@ -6,15 +6,16 @@
 #include "view/kakounecontentview.hpp"
 #include "view/widgets/scrollbar.hpp"
 
-class InlineMenuView {
-public:
+class InlineMenuView
+{
+  public:
     InlineMenuView();
 
     void init(std::shared_ptr<opengl::Renderer> renderer, std::shared_ptr<KakouneContentView> kakoune_content_view);
 
     void render(const KakouneClient &kakoune_client, float width, float height);
 
-private:
+  private:
     int m_scroll_offset;
 
     const float MAX_MENU_WIDTH = 700;
