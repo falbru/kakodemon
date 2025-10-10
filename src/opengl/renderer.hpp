@@ -25,14 +25,14 @@ class Renderer
     void renderRect(const core::Color color, float x, float y, float width, float height) const;
     void renderRectWithShadow(const core::Color color, float x, float y, float width, float height,
                               float shadowRadius) const;
-    void renderLine(Font &font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y) const;
-    void renderLine(Font &font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y,
+    void renderLine(std::shared_ptr<Font> font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y) const;
+    void renderLine(std::shared_ptr<Font> font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y,
                     const core::Alignment &alignment) const;
-    void renderLines(Font &font, const std::vector<kakoune::Line> &lines, const kakoune::Face &default_face, float x,
+    void renderLines(std::shared_ptr<Font> font, const std::vector<kakoune::Line> &lines, const kakoune::Face &default_face, float x,
                      float y) const;
 
   private:
-    void _renderLine(Font &font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y,
+    void _renderLine(std::shared_ptr<Font> font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y,
                      const core::Alignment &alignment) const;
     void _renderShadow(const core::Color color, float x, float y, float width, float height, float shadowRadius) const;
     void _renderRect(const core::Color color, float x, float y, float width, float height) const;

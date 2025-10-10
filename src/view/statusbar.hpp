@@ -18,7 +18,7 @@ class StatusBarView
 
   private:
     std::shared_ptr<opengl::Renderer> m_renderer;
-    opengl::Font m_font;
+    std::shared_ptr<opengl::Font> m_font;
 };
 
 #endif // statusbar_hpp_INCLUDED

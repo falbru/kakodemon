@@ -1,7 +1,9 @@
 #include "view/statusbar.hpp"
 #include "core/alignment.hpp"
+#include <memory>
 
-StatusBarView::StatusBarView() : m_font("/home/falk/.fonts/MonoLisa/ttf/MonoLisa-Regular.ttf", 15) {
+StatusBarView::StatusBarView() {
+    m_font = std::make_shared<opengl::Font>("/home/falk/.fonts/MonoLisa/ttf/MonoLisa-Regular.ttf", 14);
 
 }
 
@@ -15,10 +17,10 @@ void StatusBarView::render(const kakoune::Line &mode, const kakoune::Face &defau
 }
 
 int StatusBarView::getCellWidth() {
-    return m_font.getGlyph('A').Advance >> 6;
+    return m_font->getGlyph('A').width();
 
 }
 
 int StatusBarView::getCellHeight() {
-    return m_font.getLineHeight();
+    return m_font->getLineHeight();
 }

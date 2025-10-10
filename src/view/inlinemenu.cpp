@@ -75,7 +75,7 @@ void InlineMenuView::renderScrolledContent(const KakouneClient &kakoune_client, 
         float item_secondary_width = 0;
         if (item.atoms.size() > 1)
         {
-            item_secondary_width = GlyphSequence(m_font, item.atoms[1].contents.trim(TrimDirection::Left)).width();
+            item_secondary_width = m_font->width(item.atoms[1].contents.trim(TrimDirection::Left));
         }
 
         if (item_value_glyphs.width() + item_secondary_width > items_layout.current().width)
@@ -94,10 +94,10 @@ void InlineMenuView::renderScrolledContent(const KakouneClient &kakoune_client, 
                 items_layout.current().x - SPACING_MEDIUM, items_layout.current().y,
                 items_layout.current().width + SPACING_MEDIUM * 3 + m_scroll_bar->width(), line_height);
         }
-        m_renderer->renderLine(*m_font, item_value,
+        m_renderer->renderLine(m_font, item_value,
                                i == selected_index ? kakoune_client.menu_selected_face : kakoune_client.menu_face,
                                items_layout.current().x, items_layout.current().y);
-        m_renderer->renderLine(*m_font, item_secondary,
+        m_renderer->renderLine(m_font, item_secondary,
                                i == selected_index ? kakoune_client.menu_selected_face : kakoune_client.menu_face,
                                items_layout.current().x + items_layout.current().width, items_layout.current().y,
                                core::Alignment::topRight());

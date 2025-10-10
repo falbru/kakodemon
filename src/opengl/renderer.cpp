@@ -3,6 +3,8 @@
 #include "glm/ext/matrix_clip_space.hpp"
 #include "opengl/font.hpp"
 #include "spdlog/spdlog.h"
+#include "view/glyphsequence.hpp"
+#include <X11/extensions/render.h>
 
 opengl::Renderer::Renderer() {
 }
@@ -42,11 +44,11 @@ void opengl::Renderer::onWindowResize(int width, int height) {
     m_screen_height = height;
 }
 
-void opengl::Renderer::renderLine(Font& font, const kakoune::Line& line, const kakoune::Face& default_face, float x, float y) const {
+void opengl::Renderer::renderLine(std::shared_ptr<Font> font, const kakoune::Line& line, const kakoune::Face& default_face, float x, float y) const {
     renderLine(font, line, default_face, x, y, core::Alignment());
 }
 
-void opengl::Renderer::renderLine(Font &font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y, const core::Alignment& alignment) const
+void opengl::Renderer::renderLine(std::shared_ptr<Font> font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y, const core::Alignment& alignment) const
 {
     m_shader_program->use();
     glBindVertexArray(m_text_vao);
@@ -76,7 +78,7 @@ void opengl::Renderer::renderRectWithShadow(const core::Color color, float x, fl
     glBindVertexArray(0);
 }
 
-void opengl::Renderer::renderLines(Font& font, const std::vector<kakoune::Line>& lines, const kakoune::Face& default_face, float x, float y) const {
+void opengl::Renderer::renderLines(std::shared_ptr<Font> font, const std::vector<kakoune::Line>& lines, const kakoune::Face& default_face, float x, float y) const {
     m_shader_program->use();
     glBindVertexArray(m_text_vao);
 
@@ -84,37 +86,24 @@ void opengl::Renderer::renderLines(Font& font, const std::vector<kakoune::Line>&
     for (auto line : lines)
     {
         _renderLine(font, line, default_face, x, y_it, core::Alignment());
-        y_it += font.getLineHeight();
+        y_it += font->getLineHeight();
     }
 
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void opengl::Renderer::_renderLine(Font& font, const kakoune::Line& line, const kakoune::Face& default_face, float x, float y, const core::Alignment& alignment) const {
+void opengl::Renderer::_renderLine(std::shared_ptr<Font> font, const kakoune::Line& line, const kakoune::Face& default_face, float x, float y, const core::Alignment& alignment) const {
 
     float start_x = x;
     float start_y = y;
 
     if (alignment.h == core::Alignment::HorizontalAlignment::Right) {
-        float width = 0;
-        for (auto atom : line.atoms) {
-            for (int i = 0; i < atom.contents.size(); i++) {
-                Codepoint c = atom.contents.at(i);
-
-                if (!font.hasGlyph(c)) {
-                    font.loadGlyph(c);
-                }
-                auto ch = font.getGlyph(c);
-                width += ch.Advance >> 6;
-            }
-        }
-
-        start_x -= width;
+        start_x -= font->width(line.toUTF8String());
     }
 
     if (alignment.v == core::Alignment::VerticalAlignment::Bottom) {
-        start_y -= font.getLineHeight();
+        start_y -= font->getLineHeight();
     }
 
     float x_it = start_x;
@@ -123,17 +112,8 @@ void opengl::Renderer::_renderLine(Font& font, const kakoune::Line& line, const 
     {
         UTF8String text = atom.contents;
 
-        float height = font.getLineHeight();
-        float width = 0;
-        for (int i = 0; i < text.size(); i++)
-        {
-            Codepoint c = text.at(i);
-            if (!font.hasGlyph(c)) {
-                font.loadGlyph(c);
-            }
-            auto ch = font.getGlyph(c);
-            width += ch.Advance >> 6;
-        }
+        float height = font->getLineHeight();
+        float width = font->width(text);
 
         // Background color
         _renderRect(atom.face.bg.toCoreColor(default_face.bg, false), x_it, y_it, width, height);
@@ -146,13 +126,13 @@ void opengl::Renderer::_renderLine(Font& font, const kakoune::Line& line, const 
             Codepoint c = text.at(i);
             if (c == '\n') continue; // TODO clean way of stripping the last newline?
 
-            if (!font.hasGlyph(c)) {
-                font.loadGlyph(c);
+            if (!font->hasGlyph(c)) {
+                font->loadGlyph(c);
             }
-            auto glyph = font.getGlyph(c);
+            auto glyph = font->getGlyph(c);
 
             float xpos = x_it + glyph.Bearing.x;
-            float ypos = y_it + font.getAscender() - glyph.Bearing.y;
+            float ypos = y_it + font->getAscender() - glyph.Bearing.y;
 
             float w = glyph.Size.x;
             float h = glyph.Size.y;

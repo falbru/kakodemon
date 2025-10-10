@@ -2,9 +2,11 @@
 #include "kakounecontentview.hpp"
 #include <freetype/freetype.h>
 #include <glm/mat4x4.hpp>
+#include <memory>
 
-KakouneContentView::KakouneContentView() : m_font("/home/falk/.fonts/MonoLisa/ttf/MonoLisa-Regular.ttf", 14)
+KakouneContentView::KakouneContentView()
 {
+    m_font = std::make_shared<opengl::Font>("/home/falk/.fonts/MonoLisa/ttf/MonoLisa-Regular.ttf", 14);
 }
 
 void KakouneContentView::init(std::shared_ptr<opengl::Renderer> renderer)
@@ -18,11 +20,11 @@ void KakouneContentView::render(const std::vector<kakoune::Line> &lines, const k
 }
 
 float KakouneContentView::getCellWidth() const {
-    return m_font.getGlyph('A').Advance >> 6;
+    return m_font->getGlyph('A').width();
 }
 
 float KakouneContentView::getCellHeight() const {
-    return m_font.getLineHeight();
+    return m_font->getLineHeight();
 }
 
 std::pair<float, float> KakouneContentView::coordToPixels(const kakoune::Coord& coord) const {

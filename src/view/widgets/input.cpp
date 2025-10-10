@@ -30,14 +30,14 @@ void Input::render(std::shared_ptr<opengl::Renderer> renderer,
 
   input_layout.pad(PADDING);
 
-  renderer->renderLine(*m_font, kakoune_client.status_line,
+  renderer->renderLine(m_font, kakoune_client.status_line,
                        kakoune_client.status_default_face,
                        input_layout.current().x, input_layout.current().y);
 }
 
 float Input::width() const {
   return BORDER * 2 + PADDING * 2 +
-         m_content.size() * (m_font->getGlyph('A').Advance >> 6);
+         m_content.size() * (m_font->getGlyph('A').width());
 }
 
 float Input::height() const {
