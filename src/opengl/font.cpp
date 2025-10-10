@@ -85,7 +85,7 @@ float opengl::Font::width(UTF8String string) {
     float w = 0;
     for (unsigned int i = 0;i < string.size(); i++) {
         if (hasGlyph(string.at(i))) {
-            w += getGlyph(string.at(i)).width();
+            w += ensureGlyph(string.at(i)).width();
         }
     }
     return w;

@@ -12,8 +12,7 @@ class ScrolledMenuItems
   public:
     ScrolledMenuItems(std::shared_ptr<opengl::Font> font, int max_items);
 
-    void render(std::shared_ptr<opengl::Renderer> renderer, const KakouneClient &kakoune_client,
-                LayoutManager &layout);
+    void render(std::shared_ptr<opengl::Renderer> renderer, const KakouneClient &kakoune_client, LayoutManager &layout);
 
     float width() const;
     float height() const;
