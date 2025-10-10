@@ -22,11 +22,22 @@ set(SRC
     src/application.cpp
     src/controller/editorcontroller.cpp
     src/controller/inputcontroller.cpp
+    src/controller/menucontroller.cpp
     src/view/kakounecontentview.cpp
     src/view/statusbar.cpp
+    src/view/promptmenu.cpp
+    src/view/inlinemenu.cpp
+    src/view/layoutmanager.cpp
+    src/view/glyphsequence.cpp
+    src/view/widgets/input.cpp
+    src/view/widgets/scrollbar.cpp
+    src/view/widgets/scrolledmenuitems.cpp
     src/core/alignment.cpp
+    src/core/utf8string.cpp
     src/kakoune/kakouneframestatemanager.cpp
     src/kakoune/kakouneclientprocess.cpp
+    src/kakoune/coord.cpp
+    src/kakoune/menustyle.cpp
     src/kakoune/line.cpp
     src/kakoune/atom.cpp
     src/kakoune/face.cpp

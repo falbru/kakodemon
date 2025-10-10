@@ -14,6 +14,7 @@ void EditorController::init(std::shared_ptr<KakouneClient> kakoune_client,
 {
     m_kakoune_client = kakoune_client;
     m_kakoune_process = kakoune_process;
+
     m_kakoune_content_view = kakoune_content_view;
     m_status_bar_view = status_bar_view;
 
@@ -30,10 +31,23 @@ void EditorController::update()
         m_kakoune_client->status_line = frame_state.value().draw_status.status_line;
         m_kakoune_client->mode_line = frame_state.value().draw_status.mode_line;
         m_kakoune_client->status_default_face = frame_state.value().draw_status.default_face;
+        m_kakoune_client->menu_selected_index = frame_state.value().menu_selected_index;
+        if (frame_state.value().menu.has_value()) {
+            auto menu_request = frame_state.value().menu.value();
+
+            m_kakoune_client->menu_visible = true;
+            m_kakoune_client->menu_items = menu_request.items;
+            m_kakoune_client->menu_anchor = menu_request.anchor;
+            m_kakoune_client->menu_face = menu_request.face;
+            m_kakoune_client->menu_selected_face = menu_request.selected_face;
+            m_kakoune_client->menu_style = menu_request.style;
+        }else {
+            m_kakoune_client->menu_visible = false;
+        }
     }
 
     m_kakoune_content_view->render(m_kakoune_client->window_content, m_kakoune_client->window_default_face, 0.0f, 0.0f);
-    m_status_bar_view->render(m_kakoune_client->status_line, m_kakoune_client->mode_line, m_kakoune_client->status_default_face, m_width, m_height);
+    m_status_bar_view->render(m_kakoune_client->mode_line, m_kakoune_client->status_default_face, m_width, m_height);
 }
 
 void EditorController::onWindowResize(int width, int height) {
@@ -54,4 +68,12 @@ void EditorController::onWindowResize(int width, int height) {
     m_columns = columns;
     m_width = width;
     m_height = height;
+}
+
+int EditorController::width() const {
+    return m_width;
+}
+
+int EditorController::height() const {
+    return m_height;
 }

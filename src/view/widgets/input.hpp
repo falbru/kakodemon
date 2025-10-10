@@ -1,0 +1,33 @@
+#ifndef VIEW_WIDGETS_INPUT_HPP_INCLUDED
+#define VIEW_WIDGETS_INPUT_HPP_INCLUDED
+
+#include "kakoune/line.hpp"
+#include "model/kakouneclient.hpp"
+#include "opengl/font.hpp"
+#include "opengl/renderer.hpp"
+#include "view/layoutmanager.hpp"
+#include "view/styling.hpp"
+#include <memory>
+
+class Input
+{
+  public:
+    Input(std::shared_ptr<opengl::Font> font);
+
+    void setContent(const kakoune::Line &content);
+
+    void render(std::shared_ptr<opengl::Renderer> renderer, const KakouneClient &kakoune_client,
+                LayoutManager &layout) const;
+
+    float width() const;
+    float height() const;
+
+  private:
+    kakoune::Line m_content;
+    std::shared_ptr<opengl::Font> m_font;
+
+    const float BORDER = 1.0f;
+    const float PADDING = SPACING_MEDIUM;
+};
+
+#endif

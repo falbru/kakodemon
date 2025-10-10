@@ -8,6 +8,8 @@
 #include <variant>
 #include <vector>
 
+#include "kakoune/coord.hpp"
+#include "kakoune/menustyle.hpp"
 #include "line.hpp"
 
 enum class IncomingRequestType
@@ -37,12 +39,31 @@ struct DrawStatusRequestData
     kakoune::Face default_face;
 };
 
+struct MenuShowData
+{
+    std::vector<kakoune::Line> items;
+    kakoune::Coord anchor;
+    kakoune::Face selected_face;
+    kakoune::Face face;
+    kakoune::MenuStyle style;
+};
+
+struct MenuHideData
+{
+};
+
+struct MenuSelectData
+{
+    int selected;
+};
+
 struct RefreshRequestData
 {
     bool force;
 };
 
-using IncomingRequestData = std::variant<DrawRequestData, DrawStatusRequestData, RefreshRequestData>;
+using IncomingRequestData = std::variant<DrawRequestData, DrawStatusRequestData, RefreshRequestData, MenuShowData,
+                                         MenuHideData, MenuSelectData>;
 
 struct IncomingRequest
 {

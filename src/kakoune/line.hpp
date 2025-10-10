@@ -12,6 +12,9 @@ namespace kakoune
 struct Line
 {
     std::vector<Atom> atoms;
+
+    int size() const;
+    UTF8String toUTF8String() const;
 };
 
 void to_json(nlohmann::json &j, const Line &line);

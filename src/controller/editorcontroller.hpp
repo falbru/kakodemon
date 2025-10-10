@@ -20,6 +20,9 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
 
     void onWindowResize(int width, int height);
 
+    int width() const;
+    int height() const;
+
   private:
     std::shared_ptr<KakouneClient> m_kakoune_client;
     std::shared_ptr<KakouneClientProcess> m_kakoune_process;

@@ -2,11 +2,13 @@
 
 void kakoune::to_json(nlohmann::json &j, const Atom &a)
 {
-    j = nlohmann::json{{"face", a.face}, {"contents", a.contents}};
+    j = nlohmann::json{{"face", a.face}, {"contents", a.contents.toString()}};
 }
 
 void kakoune::from_json(const nlohmann::json &j, Atom &a)
 {
     j.at("face").get_to(a.face);
-    j.at("contents").get_to(a.contents);
+    std::string tmp;
+    j.at("contents").get_to(tmp);
+    a.contents = UTF8String(tmp);
 }

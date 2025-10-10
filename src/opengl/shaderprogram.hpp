@@ -16,6 +16,7 @@ class ShaderProgram
     void use();
 
     void setInt(const std::string &name, int value, bool useShader = false);
+    void setFloat(const std::string &name, float value, bool useShader = false);
     void setVector4f(const std::string &name, float x, float y, float z, float w, bool useShader = false);
     void setMatrix4(const std::string &name, const glm::mat4 &mat, bool useShader = false);
 

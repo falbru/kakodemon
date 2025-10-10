@@ -6,7 +6,9 @@
 
 #include <nlohmann/json.hpp>
 
+#include "kakoune/coord.hpp"
 #include "kakoune/face.hpp"
+#include "kakoune/menustyle.hpp"
 #include "line.hpp"
 #include "spdlog/spdlog.h"
 
@@ -156,6 +158,25 @@ std::optional<IncomingRequest> KakouneClientProcess::parseRequest(std::string re
     {
         parsed_request.type = IncomingRequestType::REFRESH;
         parsed_request.data = RefreshRequestData{params[0].get<bool>()};
+        return parsed_request;
+    }
+    if (method == "menu_show")
+    {
+        parsed_request.type = IncomingRequestType::MENU_SHOW;
+
+        parsed_request.data = MenuShowData{params[0].get<std::vector<kakoune::Line>>(), params[1].get<kakoune::Coord>(), params[2].get<kakoune::Face>(), params[3].get<kakoune::Face>(), params[4].get<kakoune::MenuStyle>()};
+        return parsed_request;
+    }
+    if (method == "menu_hide")
+    {
+        parsed_request.type = IncomingRequestType::MENU_HIDE;
+        parsed_request.data = {};
+        return parsed_request;
+    }
+    if (method == "menu_select")
+    {
+        parsed_request.type = IncomingRequestType::MENU_SELECT;
+        parsed_request.data = MenuSelectData{params[0].get<int>()};
         return parsed_request;
     }
 

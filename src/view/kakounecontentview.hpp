@@ -7,6 +7,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
+#include "kakoune/coord.hpp"
 #include "kakoune/face.hpp"
 #include "kakoune/line.hpp"
 #include "opengl/font.hpp"
@@ -25,12 +26,14 @@ class KakouneContentView
 
     void render(const std::vector<kakoune::Line> &lines, const kakoune::Face &default_face, float x, float y);
 
-    int getCellWidth();
-    int getCellHeight();
+    float getCellWidth() const;
+    float getCellHeight() const;
+
+    std::pair<float, float> coordToPixels(const kakoune::Coord &coord) const;
 
   private:
     std::shared_ptr<opengl::Renderer> m_renderer;
-    opengl::Font m_font;
+    std::shared_ptr<opengl::Font> m_font;
 };
 
 #endif

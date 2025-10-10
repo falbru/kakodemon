@@ -1,7 +1,9 @@
 #ifndef OPENGL_FONT_HPP_INCLUDED
 #define OPENGL_FONT_HPP_INCLUDED
 
+#include "core/utf8string.hpp"
 #include "opengl.hpp"
+#include <X11/extensions/render.h>
 #include <freetype/freetype.h>
 #include <ft2build.h>
 #include <glm/vec2.hpp>
@@ -10,12 +12,15 @@
 
 namespace opengl
 {
-struct Character
+struct Glyph
 {
+    Codepoint codepoint;
     unsigned int TextureID;
     glm::ivec2 Size;
     glm::ivec2 Bearing;
     long Advance;
+
+    float width() const;
 };
 
 class Font
@@ -24,13 +29,16 @@ class Font
     Font(const std::string &font_path, int font_size);
     ~Font();
 
-    bool hasCharacter(char c) const;
-    const Character &getCharacter(char c) const;
+    bool hasGlyph(Codepoint c) const;
+    const Glyph &getGlyph(Codepoint c) const;
 
-    void loadCharacter(char c);
+    void loadGlyph(Codepoint c);
+    const Glyph &ensureGlyph(Codepoint c);
 
     float getAscender() const;
     float getLineHeight() const;
+
+    float width(UTF8String string);
 
   private:
     FT_Library m_ft;
@@ -38,7 +46,7 @@ class Font
 
     float m_ascender;
     float m_line_height;
-    std::map<char, Character> m_characters;
+    std::map<Codepoint, Glyph> m_glyphs;
 };
 } // namespace opengl
 
