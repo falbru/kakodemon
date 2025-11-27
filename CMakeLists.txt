@@ -23,10 +23,12 @@ set(SRC
     src/controller/editorcontroller.cpp
     src/controller/inputcontroller.cpp
     src/controller/menucontroller.cpp
+    src/controller/infoboxcontroller.cpp
     src/view/kakounecontentview.cpp
     src/view/statusbar.cpp
     src/view/promptmenu.cpp
     src/view/inlinemenu.cpp
+    src/view/infobox.cpp
     src/view/layoutmanager.cpp
     src/view/glyphsequence.cpp
     src/view/widgets/input.cpp
@@ -38,6 +40,7 @@ set(SRC
     src/kakoune/kakouneclientprocess.cpp
     src/kakoune/coord.cpp
     src/kakoune/menustyle.cpp
+    src/kakoune/infostyle.cpp
     src/kakoune/line.cpp
     src/kakoune/atom.cpp
     src/kakoune/face.cpp

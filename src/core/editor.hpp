@@ -5,23 +5,27 @@
 #include "kakoune/line.hpp"
 #include <variant>
 
-namespace core {
+namespace core
+{
 
-struct BufferContentPosition {
+struct BufferContentPosition
+{
     kakoune::Coord coord;
 };
 
-struct StatusLinePosition {
+struct StatusLinePosition
+{
     int column;
 };
 
 using CursorPosition = std::variant<BufferContentPosition, StatusLinePosition>;
 
-struct StatusLine {
+struct StatusLine
+{
     kakoune::Line prompt;
     kakoune::Line content;
 };
 
-}
+} // namespace core
 
 #endif // editor_hpp_INCLUDED

@@ -3,6 +3,8 @@
 
 const float SPACING_SMALL = 2.0f;
 const float SPACING_MEDIUM = 4.0f;
-const float SPACING_LARGE = 4.0f;
+const float SPACING_LARGE = 8.0f;
+const float SPACING_XL = 16.0f;
+const float SPACING_XXL = 32.0f;
 
 #endif

@@ -12,7 +12,8 @@
 #include "opengl/font.hpp"
 #include "opengl/shaderprogram.hpp"
 
-struct Rectangle {
+struct Rectangle
+{
     float x;
     float y;
     float width;

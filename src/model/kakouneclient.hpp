@@ -25,6 +25,13 @@ struct KakouneClient
     kakoune::Face menu_face;
     kakoune::Face menu_selected_face;
     kakoune::MenuStyle menu_style;
+
+    bool info_box_visible;
+    kakoune::Line info_box_title;
+    std::vector<kakoune::Line> info_box_content;
+    kakoune::Coord info_box_anchor;
+    kakoune::Face info_box_face;
+    kakoune::InfoStyle info_box_style;
 };
 
 #endif

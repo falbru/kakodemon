@@ -29,9 +29,15 @@ class KakouneContentView
     float getCellWidth() const;
     float getCellHeight() const;
 
+    void setWidth(float width);
+    void setHeight(float height);
+    float width() const;
+    float height() const;
+
     std::pair<float, float> coordToPixels(const kakoune::Coord &coord) const;
 
   private:
+    float m_width, m_height;
     std::shared_ptr<opengl::Renderer> m_renderer;
     std::shared_ptr<opengl::Font> m_font;
 };

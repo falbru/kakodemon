@@ -17,8 +17,7 @@ class Input
     void setPrompt(const kakoune::Line &prompt);
     void setContent(const kakoune::Line &content);
 
-    void render(std::shared_ptr<opengl::Renderer> renderer, const KakouneClient &kakoune_client,
-                LayoutManager &layout);
+    void render(std::shared_ptr<opengl::Renderer> renderer, const KakouneClient &kakoune_client, LayoutManager &layout);
 
     float width() const;
     float height() const;

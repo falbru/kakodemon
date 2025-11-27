@@ -16,11 +16,21 @@ class InlineMenuView
 
     void render(const KakouneClient &kakoune_client, float width, float height);
 
+    float x() const;
+    float y() const;
+    float width() const;
+    float height() const;
+
   private:
     int m_scroll_offset;
 
     const float MAX_MENU_WIDTH = 700;
     const int MAX_VISIBLE_ITEMS = 12;
+
+    float m_x;
+    float m_y;
+    float m_width;
+    float m_height;
 
     std::shared_ptr<KakouneContentView> m_kakoune_content_view;
     std::shared_ptr<opengl::Renderer> m_renderer;

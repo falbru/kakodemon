@@ -60,6 +60,14 @@ void KakouneFrameStateManager::onRequest(const IncomingRequest& request)
         m_next_frame_state.menu_selected_index = -1;
         break;
     }
+    case IncomingRequestType::INFO_SHOW: {
+        m_next_frame_state.info_box = std::get<InfoShowData>(request.data);
+        break;
+    }
+    case IncomingRequestType::INFO_HIDE: {
+        m_next_frame_state.info_box = std::nullopt;
+        break;
+    }
     case IncomingRequestType::MENU_SELECT: {
         m_next_frame_state.menu_selected_index = std::get<MenuSelectData>(request.data).selected;
         break;

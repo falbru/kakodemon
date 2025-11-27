@@ -46,9 +46,23 @@ void EditorController::update()
         }else {
             m_kakoune_client->menu_visible = false;
         }
+        if (frame_state.value().info_box.has_value()) {
+            auto info_box_request = frame_state.value().info_box.value();
+
+            m_kakoune_client->info_box_visible = true;
+            m_kakoune_client->info_box_title = info_box_request.title;
+            m_kakoune_client->info_box_content = info_box_request.content;
+            m_kakoune_client->info_box_anchor = info_box_request.anchor;
+            m_kakoune_client->info_box_face = info_box_request.face;
+            m_kakoune_client->info_box_style = info_box_request.style;
+        }else {
+            m_kakoune_client->info_box_visible = false;
+        }
     }
 
     m_kakoune_content_view->render(m_kakoune_client->window_content, m_kakoune_client->window_default_face, 0.0f, 0.0f);
+    m_kakoune_content_view->setWidth(m_width);
+    m_kakoune_content_view->setHeight(m_height);
     m_status_bar_view->render(m_kakoune_client->mode_line, m_kakoune_client->status_default_face, m_width, m_height);
 }
 

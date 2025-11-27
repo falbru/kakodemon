@@ -4,7 +4,7 @@
 
 PromptMenuView::PromptMenuView()
 {
-    m_font = std::make_shared<opengl::Font>("/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf", 17);
+    m_font = std::make_shared<opengl::Font>("/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf", 14);
     m_input = std::make_unique<Input>(m_font);
     m_scrolled_menu_items = std::make_unique<ScrolledMenuItems>(m_font, MAX_VISIBLE_ITEMS);
 }
@@ -29,16 +29,16 @@ void PromptMenuView::render(const KakouneClient &kakoune_client, float width, fl
     m_input->setPrompt(kakoune_client.status_line.prompt);
     m_input->setContent(kakoune_client.status_line.content);
 
-    float menu_x = (width - WIDTH) / 2;
-    float menu_height = 2 * SPACING_MEDIUM + m_input->height();
+    m_x = (width - WIDTH) / 2;
+    m_height = 2 * SPACING_MEDIUM + m_input->height();
 
     float items_size = std::min(MAX_VISIBLE_ITEMS, (int)kakoune_client.menu_items.size());
     if (kakoune_client.menu_visible)
     {
-        menu_height += SPACING_MEDIUM + m_font->getLineHeight() * items_size;
+        m_height += SPACING_MEDIUM + m_font->getLineHeight() * items_size;
     }
 
-    LayoutManager layout(menu_x, Y, WIDTH, menu_height);
+    LayoutManager layout(m_x, Y, WIDTH, m_height);
 
     m_renderer->renderRectWithShadow(
         kakoune_client.menu_face.bg.toCoreColor(kakoune_client.window_default_face.bg, false), layout.current().x,
@@ -53,4 +53,20 @@ void PromptMenuView::render(const KakouneClient &kakoune_client, float width, fl
         layout.gapY(SPACING_MEDIUM);
         m_scrolled_menu_items->render(m_renderer, kakoune_client, layout);
     }
+}
+
+float PromptMenuView::x() const {
+    return m_x;
+}
+
+float PromptMenuView::y() const {
+    return Y;
+}
+
+float PromptMenuView::width() const {
+    return WIDTH;
+}
+
+float PromptMenuView::height() const {
+    return m_height;
 }

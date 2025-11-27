@@ -32,3 +32,19 @@ std::pair<float, float> KakouneContentView::coordToPixels(const kakoune::Coord& 
     float y = getCellHeight() * coord.line;
     return std::make_pair(x, y);
 }
+
+void KakouneContentView::setWidth(float width) {
+    m_width = width;
+}
+
+void KakouneContentView::setHeight(float height) {
+    m_height = height;
+}
+
+float KakouneContentView::width() const {
+    return m_width;
+}
+
+float KakouneContentView::height() const {
+    return m_height;
+}
