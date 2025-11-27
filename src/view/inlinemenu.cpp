@@ -37,6 +37,11 @@ void InlineMenuView::render(const KakouneClient &kakoune_client, float width, fl
         menu_y = menu_position.second - SPACING_SMALL - menu_height;
     }
 
+    m_x = menu_x;
+    m_y = menu_y;
+    m_width = menu_width;
+    m_height = menu_height;
+
     LayoutManager layout(menu_x, menu_y, menu_width, menu_height);
 
     m_renderer->renderRect(kakoune_client.menu_face.bg.toCoreColor(kakoune_client.window_default_face.bg, false),
@@ -45,4 +50,20 @@ void InlineMenuView::render(const KakouneClient &kakoune_client, float width, fl
     layout.pad(0, SPACING_MEDIUM);
 
     m_scrolled_menu_items->render(m_renderer, kakoune_client, layout);
+}
+
+float InlineMenuView::x() const {
+    return m_x;
+}
+
+float InlineMenuView::y() const {
+    return m_y;
+}
+
+float InlineMenuView::width() const {
+    return m_width;
+}
+
+float InlineMenuView::height() const {
+    return m_height;
 }

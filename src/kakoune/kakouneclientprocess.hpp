@@ -1,7 +1,6 @@
 #ifndef KAKOUNECLIENTPROCESS_HPP_INCLUDED
 #define KAKOUNECLIENTPROCESS_HPP_INCLUDED
 
-#include <queue>
 #include <sys/poll.h>
 
 #include <string>
@@ -9,6 +8,7 @@
 #include <vector>
 
 #include "kakoune/coord.hpp"
+#include "kakoune/infostyle.hpp"
 #include "kakoune/menustyle.hpp"
 #include "line.hpp"
 
@@ -57,13 +57,25 @@ struct MenuSelectData
     int selected;
 };
 
+struct InfoShowData
+{
+    kakoune::Line title;
+    std::vector<kakoune::Line> content;
+    kakoune::Coord anchor;
+    kakoune::Face face;
+    kakoune::InfoStyle style;
+};
+
+struct InfoHideData
+{
+};
+
 struct RefreshRequestData
 {
     bool force;
 };
 
-using IncomingRequestData = std::variant<DrawRequestData, DrawStatusRequestData, RefreshRequestData, MenuShowData,
-                                         MenuHideData, MenuSelectData>;
+using IncomingRequestData = std::variant<DrawRequestData, DrawStatusRequestData, RefreshRequestData, MenuShowData, MenuHideData, MenuSelectData, InfoShowData, InfoHideData>;
 
 struct IncomingRequest
 {

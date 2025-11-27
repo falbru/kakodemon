@@ -8,6 +8,7 @@
 
 #include "kakoune/coord.hpp"
 #include "kakoune/face.hpp"
+#include "kakoune/infostyle.hpp"
 #include "kakoune/menustyle.hpp"
 #include "line.hpp"
 #include "spdlog/spdlog.h"
@@ -70,7 +71,7 @@ void KakouneClientProcess::start()
     }
 }
 
-void KakouneClientProcess::setRequestCallback(std::function<void(const IncomingRequest&)> callback)
+void KakouneClientProcess::setRequestCallback(std::function<void(const IncomingRequest &)> callback)
 {
     m_request_callback = callback;
 }
@@ -111,15 +112,18 @@ void KakouneClientProcess::pollForRequests()
     m_request_remainder = request_stream;
 }
 
-void KakouneClientProcess::sendRequest(const OutgoingRequest& request)
+void KakouneClientProcess::sendRequest(const OutgoingRequest &request)
 {
     nlohmann::json data;
     data["jsonrpc"] = "2.0";
 
-    if (request.type == OutgoingRequestType::KEYS) {
+    if (request.type == OutgoingRequestType::KEYS)
+    {
         data["method"] = "keys";
         data["params"] = std::get<KeysRequestData>(request.data).keys;
-    }else if (request.type == OutgoingRequestType::RESIZE) {
+    }
+    else if (request.type == OutgoingRequestType::RESIZE)
+    {
         auto resize_data = std::get<ResizeRequestData>(request.data);
 
         data["method"] = "resize";
@@ -135,7 +139,8 @@ void KakouneClientProcess::sendRequest(const OutgoingRequest& request)
     }
 }
 
-std::optional<IncomingRequest> KakouneClientProcess::parseRequest(std::string request) {
+std::optional<IncomingRequest> KakouneClientProcess::parseRequest(std::string request)
+{
     nlohmann::json data = nlohmann::json::parse(request);
 
     std::string method = data["method"];
@@ -145,13 +150,15 @@ std::optional<IncomingRequest> KakouneClientProcess::parseRequest(std::string re
     if (method == "draw")
     {
         parsed_request.type = IncomingRequestType::DRAW;
-        parsed_request.data = DrawRequestData{params[0].get<std::vector<kakoune::Line>>(), params[1].get<kakoune::Face>()};
+        parsed_request.data =
+            DrawRequestData{params[0].get<std::vector<kakoune::Line>>(), params[2].get<kakoune::Face>()};
         return parsed_request;
     }
     if (method == "draw_status")
     {
         parsed_request.type = IncomingRequestType::DRAW_STATUS;
-        parsed_request.data = DrawStatusRequestData{params[0].get<kakoune::Line>(), params[1].get<kakoune::Line>(), params[2].get<kakoune::Face>()};
+        parsed_request.data = DrawStatusRequestData{params[1].get<kakoune::Line>(), params[3].get<kakoune::Line>(),
+                                                    params[4].get<kakoune::Face>()};
         return parsed_request;
     }
     if (method == "refresh")
@@ -164,7 +171,9 @@ std::optional<IncomingRequest> KakouneClientProcess::parseRequest(std::string re
     {
         parsed_request.type = IncomingRequestType::MENU_SHOW;
 
-        parsed_request.data = MenuShowData{params[0].get<std::vector<kakoune::Line>>(), params[1].get<kakoune::Coord>(), params[2].get<kakoune::Face>(), params[3].get<kakoune::Face>(), params[4].get<kakoune::MenuStyle>()};
+        parsed_request.data = MenuShowData{params[0].get<std::vector<kakoune::Line>>(), params[1].get<kakoune::Coord>(),
+                                           params[2].get<kakoune::Face>(), params[3].get<kakoune::Face>(),
+                                           params[4].get<kakoune::MenuStyle>()};
         return parsed_request;
     }
     if (method == "menu_hide")
@@ -177,6 +186,20 @@ std::optional<IncomingRequest> KakouneClientProcess::parseRequest(std::string re
     {
         parsed_request.type = IncomingRequestType::MENU_SELECT;
         parsed_request.data = MenuSelectData{params[0].get<int>()};
+        return parsed_request;
+    }
+    if (method == "info_show")
+    {
+        parsed_request.type = IncomingRequestType::INFO_SHOW;
+        parsed_request.data = InfoShowData{params[0].get<kakoune::Line>(), params[1].get<std::vector<kakoune::Line>>(),
+                                           params[2].get<kakoune::Coord>(), params[3].get<kakoune::Face>(),
+                                           params[4].get<kakoune::InfoStyle>()};
+        return parsed_request;
+    }
+    if (method == "info_hide")
+    {
+        parsed_request.type = IncomingRequestType::INFO_HIDE;
+        parsed_request.data = {};
         return parsed_request;
     }
 

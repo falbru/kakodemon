@@ -13,6 +13,7 @@ struct FrameState
     DrawRequestData draw;
     DrawStatusRequestData draw_status;
     std::optional<MenuShowData> menu;
+    std::optional<InfoShowData> info_box;
     int menu_selected_index;
 };
 

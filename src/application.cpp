@@ -1,4 +1,5 @@
 #include "application.hpp"
+#include "controller/infoboxcontroller.hpp"
 #include "controller/menucontroller.hpp"
 #include "core/color.hpp"
 #include "core/keys.hpp"
@@ -7,6 +8,7 @@
 #include "model/kakouneclient.hpp"
 #include "opengl/font.hpp"
 #include "opengl/renderer.hpp"
+#include "view/infobox.hpp"
 #include "view/inlinemenu.hpp"
 #include "view/kakounecontentview.hpp"
 #include "view/statusbar.hpp"
@@ -81,22 +83,26 @@ void Application::initMVC() {
     m_editor_controller = std::make_shared<EditorController>();
     m_input_controller = std::make_shared<InputController>();
     m_menu_controller = std::make_shared<MenuController>();
+    m_info_box_controller = std::make_shared<InfoBoxController>();
     m_kakoune_client = std::make_shared<KakouneClient>();
     m_kakoune_process = std::make_shared<KakouneClientProcess>("default");
     m_kakoune_content_view = std::make_shared<KakouneContentView>();
     m_status_bar = std::make_shared<StatusBarView>();
     m_prompt_menu = std::make_shared<PromptMenuView>();
     m_inline_menu = std::make_shared<InlineMenuView>();
+    m_info_box = std::make_shared<InfoBoxView>();
 
     m_input_controller->init(m_kakoune_client, m_kakoune_process);
     m_kakoune_content_view->init(m_renderer);
     m_status_bar->init(m_renderer);
     m_prompt_menu->init(m_renderer, m_kakoune_content_view);
     m_inline_menu->init(m_renderer, m_kakoune_content_view);
+    m_info_box->init(m_renderer, m_menu_controller, m_kakoune_content_view);
     m_kakoune_process->start();
     m_editor_controller->init(m_kakoune_client, m_kakoune_process, m_kakoune_content_view, m_status_bar);
     m_editor_controller->onWindowResize(width, height); // TODO move to init
     m_menu_controller->init(m_kakoune_client, m_editor_controller, m_prompt_menu, m_inline_menu);
+    m_info_box_controller->init(m_kakoune_client, m_editor_controller, m_info_box);
 }
 
 void Application::run()
@@ -111,6 +117,7 @@ void Application::run()
 
         m_editor_controller->update();
         m_menu_controller->update();
+        m_info_box_controller->update();
 
         glfwSwapBuffers(m_window);
         glfwPollEvents();
