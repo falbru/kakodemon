@@ -6,7 +6,7 @@
 
 KakouneContentView::KakouneContentView()
 {
-    m_font = std::make_shared<opengl::Font>("/home/falk/.fonts/MonoLisa/ttf/MonoLisa-Regular.ttf", 14);
+    m_font = std::make_shared<opengl::Font>("/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf", 17);
 }
 
 void KakouneContentView::init(std::shared_ptr<opengl::Renderer> renderer)

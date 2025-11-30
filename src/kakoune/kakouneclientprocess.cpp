@@ -57,7 +57,7 @@ void KakouneClientProcess::start()
         dup2(m_stdout_pipefd[1], STDOUT_FILENO);
         close(m_stdout_pipefd[1]);
 
-        execlp("kak", "kak", "-ui", "json", "-c", m_session_name.c_str(), nullptr);
+        execlp("/usr/local/bin/kak2", "kak2", "-ui", "json", "-c", m_session_name.c_str(), nullptr);
         perror("execlp");
         _exit(1);
     }
@@ -145,13 +145,13 @@ std::optional<IncomingRequest> KakouneClientProcess::parseRequest(std::string re
     if (method == "draw")
     {
         parsed_request.type = IncomingRequestType::DRAW;
-        parsed_request.data = DrawRequestData{params[0].get<std::vector<kakoune::Line>>(), params[1].get<kakoune::Face>()};
+        parsed_request.data = DrawRequestData{params[0].get<std::vector<kakoune::Line>>(), params[1].get<kakoune::Coord>(), params[2].get<kakoune::Face>()};
         return parsed_request;
     }
     if (method == "draw_status")
     {
         parsed_request.type = IncomingRequestType::DRAW_STATUS;
-        parsed_request.data = DrawStatusRequestData{params[0].get<kakoune::Line>(), params[1].get<kakoune::Line>(), params[2].get<kakoune::Face>()};
+        parsed_request.data = DrawStatusRequestData{params[0].get<kakoune::Line>(), params[1].get<kakoune::Line>(), params[2].get<int>(), params[3].get<kakoune::Line>(), params[4].get<kakoune::Face>()};
         return parsed_request;
     }
     if (method == "refresh")

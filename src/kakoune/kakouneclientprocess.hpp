@@ -29,12 +29,15 @@ enum class IncomingRequestType
 struct DrawRequestData
 {
     std::vector<kakoune::Line> lines;
+    kakoune::Coord cursor_pos;
     kakoune::Face default_face;
 };
 
 struct DrawStatusRequestData
 {
-    kakoune::Line status_line;
+    kakoune::Line status_line_prompt;
+    kakoune::Line status_line_content;
+    int cursor_pos;
     kakoune::Line mode_line;
     kakoune::Face default_face;
 };

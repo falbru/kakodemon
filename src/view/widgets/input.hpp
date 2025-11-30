@@ -14,15 +14,19 @@ class Input
   public:
     Input(std::shared_ptr<opengl::Font> font);
 
+    void setPrompt(const kakoune::Line &prompt);
     void setContent(const kakoune::Line &content);
 
     void render(std::shared_ptr<opengl::Renderer> renderer, const KakouneClient &kakoune_client,
-                LayoutManager &layout) const;
+                LayoutManager &layout);
 
     float width() const;
     float height() const;
 
   private:
+    float m_offset_x = 0.0f;
+
+    kakoune::Line m_prompt;
     kakoune::Line m_content;
     std::shared_ptr<opengl::Font> m_font;
 

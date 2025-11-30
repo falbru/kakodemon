@@ -32,6 +32,7 @@ class LayoutManager
     void gapY(float gap_size);
 
     LayoutManager sliceTop(float height);
+    LayoutManager sliceLeft(float width);
 
   private:
     Rect m_current;

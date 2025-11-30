@@ -4,7 +4,7 @@
 
 PromptMenuView::PromptMenuView()
 {
-    m_font = std::make_shared<opengl::Font>("/home/falk/.fonts/MonoLisa/ttf/MonoLisa-Regular.ttf", 14);
+    m_font = std::make_shared<opengl::Font>("/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf", 17);
     m_input = std::make_unique<Input>(m_font);
     m_scrolled_menu_items = std::make_unique<ScrolledMenuItems>(m_font, MAX_VISIBLE_ITEMS);
 }
@@ -18,7 +18,7 @@ void PromptMenuView::init(std::shared_ptr<opengl::Renderer> renderer,
 
 void PromptMenuView::render(const KakouneClient &kakoune_client, float width, float height)
 {
-    if (kakoune_client.status_line.atoms.size() < 1)
+    if (kakoune_client.status_line.prompt.atoms.size() < 1 && kakoune_client.status_line.content.atoms.size() < 1)
         return;
 
     static bool opened_before = false; // TODO remove this???
@@ -26,7 +26,8 @@ void PromptMenuView::render(const KakouneClient &kakoune_client, float width, fl
         return;
     opened_before = true;
 
-    m_input->setContent(kakoune_client.status_line);
+    m_input->setPrompt(kakoune_client.status_line.prompt);
+    m_input->setContent(kakoune_client.status_line.content);
 
     float menu_x = (width - WIDTH) / 2;
     float menu_height = 2 * SPACING_MEDIUM + m_input->height();

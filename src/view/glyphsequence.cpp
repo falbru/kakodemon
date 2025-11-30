@@ -1,11 +1,14 @@
 #include "view/glyphsequence.hpp"
 #include "core/utf8string.hpp"
+#include "opengl/font.hpp"
 
 GlyphSequence::GlyphSequence(std::shared_ptr<opengl::Font> font, const UTF8String& string) : m_font(font) {
     for (int i = 0; i < string.size(); i++) {
         m_glyphs.push_back(m_font->ensureGlyph(string.at(i)));
     }
 }
+
+GlyphSequence::GlyphSequence(std::shared_ptr<opengl::Font> font, std::vector<opengl::Glyph> glyphs) : m_font(font), m_glyphs(glyphs) {}
 
 float GlyphSequence::width() const {
     float w = 0;
@@ -39,6 +42,23 @@ void GlyphSequence::truncate(float max_width) {
 
     m_glyphs.erase(it, m_glyphs.end());
     m_glyphs.push_back(ellipsis);
+}
+
+void GlyphSequence::cut(float max_width) {
+    if (width() < max_width) return;
+
+    auto it = m_glyphs.begin();
+    float it_width = 0;
+    while (it != m_glyphs.end() && it_width + it->width() < max_width) {
+        it_width += it->width();
+        it++;
+    }
+
+    m_glyphs.erase(it, m_glyphs.end());
+}
+
+GlyphSequence GlyphSequence::substr(int start, int length) {
+    return GlyphSequence(m_font, std::vector<opengl::Glyph>(m_glyphs.begin() + start, m_glyphs.begin() + start + length));
 }
 
 UTF8String GlyphSequence::toUTF8String() {

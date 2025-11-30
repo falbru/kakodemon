@@ -9,6 +9,7 @@ class GlyphSequence
 {
   public:
     GlyphSequence(std::shared_ptr<opengl::Font> font, const UTF8String &string);
+    GlyphSequence(std::shared_ptr<opengl::Font> font, std::vector<opengl::Glyph> glyphs);
 
     float width() const;
 
@@ -16,6 +17,8 @@ class GlyphSequence
     const std::vector<opengl::Glyph> &glyphs() const;
 
     void truncate(float max_width);
+    void cut(float max_width);
+    GlyphSequence substr(int start, int length);
 
     UTF8String toUTF8String();
 

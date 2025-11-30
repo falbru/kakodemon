@@ -2,6 +2,7 @@
 #define OPENGL_RENDERER_HPP_INCLUDED
 
 #include <memory>
+#include <stack>
 #include <vector>
 
 #include "core/alignment.hpp"
@@ -10,6 +11,13 @@
 #include "kakoune/line.hpp"
 #include "opengl/font.hpp"
 #include "opengl/shaderprogram.hpp"
+
+struct Rectangle {
+    float x;
+    float y;
+    float width;
+    float height;
+};
 
 namespace opengl
 {
@@ -21,6 +29,8 @@ class Renderer
 
     void init(int width, int height);
     void onWindowResize(int width, int height);
+    void addBounds(float x, float y, float width, float height);
+    void popBounds();
 
     void renderRect(const core::Color color, float x, float y, float width, float height) const;
     void renderRectWithShadow(const core::Color color, float x, float y, float width, float height,
@@ -43,6 +53,8 @@ class Renderer
     unsigned int m_rect_vao, m_rect_vbo;
 
     int m_screen_width, m_screen_height;
+
+    std::stack<Rectangle> m_bounds;
 };
 
 } // namespace opengl

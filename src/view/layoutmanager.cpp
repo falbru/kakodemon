@@ -68,3 +68,10 @@ LayoutManager LayoutManager::sliceTop(float height) {
     m_current.height -= height;
     return slice;
 }
+
+LayoutManager LayoutManager::sliceLeft(float width) {
+    LayoutManager slice(m_current.x, m_current.y, width, m_current.height);
+    m_current.x += width;
+    m_current.width -= width;
+    return slice;
+}

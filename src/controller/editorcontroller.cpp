@@ -1,4 +1,5 @@
 #include "editorcontroller.hpp"
+#include "core/editor.hpp"
 #include "kakoune/kakouneclientprocess.hpp"
 #include "view/statusbar.hpp"
 #include <memory>
@@ -28,7 +29,8 @@ void EditorController::update()
     if (frame_state.has_value()) {
         m_kakoune_client->window_content = frame_state.value().draw.lines;
         m_kakoune_client->window_default_face = frame_state.value().draw.default_face;
-        m_kakoune_client->status_line = frame_state.value().draw_status.status_line;
+        m_kakoune_client->status_line = core::StatusLine{frame_state.value().draw_status.status_line_prompt , frame_state.value().draw_status.status_line_content};
+        m_kakoune_client->cursor_pos = core::StatusLinePosition{frame_state.value().draw_status.cursor_pos};
         m_kakoune_client->mode_line = frame_state.value().draw_status.mode_line;
         m_kakoune_client->status_default_face = frame_state.value().draw_status.default_face;
         m_kakoune_client->menu_selected_index = frame_state.value().menu_selected_index;

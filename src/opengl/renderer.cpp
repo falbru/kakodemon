@@ -44,6 +44,23 @@ void opengl::Renderer::onWindowResize(int width, int height) {
     m_screen_height = height;
 }
 
+void opengl::Renderer::addBounds(float x, float y, float width, float height) {
+    glEnable(GL_SCISSOR_TEST);
+    Rectangle r{x, m_screen_height - height - y, width, height};
+    glScissor(r.x, r.y, r.width, r.height);
+    m_bounds.push(r);
+}
+
+void opengl::Renderer::popBounds() {
+    m_bounds.pop();
+    if (m_bounds.empty()) {
+        glDisable(GL_SCISSOR_TEST);
+    }else {
+        auto r = m_bounds.top();
+        glScissor(r.x, r.y, r.width, r.height);
+    }
+}
+
 void opengl::Renderer::renderLine(std::shared_ptr<Font> font, const kakoune::Line& line, const kakoune::Face& default_face, float x, float y) const {
     renderLine(font, line, default_face, x, y, core::Alignment());
 }

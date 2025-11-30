@@ -1,0 +1,27 @@
+#ifndef EDITOR_HPP_INCLUDED
+#define EDITOR_HPP_INCLUDED
+
+#include "kakoune/coord.hpp"
+#include "kakoune/line.hpp"
+#include <variant>
+
+namespace core {
+
+struct BufferContentPosition {
+    kakoune::Coord coord;
+};
+
+struct StatusLinePosition {
+    int column;
+};
+
+using CursorPosition = std::variant<BufferContentPosition, StatusLinePosition>;
+
+struct StatusLine {
+    kakoune::Line prompt;
+    kakoune::Line content;
+};
+
+}
+
+#endif // editor_hpp_INCLUDED

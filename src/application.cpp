@@ -82,7 +82,7 @@ void Application::initMVC() {
     m_input_controller = std::make_shared<InputController>();
     m_menu_controller = std::make_shared<MenuController>();
     m_kakoune_client = std::make_shared<KakouneClient>();
-    m_kakoune_process = std::make_shared<KakouneClientProcess>("default");
+    m_kakoune_process = std::make_shared<KakouneClientProcess>("default2");
     m_kakoune_content_view = std::make_shared<KakouneContentView>();
     m_status_bar = std::make_shared<StatusBarView>();
     m_prompt_menu = std::make_shared<PromptMenuView>();
