@@ -3,14 +3,14 @@
 #include "model/kakouneclient.hpp"
 #include "view/glyphsequence.hpp"
 
-Input::Input(std::shared_ptr<opengl::Font> font)
+Input::Input(Font* font)
     : m_font(font) {}
 
 void Input::setPrompt(const kakoune::Line& prompt) { m_prompt = prompt; }
 
 void Input::setContent(const kakoune::Line& content) { m_content = content; }
 
-void Input::render(std::shared_ptr<opengl::Renderer> renderer,
+void Input::render(Renderer* renderer,
                    const KakouneClient& kakoune_client,
                    LayoutManager &layout) {
   auto input_layout = layout.sliceTop(height());
@@ -76,7 +76,7 @@ void Input::render(std::shared_ptr<opengl::Renderer> renderer,
 
 float Input::width() const {
   return BORDER * 2 + PADDING * 2 +
-         m_content.size() * (m_font->getGlyph('A').width());
+         m_font->width(m_content.toUTF8String());
 }
 
 float Input::height() const {

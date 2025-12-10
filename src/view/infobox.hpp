@@ -2,7 +2,7 @@
 #define VIEW_INFOBOX_HPP_INCLUDED
 #include "controller/menucontroller.hpp"
 #include "model/kakouneclient.hpp"
-#include "opengl/renderer.hpp"
+#include "model/uioptions.hpp"
 #include "view/kakounecontentview.hpp"
 
 enum class PlacementDirection
@@ -34,29 +34,27 @@ class InfoBoxView
 {
   public:
     InfoBoxView();
-    void init(std::shared_ptr<opengl::Renderer> renderer, std::shared_ptr<MenuController> menu_controller,
-              std::shared_ptr<KakouneContentView> kakoune_content_view);
+    void init(Renderer *renderer, MenuController *menu_controller, KakouneContentView *kakoune_content_view);
 
     std::pair<float, float> calculateInfoBoxPosition(const Rectangle &anchor, float info_box_width,
                                                      float info_box_height, float viewport_width, float viewport_height,
                                                      PlacementDirection direction, CrossAxisAlignment alignment) const;
 
     std::pair<std::vector<kakoune::Line>, std::pair<float, float>> calculateWrappedContent(
-        const std::vector<kakoune::Line> &input_lines, float max_width) const;
+        const std::vector<kakoune::Line> &input_lines, float max_width, Font *font) const;
 
     std::optional<Placement> tryPlaceInfoBox(PlacementDirection direction, CrossAxisAlignment alignment,
                                              const std::vector<kakoune::Line> &content, const Rectangle &anchor,
-                                             float layout_width, float layout_height);
+                                             float layout_width, float layout_height, Font *font);
 
-    void render(const KakouneClient &kakoune_client, float width, float height);
+    void render(const KakouneClient &kakoune_client, const UIOptions &ui_options, float width, float height);
 
   private:
     const float MIN_WIDTH = 150.0f;
     const float MAX_WIDTH = 1000.0f;
-    std::shared_ptr<opengl::Renderer> m_renderer;
-    std::shared_ptr<KakouneContentView> m_kakoune_content_view;
-    std::shared_ptr<opengl::Font> m_font;
-    std::shared_ptr<MenuController> m_menu_controller;
+    Renderer *m_renderer;
+    KakouneContentView *m_kakoune_content_view;
+    MenuController *m_menu_controller;
 };
 
 #endif // VIEW_INFOBOX_HPP_INCLUDED

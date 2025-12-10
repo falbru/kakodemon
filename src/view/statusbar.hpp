@@ -1,24 +1,22 @@
 #ifndef STATUSBAR_HPP_INCLUDED
 #define STATUSBAR_HPP_INCLUDED
 
-#include "opengl/renderer.hpp"
-#include <memory>
+#include "renderer.hpp"
 
 class StatusBarView
 {
   public:
     StatusBarView();
 
-    void init(std::shared_ptr<opengl::Renderer> renderer);
+    void init(Renderer *renderer);
 
-    void render(const kakoune::Line &mode, const kakoune::Face &default_face, float width, float height);
+    void render(Font *font, const kakoune::Line &mode, const kakoune::Face &default_face, float width, float height);
 
-    int getCellWidth();
-    int getCellHeight();
+    int getCellWidth(Font *font);
+    int getCellHeight(Font *font);
 
   private:
-    std::shared_ptr<opengl::Renderer> m_renderer;
-    std::shared_ptr<opengl::Font> m_font;
+    Renderer *m_renderer;
 };
 
 #endif // statusbar_hpp_INCLUDED

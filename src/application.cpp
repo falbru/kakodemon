@@ -6,8 +6,7 @@
 #include "controller/editorcontroller.hpp"
 #include "controller/inputcontroller.hpp"
 #include "model/kakouneclient.hpp"
-#include "opengl/font.hpp"
-#include "opengl/renderer.hpp"
+#include "model/uioptions.hpp"
 #include "view/infobox.hpp"
 #include "view/inlinemenu.hpp"
 #include "view/kakounecontentview.hpp"
@@ -16,234 +15,64 @@
 
 Application::Application()
 {
-
 }
 
 Application::~Application()
 {
-    glfwTerminate();
 }
 
 void Application::init()
 {
-    initGLFW();
-    initMVC();
-}
+    m_kakoune_client = std::make_unique<KakouneClient>();
+    m_kakoune_process = std::make_unique<KakouneClientProcess>("default");
+    m_ui_options = std::make_unique<UIOptions>();
 
-void Application::initGLFW()
-{
-    if (!glfwInit()) {
-        return;
-    }
+    m_editor_controller = std::make_unique<EditorController>();
+    m_input_controller = std::make_unique<InputController>();
+    m_menu_controller = std::make_unique<MenuController>();
+    m_info_box_controller = std::make_unique<InfoBoxController>();
+    m_kakoune_content_view = std::make_unique<KakouneContentView>();
+    m_status_bar = std::make_unique<StatusBarView>();
+    m_prompt_menu = std::make_unique<PromptMenuView>();
+    m_inline_menu = std::make_unique<InlineMenuView>();
+    m_info_box = std::make_unique<InfoBoxView>();
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    m_kakoune_content_view->init(m_renderer.get());
+    m_status_bar->init(m_renderer.get());
+    m_prompt_menu->init(m_renderer.get(), m_kakoune_content_view.get());
+    m_inline_menu->init(m_renderer.get(), m_kakoune_content_view.get());
+    m_info_box->init(m_renderer.get(), m_menu_controller.get(), m_kakoune_content_view.get());
 
-    m_window = glfwCreateWindow(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, "Kakodemon", NULL, NULL);
-    if (!m_window)
-    {
-        glfwTerminate();
-        return;
-    }
+    m_input_controller->init(m_kakoune_client.get(), m_kakoune_process.get());
+    m_editor_controller->init(m_kakoune_client.get(), m_kakoune_process.get(), m_kakoune_content_view.get(), m_status_bar.get(), [&](core::Color color) { setClearColor(color); });
+    m_menu_controller->init(m_kakoune_client.get(), m_editor_controller.get(), m_prompt_menu.get(), m_inline_menu.get());
+    m_info_box_controller->init(m_kakoune_client.get(), m_editor_controller.get(), m_info_box.get());
 
-    glfwMakeContextCurrent(m_window);
-    glfwSwapInterval( 0 );
-    glfwSetWindowUserPointer(m_window, this);
-
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        return;
-    }
-
-    glViewport(0, 0, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
-
-    glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int width, int height) {
-        Application* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
-        app->onWindowResize(width, height);
-    });
-
-    glfwSetCharModsCallback(m_window, [](GLFWwindow* window, unsigned int codepoint, int mods) {
-        Application* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
-        app->onCharacterInsert(codepoint, mods);
-    });
-
-    glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-        Application* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
-        app->onKeyInput(key, scancode, action, mods);
-    });
-}
-
-void Application::initMVC() {
-    int width, height;
-    glfwGetWindowSize(m_window, &width, &height);
-
-    m_renderer = std::make_shared<opengl::Renderer>();
-    m_renderer->init(width, height);
-
-    m_editor_controller = std::make_shared<EditorController>();
-    m_input_controller = std::make_shared<InputController>();
-    m_menu_controller = std::make_shared<MenuController>();
-    m_info_box_controller = std::make_shared<InfoBoxController>();
-    m_kakoune_client = std::make_shared<KakouneClient>();
-    m_kakoune_process = std::make_shared<KakouneClientProcess>("default");
-    m_kakoune_content_view = std::make_shared<KakouneContentView>();
-    m_status_bar = std::make_shared<StatusBarView>();
-    m_prompt_menu = std::make_shared<PromptMenuView>();
-    m_inline_menu = std::make_shared<InlineMenuView>();
-    m_info_box = std::make_shared<InfoBoxView>();
-
-    m_input_controller->init(m_kakoune_client, m_kakoune_process);
-    m_kakoune_content_view->init(m_renderer);
-    m_status_bar->init(m_renderer);
-    m_prompt_menu->init(m_renderer, m_kakoune_content_view);
-    m_inline_menu->init(m_renderer, m_kakoune_content_view);
-    m_info_box->init(m_renderer, m_menu_controller, m_kakoune_content_view);
     m_kakoune_process->start();
-    m_editor_controller->init(m_kakoune_client, m_kakoune_process, m_kakoune_content_view, m_status_bar);
-    m_editor_controller->onWindowResize(width, height); // TODO move to init
-    m_menu_controller->init(m_kakoune_client, m_editor_controller, m_prompt_menu, m_inline_menu);
-    m_info_box_controller->init(m_kakoune_client, m_editor_controller, m_info_box);
 }
 
-void Application::run()
+void Application::updateControllers()
 {
-    while (!glfwWindowShouldClose(m_window))
-    {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        if (m_kakoune_client->window_default_face.bg.color_string != "") { // TODO no need to parse everytime. should be done in a controller somehow
-            core::Color background_color = m_kakoune_client->window_default_face.bg.toCoreColor(std::nullopt, false);
-            glClearColor(background_color.r, background_color.g, background_color.b, 1.0f);
-        }
-
-        m_editor_controller->update();
-        m_menu_controller->update();
-        m_info_box_controller->update();
-
-        glfwSwapBuffers(m_window);
-        glfwPollEvents();
-    }
+    m_editor_controller->update(*m_ui_options.get());
+    m_menu_controller->update(*m_ui_options.get());
+    m_info_box_controller->update(*m_ui_options.get());
 }
 
 void Application::onWindowResize(int width, int height)
 {
-    glViewport(0, 0, width, height);
     m_renderer->onWindowResize(width, height);
-    m_editor_controller->onWindowResize(width, height);
+    m_editor_controller->onWindowResize(width, height, *m_ui_options.get());
 }
 
-void Application::onKeyInput(int key, int scancode, int action, int mods)
+void Application::onKeyInput(core::KeyEvent event)
 {
-    if (action != GLFW_PRESS && action != GLFW_REPEAT) {
-        return;
-    }
-
-    std::optional<KeyEvent> event = glfwSpecialKeyToKeyEvent(key, mods);
-
-    if (event.has_value()) {
-        m_input_controller->onKeyInput(event.value());
-    }
+    m_input_controller->onKeyInput(event);
 }
 
-void Application::onCharacterInsert(unsigned int codepoint, int mods)
-{
-    m_input_controller->onKeyInput(glfwCharToKeyEvent(codepoint, mods));
+void Application::setClearColor(core::Color color) {
+    m_clear_color = color;
 }
 
-std::optional<KeyEvent> Application::glfwSpecialKeyToKeyEvent(int key, int mods) {
-    static const std::unordered_map<int, SpecialKey> glfw_special_keys = {
-        {GLFW_KEY_ESCAPE, ESCAPE},
-        {GLFW_KEY_TAB, TAB},
-        {GLFW_KEY_ENTER, RETURN},
-        {GLFW_KEY_BACKSPACE, BACKSPACE},
-        {GLFW_KEY_DELETE, DELETE},
-        {GLFW_KEY_LEFT, LEFT},
-        {GLFW_KEY_RIGHT, RIGHT},
-        {GLFW_KEY_UP, UP},
-        {GLFW_KEY_DOWN, DOWN},
-        {GLFW_KEY_HOME, HOME},
-        {GLFW_KEY_END, END},
-        {GLFW_KEY_PAGE_UP, PAGE_UP},
-        {GLFW_KEY_PAGE_DOWN, PAGE_DOWN},
-        {GLFW_KEY_INSERT, INSERT}
-    };
-
-    auto it = glfw_special_keys.find(key);
-    if (it == glfw_special_keys.end()) {
-        return std::nullopt;
-    }
-
-    KeyEvent event;
-    event.key = it->second;
-
-    event.modifiers = 0;
-    if (mods & GLFW_MOD_CONTROL) {
-        event.modifiers |= CONTROL;
-    }
-    if (mods & GLFW_MOD_SHIFT) {
-        event.modifiers |= SHIFT;
-    }
-    if (mods & GLFW_MOD_ALT) {
-        event.modifiers |= ALT;
-    }
-
-    return event;
-}
-
-std::string utf8_encode(unsigned int utf)
-{
-    if (utf <= 0x7F) {
-        // Plain ASCII
-        return std::string(1, (char) utf);
-    }
-    else if (utf <= 0x07FF) {
-        // 2-byte unicode
-        std::string result;
-        result += (char) (((utf >> 6) & 0x1F) | 0xC0);
-        result += (char) (((utf >> 0) & 0x3F) | 0x80);
-        return result;
-    }
-    else if (utf <= 0xFFFF) {
-        // 3-byte unicode
-        std::string result;
-        result += (char) (((utf >> 12) & 0x0F) | 0xE0);
-        result += (char) (((utf >> 6) & 0x3F) | 0x80);
-        result += (char) (((utf >> 0) & 0x3F) | 0x80);
-        return result;
-    }
-    else if (utf <= 0x10FFFF) {
-        // 4-byte unicode
-        std::string result;
-        result += (char) (((utf >> 18) & 0x07) | 0xF0);
-        result += (char) (((utf >> 12) & 0x3F) | 0x80);
-        result += (char) (((utf >> 6) & 0x3F) | 0x80);
-        result += (char) (((utf >> 0) & 0x3F) | 0x80);
-        return result;
-    }
-    else {
-        // error - use replacement character
-        std::string result;
-        result += (char) 0xEF;
-        result += (char) 0xBF;
-        result += (char) 0xBD;
-        return result;
-    }
-}
-
-KeyEvent Application::glfwCharToKeyEvent(unsigned int codepoint, int mods) {
-    KeyEvent event;
-
-    event.modifiers = 0;
-    if (mods & GLFW_MOD_CONTROL) {
-        event.modifiers |= CONTROL;
-    }
-    if (mods & GLFW_MOD_SHIFT) {
-        event.modifiers |= SHIFT;
-    }
-    if (mods & GLFW_MOD_ALT) {
-        event.modifiers |= ALT;
-    }
-
-    event.key = utf8_encode(codepoint);
-
-    return event;
+void Application::setCursor(core::Cursor cursor) {
+    m_cursor = cursor;
 }

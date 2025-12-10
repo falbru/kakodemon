@@ -1,4 +1,6 @@
 #include "controller/inputcontroller.hpp"
+#include "core/keys.hpp"
+#include "core/utf8string.hpp"
 #include "kakoune/kakouneclientprocess.hpp"
 #include <string>
 #include <variant>
@@ -12,12 +14,12 @@ InputController::~InputController() {
 
 }
 
-void InputController::init(std::shared_ptr<KakouneClient> kakoune_client, std::shared_ptr<KakouneClientProcess> kakoune_process) {
+void InputController::init(KakouneClient* kakoune_client, KakouneClientProcess*kakoune_process) {
     m_kakoune_client = kakoune_client;
     m_kakoune_process = kakoune_process;
 }
 
-void InputController::onKeyInput(const KeyEvent& event) {
+void InputController::onKeyInput(const core::KeyEvent& event) {
     OutgoingRequest keys_request;
     keys_request.type = OutgoingRequestType::KEYS;
     keys_request.data = KeysRequestData{{keyEventToKakouneKey(event)}};
@@ -25,7 +27,7 @@ void InputController::onKeyInput(const KeyEvent& event) {
     m_kakoune_process->sendRequest(keys_request);
 }
 
-std::string InputController::keyEventToKakouneKey(const KeyEvent& event) {
+std::string InputController::keyEventToKakouneKey(const core::KeyEvent& event) {
     static const std::unordered_map<std::string, std::string> special_chars = {
         {" ", "space"},
         {"-", "minus"},
@@ -34,30 +36,30 @@ std::string InputController::keyEventToKakouneKey(const KeyEvent& event) {
         {">", "gt"}
     };
 
-    static const std::unordered_map<SpecialKey, std::string> special_keys = {
-        {ESCAPE, "esc"},
-        {TAB, "tab"},
-        {RETURN, "ret"},
-        {BACKSPACE, "backspace"},
-        {DELETE, "del"},
-        {LEFT, "left"},
-        {RIGHT, "right"},
-        {UP, "up"},
-        {DOWN, "down"},
-        {HOME, "home"},
-        {END, "end"},
-        {PAGE_UP, "pageup"},
-        {PAGE_DOWN, "pagedown"},
-        {INSERT, "ins"}
+    static const std::unordered_map<core::SpecialKey, std::string> special_keys = {
+        {core::SpecialKey::ESCAPE,    "esc"},
+        {core::SpecialKey::TAB,       "tab"},
+        {core::SpecialKey::RETURN,    "ret"},
+        {core::SpecialKey::BACKSPACE, "backspace"},
+        {core::SpecialKey::DELETE,    "del"},
+        {core::SpecialKey::LEFT,      "left"},
+        {core::SpecialKey::RIGHT,     "right"},
+        {core::SpecialKey::UP,        "up"},
+        {core::SpecialKey::DOWN,      "down"},
+        {core::SpecialKey::HOME,      "home"},
+        {core::SpecialKey::END,       "end"},
+        {core::SpecialKey::PAGE_UP,   "pageup"},
+        {core::SpecialKey::PAGE_DOWN, "pagedown"},
+        {core::SpecialKey::INSERT,    "ins"}
     };
 
     std::string key_name;
 
-    bool has_modifiers = (event.modifiers & (CONTROL | ALT | SHIFT)) != 0;
+    bool has_modifiers = (event.modifiers & (core::CONTROL | core::ALT | core::SHIFT)) != 0;
     bool needsEscaping = false;
 
-    if (std::holds_alternative<std::string>(event.key)) {
-        key_name = std::get<std::string>(event.key);
+    if (std::holds_alternative<Codepoint>(event.key)) {
+        key_name = codePointToString(std::get<Codepoint>(event.key));
 
         auto it = special_chars.find(key_name);
         if (it != special_chars.end()) {
@@ -65,7 +67,7 @@ std::string InputController::keyEventToKakouneKey(const KeyEvent& event) {
             key_name = it->second;
         }
     } else {
-        SpecialKey special = std::get<SpecialKey>(event.key);
+        core::SpecialKey special = std::get<core::SpecialKey>(event.key);
         needsEscaping = true;
         key_name = special_keys.at(special);
     }
@@ -73,13 +75,13 @@ std::string InputController::keyEventToKakouneKey(const KeyEvent& event) {
     std::string result;
     if (needsEscaping || has_modifiers) {
         result = "<";
-        if (event.modifiers & CONTROL) {
+        if (event.modifiers & core::CONTROL) {
             result += "c-";
         }
-        if (!std::holds_alternative<std::string>(event.key) && event.modifiers & SHIFT) {
+        if (!std::holds_alternative<Codepoint>(event.key) && event.modifiers & core::SHIFT) {
             result += "s-";
         }
-        if (event.modifiers & ALT) {
+        if (event.modifiers & core::ALT) {
             result += "a-";
         }
         result += key_name + ">";

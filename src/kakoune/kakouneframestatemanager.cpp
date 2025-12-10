@@ -2,7 +2,7 @@
 #include "kakoune/kakouneclientprocess.hpp"
 #include <optional>
 
-KakouneFrameStateManager::KakouneFrameStateManager(std::shared_ptr<KakouneClientProcess> process)
+KakouneFrameStateManager::KakouneFrameStateManager(KakouneClientProcess* process)
     : m_process(process), m_next_frame_state_ready(false), m_running(false) {
     m_process->setRequestCallback([this](const IncomingRequest& request) {
         onRequest(request);

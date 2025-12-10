@@ -2,7 +2,6 @@
 #define VIEW_INLINEMENU_HPP_INCLUDED
 
 #include "model/kakouneclient.hpp"
-#include "opengl/renderer.hpp"
 #include "view/kakounecontentview.hpp"
 #include "view/widgets/scrolledmenuitems.hpp"
 #include <memory>
@@ -12,9 +11,9 @@ class InlineMenuView
   public:
     InlineMenuView();
 
-    void init(std::shared_ptr<opengl::Renderer> renderer, std::shared_ptr<KakouneContentView> kakoune_content_view);
+    void init(Renderer *renderer, KakouneContentView *kakoune_content_view);
 
-    void render(const KakouneClient &kakoune_client, float width, float height);
+    void render(Font *font, const KakouneClient &kakoune_client, float width, float height);
 
     float x() const;
     float y() const;
@@ -32,9 +31,8 @@ class InlineMenuView
     float m_width;
     float m_height;
 
-    std::shared_ptr<KakouneContentView> m_kakoune_content_view;
-    std::shared_ptr<opengl::Renderer> m_renderer;
-    std::shared_ptr<opengl::Font> m_font;
+    KakouneContentView *m_kakoune_content_view;
+    Renderer *m_renderer;
 
     std::unique_ptr<ScrolledMenuItems> m_scrolled_menu_items;
 };

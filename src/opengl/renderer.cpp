@@ -1,10 +1,7 @@
 #include "renderer.hpp"
 #include "core/alignment.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
-#include "opengl/font.hpp"
-#include "spdlog/spdlog.h"
-#include "view/glyphsequence.hpp"
-#include <X11/extensions/render.h>
+#include "opengl.hpp"
 
 opengl::Renderer::Renderer() {
 }
@@ -38,6 +35,8 @@ void opengl::Renderer::init(int width, int height) {
 }
 
 void opengl::Renderer::onWindowResize(int width, int height) {
+    glViewport(0, 0, width, height);
+
     glm::mat4 projection = glm::ortho(0.0f, (float)width, (float)height, 0.0f);
     m_shader_program->setMatrix4("projection", projection, true);
     m_screen_width = width;
@@ -61,16 +60,21 @@ void opengl::Renderer::popBounds() {
     }
 }
 
-void opengl::Renderer::renderLine(std::shared_ptr<Font> font, const kakoune::Line& line, const kakoune::Face& default_face, float x, float y) const {
+void opengl::Renderer::renderLine(::Font* font, const kakoune::Line &line, const kakoune::Face &default_face, float x,
+                     float y) const {
     renderLine(font, line, default_face, x, y, core::Alignment());
 }
 
-void opengl::Renderer::renderLine(std::shared_ptr<Font> font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y, const core::Alignment& alignment) const
+void opengl::Renderer::renderLine(::Font* font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y, const core::Alignment& alignment) const
 {
+    opengl::Font* opengl_font = dynamic_cast<opengl::Font*>(font);
+
+    if (!opengl_font) return;
+
     m_shader_program->use();
     glBindVertexArray(m_text_vao);
 
-    _renderLine(font, line, default_face, x, y, alignment);
+    _renderLine(opengl_font, line, default_face, x, y, alignment);
 
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -95,14 +99,18 @@ void opengl::Renderer::renderRectWithShadow(const core::Color color, float x, fl
     glBindVertexArray(0);
 }
 
-void opengl::Renderer::renderLines(std::shared_ptr<Font> font, const std::vector<kakoune::Line>& lines, const kakoune::Face& default_face, float x, float y) const {
+void opengl::Renderer::renderLines(::Font* font, const std::vector<kakoune::Line>& lines, const kakoune::Face& default_face, float x, float y) const {
+    opengl::Font* opengl_font = dynamic_cast<opengl::Font*>(font);
+
+    if (!opengl_font) return;
+
     m_shader_program->use();
     glBindVertexArray(m_text_vao);
 
     float y_it = y;
     for (auto line : lines)
     {
-        _renderLine(font, line, default_face, x, y_it, core::Alignment());
+        _renderLine(opengl_font, line, default_face, x, y_it, core::Alignment());
         y_it += font->getLineHeight();
     }
 
@@ -110,7 +118,7 @@ void opengl::Renderer::renderLines(std::shared_ptr<Font> font, const std::vector
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void opengl::Renderer::_renderLine(std::shared_ptr<Font> font, const kakoune::Line& line, const kakoune::Face& default_face, float x, float y, const core::Alignment& alignment) const {
+void opengl::Renderer::_renderLine(opengl::Font* font, const kakoune::Line& line, const kakoune::Face& default_face, float x, float y, const core::Alignment& alignment) const {
 
     float start_x = x;
     float start_y = y;
@@ -148,11 +156,11 @@ void opengl::Renderer::_renderLine(std::shared_ptr<Font> font, const kakoune::Li
             }
             auto glyph = font->getGlyph(c);
 
-            float xpos = x_it + glyph.Bearing.x;
-            float ypos = y_it + font->getAscender() - glyph.Bearing.y;
+            float xpos = x_it + glyph.metrics.bearing.x;
+            float ypos = y_it + font->getAscender() - glyph.metrics.bearing.y;
 
-            float w = glyph.Size.x;
-            float h = glyph.Size.y;
+            float w = glyph.metrics.size.x;
+            float h = glyph.metrics.size.y;
             // update VBO for each character
             float vertices[6][4] = {
                 {xpos, ypos, 0.0f, 0.0f}, {xpos, ypos + h, 0.0f, 1.0f},     {xpos + w, ypos + h, 1.0f, 1.0f},
@@ -160,7 +168,7 @@ void opengl::Renderer::_renderLine(std::shared_ptr<Font> font, const kakoune::Li
                 {xpos, ypos, 0.0f, 0.0f}, {xpos + w, ypos + h, 1.0f, 1.0f}, {xpos + w, ypos, 1.0f, 0.0f}};
             glBindVertexArray(m_text_vao);
             // render glyph texture over quad
-            glBindTexture(GL_TEXTURE_2D, glyph.TextureID);
+            glBindTexture(GL_TEXTURE_2D, glyph.texture_id);
             // update content of VBO memory
             glBindBuffer(GL_ARRAY_BUFFER, m_text_vbo);
             glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
@@ -168,7 +176,7 @@ void opengl::Renderer::_renderLine(std::shared_ptr<Font> font, const kakoune::Li
             // render quad
             glDrawArrays(GL_TRIANGLES, 0, 6);
             // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-            x_it += glyph.Advance >> 6; // bitshift by 6 to get value in pixels (2^6 = 64)
+            x_it += glyph.metrics.width(); // bitshift by 6 to get value in pixels (2^6 = 64)
         }
     }
 }

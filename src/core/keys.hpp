@@ -1,10 +1,13 @@
 #ifndef KEY_HPP_INCLUDED
 #define KEY_HPP_INCLUDED
 
-#include <string>
+#include "core/utf8string.hpp"
 #include <variant>
 
-enum SpecialKey
+namespace core
+{
+
+enum class SpecialKey
 {
     ESCAPE,
     TAB,
@@ -30,12 +33,14 @@ enum KeyModifier
     ALT = 1 << 2,
 };
 
-using Key = std::variant<std::string, SpecialKey>;
+using Key = std::variant<Codepoint, SpecialKey>;
 
 struct KeyEvent
 {
     Key key;
     int modifiers;
 };
+
+} // namespace core
 
 #endif

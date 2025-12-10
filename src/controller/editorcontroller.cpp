@@ -1,4 +1,5 @@
 #include "editorcontroller.hpp"
+#include "core/color.hpp"
 #include "core/editor.hpp"
 #include "kakoune/kakouneclientprocess.hpp"
 #include "view/statusbar.hpp"
@@ -8,11 +9,14 @@ EditorController::EditorController()
 {
 }
 
-void EditorController::init(std::shared_ptr<KakouneClient> kakoune_client,
-                            std::shared_ptr<KakouneClientProcess> kakoune_process,
-                            std::shared_ptr<KakouneContentView> kakoune_content_view,
-                            std::shared_ptr<StatusBarView> status_bar_view)
+void EditorController::init(KakouneClient* kakoune_client,
+                            KakouneClientProcess* kakoune_process,
+                            KakouneContentView* kakoune_content_view,
+                            StatusBarView* status_bar_view,
+                            std::function<void(core::Color)> set_clear_color)
 {
+    m_set_clear_color = set_clear_color;
+
     m_kakoune_client = kakoune_client;
     m_kakoune_process = kakoune_process;
 
@@ -23,7 +27,7 @@ void EditorController::init(std::shared_ptr<KakouneClient> kakoune_client,
     m_frame_state_manager->start();
 }
 
-void EditorController::update()
+void EditorController::update(const UIOptions& ui_options)
 {
     auto frame_state = m_frame_state_manager->getNextFrameState();
     if (frame_state.has_value()) {
@@ -58,17 +62,19 @@ void EditorController::update()
         }else {
             m_kakoune_client->info_box_visible = false;
         }
+
+        setClearColor(m_kakoune_client->window_default_face.bg.toCoreColor(std::nullopt, false));
     }
 
-    m_kakoune_content_view->render(m_kakoune_client->window_content, m_kakoune_client->window_default_face, 0.0f, 0.0f);
+    m_kakoune_content_view->render(ui_options.font.get(), m_kakoune_client->window_content, m_kakoune_client->window_default_face, 0.0f, 0.0f);
     m_kakoune_content_view->setWidth(m_width);
-    m_kakoune_content_view->setHeight(m_height - m_status_bar_view->getCellHeight());
-    m_status_bar_view->render(m_kakoune_client->mode_line, m_kakoune_client->status_default_face, m_width, m_height);
+    m_kakoune_content_view->setHeight(m_height - m_status_bar_view->getCellHeight(ui_options.font.get()));
+    m_status_bar_view->render(ui_options.font.get(), m_kakoune_client->mode_line, m_kakoune_client->status_default_face, m_width, m_height);
 }
 
-void EditorController::onWindowResize(int width, int height) {
-    int rows = (height - m_status_bar_view->getCellHeight()) / m_kakoune_content_view->getCellHeight();
-    int columns = width / m_kakoune_content_view->getCellWidth();
+void EditorController::onWindowResize(int width, int height, const UIOptions& ui_options) {
+    int rows = (height - m_status_bar_view->getCellHeight(ui_options.font.get())) / m_kakoune_content_view->getCellHeight(ui_options.font.get());
+    int columns = width / m_kakoune_content_view->getCellWidth(ui_options.font.get());
 
     if (rows != m_rows || columns != m_columns) {
         m_kakoune_process->sendRequest(OutgoingRequest{
@@ -92,4 +98,8 @@ int EditorController::width() const {
 
 int EditorController::height() const {
     return m_height;
+}
+
+void EditorController::setClearColor(core::Color color) {
+    m_set_clear_color(color);
 }

@@ -20,7 +20,7 @@ struct FrameState
 class KakouneFrameStateManager
 {
   public:
-    KakouneFrameStateManager(std::shared_ptr<KakouneClientProcess> process);
+    KakouneFrameStateManager(KakouneClientProcess *process);
     ~KakouneFrameStateManager();
 
     void start();
@@ -31,7 +31,7 @@ class KakouneFrameStateManager
   private:
     void onRequest(const IncomingRequest &request);
 
-    std::shared_ptr<KakouneClientProcess> m_process;
+    KakouneClientProcess *m_process;
 
     FrameState m_next_frame_state;
     bool m_next_frame_state_ready;

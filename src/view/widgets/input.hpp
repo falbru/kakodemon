@@ -3,21 +3,19 @@
 
 #include "kakoune/line.hpp"
 #include "model/kakouneclient.hpp"
-#include "opengl/font.hpp"
-#include "opengl/renderer.hpp"
+#include "renderer.hpp"
 #include "view/layoutmanager.hpp"
 #include "view/styling.hpp"
-#include <memory>
 
 class Input
 {
   public:
-    Input(std::shared_ptr<opengl::Font> font);
+    Input(Font *font);
 
     void setPrompt(const kakoune::Line &prompt);
     void setContent(const kakoune::Line &content);
 
-    void render(std::shared_ptr<opengl::Renderer> renderer, const KakouneClient &kakoune_client, LayoutManager &layout);
+    void render(Renderer *renderer, const KakouneClient &kakoune_client, LayoutManager &layout);
 
     float width() const;
     float height() const;
@@ -27,7 +25,7 @@ class Input
 
     kakoune::Line m_prompt;
     kakoune::Line m_content;
-    std::shared_ptr<opengl::Font> m_font;
+    Font *m_font;
 
     const float BORDER = 1.0f;
     const float PADDING = SPACING_MEDIUM;

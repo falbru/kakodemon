@@ -2,7 +2,6 @@
 #include "core/utf8string.hpp"
 #include "infobox.hpp"
 #include "kakoune/line.hpp"
-#include "opengl/renderer.hpp"
 #include "view/glyphsequence.hpp"
 #include "view/layoutmanager.hpp"
 #include "view/styling.hpp"
@@ -11,11 +10,10 @@
 
 InfoBoxView::InfoBoxView()
 {
-    m_font = std::make_shared<opengl::Font>("/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf", 14);
 }
 
-void InfoBoxView::init(std::shared_ptr<opengl::Renderer> renderer, std::shared_ptr<MenuController> menu_controller,
-                       std::shared_ptr<KakouneContentView> kakoune_content_view)
+void InfoBoxView::init(Renderer* renderer, MenuController* menu_controller,
+                       KakouneContentView* kakoune_content_view)
 {
     m_renderer = renderer;
     m_menu_controller = menu_controller;
@@ -23,7 +21,7 @@ void InfoBoxView::init(std::shared_ptr<opengl::Renderer> renderer, std::shared_p
 }
 
 std::pair<std::vector<kakoune::Line>, std::pair<float, float>> InfoBoxView::calculateWrappedContent(
-    const std::vector<kakoune::Line> &input_lines, float max_width) const
+    const std::vector<kakoune::Line> &input_lines, float max_width, Font* font) const
 {
     std::vector<kakoune::Line> lines;
     float actual_max_width = 0;
@@ -40,7 +38,7 @@ std::pair<std::vector<kakoune::Line>, std::pair<float, float>> InfoBoxView::calc
 
             while (atom_it != current_line->atoms.end())
             {
-                float atom_width = m_font->width(atom_it->contents);
+                float atom_width = font->width(atom_it->contents);
                 if (current_width + atom_width > max_width)
                     break;
 
@@ -59,7 +57,7 @@ std::pair<std::vector<kakoune::Line>, std::pair<float, float>> InfoBoxView::calc
                     UTF8String test_string = fitted_part;
                     test_string.addCodepoint(atom_it->contents.at(i));
 
-                    if (m_font->width(test_string) > max_width - current_width)
+                    if (font->width(test_string) > max_width - current_width)
                         break;
 
                     fitted_part = test_string;
@@ -115,7 +113,7 @@ std::pair<std::vector<kakoune::Line>, std::pair<float, float>> InfoBoxView::calc
             float line_width = 0;
             for (const auto &atom : wrapped_line)
             {
-                line_width += m_font->width(atom.contents);
+                line_width += font->width(atom.contents);
             }
             actual_max_width = std::max(actual_max_width, line_width);
 
@@ -123,13 +121,13 @@ std::pair<std::vector<kakoune::Line>, std::pair<float, float>> InfoBoxView::calc
         }
     }
 
-    float height = m_font->getLineHeight() * lines.size();
+    float height = font->getLineHeight() * lines.size();
     return {lines, {actual_max_width, height}};
 }
 
 std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection direction, CrossAxisAlignment alignment,
                                                       const std::vector<kakoune::Line> &content,
-                                                      const Rectangle &anchor, float layout_width, float layout_height)
+                                                      const Rectangle &anchor, float layout_width, float layout_height, Font* font)
 {
     std::vector<kakoune::Line> new_content;
     Rectangle info_box;
@@ -138,13 +136,13 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
         &*std::max_element(content.begin(), content.end(),
                            [](const auto &a, const auto &b) { return a.size() < b.size(); });
 
-    info_box.width = GlyphSequence(m_font, longest_line->toUTF8String()).width();
-    info_box.height = content.size() * m_font->getLineHeight();
+    info_box.width = GlyphSequence(font, longest_line->toUTF8String()).width();
+    info_box.height = content.size() * font->getLineHeight();
 
     if (info_box.width > MAX_WIDTH - SPACING_MEDIUM * 2.0f)
     {
         auto [wrapped_content, dimensions] =
-            calculateWrappedContent(content, MAX_WIDTH - SPACING_MEDIUM * 2.0f);
+            calculateWrappedContent(content, MAX_WIDTH - SPACING_MEDIUM * 2.0f, font);
 
         new_content = wrapped_content;
         info_box.width = dimensions.first;
@@ -165,7 +163,7 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
             if (available_width < MIN_WIDTH)
                 return std::nullopt;
 
-            auto [wrapped_content, dimensions] = calculateWrappedContent(content, available_width);
+            auto [wrapped_content, dimensions] = calculateWrappedContent(content, available_width, font);
 
             new_content = wrapped_content;
             info_box.width = dimensions.first;
@@ -203,7 +201,7 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
             if (available_width < MIN_WIDTH)
                 return std::nullopt;
 
-            auto [wrapped_content, dimensions] = calculateWrappedContent(content, available_width);
+            auto [wrapped_content, dimensions] = calculateWrappedContent(content, available_width, font);
 
             new_content = wrapped_content;
             info_box.width = dimensions.first;
@@ -240,7 +238,7 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
         info_box.x = anchor.x;
         info_box.y = anchor.y - info_box.height - SPACING_MEDIUM * 2.0f;
 
-        auto [wrapped_content, dimensions] = calculateWrappedContent(content, layout_width);
+        auto [wrapped_content, dimensions] = calculateWrappedContent(content, layout_width, font);
 
         new_content = wrapped_content;
         info_box.width = dimensions.first;
@@ -274,7 +272,7 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
         info_box.x = anchor.x;
         info_box.y = anchor.y + anchor.height;
 
-        auto [wrapped_content, dimensions] = calculateWrappedContent(content, layout_width);
+        auto [wrapped_content, dimensions] = calculateWrappedContent(content, layout_width, font);
 
         new_content = wrapped_content;
         info_box.width = dimensions.first;
@@ -322,7 +320,7 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
     return std::nullopt;
 }
 
-void InfoBoxView::render(const KakouneClient &kakoune_client, float width, float height)
+void InfoBoxView::render(const KakouneClient &kakoune_client, const UIOptions& ui_options, float width, float height)
 {
     if (kakoune_client.info_box_content.empty())
     {
@@ -355,9 +353,9 @@ void InfoBoxView::render(const KakouneClient &kakoune_client, float width, float
         break;
 
     case kakoune::InfoStyle::INLINE: {
-        auto pos = m_kakoune_content_view->coordToPixels(kakoune_client.info_box_anchor);
-        anchor = {pos.first, pos.second, m_kakoune_content_view->getCellWidth(),
-                  m_kakoune_content_view->getCellHeight()};
+        auto pos = m_kakoune_content_view->coordToPixels(ui_options.font.get(), kakoune_client.info_box_anchor);
+        anchor = {pos.first, pos.second, m_kakoune_content_view->getCellWidth(ui_options.font.get()),
+                  m_kakoune_content_view->getCellHeight(ui_options.font.get())};
         direction = PlacementDirection::BELOW;
         alignment = CrossAxisAlignment::START;
         fallback_directions = {PlacementDirection::ABOVE, PlacementDirection::RIGHT_WRAPPED,
@@ -366,9 +364,9 @@ void InfoBoxView::render(const KakouneClient &kakoune_client, float width, float
     break;
 
     case kakoune::InfoStyle::INLINE_ABOVE: {
-        auto pos = m_kakoune_content_view->coordToPixels(kakoune_client.info_box_anchor);
-        anchor = {pos.first, pos.second, m_kakoune_content_view->getCellWidth(),
-                  m_kakoune_content_view->getCellHeight()};
+        auto pos = m_kakoune_content_view->coordToPixels(ui_options.font.get(), kakoune_client.info_box_anchor);
+        anchor = {pos.first, pos.second, m_kakoune_content_view->getCellWidth(ui_options.font.get()),
+                  m_kakoune_content_view->getCellHeight(ui_options.font.get())};
         direction = PlacementDirection::ABOVE;
         alignment = CrossAxisAlignment::START;
         fallback_directions = {PlacementDirection::BELOW, PlacementDirection::RIGHT_WRAPPED,
@@ -377,8 +375,8 @@ void InfoBoxView::render(const KakouneClient &kakoune_client, float width, float
     break;
 
     case kakoune::InfoStyle::INLINE_BELOW: {
-        auto pos = m_kakoune_content_view->coordToPixels(kakoune_client.info_box_anchor);
-        anchor = {pos.first, pos.second, 0, m_kakoune_content_view->getCellHeight()};
+        auto pos = m_kakoune_content_view->coordToPixels(ui_options.font.get(), kakoune_client.info_box_anchor);
+        anchor = {pos.first, pos.second, 0, m_kakoune_content_view->getCellHeight(ui_options.font.get())};
         direction = PlacementDirection::BELOW;
         alignment = CrossAxisAlignment::START;
         fallback_directions = {PlacementDirection::ABOVE, PlacementDirection::RIGHT_WRAPPED,
@@ -408,7 +406,7 @@ void InfoBoxView::render(const KakouneClient &kakoune_client, float width, float
     Placement placement;
     for (auto dir : fallback_directions)
     {
-        auto current_placement = tryPlaceInfoBox(dir, alignment, kakoune_client.info_box_content, anchor, width, height);
+        auto current_placement = tryPlaceInfoBox(dir, alignment, kakoune_client.info_box_content, anchor, width, height, ui_options.font.get());
         if (current_placement.has_value()) {
             placement = current_placement.value();
             break;
@@ -423,5 +421,5 @@ void InfoBoxView::render(const KakouneClient &kakoune_client, float width, float
 
     layout.pad(SPACING_MEDIUM);
 
-    m_renderer->renderLines(m_font, placement.content, kakoune_client.info_box_face, layout.current().x, layout.current().y);
+    m_renderer->renderLines(ui_options.font.get(), placement.content, kakoune_client.info_box_face, layout.current().x, layout.current().y);
 }

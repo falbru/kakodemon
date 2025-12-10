@@ -1,11 +1,11 @@
 #ifndef EDITORCONTROLLER_HPP_INCLUDED
 #define EDITORCONTROLLER_HPP_INCLUDED
 
-#include <memory>
-
+#include "core/color.hpp"
 #include "kakoune/kakouneclientprocess.hpp"
 #include "kakoune/kakouneframestatemanager.hpp"
 #include "model/kakouneclient.hpp"
+#include "model/uioptions.hpp"
 #include "view/kakounecontentview.hpp"
 #include "view/statusbar.hpp"
 
@@ -14,20 +14,24 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
   public:
     EditorController();
 
-    void init(std::shared_ptr<KakouneClient> kakoune_client, std::shared_ptr<KakouneClientProcess> kakoune_process,
-              std::shared_ptr<KakouneContentView> kakoune_content_view, std::shared_ptr<StatusBarView> status_bar_view);
-    void update();
+    void init(KakouneClient *kakoune_client, KakouneClientProcess *kakoune_process,
+              KakouneContentView *kakoune_content_view, StatusBarView *status_bar_view,
+              std::function<void(core::Color)> set_clear_color);
+    void update(const UIOptions &ui_options);
 
-    void onWindowResize(int width, int height);
+    void onWindowResize(int width, int height, const UIOptions &ui_options);
 
     int width() const;
     int height() const;
 
   private:
-    std::shared_ptr<KakouneClient> m_kakoune_client;
-    std::shared_ptr<KakouneClientProcess> m_kakoune_process;
-    std::shared_ptr<KakouneContentView> m_kakoune_content_view;
-    std::shared_ptr<StatusBarView> m_status_bar_view;
+    KakouneClient *m_kakoune_client;
+    KakouneClientProcess *m_kakoune_process;
+    KakouneContentView *m_kakoune_content_view;
+    StatusBarView *m_status_bar_view;
+
+    std::function<void(core::Color)> m_set_clear_color;
+    void setClearColor(core::Color color);
 
     std::unique_ptr<KakouneFrameStateManager> m_frame_state_manager;
 

@@ -11,6 +11,35 @@ UTF8String::UTF8String(std::vector<Codepoint> codepoints) : m_codepoints(codepoi
 // Use kakoune's utf8 encoding and decoding for reference:
 // https://github.com/mawww/kakoune/blob/e3263887653ce5ec817c1aad51389c9600dfeabe/src/utf8.hh
 
+std::string codePointToString(Codepoint codepoint) {
+    std::string result;
+
+    if (codepoint <= 0x7F)
+    {
+        result += static_cast<char>(codepoint);
+    }
+    else if (codepoint <= 0x7FF)
+    {
+        result += static_cast<char>(0xC0 | (codepoint >> 6));
+        result += static_cast<char>(0x80 | (codepoint & 0x3F));
+    }
+    else if (codepoint <= 0xFFFF)
+    {
+        result += static_cast<char>(0xE0 | (codepoint >> 12));
+        result += static_cast<char>(0x80 | ((codepoint >> 6) & 0x3F));
+        result += static_cast<char>(0x80 | (codepoint & 0x3F));
+    }
+    else if (codepoint <= 0x10FFFF)
+    {
+        result += static_cast<char>(0xF0 | (codepoint >> 18));
+        result += static_cast<char>(0x80 | ((codepoint >> 12) & 0x3F));
+        result += static_cast<char>(0x80 | ((codepoint >> 6) & 0x3F));
+        result += static_cast<char>(0x80 | (codepoint & 0x3F));
+    }
+
+    return result;
+}
+
 UTF8String::UTF8String(std::string string)
 {
     auto it = string.cbegin();
@@ -64,28 +93,7 @@ std::string UTF8String::toString() const
 
     for (Codepoint codepoint : m_codepoints)
     {
-        if (codepoint <= 0x7F)
-        {
-            result += static_cast<char>(codepoint);
-        }
-        else if (codepoint <= 0x7FF)
-        {
-            result += static_cast<char>(0xC0 | (codepoint >> 6));
-            result += static_cast<char>(0x80 | (codepoint & 0x3F));
-        }
-        else if (codepoint <= 0xFFFF)
-        {
-            result += static_cast<char>(0xE0 | (codepoint >> 12));
-            result += static_cast<char>(0x80 | ((codepoint >> 6) & 0x3F));
-            result += static_cast<char>(0x80 | (codepoint & 0x3F));
-        }
-        else if (codepoint <= 0x10FFFF)
-        {
-            result += static_cast<char>(0xF0 | (codepoint >> 18));
-            result += static_cast<char>(0x80 | ((codepoint >> 12) & 0x3F));
-            result += static_cast<char>(0x80 | ((codepoint >> 6) & 0x3F));
-            result += static_cast<char>(0x80 | (codepoint & 0x3F));
-        }
+        result += codePointToString(codepoint);
     }
 
     return result;

@@ -3,6 +3,7 @@
 
 #include "controller/editorcontroller.hpp"
 #include "kakoune/menustyle.hpp"
+#include "model/uioptions.hpp"
 #include "view/inlinemenu.hpp"
 #include "view/promptmenu.hpp"
 
@@ -11,10 +12,10 @@ class MenuController
   public:
     MenuController();
 
-    void init(std::shared_ptr<KakouneClient> kakoune_client, std::shared_ptr<EditorController> editor_controller,
-              std::shared_ptr<PromptMenuView> prompt_menu_view, std::shared_ptr<InlineMenuView> inline_menu_view);
+    void init(KakouneClient *kakoune_client, EditorController *editor_controller, PromptMenuView *prompt_menu_view,
+              InlineMenuView *inline_menu_view);
 
-    void update();
+    void update(const UIOptions &ui_options);
 
     float x() const;
     float y() const;
@@ -22,10 +23,10 @@ class MenuController
     float height() const;
 
   private:
-    std::shared_ptr<KakouneClient> m_kakoune_client;
-    std::shared_ptr<EditorController> m_editor_controller;
-    std::shared_ptr<InlineMenuView> m_inline_menu_view;
-    std::shared_ptr<PromptMenuView> m_prompt_menu_view;
+    KakouneClient *m_kakoune_client;
+    EditorController *m_editor_controller;
+    InlineMenuView *m_inline_menu_view;
+    PromptMenuView *m_prompt_menu_view;
 
     kakoune::MenuStyle m_current_style;
 };

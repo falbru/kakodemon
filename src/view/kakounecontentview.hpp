@@ -10,36 +10,33 @@
 #include "kakoune/coord.hpp"
 #include "kakoune/face.hpp"
 #include "kakoune/line.hpp"
-#include "opengl/font.hpp"
 #include "opengl/opengl.hpp"
-#include "opengl/renderer.hpp"
-#include <ft2build.h>
+#include "renderer.hpp"
 #include <vector>
-#include FT_FREETYPE_H
 
 class KakouneContentView
 {
   public:
     KakouneContentView();
 
-    void init(std::shared_ptr<opengl::Renderer> renderer);
+    void init(Renderer *renderer);
 
-    void render(const std::vector<kakoune::Line> &lines, const kakoune::Face &default_face, float x, float y);
+    void render(Font *font, const std::vector<kakoune::Line> &lines, const kakoune::Face &default_face, float x,
+                float y);
 
-    float getCellWidth() const;
-    float getCellHeight() const;
+    float getCellWidth(Font *font) const;
+    float getCellHeight(Font *font) const;
 
     void setWidth(float width);
     void setHeight(float height);
     float width() const;
     float height() const;
 
-    std::pair<float, float> coordToPixels(const kakoune::Coord &coord) const;
+    std::pair<float, float> coordToPixels(Font *font, const kakoune::Coord &coord) const;
 
   private:
     float m_width, m_height;
-    std::shared_ptr<opengl::Renderer> m_renderer;
-    std::shared_ptr<opengl::Font> m_font;
+    Renderer *m_renderer;
 };
 
 #endif

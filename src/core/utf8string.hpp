@@ -6,6 +6,8 @@
 
 typedef unsigned int Codepoint;
 
+std::string codePointToString(Codepoint codepoint);
+
 enum class TrimDirection
 {
     Left,

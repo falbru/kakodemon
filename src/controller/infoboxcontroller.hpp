@@ -10,15 +10,14 @@ class InfoBoxController
   public:
     InfoBoxController();
 
-    void init(std::shared_ptr<KakouneClient> kakoune_client, std::shared_ptr<EditorController> editor_controller,
-              std::shared_ptr<InfoBoxView> info_box_view);
+    void init(KakouneClient *kakoune_client, EditorController *editor_controller, InfoBoxView *info_box_view);
 
-    void update();
+    void update(const UIOptions &ui_options);
 
   private:
-    std::shared_ptr<KakouneClient> m_kakoune_client;
-    std::shared_ptr<EditorController> m_editor_controller;
-    std::shared_ptr<InfoBoxView> m_info_box_view;
+    KakouneClient *m_kakoune_client;
+    EditorController *m_editor_controller;
+    InfoBoxView *m_info_box_view;
 };
 
 #endif

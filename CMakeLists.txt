@@ -15,11 +15,17 @@ add_subdirectory(vendor/nlohmann_json)
 
 find_package(Freetype)
 
+find_package(Fontconfig)
+
 add_subdirectory(vendor/spdlog)
 
 set(SRC
     src/main.cpp
     src/application.cpp
+    src/font.cpp
+    src/fontconfigresolver.cpp
+    src/freetypefontengine.cpp
+    src/fontconfigresolver.cpp
     src/controller/editorcontroller.cpp
     src/controller/inputcontroller.cpp
     src/controller/menucontroller.cpp
@@ -45,6 +51,7 @@ set(SRC
     src/kakoune/atom.cpp
     src/kakoune/face.cpp
     src/kakoune/color.cpp
+    src/opengl/application.cpp
     src/opengl/renderer.cpp
     src/opengl/shaderprogram.cpp
     src/opengl/font.cpp
@@ -54,4 +61,4 @@ set(SRC
 add_executable(kakod ${SRC})
 
 target_include_directories(kakod PRIVATE src/ vendor/glad/include)
-target_link_libraries(kakod glfw glm::glm nlohmann_json::nlohmann_json Freetype::Freetype spdlog::spdlog)
+target_link_libraries(kakod glfw glm::glm nlohmann_json::nlohmann_json Freetype::Freetype Fontconfig::Fontconfig spdlog::spdlog)

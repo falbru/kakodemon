@@ -4,20 +4,24 @@
 
 PromptMenuView::PromptMenuView()
 {
-    m_font = std::make_shared<opengl::Font>("/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf", 14);
-    m_input = std::make_unique<Input>(m_font);
-    m_scrolled_menu_items = std::make_unique<ScrolledMenuItems>(m_font, MAX_VISIBLE_ITEMS);
 }
 
-void PromptMenuView::init(std::shared_ptr<opengl::Renderer> renderer,
-                          std::shared_ptr<KakouneContentView> kakoune_content_view)
+void PromptMenuView::init(Renderer* renderer,
+                          KakouneContentView* kakoune_content_view)
 {
     m_renderer = renderer;
     m_kakoune_content_view = kakoune_content_view;
 }
 
-void PromptMenuView::render(const KakouneClient &kakoune_client, float width, float height)
+void PromptMenuView::render(Font* font, const KakouneClient &kakoune_client, float width, float height)
 {
+    if (!m_input) {
+        m_input = std::make_unique<Input>(font);
+    }
+    if (!m_scrolled_menu_items) {
+        m_scrolled_menu_items = std::make_unique<ScrolledMenuItems>(MAX_VISIBLE_ITEMS);
+    }
+
     if (kakoune_client.status_line.prompt.atoms.size() < 1 && kakoune_client.status_line.content.atoms.size() < 1)
         return;
 
@@ -35,7 +39,7 @@ void PromptMenuView::render(const KakouneClient &kakoune_client, float width, fl
     float items_size = std::min(MAX_VISIBLE_ITEMS, (int)kakoune_client.menu_items.size());
     if (kakoune_client.menu_visible)
     {
-        m_height += SPACING_MEDIUM + m_font->getLineHeight() * items_size;
+        m_height += SPACING_MEDIUM + font->getLineHeight() * items_size;
     }
 
     LayoutManager layout(m_x, Y, WIDTH, m_height);
@@ -51,7 +55,7 @@ void PromptMenuView::render(const KakouneClient &kakoune_client, float width, fl
     if (kakoune_client.menu_visible)
     {
         layout.gapY(SPACING_MEDIUM);
-        m_scrolled_menu_items->render(m_renderer, kakoune_client, layout);
+        m_scrolled_menu_items->render(m_renderer, font, kakoune_client, layout);
     }
 }
 
