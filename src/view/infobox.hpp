@@ -44,8 +44,9 @@ class InfoBoxView
     std::pair<std::vector<kakoune::Line>, std::pair<float, float>> calculateWrappedContent(
         const std::vector<kakoune::Line> &input_lines, float max_width) const;
 
-    std::optional<Placement> tryPlaceInfoBox(PlacementDirection direction, const std::vector<kakoune::Line> &content,
-                                             const Rectangle &anchor, float layout_width, float layout_height);
+    std::optional<Placement> tryPlaceInfoBox(PlacementDirection direction, CrossAxisAlignment alignment,
+                                             const std::vector<kakoune::Line> &content, const Rectangle &anchor,
+                                             float layout_width, float layout_height);
 
     void render(const KakouneClient &kakoune_client, float width, float height);
 

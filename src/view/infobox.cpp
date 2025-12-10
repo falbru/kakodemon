@@ -127,7 +127,7 @@ std::pair<std::vector<kakoune::Line>, std::pair<float, float>> InfoBoxView::calc
     return {lines, {actual_max_width, height}};
 }
 
-std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection direction,
+std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection direction, CrossAxisAlignment alignment,
                                                       const std::vector<kakoune::Line> &content,
                                                       const Rectangle &anchor, float layout_width, float layout_height)
 {
@@ -157,7 +157,6 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
     case PlacementDirection::RIGHT:
     case PlacementDirection::RIGHT_WRAPPED: {
         info_box.x = anchor.x + anchor.width;
-        info_box.y = anchor.y;
 
         if (direction == PlacementDirection::RIGHT_WRAPPED)
         {
@@ -175,6 +174,18 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
         else if (info_box.x + info_box.width + SPACING_MEDIUM * 2.0f > layout_width)
         {
             return std::nullopt;
+        }
+
+        switch(alignment) {
+            case CrossAxisAlignment::START:
+                info_box.y = anchor.y;
+                break;
+            case CrossAxisAlignment::CENTER:
+                info_box.y = anchor.y + (anchor.height - info_box.height) / 2.0f;
+                break;
+            case CrossAxisAlignment::END:
+                info_box.y = anchor.y + anchor.height - info_box.height;
+                break;
         }
 
         if (info_box.y + info_box.height + SPACING_MEDIUM * 2.0f > m_kakoune_content_view->height())
@@ -200,11 +211,22 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
         }
 
         info_box.x = anchor.x - info_box.width - SPACING_MEDIUM * 2.0f;
-        info_box.y = anchor.y;
 
         if (info_box.x < 0)
         {
             return std::nullopt;
+        }
+
+        switch(alignment) {
+            case CrossAxisAlignment::START:
+                info_box.y = anchor.y;
+                break;
+            case CrossAxisAlignment::CENTER:
+                info_box.y = anchor.y + (anchor.height - info_box.height) / 2.0f;
+                break;
+            case CrossAxisAlignment::END:
+                info_box.y = anchor.y + anchor.height - info_box.height;
+                break;
         }
 
         if (info_box.y + info_box.height + SPACING_MEDIUM * 2.0f > m_kakoune_content_view->height())
@@ -229,6 +251,18 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
             return std::nullopt;
         }
 
+        switch(alignment) {
+            case CrossAxisAlignment::START:
+                info_box.x = anchor.x;
+                break;
+            case CrossAxisAlignment::CENTER:
+                info_box.x = anchor.x + (anchor.width - info_box.width) / 2.0f;
+                break;
+            case CrossAxisAlignment::END:
+                info_box.x = anchor.x + anchor.width - info_box.width;
+                break;
+        }
+
         if (info_box.x + info_box.width + SPACING_MEDIUM * 2.0f > m_kakoune_content_view->width())
         {
             info_box.x = std::max(0.0f, m_kakoune_content_view->width() - info_box.width - SPACING_MEDIUM * 2.0f);
@@ -251,6 +285,18 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
             return std::nullopt;
         }
 
+        switch(alignment) {
+            case CrossAxisAlignment::START:
+                info_box.x = anchor.x;
+                break;
+            case CrossAxisAlignment::CENTER:
+                info_box.x = anchor.x + (anchor.width - info_box.width) / 2.0f;
+                break;
+            case CrossAxisAlignment::END:
+                info_box.x = anchor.x + anchor.width - info_box.width;
+                break;
+        }
+
         if (info_box.x + info_box.width + SPACING_MEDIUM * 2.0f > m_kakoune_content_view->width())
         {
             info_box.x = std::max(0.0f, m_kakoune_content_view->width() - info_box.width - SPACING_MEDIUM * 2.0f);
@@ -267,8 +313,8 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
     case PlacementDirection::FULL: {
         info_box.x = 0;
         info_box.y = 0;
-        info_box.width = 0;
-        info_box.height = 0;
+        info_box.width = layout_width;
+        info_box.height = layout_height;
 
         return Placement{content, info_box};
     }
@@ -301,7 +347,7 @@ void InfoBoxView::render(const KakouneClient &kakoune_client, float width, float
         }
         else
         {
-            anchor = {0, height, width, 0};
+            anchor = {0, m_kakoune_content_view->height(), m_kakoune_content_view->width(), 0};
             direction = PlacementDirection::ABOVE;
             alignment = CrossAxisAlignment::END;
             fallback_directions = {PlacementDirection::FULL};
@@ -362,7 +408,7 @@ void InfoBoxView::render(const KakouneClient &kakoune_client, float width, float
     Placement placement;
     for (auto dir : fallback_directions)
     {
-        auto current_placement = tryPlaceInfoBox(dir, kakoune_client.info_box_content, anchor, width, height);
+        auto current_placement = tryPlaceInfoBox(dir, alignment, kakoune_client.info_box_content, anchor, width, height);
         if (current_placement.has_value()) {
             placement = current_placement.value();
             break;
