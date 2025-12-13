@@ -6,6 +6,7 @@
 #include "application/view/kakounecontentview.hpp"
 #include "application/view/statusbar.hpp"
 #include "domain/color.hpp"
+#include "domain/mouse.hpp"
 #include "kakoune/kakouneclientprocess.hpp"
 #include "kakoune/kakouneframestatemanager.hpp"
 
@@ -20,6 +21,7 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
     void update(const UIOptions &ui_options);
 
     void onWindowResize(int width, int height, const UIOptions &ui_options);
+    domain::MouseMoveResult onMouseMove(float x, float y);
 
     int width() const;
     int height() const;
@@ -39,6 +41,7 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
     int m_columns;
     int m_width;
     int m_height;
+    int m_content_height;
 };
 
 #endif

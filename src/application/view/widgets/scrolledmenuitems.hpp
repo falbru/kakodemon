@@ -17,11 +17,17 @@ class ScrolledMenuItems
 
     float width() const;
     float height() const;
+    float x() const;
+    float y() const;
 
   private:
     float m_scroll_offset = 0;
     int m_max_visible_items = 0;
     std::unique_ptr<ScrollBar> m_scroll_bar;
+    float m_x = 0;
+    float m_y = 0;
+    float m_width = 0;
+    float m_height = 0;
 };
 
 #endif

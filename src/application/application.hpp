@@ -17,8 +17,8 @@
 #include "application/view/searchmenu.hpp"
 #include "application/view/statusbar.hpp"
 #include "domain/color.hpp"
-#include "domain/cursor.hpp"
 #include "domain/keys.hpp"
+#include "domain/mouse.hpp"
 #include "domain/ports/renderer.hpp"
 #include "kakoune/kakouneclientprocess.hpp"
 
@@ -32,10 +32,11 @@ class Application
     virtual void run() = 0;
 
     void setClearColor(domain::Color color);
-    void setCursor(domain::Cursor cursor);
+    virtual void setCursor(domain::Cursor cursor);
 
     void onWindowResize(int width, int height);
     void onKeyInput(domain::KeyEvent event);
+    void onMouseMove(float x, float y);
 
   protected:
     const int DEFAULT_WINDOW_WIDTH = 640;

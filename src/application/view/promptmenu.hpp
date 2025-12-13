@@ -5,6 +5,7 @@
 #include "application/view/kakounecontentview.hpp"
 #include "application/view/widgets/input.hpp"
 #include "application/view/widgets/scrolledmenuitems.hpp"
+#include "domain/mouse.hpp"
 
 class PromptMenuView
 {
@@ -15,10 +16,17 @@ class PromptMenuView
 
     void render(domain::Font *font, const KakouneClient &kakoune_client, float width, float height);
 
+    domain::MouseMoveResult onMouseMove(float x, float y);
+
     float x() const;
     float y() const;
     float width() const;
     float height() const;
+
+    float scrolledItemsX() const;
+    float scrolledItemsY() const;
+    float scrolledItemsWidth() const;
+    float scrolledItemsHeight() const;
 
   private:
     int m_scroll_offset;

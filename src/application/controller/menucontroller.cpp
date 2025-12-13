@@ -1,6 +1,8 @@
 #include "menucontroller.hpp"
+#include "domain/mouse.hpp"
 #include "kakoune/menustyle.hpp"
 #include "application/view/promptmenu.hpp"
+#include <optional>
 
 MenuController::MenuController() {
 
@@ -29,6 +31,18 @@ void MenuController::update(const UIOptions& ui_options) {
             m_search_menu_view->render(ui_options.font.get(), *m_kakoune_client, m_editor_controller->width(), m_editor_controller->height());
             break;
     }
+}
+
+domain::MouseMoveResult MenuController::onMouseMove(float x, float y) {
+    switch(m_kakoune_client->menu_style) {
+        case kakoune::MenuStyle::INLINE:
+            return m_inline_menu_view->onMouseMove(x, y);
+        case kakoune::MenuStyle::PROMPT:
+            return m_prompt_menu_view->onMouseMove(x, y);
+        case kakoune::MenuStyle::SEARCH:
+            return m_search_menu_view->onMouseMove(x, y);
+    }
+    return domain::MouseMoveResult{std::nullopt};
 }
 
 float MenuController::x() const {

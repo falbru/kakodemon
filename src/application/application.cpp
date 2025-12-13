@@ -12,7 +12,9 @@
 #include "application/view/inlinemenu.hpp"
 #include "application/view/kakounecontentview.hpp"
 #include "application/view/statusbar.hpp"
+#include "domain/mouse.hpp"
 #include <memory>
+#include <optional>
 
 Application::Application()
 {
@@ -65,6 +67,22 @@ void Application::onWindowResize(int width, int height)
 {
     m_renderer->onWindowResize(width, height);
     m_editor_controller->onWindowResize(width, height, *m_ui_options.get());
+}
+
+void Application::onMouseMove(float x, float y)
+{
+    domain::MouseMoveResult mouse_move_result;
+    std::optional<domain::Cursor> cursor;
+
+    mouse_move_result = m_editor_controller->onMouseMove(x, y);
+    cursor = mouse_move_result.cursor;
+
+    mouse_move_result = mouse_move_result = m_menu_controller->onMouseMove(x, y);
+    if (mouse_move_result.cursor != std::nullopt) cursor = mouse_move_result.cursor;
+
+    if (cursor != std::nullopt) {
+        setCursor(cursor.value());
+    }
 }
 
 void Application::onKeyInput(domain::KeyEvent event)

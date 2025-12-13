@@ -1,14 +1,15 @@
 #include "application.hpp"
 #include "adapters/freetype/freetypefontengine.hpp"
-#include "font.hpp"
-#include "renderer.hpp"
-#include <memory>
+#include "adapters/opengl/renderer.hpp"
+#include "domain/mouse.hpp"
 
 opengl::GLFWApplication::GLFWApplication() {
-
 }
 
 opengl::GLFWApplication::~GLFWApplication() {
+    glfwDestroyCursor(m_cursor_ibeam);
+    glfwDestroyCursor(m_cursor_pointer);
+
     glfwTerminate();
 }
 
@@ -53,11 +54,19 @@ void opengl::GLFWApplication::init() {
         app->onGLFWKeyInput(key, scancode, action, mods);
     });
 
+    glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double xpos, double ypos) {
+        GLFWApplication* app = static_cast<GLFWApplication*>(glfwGetWindowUserPointer(window));
+        app->onMouseMove(xpos, ypos);
+    });
+
     int framebuffer_width, framebuffer_height;
     glfwGetFramebufferSize(m_window, &framebuffer_width, &framebuffer_height);
 
     m_renderer = std::make_unique<opengl::Renderer>();
     m_renderer->init(framebuffer_width, framebuffer_height);
+
+    m_cursor_ibeam = glfwCreateStandardCursor(GLFW_IBEAM_CURSOR);
+    m_cursor_pointer = glfwCreateStandardCursor(GLFW_POINTING_HAND_CURSOR);
 
     Application::init();
 
@@ -153,4 +162,20 @@ domain::KeyEvent opengl::GLFWApplication::glfwCharToKeyEvent(unsigned int codepo
     }
 
     return event;
+}
+
+void opengl::GLFWApplication::setCursor(domain::Cursor cursor) {
+    Application::setCursor(cursor);
+
+    switch(cursor) {
+        case domain::Cursor::DEFAULT:
+            glfwSetCursor(m_window, NULL);
+            break;
+        case domain::Cursor::IBEAM:
+            glfwSetCursor(m_window, m_cursor_ibeam);
+            break;
+        case domain::Cursor::POINTER:
+            glfwSetCursor(m_window, m_cursor_pointer);
+            break;
+    }
 }

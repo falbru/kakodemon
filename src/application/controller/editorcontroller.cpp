@@ -1,5 +1,6 @@
 #include "editorcontroller.hpp"
 #include "domain/color.hpp"
+#include "domain/mouse.hpp"
 #include "domain/editor.hpp"
 #include "kakoune/kakouneclientprocess.hpp"
 #include "application/view/statusbar.hpp"
@@ -68,7 +69,8 @@ void EditorController::update(const UIOptions& ui_options)
 
     m_kakoune_content_view->render(ui_options.font.get(), m_kakoune_client->window_content, m_kakoune_client->window_default_face, 0.0f, 0.0f);
     m_kakoune_content_view->setWidth(m_width);
-    m_kakoune_content_view->setHeight(m_height - m_status_bar_view->getCellHeight(ui_options.font.get()));
+    m_content_height = m_height - m_status_bar_view->getCellHeight(ui_options.font.get());
+    m_kakoune_content_view->setHeight(m_content_height);
     m_status_bar_view->render(ui_options.font.get(), m_kakoune_client->mode_line, m_kakoune_client->status_default_face, m_width, m_height);
 }
 
@@ -90,6 +92,13 @@ void EditorController::onWindowResize(int width, int height, const UIOptions& ui
     m_columns = columns;
     m_width = width;
     m_height = height;
+}
+
+domain::MouseMoveResult EditorController::onMouseMove(float x, float y) {
+    if (y >= m_content_height) {
+        return domain::MouseMoveResult{domain::Cursor::DEFAULT};
+    }
+    return domain::MouseMoveResult{domain::Cursor::IBEAM};
 }
 
 int EditorController::width() const {

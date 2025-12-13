@@ -6,6 +6,7 @@
 #include "application/view/inlinemenu.hpp"
 #include "application/view/promptmenu.hpp"
 #include "application/view/searchmenu.hpp"
+#include "domain/mouse.hpp"
 #include "kakoune/menustyle.hpp"
 
 class MenuController
@@ -17,6 +18,8 @@ class MenuController
               InlineMenuView *inline_menu_view, SearchMenuView *search_menu_view);
 
     void update(const UIOptions &ui_options);
+
+    domain::MouseMoveResult onMouseMove(float x, float y);
 
     float x() const;
     float y() const;

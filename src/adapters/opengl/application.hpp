@@ -16,6 +16,8 @@ class GLFWApplication : public Application
     void init() override;
     void run() override;
 
+    void setCursor(domain::Cursor cursor) override;
+
   private:
     void onGLFWKeyInput(int key, int scancode, int action, int mods);
     void onGLFWCharacterInsert(unsigned int codepoint, int mods);
@@ -24,6 +26,9 @@ class GLFWApplication : public Application
     domain::KeyEvent glfwCharToKeyEvent(unsigned int codepoint, int mods);
 
     GLFWwindow *m_window;
+
+    GLFWcursor *m_cursor_ibeam;
+    GLFWcursor *m_cursor_pointer;
 };
 
 }; // namespace opengl
