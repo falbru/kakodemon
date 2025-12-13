@@ -38,6 +38,8 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
 
     std::unique_ptr<KakouneFrameStateManager> m_frame_state_manager;
 
+    std::map<domain::MouseButton, bool> m_mouse_button_pressed;
+
     int m_rows;
     int m_columns;
     int m_width;

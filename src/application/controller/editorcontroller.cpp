@@ -5,6 +5,7 @@
 #include "domain/editor.hpp"
 #include "kakoune/kakouneclientprocess.hpp"
 #include "application/view/statusbar.hpp"
+#include "spdlog/spdlog.h"
 #include <memory>
 
 EditorController::EditorController()
@@ -100,16 +101,26 @@ domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const UI
         return domain::MouseMoveResult{domain::Cursor::DEFAULT};
     }
 
-    int column = x / ui_options->font.get()->getGlyphMetrics(97).width();
-    int line = y / ui_options->font.get()->getLineHeight();
-
-    m_kakoune_process->sendRequest(OutgoingRequest{
-        OutgoingRequestType::MOUSE_MOVE,
-        MouseMoveRequestData{
-            line,
-            column
+    bool is_any_mouse_button_pressed = false;
+    for (auto mouse_button : m_mouse_button_pressed) {
+        if (mouse_button.second) {
+            is_any_mouse_button_pressed = true;
+            break;
         }
-    });
+    }
+
+    if (is_any_mouse_button_pressed) {
+        int column = x / ui_options->font.get()->getGlyphMetrics(97).width();
+        int line = y / ui_options->font.get()->getLineHeight();
+
+        m_kakoune_process->sendRequest(OutgoingRequest{
+            OutgoingRequestType::MOUSE_MOVE,
+            MouseMoveRequestData{
+                line,
+                column
+            }
+        });
+    }
 
     return domain::MouseMoveResult{domain::Cursor::IBEAM};
 }
@@ -140,6 +151,8 @@ void EditorController::onMouseButton(domain::MouseButtonEvent event, const UIOpt
                 column
             }
         });
+
+        m_mouse_button_pressed[event.button] = true;
     }else if (event.action == domain::MouseButtonAction::RELEASE) {
         m_kakoune_process->sendRequest(OutgoingRequest{
             OutgoingRequestType::MOUSE_RELEASE,
@@ -149,6 +162,8 @@ void EditorController::onMouseButton(domain::MouseButtonEvent event, const UIOpt
                 column
             }
         });
+
+        m_mouse_button_pressed[event.button] = false;
     }
 }
 
