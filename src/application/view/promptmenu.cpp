@@ -12,14 +12,11 @@ void PromptMenuView::init(domain::Renderer* renderer,
     m_renderer = renderer;
     m_kakoune_content_view = kakoune_content_view;
     m_scrolled_menu_items = std::make_unique<ScrolledMenuItems>(MAX_VISIBLE_ITEMS);
+    m_input = std::make_unique<Input>();
 }
 
 void PromptMenuView::render(domain::Font* font, const KakouneClient &kakoune_client, float width, float height)
 {
-    if (!m_input) {
-        m_input = std::make_unique<Input>(font);
-    }
-
     if (kakoune_client.status_line.prompt.atoms.size() < 1 && kakoune_client.status_line.content.atoms.size() < 1)
         return;
 
@@ -32,7 +29,7 @@ void PromptMenuView::render(domain::Font* font, const KakouneClient &kakoune_cli
     m_input->setContent(kakoune_client.status_line.content);
 
     m_x = (width - WIDTH) / 2;
-    m_height = 2 * SPACING_MEDIUM + m_input->height();
+    m_height = 2 * SPACING_MEDIUM + m_input->height(font);
 
     float items_size = std::min(MAX_VISIBLE_ITEMS, (int)kakoune_client.menu_items.size());
     if (kakoune_client.menu_visible)
@@ -48,7 +45,7 @@ void PromptMenuView::render(domain::Font* font, const KakouneClient &kakoune_cli
 
     layout.pad(SPACING_MEDIUM);
 
-    m_input->render(m_renderer, kakoune_client, layout);
+    m_input->render(m_renderer, font, kakoune_client, layout);
 
     if (kakoune_client.menu_visible)
     {

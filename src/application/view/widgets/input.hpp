@@ -10,22 +10,21 @@
 class Input
 {
   public:
-    Input(domain::Font *font);
+    Input();
 
     void setPrompt(const kakoune::Line &prompt);
     void setContent(const kakoune::Line &content);
 
-    void render(domain::Renderer *renderer, const KakouneClient &kakoune_client, LayoutManager &layout);
+    void render(domain::Renderer *renderer, domain::Font *font, const KakouneClient &kakoune_client,
+                LayoutManager &layout);
 
-    float width() const;
-    float height() const;
+    float height(domain::Font *font) const;
 
   private:
     float m_offset_x = 0.0f;
 
     kakoune::Line m_prompt;
     kakoune::Line m_content;
-    domain::Font *m_font;
 
     const float BORDER = 1.0f;
     const float PADDING = SPACING_MEDIUM;
