@@ -11,7 +11,7 @@ namespace kakoune
 struct Atom
 {
     Face face;
-    UTF8String contents;
+    domain::UTF8String contents;
 };
 
 void to_json(nlohmann::json &j, const Atom &atom);

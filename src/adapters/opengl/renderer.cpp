@@ -45,7 +45,7 @@ void opengl::Renderer::onWindowResize(int width, int height) {
 
 void opengl::Renderer::addBounds(float x, float y, float width, float height) {
     glEnable(GL_SCISSOR_TEST);
-    Rectangle r{x, m_screen_height - height - y, width, height};
+    domain::Rectangle r{x, m_screen_height - height - y, width, height};
     glScissor(r.x, r.y, r.width, r.height);
     m_bounds.push(r);
 }
@@ -60,12 +60,12 @@ void opengl::Renderer::popBounds() {
     }
 }
 
-void opengl::Renderer::renderLine(::Font* font, const kakoune::Line &line, const kakoune::Face &default_face, float x,
+void opengl::Renderer::renderLine(domain::Font* font, const kakoune::Line &line, const kakoune::Face &default_face, float x,
                      float y) const {
     renderLine(font, line, default_face, x, y, domain::Alignment());
 }
 
-void opengl::Renderer::renderLine(::Font* font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y, const domain::Alignment& alignment) const
+void opengl::Renderer::renderLine(domain::Font* font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y, const domain::Alignment& alignment) const
 {
     opengl::Font* opengl_font = dynamic_cast<opengl::Font*>(font);
 
@@ -99,7 +99,7 @@ void opengl::Renderer::renderRectWithShadow(const domain::Color color, float x, 
     glBindVertexArray(0);
 }
 
-void opengl::Renderer::renderLines(::Font* font, const std::vector<kakoune::Line>& lines, const kakoune::Face& default_face, float x, float y) const {
+void opengl::Renderer::renderLines(domain::Font* font, const std::vector<kakoune::Line>& lines, const kakoune::Face& default_face, float x, float y) const {
     opengl::Font* opengl_font = dynamic_cast<opengl::Font*>(font);
 
     if (!opengl_font) return;
@@ -135,7 +135,7 @@ void opengl::Renderer::_renderLine(opengl::Font* font, const kakoune::Line& line
     float y_it = start_y;
     for (auto atom : line.atoms)
     {
-        UTF8String text = atom.contents;
+        domain::UTF8String text = atom.contents;
 
         float height = font->getLineHeight();
         float width = font->width(text);
@@ -148,7 +148,7 @@ void opengl::Renderer::_renderLine(opengl::Font* font, const kakoune::Line& line
         m_shader_program->setInt("renderType", 0);
         for (int i = 0; i < text.size(); i++ )
         {
-            Codepoint c = text.at(i);
+            domain::Codepoint c = text.at(i);
             if (c == '\n') continue; // TODO clean way of stripping the last newline?
 
             if (!font->hasGlyph(c)) {

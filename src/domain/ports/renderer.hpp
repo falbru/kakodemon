@@ -1,10 +1,13 @@
-#ifndef RENDERER_HPP_INCLUDED
-#define RENDERER_HPP_INCLUDED
+#ifndef DOMAIN_RENDERER_HPP_INCLUDED
+#define DOMAIN_RENDERER_HPP_INCLUDED
 
 #include "domain/alignment.hpp"
 #include "domain/color.hpp"
 #include "domain/ports/font.hpp"
 #include "kakoune/line.hpp"
+
+namespace domain
+{
 
 class Renderer
 {
@@ -24,5 +27,7 @@ class Renderer
     virtual void renderLines(Font *font, const std::vector<kakoune::Line> &lines, const kakoune::Face &default_face,
                              float x, float y) const = 0;
 };
+
+} // namespace domain
 
 #endif // renderer_hpp_INCLUDED

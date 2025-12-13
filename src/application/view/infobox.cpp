@@ -12,7 +12,7 @@ InfoBoxView::InfoBoxView()
 {
 }
 
-void InfoBoxView::init(Renderer* renderer, MenuController* menu_controller,
+void InfoBoxView::init(domain::Renderer* renderer, MenuController* menu_controller,
                        KakouneContentView* kakoune_content_view)
 {
     m_renderer = renderer;
@@ -21,7 +21,7 @@ void InfoBoxView::init(Renderer* renderer, MenuController* menu_controller,
 }
 
 std::pair<std::vector<kakoune::Line>, std::pair<float, float>> InfoBoxView::calculateWrappedContent(
-    const std::vector<kakoune::Line> &input_lines, float max_width, Font* font) const
+    const std::vector<kakoune::Line> &input_lines, float max_width, domain::Font* font) const
 {
     std::vector<kakoune::Line> lines;
     float actual_max_width = 0;
@@ -49,12 +49,12 @@ std::pair<std::vector<kakoune::Line>, std::pair<float, float>> InfoBoxView::calc
 
             if (atom_it != current_line->atoms.end())
             {
-                UTF8String fitted_part;
+                domain::UTF8String fitted_part;
                 int last_whitespace_pos = -1;
 
                 for (int i = 0; i < atom_it->contents.size(); ++i)
                 {
-                    UTF8String test_string = fitted_part;
+                    domain::UTF8String test_string = fitted_part;
                     test_string.addCodepoint(atom_it->contents.at(i));
 
                     if (font->width(test_string) > max_width - current_width)
@@ -127,10 +127,10 @@ std::pair<std::vector<kakoune::Line>, std::pair<float, float>> InfoBoxView::calc
 
 std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection direction, CrossAxisAlignment alignment,
                                                       const std::vector<kakoune::Line> &content,
-                                                      const Rectangle &anchor, float layout_width, float layout_height, Font* font)
+                                                      const domain::Rectangle &anchor, float layout_width, float layout_height, domain::Font* font)
 {
     std::vector<kakoune::Line> new_content;
-    Rectangle info_box;
+    domain::Rectangle info_box;
 
     const kakoune::Line *longest_line =
         &*std::max_element(content.begin(), content.end(),
@@ -327,7 +327,7 @@ void InfoBoxView::render(const KakouneClient &kakoune_client, const UIOptions& u
         return;
     }
 
-    Rectangle anchor;
+    domain::Rectangle anchor;
     PlacementDirection direction = PlacementDirection::BELOW;
     CrossAxisAlignment alignment = CrossAxisAlignment::START;
     std::vector<PlacementDirection> fallback_directions;

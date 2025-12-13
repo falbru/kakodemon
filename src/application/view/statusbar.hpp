@@ -8,15 +8,16 @@ class StatusBarView
   public:
     StatusBarView();
 
-    void init(Renderer *renderer);
+    void init(domain::Renderer *renderer);
 
-    void render(Font *font, const kakoune::Line &mode, const kakoune::Face &default_face, float width, float height);
+    void render(domain::Font *font, const kakoune::Line &mode, const kakoune::Face &default_face, float width,
+                float height);
 
-    int getCellWidth(Font *font);
-    int getCellHeight(Font *font);
+    int getCellWidth(domain::Font *font);
+    int getCellHeight(domain::Font *font);
 
   private:
-    Renderer *m_renderer;
+    domain::Renderer *m_renderer;
 };
 
 #endif // statusbar_hpp_INCLUDED

@@ -19,24 +19,24 @@ class KakouneContentView
   public:
     KakouneContentView();
 
-    void init(Renderer *renderer);
+    void init(domain::Renderer *renderer);
 
-    void render(Font *font, const std::vector<kakoune::Line> &lines, const kakoune::Face &default_face, float x,
+    void render(domain::Font *font, const std::vector<kakoune::Line> &lines, const kakoune::Face &default_face, float x,
                 float y);
 
-    float getCellWidth(Font *font) const;
-    float getCellHeight(Font *font) const;
+    float getCellWidth(domain::Font *font) const;
+    float getCellHeight(domain::Font *font) const;
 
     void setWidth(float width);
     void setHeight(float height);
     float width() const;
     float height() const;
 
-    std::pair<float, float> coordToPixels(Font *font, const kakoune::Coord &coord) const;
+    std::pair<float, float> coordToPixels(domain::Font *font, const kakoune::Coord &coord) const;
 
   private:
     float m_width, m_height;
-    Renderer *m_renderer;
+    domain::Renderer *m_renderer;
 };
 
 #endif

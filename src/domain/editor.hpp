@@ -1,5 +1,5 @@
-#ifndef EDITOR_HPP_INCLUDED
-#define EDITOR_HPP_INCLUDED
+#ifndef DOMAIN_EDITOR_HPP_INCLUDED
+#define DOMAIN_EDITOR_HPP_INCLUDED
 
 #include "kakoune/coord.hpp"
 #include "kakoune/line.hpp"

@@ -3,14 +3,14 @@
 #include "application/model/kakouneclient.hpp"
 #include "application/view/glyphsequence.hpp"
 
-Input::Input(Font* font)
+Input::Input(domain::Font* font)
     : m_font(font) {}
 
 void Input::setPrompt(const kakoune::Line& prompt) { m_prompt = prompt; }
 
 void Input::setContent(const kakoune::Line& content) { m_content = content; }
 
-void Input::render(Renderer* renderer,
+void Input::render(domain::Renderer* renderer,
                    const KakouneClient& kakoune_client,
                    LayoutManager &layout) {
   auto input_layout = layout.sliceTop(height());

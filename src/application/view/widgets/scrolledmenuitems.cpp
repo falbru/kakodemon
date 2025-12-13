@@ -6,7 +6,7 @@ ScrolledMenuItems::ScrolledMenuItems(int max_visible_items) : m_max_visible_item
     m_scroll_bar = std::make_unique<ScrollBar>();
 }
 
-void ScrolledMenuItems::render(Renderer* renderer, Font* font, const KakouneClient &kakoune_client, LayoutManager &layout) {
+void ScrolledMenuItems::render(domain::Renderer* renderer, domain::Font* font, const KakouneClient &kakoune_client, LayoutManager &layout) {
     auto items_layout = layout.copy();
     items_layout.padRight(SPACING_MEDIUM + m_scroll_bar->width());
 
@@ -26,11 +26,11 @@ void ScrolledMenuItems::render(Renderer* renderer, Font* font, const KakouneClie
     {
         auto item = kakoune_client.menu_items.at(i);
 
-        GlyphSequence item_value_glyphs = GlyphSequence(font, item.atoms[0].contents.trim(TrimDirection::Right));
+        GlyphSequence item_value_glyphs = GlyphSequence(font, item.atoms[0].contents.trim(domain::TrimDirection::Right));
         float item_secondary_width = 0;
         if (item.atoms.size() > 1)
         {
-            item_secondary_width = font->width(item.atoms[1].contents.trim(TrimDirection::Left));
+            item_secondary_width = font->width(item.atoms[1].contents.trim(domain::TrimDirection::Left));
         }
 
         if (item_value_glyphs.width() + item_secondary_width > items_layout.current().width)

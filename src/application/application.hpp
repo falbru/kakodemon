@@ -1,5 +1,5 @@
-#ifndef APPLICATION_HPP_INCLUDED
-#define APPLICATION_HPP_INCLUDED
+#ifndef APPLICATION_APPLICATION_HPP_INCLUDED
+#define APPLICATION_APPLICATION_HPP_INCLUDED
 
 #include <memory>
 
@@ -40,7 +40,7 @@ class Application
     const int DEFAULT_WINDOW_WIDTH = 640;
     const int DEFAULT_WINDOW_HEIGHT = 480;
 
-    std::unique_ptr<Renderer> m_renderer;
+    std::unique_ptr<domain::Renderer> m_renderer;
 
     void updateControllers();
 

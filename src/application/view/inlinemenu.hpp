@@ -11,9 +11,9 @@ class InlineMenuView
   public:
     InlineMenuView();
 
-    void init(Renderer *renderer, KakouneContentView *kakoune_content_view);
+    void init(domain::Renderer *renderer, KakouneContentView *kakoune_content_view);
 
-    void render(Font *font, const KakouneClient &kakoune_client, float width, float height);
+    void render(domain::Font *font, const KakouneClient &kakoune_client, float width, float height);
 
     float x() const;
     float y() const;
@@ -32,7 +32,7 @@ class InlineMenuView
     float m_height;
 
     KakouneContentView *m_kakoune_content_view;
-    Renderer *m_renderer;
+    domain::Renderer *m_renderer;
 
     std::unique_ptr<ScrolledMenuItems> m_scrolled_menu_items;
 };

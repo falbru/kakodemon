@@ -6,7 +6,7 @@
 
 struct UIOptions
 {
-    std::unique_ptr<Font> font;
+    std::unique_ptr<domain::Font> font;
 };
 
 #endif

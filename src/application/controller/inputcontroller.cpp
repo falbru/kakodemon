@@ -58,8 +58,8 @@ std::string InputController::keyEventToKakouneKey(const domain::KeyEvent& event)
     bool has_modifiers = (event.modifiers & (domain::CONTROL | domain::ALT | domain::SHIFT)) != 0;
     bool needsEscaping = false;
 
-    if (std::holds_alternative<Codepoint>(event.key)) {
-        key_name = codePointToString(std::get<Codepoint>(event.key));
+    if (std::holds_alternative<domain::Codepoint>(event.key)) {
+        key_name = domain::codePointToString(std::get<domain::Codepoint>(event.key));
 
         auto it = special_chars.find(key_name);
         if (it != special_chars.end()) {
@@ -78,7 +78,7 @@ std::string InputController::keyEventToKakouneKey(const domain::KeyEvent& event)
         if (event.modifiers & domain::CONTROL) {
             result += "c-";
         }
-        if (!std::holds_alternative<Codepoint>(event.key) && event.modifiers & domain::SHIFT) {
+        if (!std::holds_alternative<domain::Codepoint>(event.key) && event.modifiers & domain::SHIFT) {
             result += "s-";
         }
         if (event.modifiers & domain::ALT) {

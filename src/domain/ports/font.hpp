@@ -1,8 +1,11 @@
-#ifndef FONT_HPP_INCLUDED
-#define FONT_HPP_INCLUDED
+#ifndef DOMAIN_FONT_HPP_INCLUDED
+#define DOMAIN_FONT_HPP_INCLUDED
 
 #include "domain/geometry.hpp"
 #include "domain/utf8string.hpp"
+
+namespace domain
+{
 
 struct GlyphMetrics
 {
@@ -31,4 +34,6 @@ class Font
     virtual float width(UTF8String string) = 0;
 };
 
-#endif // font_hpp_INCLUDED
+} // namespace domain
+
+#endif

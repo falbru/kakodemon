@@ -10,5 +10,5 @@ void kakoune::from_json(const nlohmann::json &j, Atom &a)
     j.at("face").get_to(a.face);
     std::string tmp;
     j.at("contents").get_to(tmp);
-    a.contents = UTF8String(tmp);
+    a.contents = domain::UTF8String(tmp);
 }

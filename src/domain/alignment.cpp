@@ -5,9 +5,9 @@ namespace domain{
 Alignment::Alignment(HorizontalAlignment horizontal, VerticalAlignment vertical)
     : h(horizontal), v(vertical) {}
 
-domain::Alignment domain::Alignment::topLeft() { return {HorizontalAlignment::Left, VerticalAlignment::Top}; }
-domain::Alignment domain::Alignment::topRight() { return {HorizontalAlignment::Right, VerticalAlignment::Top}; }
-domain::Alignment domain::Alignment::bottomLeft() { return {HorizontalAlignment::Left, VerticalAlignment::Bottom}; }
-domain::Alignment domain::Alignment::bottomRight() { return {HorizontalAlignment::Right, VerticalAlignment::Bottom}; }
+Alignment Alignment::topLeft() { return {HorizontalAlignment::Left, VerticalAlignment::Top}; }
+Alignment Alignment::topRight() { return {HorizontalAlignment::Right, VerticalAlignment::Top}; }
+Alignment Alignment::bottomLeft() { return {HorizontalAlignment::Left, VerticalAlignment::Bottom}; }
+Alignment Alignment::bottomRight() { return {HorizontalAlignment::Right, VerticalAlignment::Bottom}; }
 
 }

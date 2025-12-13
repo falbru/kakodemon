@@ -4,10 +4,10 @@
 
 #include <spdlog/spdlog.h>
 
-opengl::Font::Font(FontEngine* font_engine) : m_font_engine(font_engine) {
+opengl::Font::Font(domain::FontEngine* font_engine) : m_font_engine(font_engine) {
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-    for (Codepoint c = 0; c < 128; c++)
+    for (domain::Codepoint c = 0; c < 128; c++)
     {
         loadGlyph(c);
     }
@@ -15,19 +15,19 @@ opengl::Font::Font(FontEngine* font_engine) : m_font_engine(font_engine) {
 
 opengl::Font::~Font() { }
 
-bool opengl::Font::hasGlyph(Codepoint c) const {
+bool opengl::Font::hasGlyph(domain::Codepoint c) const {
     return m_glyphs.find(c) != m_glyphs.end();
 }
 
-const GlyphMetrics &opengl::Font::getGlyphMetrics(Codepoint c) const {
+const domain::GlyphMetrics &opengl::Font::getGlyphMetrics(domain::Codepoint c) const {
     return m_glyphs.at(c).metrics;
 }
 
-const opengl::Glyph &opengl::Font::getGlyph(Codepoint c) const {
+const opengl::Glyph &opengl::Font::getGlyph(domain::Codepoint c) const {
     return m_glyphs.at(c);
 }
 
-void opengl::Font::loadGlyph(Codepoint c) {
+void opengl::Font::loadGlyph(domain::Codepoint c) {
     if (auto rasterized_glyph = m_font_engine->rasterizeGlyph(c)) {
         unsigned int texture;
         glGenTextures(1, &texture);
@@ -40,11 +40,11 @@ void opengl::Font::loadGlyph(Codepoint c) {
 
         Glyph glyph = {texture, rasterized_glyph.value().metrics};
 
-        m_glyphs.insert(std::pair<Codepoint, Glyph>(c, glyph));
+        m_glyphs.insert(std::pair<domain::Codepoint, Glyph>(c, glyph));
     }
 }
 
-const GlyphMetrics& opengl::Font::ensureGlyph(Codepoint c) {
+const domain::GlyphMetrics& opengl::Font::ensureGlyph(domain::Codepoint c) {
     if (!hasGlyph(c)) {
         loadGlyph(c);
     }
@@ -60,7 +60,7 @@ float opengl::Font::getLineHeight() const {
     return m_font_engine->getLineHeight();
 }
 
-float opengl::Font::width(UTF8String string) {
+float opengl::Font::width(domain::UTF8String string) {
     float w = 0;
 
     for (int i = 0; i < string.size(); i++) {

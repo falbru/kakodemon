@@ -1,5 +1,8 @@
-#ifndef CORE_GEOMETRY_HPP_INCLUDED
-#define CORE_GEOMETRY_HPP_INCLUDED
+#ifndef DOMAIN_GEOMETRY_HPP_INCLUDED
+#define DOMAIN_GEOMETRY_HPP_INCLUDED
+
+namespace domain
+{
 
 struct IVec2
 {
@@ -20,5 +23,7 @@ struct Rectangle
     float width;
     float height;
 };
+
+} // namespace domain
 
 #endif

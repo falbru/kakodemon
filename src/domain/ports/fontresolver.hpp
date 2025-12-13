@@ -1,7 +1,10 @@
-#ifndef FONTRESOLVER_HPP_INCLUDED
-#define FONTRESOLVER_HPP_INCLUDED
+#ifndef DOMAIN_FONTRESOLVER_HPP_INCLUDED
+#define DOMAIN_FONTRESOLVER_HPP_INCLUDED
 
 #include <string>
+
+namespace domain
+{
 
 struct FontMatch
 {
@@ -16,5 +19,7 @@ class FontResolver
 
     virtual FontMatch resolve(std::string pattern) = 0;
 };
+
+} // namespace domain
 
 #endif

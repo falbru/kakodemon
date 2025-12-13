@@ -9,6 +9,6 @@ FontconfigResolver::~FontconfigResolver() {
 
 }
 
-FontMatch FontconfigResolver::resolve(std::string pattern) {
-    return FontMatch();
+domain::FontMatch FontconfigResolver::resolve(std::string pattern) {
+    return domain::FontMatch();
 }

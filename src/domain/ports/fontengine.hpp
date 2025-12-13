@@ -1,9 +1,12 @@
-#ifndef FONTENGINE_HPP_INCLUDED
-#define FONTENGINE_HPP_INCLUDED
+#ifndef DOMAIN_FONTENGINE_HPP_INCLUDED
+#define DOMAIN_FONTENGINE_HPP_INCLUDED
 
 #include "domain/ports/font.hpp"
 #include "domain/utf8string.hpp"
 #include <optional>
+
+namespace domain
+{
 
 struct RasterizedGlyph
 {
@@ -27,5 +30,7 @@ class FontEngine
   protected:
     FontEngine() = default;
 };
+
+} // namespace domain
 
 #endif

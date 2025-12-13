@@ -1,5 +1,5 @@
-#ifndef KEY_HPP_INCLUDED
-#define KEY_HPP_INCLUDED
+#ifndef DOMAIN_KEY_HPP_INCLUDED
+#define DOMAIN_KEY_HPP_INCLUDED
 
 #include "utf8string.hpp"
 #include <variant>

@@ -3,13 +3,13 @@
 
 #include "domain/ports/fontresolver.hpp"
 
-class FontconfigResolver : public FontResolver
+class FontconfigResolver : public domain::FontResolver
 {
   public:
     FontconfigResolver();
     ~FontconfigResolver();
 
-    FontMatch resolve(std::string pattern) override;
+    domain::FontMatch resolve(std::string pattern) override;
 };
 
 #endif

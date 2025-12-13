@@ -1,5 +1,5 @@
 #include "domain/ports/font.hpp"
 
-float GlyphMetrics::width() const {
+float domain::GlyphMetrics::width() const {
     return advance >> 6;
 }

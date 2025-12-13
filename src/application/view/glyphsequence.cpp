@@ -2,13 +2,13 @@
 #include "domain/utf8string.hpp"
 #include "domain/ports/font.hpp"
 
-GlyphSequence::GlyphSequence(Font* font, const UTF8String& string) : m_font(font) {
+GlyphSequence::GlyphSequence(domain::Font* font, const domain::UTF8String& string) : m_font(font) {
     for (int i = 0; i < string.size(); i++) {
         m_glyphs.push_back(m_font->ensureGlyph(string.at(i)));
     }
 }
 
-GlyphSequence::GlyphSequence(Font* font, const std::vector<GlyphMetrics> &glyphs) : m_font(font), m_glyphs(glyphs) {
+GlyphSequence::GlyphSequence(domain::Font* font, const std::vector<domain::GlyphMetrics> &glyphs) : m_font(font), m_glyphs(glyphs) {
 }
 
 float GlyphSequence::width() const {
@@ -24,7 +24,7 @@ float GlyphSequence::count() const {
 
 }
 
-const std::vector<GlyphMetrics>& GlyphSequence::glyphs() const {
+const std::vector<domain::GlyphMetrics>& GlyphSequence::glyphs() const {
     return m_glyphs;
 
 }
@@ -46,15 +46,15 @@ void GlyphSequence::truncate(float max_width) {
 }
 
 GlyphSequence GlyphSequence::substr(int start, int length) {
-    return GlyphSequence(m_font, std::vector<GlyphMetrics>(m_glyphs.begin() + start, m_glyphs.begin() + start + length));
+    return GlyphSequence(m_font, std::vector<domain::GlyphMetrics>(m_glyphs.begin() + start, m_glyphs.begin() + start + length));
 }
 
-UTF8String GlyphSequence::toUTF8String() {
-    std::vector<Codepoint> codepoints;
+domain::UTF8String GlyphSequence::toUTF8String() {
+    std::vector<domain::Codepoint> codepoints;
     for (const auto& glyph : m_glyphs) {
         codepoints.push_back(glyph.codepoint);
     }
-    return UTF8String(codepoints);
+    return domain::UTF8String(codepoints);
 }
 
 std::optional<GlyphSequence> GlyphSequence::cut(float max_width, CutMode mode) {
@@ -78,7 +78,7 @@ std::optional<GlyphSequence> GlyphSequence::cut(float max_width, CutMode mode) {
         }
     }
 
-    std::vector<GlyphMetrics> glyphs;
+    std::vector<domain::GlyphMetrics> glyphs;
     glyphs.assign(it, m_glyphs.end());
     GlyphSequence remaining(m_font, glyphs);
 

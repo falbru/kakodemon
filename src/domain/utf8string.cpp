@@ -1,5 +1,7 @@
 #include "utf8string.hpp"
 
+namespace domain {
+
 UTF8String::UTF8String()
 {
 }
@@ -176,4 +178,6 @@ UTF8String UTF8String::substring(size_t start, size_t length) const
 UTF8String UTF8String::substring(size_t start) const
 {
     return substring(start, m_codepoints.size() - start);
+}
+
 }

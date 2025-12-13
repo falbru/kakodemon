@@ -6,7 +6,7 @@ InlineMenuView::InlineMenuView()
 {
 }
 
-void InlineMenuView::init(Renderer* renderer,
+void InlineMenuView::init(domain::Renderer* renderer,
                           KakouneContentView* kakoune_content_view)
 {
     m_renderer = renderer;
@@ -29,7 +29,7 @@ float InlineMenuView::height() const {
     return m_height;
 }
 
-void InlineMenuView::render(Font* font, const KakouneClient &kakoune_client, float width, float height)
+void InlineMenuView::render(domain::Font* font, const KakouneClient &kakoune_client, float width, float height)
 {
     if (!m_scrolled_menu_items) {
         m_scrolled_menu_items = std::make_unique<ScrolledMenuItems>(MAX_VISIBLE_ITEMS);

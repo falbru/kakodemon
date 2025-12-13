@@ -6,14 +6,14 @@ PromptMenuView::PromptMenuView()
 {
 }
 
-void PromptMenuView::init(Renderer* renderer,
+void PromptMenuView::init(domain::Renderer* renderer,
                           KakouneContentView* kakoune_content_view)
 {
     m_renderer = renderer;
     m_kakoune_content_view = kakoune_content_view;
 }
 
-void PromptMenuView::render(Font* font, const KakouneClient &kakoune_client, float width, float height)
+void PromptMenuView::render(domain::Font* font, const KakouneClient &kakoune_client, float width, float height)
 {
     if (!m_input) {
         m_input = std::make_unique<Input>(font);

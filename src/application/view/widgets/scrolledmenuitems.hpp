@@ -12,7 +12,8 @@ class ScrolledMenuItems
   public:
     ScrolledMenuItems(int max_items);
 
-    void render(Renderer *renderer, Font *font, const KakouneClient &kakoune_client, LayoutManager &layout);
+    void render(domain::Renderer *renderer, domain::Font *font, const KakouneClient &kakoune_client,
+                LayoutManager &layout);
 
     float width() const;
     float height() const;

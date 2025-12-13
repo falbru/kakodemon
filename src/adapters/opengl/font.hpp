@@ -13,31 +13,31 @@ namespace opengl
 struct Glyph
 {
     unsigned int texture_id;
-    GlyphMetrics metrics;
+    domain::GlyphMetrics metrics;
 };
 
-class Font : public ::Font
+class Font : public domain::Font
 {
   public:
-    Font(FontEngine *font_engine);
+    Font(domain::FontEngine *font_engine);
     virtual ~Font();
 
-    bool hasGlyph(Codepoint c) const override;
-    const GlyphMetrics &getGlyphMetrics(Codepoint c) const override;
+    bool hasGlyph(domain::Codepoint c) const override;
+    const domain::GlyphMetrics &getGlyphMetrics(domain::Codepoint c) const override;
 
-    const Glyph &getGlyph(Codepoint c) const;
+    const Glyph &getGlyph(domain::Codepoint c) const;
 
-    void loadGlyph(Codepoint c) override;
-    const GlyphMetrics &ensureGlyph(Codepoint c) override;
+    void loadGlyph(domain::Codepoint c) override;
+    const domain::GlyphMetrics &ensureGlyph(domain::Codepoint c) override;
 
     float getAscender() const override;
     float getLineHeight() const override;
 
-    float width(UTF8String string) override;
+    float width(domain::UTF8String string) override;
 
   private:
-    std::map<Codepoint, Glyph> m_glyphs;
-    FontEngine *m_font_engine;
+    std::map<domain::Codepoint, Glyph> m_glyphs;
+    domain::FontEngine *m_font_engine;
 };
 
 } // namespace opengl

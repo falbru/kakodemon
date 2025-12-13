@@ -14,24 +14,24 @@ enum class CutMode
 class GlyphSequence
 {
   public:
-    GlyphSequence(Font *font, const UTF8String &string);
-    GlyphSequence(Font *font, const std::vector<GlyphMetrics> &glyphs);
+    GlyphSequence(domain::Font *font, const domain::UTF8String &string);
+    GlyphSequence(domain::Font *font, const std::vector<domain::GlyphMetrics> &glyphs);
 
     float width() const;
 
     float count() const;
-    const std::vector<GlyphMetrics> &glyphs() const;
+    const std::vector<domain::GlyphMetrics> &glyphs() const;
 
     void truncate(float max_width);
     std::optional<GlyphSequence> cut(float max_width, CutMode mode = CutMode::CHARACTER);
     GlyphSequence substr(int start, int length);
 
-    UTF8String toUTF8String();
+    domain::UTF8String toUTF8String();
 
   private:
-    std::vector<GlyphMetrics> m_glyphs;
+    std::vector<domain::GlyphMetrics> m_glyphs;
 
-    Font *m_font;
+    domain::Font *m_font;
 };
 
 #endif

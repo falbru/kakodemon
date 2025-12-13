@@ -24,11 +24,11 @@ FreeTypeFontEngine::~FreeTypeFontEngine() {
     FT_Done_FreeType(m_library);
 }
 
-bool FreeTypeFontEngine::hasGlyph(Codepoint c) const {
+bool FreeTypeFontEngine::hasGlyph(domain::Codepoint c) const {
     return m_glyphs.find(c) != m_glyphs.end();
 }
 
-std::optional<RasterizedGlyph> FreeTypeFontEngine::rasterizeGlyph(Codepoint c) {
+std::optional<domain::RasterizedGlyph> FreeTypeFontEngine::rasterizeGlyph(domain::Codepoint c) {
     if (hasGlyph(c)) {
         return m_glyphs.at(c);
     }
@@ -39,7 +39,7 @@ std::optional<RasterizedGlyph> FreeTypeFontEngine::rasterizeGlyph(Codepoint c) {
         return std::nullopt;
     }
 
-    RasterizedGlyph glyph = {
+    domain::RasterizedGlyph glyph = {
         .metrics = {
             .codepoint = c,
             .size = { m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows },

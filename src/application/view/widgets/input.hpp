@@ -10,12 +10,12 @@
 class Input
 {
   public:
-    Input(Font *font);
+    Input(domain::Font *font);
 
     void setPrompt(const kakoune::Line &prompt);
     void setContent(const kakoune::Line &content);
 
-    void render(Renderer *renderer, const KakouneClient &kakoune_client, LayoutManager &layout);
+    void render(domain::Renderer *renderer, const KakouneClient &kakoune_client, LayoutManager &layout);
 
     float width() const;
     float height() const;
@@ -25,7 +25,7 @@ class Input
 
     kakoune::Line m_prompt;
     kakoune::Line m_content;
-    Font *m_font;
+    domain::Font *m_font;
 
     const float BORDER = 1.0f;
     const float PADDING = SPACING_MEDIUM;

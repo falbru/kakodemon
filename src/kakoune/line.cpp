@@ -19,8 +19,8 @@ int kakoune::Line::size() const {
     return size;
 }
 
-UTF8String kakoune::Line::toUTF8String() const {
-    UTF8String string;
+domain::UTF8String kakoune::Line::toUTF8String() const {
+    domain::UTF8String string;
     for (int i = 0; i < atoms.size(); i++) {
         for (int j = 0; j < atoms[i].contents.size(); j++) {
             string.addCodepoint(atoms[i].contents.at(j));

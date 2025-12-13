@@ -7,14 +7,14 @@
 #include <map>
 #include FT_FREETYPE_H
 
-class FreeTypeFontEngine : public FontEngine
+class FreeTypeFontEngine : public domain::FontEngine
 {
   public:
     FreeTypeFontEngine(const std::string path, int size);
     ~FreeTypeFontEngine();
 
-    bool hasGlyph(Codepoint c) const override;
-    std::optional<RasterizedGlyph> rasterizeGlyph(Codepoint c) override;
+    bool hasGlyph(domain::Codepoint c) const override;
+    std::optional<domain::RasterizedGlyph> rasterizeGlyph(domain::Codepoint c) override;
 
     float getAscender() const override;
     float getLineHeight() const override;
@@ -26,7 +26,7 @@ class FreeTypeFontEngine : public FontEngine
     float m_ascender;
     float m_line_height;
 
-    std::map<Codepoint, RasterizedGlyph> m_glyphs;
+    std::map<domain::Codepoint, domain::RasterizedGlyph> m_glyphs;
 };
 
 #endif

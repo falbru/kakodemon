@@ -16,7 +16,7 @@
 namespace opengl
 {
 
-class Renderer : public ::Renderer
+class Renderer : public domain::Renderer
 {
   public:
     Renderer();
@@ -29,12 +29,12 @@ class Renderer : public ::Renderer
     void renderRect(const domain::Color color, float x, float y, float width, float height) const override;
     void renderRectWithShadow(const domain::Color color, float x, float y, float width, float height,
                               float shadowRadius) const override;
-    void renderLine(::Font *font, const kakoune::Line &line, const kakoune::Face &default_face, float x,
+    void renderLine(domain::Font *font, const kakoune::Line &line, const kakoune::Face &default_face, float x,
                     float y) const override;
-    void renderLine(::Font *font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y,
+    void renderLine(domain::Font *font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y,
                     const domain::Alignment &alignment) const override;
-    void renderLines(::Font *font, const std::vector<kakoune::Line> &lines, const kakoune::Face &default_face, float x,
-                     float y) const override;
+    void renderLines(domain::Font *font, const std::vector<kakoune::Line> &lines, const kakoune::Face &default_face,
+                     float x, float y) const override;
 
   private:
     void _renderLine(opengl::Font *font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y,
@@ -49,7 +49,7 @@ class Renderer : public ::Renderer
 
     unsigned int m_screen_width, m_screen_height;
 
-    std::stack<Rectangle> m_bounds;
+    std::stack<domain::Rectangle> m_bounds;
 };
 
 } // namespace opengl

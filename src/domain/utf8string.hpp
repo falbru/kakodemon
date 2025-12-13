@@ -1,8 +1,11 @@
-#ifndef CORE_UTF8STRING_INCLUDED
-#define CORE_UTF8STRING_INCLUDED
+#ifndef DOMAIN_UTF8STRING_INCLUDED
+#define DOMAIN_UTF8STRING_INCLUDED
 
 #include <string>
 #include <vector>
+
+namespace domain
+{
 
 typedef unsigned int Codepoint;
 
@@ -37,5 +40,7 @@ class UTF8String
   private:
     std::vector<Codepoint> m_codepoints;
 };
+
+} // namespace domain
 
 #endif
