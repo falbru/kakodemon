@@ -1,5 +1,5 @@
-#include "application.hpp"
-#include "opengl/application.hpp"
+#include "application/application.hpp"
+#include "adapters/opengl/application.hpp"
 #include <memory>
 
 int main(void)

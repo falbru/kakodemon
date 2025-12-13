@@ -21,27 +21,26 @@ add_subdirectory(vendor/spdlog)
 
 set(SRC
     src/main.cpp
-    src/application.cpp
-    src/font.cpp
-    src/fontconfigresolver.cpp
-    src/freetypefontengine.cpp
-    src/fontconfigresolver.cpp
-    src/controller/editorcontroller.cpp
-    src/controller/inputcontroller.cpp
-    src/controller/menucontroller.cpp
-    src/controller/infoboxcontroller.cpp
-    src/view/kakounecontentview.cpp
-    src/view/statusbar.cpp
-    src/view/promptmenu.cpp
-    src/view/inlinemenu.cpp
-    src/view/infobox.cpp
-    src/view/layoutmanager.cpp
-    src/view/glyphsequence.cpp
-    src/view/widgets/input.cpp
-    src/view/widgets/scrollbar.cpp
-    src/view/widgets/scrolledmenuitems.cpp
-    src/core/alignment.cpp
-    src/core/utf8string.cpp
+    src/application/application.cpp
+    src/domain/ports/font.cpp
+    src/adapters/fontconfig/fontconfigresolver.cpp
+    src/adapters/freetype/freetypefontengine.cpp
+    src/application/controller/editorcontroller.cpp
+    src/application/controller/inputcontroller.cpp
+    src/application/controller/menucontroller.cpp
+    src/application/controller/infoboxcontroller.cpp
+    src/application/view/kakounecontentview.cpp
+    src/application/view/statusbar.cpp
+    src/application/view/promptmenu.cpp
+    src/application/view/inlinemenu.cpp
+    src/application/view/infobox.cpp
+    src/application/view/layoutmanager.cpp
+    src/application/view/glyphsequence.cpp
+    src/application/view/widgets/input.cpp
+    src/application/view/widgets/scrollbar.cpp
+    src/application/view/widgets/scrolledmenuitems.cpp
+    src/domain/alignment.cpp
+    src/domain/utf8string.cpp
     src/kakoune/kakouneframestatemanager.cpp
     src/kakoune/kakouneclientprocess.cpp
     src/kakoune/coord.cpp
@@ -51,10 +50,10 @@ set(SRC
     src/kakoune/atom.cpp
     src/kakoune/face.cpp
     src/kakoune/color.cpp
-    src/opengl/application.cpp
-    src/opengl/renderer.cpp
-    src/opengl/shaderprogram.cpp
-    src/opengl/font.cpp
+    src/adapters/opengl/application.cpp
+    src/adapters/opengl/renderer.cpp
+    src/adapters/opengl/shaderprogram.cpp
+    src/adapters/opengl/font.cpp
     vendor/glad/src/glad.c
 )
 

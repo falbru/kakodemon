@@ -1,29 +1,29 @@
 #include "color.hpp"
-#include "core/color.hpp"
+#include "domain/color.hpp"
 #include <cctype>
 #include <spdlog/spdlog.h>
 
-const std::unordered_map<std::string, core::Color> NAMED_COLORS = {
-    {"black",          core::Color{0.0f, 0.0f, 0.0f, 1.0f}},
-    {"red",            core::Color{1.0f, 0.0f, 0.0f, 1.0f}},
-    {"green",          core::Color{0.0f, 0.502f, 0.0f, 1.0f}},
-    {"yellow",         core::Color{1.0f, 1.0f, 0.0f, 1.0f}},
-    {"blue",           core::Color{0.0f, 0.0f, 1.0f, 1.0f}},
-    {"magenta",        core::Color{1.0f, 0.0f, 1.0f, 1.0f}},
-    {"cyan",           core::Color{0.0f, 1.0f, 1.0f, 1.0f}},
-    {"white",          core::Color{1.0f, 1.0f, 1.0f, 1.0f}},
-    {"bright-black",   core::Color{0.502f, 0.502f, 0.502f, 1.0f}},
-    {"bright-red",     core::Color{1.0f, 0.502f, 0.502f, 1.0f}},
-    {"bright-green",   core::Color{0.502f, 1.0f, 0.502f, 1.0f}},
-    {"bright-yellow",  core::Color{1.0f, 1.0f, 0.502f, 1.0f}},
-    {"bright-blue",    core::Color{0.502f, 0.502f, 1.0f, 1.0f}},
-    {"bright-magenta", core::Color{1.0f, 0.502f, 1.0f, 1.0f}},
-    {"bright-cyan",    core::Color{0.502f, 1.0f, 1.0f, 1.0f}},
-    {"bright-white",   core::Color{1.0f, 1.0f, 1.0f, 1.0f}},
+const std::unordered_map<std::string, domain::Color> NAMED_COLORS = {
+    {"black",          domain::Color{0.0f, 0.0f, 0.0f, 1.0f}},
+    {"red",            domain::Color{1.0f, 0.0f, 0.0f, 1.0f}},
+    {"green",          domain::Color{0.0f, 0.502f, 0.0f, 1.0f}},
+    {"yellow",         domain::Color{1.0f, 1.0f, 0.0f, 1.0f}},
+    {"blue",           domain::Color{0.0f, 0.0f, 1.0f, 1.0f}},
+    {"magenta",        domain::Color{1.0f, 0.0f, 1.0f, 1.0f}},
+    {"cyan",           domain::Color{0.0f, 1.0f, 1.0f, 1.0f}},
+    {"white",          domain::Color{1.0f, 1.0f, 1.0f, 1.0f}},
+    {"bright-black",   domain::Color{0.502f, 0.502f, 0.502f, 1.0f}},
+    {"bright-red",     domain::Color{1.0f, 0.502f, 0.502f, 1.0f}},
+    {"bright-green",   domain::Color{0.502f, 1.0f, 0.502f, 1.0f}},
+    {"bright-yellow",  domain::Color{1.0f, 1.0f, 0.502f, 1.0f}},
+    {"bright-blue",    domain::Color{0.502f, 0.502f, 1.0f, 1.0f}},
+    {"bright-magenta", domain::Color{1.0f, 0.502f, 1.0f, 1.0f}},
+    {"bright-cyan",    domain::Color{0.502f, 1.0f, 1.0f, 1.0f}},
+    {"bright-white",   domain::Color{1.0f, 1.0f, 1.0f, 1.0f}},
 };
 
-const core::Color default_fg_color = core::Color{1.0f, 1.0f, 1.0f, 1.0f};
-const core::Color default_bg_color = core::Color{0.0f, 0.0f, 0.0f, 1.0f};
+const domain::Color default_fg_color = domain::Color{1.0f, 1.0f, 1.0f, 1.0f};
+const domain::Color default_bg_color = domain::Color{0.0f, 0.0f, 0.0f, 1.0f};
 
 int hexToInt(const std::string& hex) {
     int result = 0;
@@ -46,7 +46,7 @@ bool IsValidHexChar(char c) {
            (c >= 'A' && c <= 'F');
 }
 
-core::Color kakoune::Color::toCoreColor(std::optional<Color> default_color, bool fg) const {
+domain::Color kakoune::Color::toCoreColor(std::optional<Color> default_color, bool fg) const {
     if (color_string == "default") {
         if (default_color.has_value()) {
             return default_color.value().toCoreColor(std::nullopt, fg);
@@ -79,7 +79,7 @@ core::Color kakoune::Color::toCoreColor(std::optional<Color> default_color, bool
         float green = green_int / 255.0f;
         float blue = blue_int / 255.0f;
 
-        return core::Color{red, green, blue, 1.0f};
+        return domain::Color{red, green, blue, 1.0f};
     }
 
     // rgba:rrggbbaa
@@ -102,7 +102,7 @@ core::Color kakoune::Color::toCoreColor(std::optional<Color> default_color, bool
         float blue = blue_int / 255.0f;
         float alpha = alpha_int / 255.0f;
 
-        return core::Color{red, green, blue, alpha};
+        return domain::Color{red, green, blue, alpha};
     }
 
     throw std::runtime_error("Unable to convert color: " + color_string);
