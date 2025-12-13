@@ -33,7 +33,7 @@ class SearchMenuView
     int m_scroll_offset;
 
     const float WIDTH = 600.0f;
-    const int MAX_VISIBLE_ITEMS = 25;
+    const int MAX_VISIBLE_ITEMS = 10;
 
     float m_x;
     float m_height;

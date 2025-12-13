@@ -74,7 +74,7 @@ void Application::onMouseMove(float x, float y)
     domain::MouseMoveResult mouse_move_result;
     std::optional<domain::Cursor> cursor;
 
-    mouse_move_result = m_editor_controller->onMouseMove(x, y);
+    mouse_move_result = m_editor_controller->onMouseMove(x, y, m_ui_options.get());
     cursor = mouse_move_result.cursor;
 
     mouse_move_result = mouse_move_result = m_menu_controller->onMouseMove(x, y);
@@ -83,6 +83,11 @@ void Application::onMouseMove(float x, float y)
     if (cursor != std::nullopt) {
         setCursor(cursor.value());
     }
+}
+
+void Application::onMouseButton(domain::MouseButtonEvent event)
+{
+    m_editor_controller->onMouseButton(event, m_ui_options.get());
 }
 
 void Application::onKeyInput(domain::KeyEvent event)

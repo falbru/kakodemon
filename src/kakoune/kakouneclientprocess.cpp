@@ -129,6 +129,27 @@ void KakouneClientProcess::sendRequest(const OutgoingRequest &request)
         data["method"] = "resize";
         data["params"] = {resize_data.rows, resize_data.columns};
     }
+    else if (request.type == OutgoingRequestType::MOUSE_MOVE)
+    {
+        auto mouse_move_data = std::get<MouseMoveRequestData>(request.data);
+
+        data["method"] = "mouse_move";
+        data["params"] = {mouse_move_data.line, mouse_move_data.column};
+    }
+    else if (request.type == OutgoingRequestType::MOUSE_PRESS)
+    {
+        auto mouse_move_data = std::get<MousePressRequestData>(request.data);
+
+        data["method"] = "mouse_press";
+        data["params"] = {mouse_move_data.button, mouse_move_data.line, mouse_move_data.column};
+    }
+    else if (request.type == OutgoingRequestType::MOUSE_RELEASE)
+    {
+        auto mouse_move_data = std::get<MouseReleaseRequestData>(request.data);
+
+        data["method"] = "mouse_release";
+        data["params"] = {mouse_move_data.button, mouse_move_data.line, mouse_move_data.column};
+    }
 
     std::string json_str = data.dump();
 

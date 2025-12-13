@@ -34,6 +34,10 @@ void MenuController::update(const UIOptions& ui_options) {
 }
 
 domain::MouseMoveResult MenuController::onMouseMove(float x, float y) {
+    if (!m_kakoune_client->menu_visible) {
+        return domain::MouseMoveResult{std::nullopt};
+    }
+
     switch(m_kakoune_client->menu_style) {
         case kakoune::MenuStyle::INLINE:
             return m_inline_menu_view->onMouseMove(x, y);

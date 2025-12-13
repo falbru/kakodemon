@@ -90,7 +90,10 @@ struct IncomingRequest
 enum class OutgoingRequestType
 {
     KEYS,
-    RESIZE
+    RESIZE,
+    MOUSE_MOVE,
+    MOUSE_PRESS,
+    MOUSE_RELEASE
 };
 
 struct KeysRequestData
@@ -104,7 +107,28 @@ struct ResizeRequestData
     int columns;
 };
 
-using OutgoingRequestData = std::variant<KeysRequestData, ResizeRequestData>;
+struct MouseMoveRequestData
+{
+    int line;
+    int column;
+};
+
+struct MousePressRequestData
+{
+    std::string button;
+    int line;
+    int column;
+};
+
+struct MouseReleaseRequestData
+{
+    std::string button;
+    int line;
+    int column;
+};
+
+using OutgoingRequestData = std::variant<KeysRequestData, ResizeRequestData, MouseMoveRequestData,
+                                         MousePressRequestData, MouseReleaseRequestData>;
 
 struct OutgoingRequest
 {

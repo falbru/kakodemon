@@ -21,6 +21,10 @@ class GLFWApplication : public Application
   private:
     void onGLFWKeyInput(int key, int scancode, int action, int mods);
     void onGLFWCharacterInsert(unsigned int codepoint, int mods);
+    void onGLFWMouseMove(float cursor_x, float cursor_y);
+    void onGLFWMouseButton(int button, int action, int mods);
+
+    int toDomainModifiers(int mods);
 
     std::optional<domain::KeyEvent> glfwSpecialKeyToKeyEvent(int key, int mods);
     domain::KeyEvent glfwCharToKeyEvent(unsigned int codepoint, int mods);
@@ -29,6 +33,9 @@ class GLFWApplication : public Application
 
     GLFWcursor *m_cursor_ibeam;
     GLFWcursor *m_cursor_pointer;
+
+    float m_cursor_x;
+    float m_cursor_y;
 };
 
 }; // namespace opengl

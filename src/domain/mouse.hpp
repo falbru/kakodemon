@@ -5,11 +5,34 @@
 
 namespace domain
 {
+
 enum class Cursor
 {
     DEFAULT,
     IBEAM,
     POINTER
+};
+
+enum class MouseButton
+{
+    LEFT,
+    MIDDLE,
+    RIGHT
+};
+
+enum class MouseButtonAction
+{
+    PRESS,
+    RELEASE
+};
+
+struct MouseButtonEvent
+{
+    MouseButton button;
+    MouseButtonAction action;
+    int modifiers;
+    float x;
+    float y;
 };
 
 struct MouseMoveResult

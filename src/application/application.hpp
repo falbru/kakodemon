@@ -37,6 +37,7 @@ class Application
     void onWindowResize(int width, int height);
     void onKeyInput(domain::KeyEvent event);
     void onMouseMove(float x, float y);
+    void onMouseButton(domain::MouseButtonEvent event);
 
   protected:
     const int DEFAULT_WINDOW_WIDTH = 640;

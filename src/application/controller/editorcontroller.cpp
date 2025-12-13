@@ -1,4 +1,5 @@
 #include "editorcontroller.hpp"
+#include "application/model/uioptions.hpp"
 #include "domain/color.hpp"
 #include "domain/mouse.hpp"
 #include "domain/editor.hpp"
@@ -94,12 +95,63 @@ void EditorController::onWindowResize(int width, int height, const UIOptions& ui
     m_height = height;
 }
 
-domain::MouseMoveResult EditorController::onMouseMove(float x, float y) {
+domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const UIOptions* ui_options) {
     if (y >= m_content_height) {
         return domain::MouseMoveResult{domain::Cursor::DEFAULT};
     }
+
+    int column = x / ui_options->font.get()->getGlyphMetrics(97).width();
+    int line = y / ui_options->font.get()->getLineHeight();
+
+    m_kakoune_process->sendRequest(OutgoingRequest{
+        OutgoingRequestType::MOUSE_MOVE,
+        MouseMoveRequestData{
+            line,
+            column
+        }
+    });
+
     return domain::MouseMoveResult{domain::Cursor::IBEAM};
 }
+
+void EditorController::onMouseButton(domain::MouseButtonEvent event, const UIOptions* ui_options) {
+    int column = event.x / ui_options->font.get()->getGlyphMetrics(97).width();
+    int line = event.y / ui_options->font.get()->getLineHeight();
+
+    std::string button;
+    switch(event.button) {
+        case domain::MouseButton::LEFT:
+            button = "left";
+            break;
+        case domain::MouseButton::MIDDLE:
+            button = "middle";
+            break;
+        case domain::MouseButton::RIGHT:
+            button = "right";
+            break;
+    }
+
+    if (event.action == domain::MouseButtonAction::PRESS) {
+        m_kakoune_process->sendRequest(OutgoingRequest{
+            OutgoingRequestType::MOUSE_PRESS,
+            MousePressRequestData{
+                button,
+                line,
+                column
+            }
+        });
+    }else if (event.action == domain::MouseButtonAction::RELEASE) {
+        m_kakoune_process->sendRequest(OutgoingRequest{
+            OutgoingRequestType::MOUSE_RELEASE,
+            MouseReleaseRequestData{
+                button,
+                line,
+                column
+            }
+        });
+    }
+}
+
 
 int EditorController::width() const {
     return m_width;

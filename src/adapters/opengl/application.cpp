@@ -1,4 +1,5 @@
 #include "application.hpp"
+#include "GLFW/glfw3.h"
 #include "adapters/freetype/freetypefontengine.hpp"
 #include "adapters/opengl/renderer.hpp"
 #include "domain/mouse.hpp"
@@ -56,7 +57,12 @@ void opengl::GLFWApplication::init() {
 
     glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double xpos, double ypos) {
         GLFWApplication* app = static_cast<GLFWApplication*>(glfwGetWindowUserPointer(window));
-        app->onMouseMove(xpos, ypos);
+        app->onGLFWMouseMove(xpos, ypos);
+    });
+
+    glfwSetMouseButtonCallback(m_window, [](GLFWwindow* window, int button, int action, int mods) {
+        GLFWApplication* app = static_cast<GLFWApplication*>(glfwGetWindowUserPointer(window));
+        app->onGLFWMouseButton(button, action, mods);
     });
 
     int framebuffer_width, framebuffer_height;
@@ -131,18 +137,63 @@ std::optional<domain::KeyEvent> opengl::GLFWApplication::glfwSpecialKeyToKeyEven
     domain::KeyEvent event;
     event.key = it->second;
 
-    event.modifiers = 0;
-    if (mods & GLFW_MOD_CONTROL) {
-        event.modifiers |= domain::CONTROL;
-    }
-    if (mods & GLFW_MOD_SHIFT) {
-        event.modifiers |= domain::SHIFT;
-    }
-    if (mods & GLFW_MOD_ALT) {
-        event.modifiers |= domain::ALT;
-    }
+    event.modifiers = toDomainModifiers(mods);
 
     return event;
+}
+
+void opengl::GLFWApplication::onGLFWMouseMove(float cursor_x, float cursor_y) {
+    m_cursor_x = cursor_x;
+    m_cursor_y = cursor_y;
+
+    this->onMouseMove(cursor_x, cursor_y);
+}
+
+void opengl::GLFWApplication::onGLFWMouseButton(int button, int action, int mods) {
+    domain::MouseButtonEvent event;
+
+    switch(button) {
+        case GLFW_MOUSE_BUTTON_LEFT:
+            event.button = domain::MouseButton::LEFT;
+            break;
+        case GLFW_MOUSE_BUTTON_MIDDLE:
+            event.button = domain::MouseButton::MIDDLE;
+            break;
+        case GLFW_MOUSE_BUTTON_RIGHT:
+            event.button = domain::MouseButton::RIGHT;
+            break;
+    }
+
+    switch(action) {
+        case GLFW_PRESS:
+            event.action = domain::MouseButtonAction::PRESS;
+            break;
+        case GLFW_RELEASE:
+            event.action = domain::MouseButtonAction::RELEASE;
+            break;
+    }
+
+    event.modifiers = toDomainModifiers(mods);
+    event.x = m_cursor_x;
+    event.y = m_cursor_y;
+
+    onMouseButton(event);
+}
+
+int opengl::GLFWApplication::toDomainModifiers(int mods) {
+    int domain_modifiers = 0;
+
+    if (mods & GLFW_MOD_CONTROL) {
+        domain_modifiers |= domain::CONTROL;
+    }
+    if (mods & GLFW_MOD_SHIFT) {
+        domain_modifiers |= domain::SHIFT;
+    }
+    if (mods & GLFW_MOD_ALT) {
+        domain_modifiers |= domain::ALT;
+    }
+
+    return domain_modifiers;
 }
 
 domain::KeyEvent opengl::GLFWApplication::glfwCharToKeyEvent(unsigned int codepoint, int mods) {
