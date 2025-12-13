@@ -5,6 +5,7 @@
 #include "application/model/uioptions.hpp"
 #include "application/view/inlinemenu.hpp"
 #include "application/view/promptmenu.hpp"
+#include "application/view/searchmenu.hpp"
 #include "kakoune/menustyle.hpp"
 
 class MenuController
@@ -13,7 +14,7 @@ class MenuController
     MenuController();
 
     void init(KakouneClient *kakoune_client, EditorController *editor_controller, PromptMenuView *prompt_menu_view,
-              InlineMenuView *inline_menu_view);
+              InlineMenuView *inline_menu_view, SearchMenuView *search_menu_view);
 
     void update(const UIOptions &ui_options);
 
@@ -27,6 +28,7 @@ class MenuController
     EditorController *m_editor_controller;
     InlineMenuView *m_inline_menu_view;
     PromptMenuView *m_prompt_menu_view;
+    SearchMenuView *m_search_menu_view;
 
     kakoune::MenuStyle m_current_style;
 };

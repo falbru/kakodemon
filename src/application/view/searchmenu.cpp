@@ -1,21 +1,19 @@
-#include "promptmenu.hpp"
-#include "styling.hpp"
-#include "widgets/scrolledmenuitems.hpp"
+#include "application/view/searchmenu.hpp"
+#include "application/view/styling.hpp"
+#include "application/view/widgets/input.hpp"
+#include "application/view/widgets/scrolledmenuitems.hpp"
 
-PromptMenuView::PromptMenuView()
-{
+SearchMenuView::SearchMenuView() {
+
 }
 
-void PromptMenuView::init(domain::Renderer* renderer,
-                          KakouneContentView* kakoune_content_view)
-{
+void SearchMenuView::init(domain::Renderer *renderer) {
     m_renderer = renderer;
-    m_kakoune_content_view = kakoune_content_view;
+
     m_scrolled_menu_items = std::make_unique<ScrolledMenuItems>(MAX_VISIBLE_ITEMS);
 }
 
-void PromptMenuView::render(domain::Font* font, const KakouneClient &kakoune_client, float width, float height)
-{
+void SearchMenuView::render(domain::Font *font, const KakouneClient &kakoune_client, float width, float height) {
     if (!m_input) {
         m_input = std::make_unique<Input>(font);
     }
@@ -23,15 +21,10 @@ void PromptMenuView::render(domain::Font* font, const KakouneClient &kakoune_cli
     if (kakoune_client.status_line.prompt.atoms.size() < 1 && kakoune_client.status_line.content.atoms.size() < 1)
         return;
 
-    static bool opened_before = false; // TODO remove this???
-    if (!kakoune_client.menu_visible && !opened_before)
-        return;
-    opened_before = true;
-
     m_input->setPrompt(kakoune_client.status_line.prompt);
     m_input->setContent(kakoune_client.status_line.content);
 
-    m_x = (width - WIDTH) / 2;
+    m_x = width - WIDTH;
     m_height = 2 * SPACING_MEDIUM + m_input->height();
 
     float items_size = std::min(MAX_VISIBLE_ITEMS, (int)kakoune_client.menu_items.size());
@@ -40,7 +33,7 @@ void PromptMenuView::render(domain::Font* font, const KakouneClient &kakoune_cli
         m_height += SPACING_MEDIUM + font->getLineHeight() * items_size;
     }
 
-    LayoutManager layout(m_x, Y, WIDTH, m_height);
+    LayoutManager layout(m_x, 0, WIDTH, m_height);
 
     m_renderer->renderRectWithShadow(
         kakoune_client.menu_face.bg.toCoreColor(kakoune_client.window_default_face.bg, false), layout.current().x,
@@ -57,18 +50,18 @@ void PromptMenuView::render(domain::Font* font, const KakouneClient &kakoune_cli
     }
 }
 
-float PromptMenuView::x() const {
+float SearchMenuView::x() const {
     return m_x;
 }
 
-float PromptMenuView::y() const {
-    return Y;
+float SearchMenuView::y() const {
+    return 0.0f;
 }
 
-float PromptMenuView::width() const {
+float SearchMenuView::width() const {
     return WIDTH;
 }
 
-float PromptMenuView::height() const {
+float SearchMenuView::height() const {
     return m_height;
 }

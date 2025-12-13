@@ -6,11 +6,12 @@ MenuController::MenuController() {
 
 }
 
-void MenuController::init(KakouneClient* kakoune_client, EditorController* editor_controller, PromptMenuView* prompt_menu_view, InlineMenuView* inline_menu_view) {
+void MenuController::init(KakouneClient* kakoune_client, EditorController* editor_controller, PromptMenuView* prompt_menu_view, InlineMenuView* inline_menu_view, SearchMenuView *search_menu_view) {
     m_kakoune_client = kakoune_client;
     m_editor_controller = editor_controller;
     m_inline_menu_view = inline_menu_view;
     m_prompt_menu_view = prompt_menu_view;
+    m_search_menu_view = search_menu_view;
 }
 
 void MenuController::update(const UIOptions& ui_options) {
@@ -24,6 +25,9 @@ void MenuController::update(const UIOptions& ui_options) {
         case kakoune::MenuStyle::PROMPT:
             m_prompt_menu_view->render(ui_options.font.get(), *m_kakoune_client, m_editor_controller->width(), m_editor_controller->height());
             break;
+        case kakoune::MenuStyle::SEARCH:
+            m_search_menu_view->render(ui_options.font.get(), *m_kakoune_client, m_editor_controller->width(), m_editor_controller->height());
+            break;
     }
 }
 
@@ -33,6 +37,8 @@ float MenuController::x() const {
             return m_inline_menu_view->x();
         case kakoune::MenuStyle::PROMPT:
             return m_prompt_menu_view->x();
+        case kakoune::MenuStyle::SEARCH:
+            return m_search_menu_view->x();
     }
     return 0;
 }
@@ -43,6 +49,8 @@ float MenuController::y() const {
             return m_inline_menu_view->y();
         case kakoune::MenuStyle::PROMPT:
             return m_prompt_menu_view->y();
+        case kakoune::MenuStyle::SEARCH:
+            return m_search_menu_view->y();
     }
     return 0;
 }
@@ -53,6 +61,8 @@ float MenuController::width() const {
             return m_inline_menu_view->width();
         case kakoune::MenuStyle::PROMPT:
             return m_prompt_menu_view->width();
+        case kakoune::MenuStyle::SEARCH:
+            return m_search_menu_view->width();
     }
     return 0;
 }
@@ -63,6 +73,8 @@ float MenuController::height() const {
             return m_inline_menu_view->height();
         case kakoune::MenuStyle::PROMPT:
             return m_prompt_menu_view->height();
+        case kakoune::MenuStyle::SEARCH:
+            return m_search_menu_view->height();
     }
     return 0;
 }

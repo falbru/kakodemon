@@ -8,7 +8,8 @@ namespace kakoune
 enum class MenuStyle
 {
     PROMPT,
-    INLINE
+    INLINE,
+    SEARCH
 };
 
 void to_json(nlohmann::json &j, const MenuStyle &style);

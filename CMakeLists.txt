@@ -33,6 +33,7 @@ set(SRC
     src/application/view/statusbar.cpp
     src/application/view/promptmenu.cpp
     src/application/view/inlinemenu.cpp
+    src/application/view/searchmenu.cpp
     src/application/view/infobox.cpp
     src/application/view/layoutmanager.cpp
     src/application/view/glyphsequence.cpp

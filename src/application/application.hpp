@@ -14,6 +14,7 @@
 #include "application/view/inlinemenu.hpp"
 #include "application/view/kakounecontentview.hpp"
 #include "application/view/promptmenu.hpp"
+#include "application/view/searchmenu.hpp"
 #include "application/view/statusbar.hpp"
 #include "domain/color.hpp"
 #include "domain/cursor.hpp"
@@ -60,6 +61,7 @@ class Application
     std::unique_ptr<StatusBarView> m_status_bar;
     std::unique_ptr<PromptMenuView> m_prompt_menu;
     std::unique_ptr<InlineMenuView> m_inline_menu;
+    std::unique_ptr<SearchMenuView> m_search_menu;
     std::unique_ptr<InfoBoxView> m_info_box;
 };
 
