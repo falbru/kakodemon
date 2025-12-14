@@ -157,6 +157,13 @@ void KakouneClientProcess::sendRequest(const OutgoingRequest &request)
         data["method"] = "menu_select";
         data["params"] = {menu_select_data.selected_index};
     }
+    else if (request.type == OutgoingRequestType::SCROLL)
+    {
+        auto scroll_data = std::get<ScrollRequestData>(request.data);
+
+        data["method"] = "scroll";
+        data["params"] = {scroll_data.amount, scroll_data.line, scroll_data.line};
+    }
 
     std::string json_str = data.dump();
 

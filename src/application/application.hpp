@@ -39,6 +39,7 @@ class Application
     void onKeyInput(domain::KeyEvent event);
     void onMouseMove(float x, float y);
     void onMouseButton(domain::MouseButtonEvent event);
+    void onMouseScroll(double offset);
 
   protected:
     const int DEFAULT_WINDOW_WIDTH = 640;
@@ -50,6 +51,9 @@ class Application
 
     domain::Color m_clear_color;
     domain::Cursor m_cursor;
+
+    float m_mouse_x = 0.0f;
+    float m_mouse_y = 0.0f;
 
     std::unique_ptr<KakouneClient> m_kakoune_client;
     std::unique_ptr<UIOptions> m_ui_options;

@@ -65,6 +65,11 @@ void opengl::GLFWApplication::init() {
         app->onGLFWMouseButton(button, action, mods);
     });
 
+    glfwSetScrollCallback(m_window, [](GLFWwindow* window, double xoffset, double yoffset) {
+        GLFWApplication* app = static_cast<GLFWApplication*>(glfwGetWindowUserPointer(window));
+        app->onMouseScroll(yoffset);
+    });
+
     int framebuffer_width, framebuffer_height;
     glfwGetFramebufferSize(m_window, &framebuffer_width, &framebuffer_height);
 

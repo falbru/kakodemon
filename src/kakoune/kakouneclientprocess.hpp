@@ -94,7 +94,8 @@ enum class OutgoingRequestType
     MOUSE_MOVE,
     MOUSE_PRESS,
     MOUSE_RELEASE,
-    MENU_SELECT
+    MENU_SELECT,
+    SCROLL
 };
 
 struct KeysRequestData
@@ -133,8 +134,16 @@ struct MenuSelectRequestData
     int selected_index;
 };
 
-using OutgoingRequestData = std::variant<KeysRequestData, ResizeRequestData, MouseMoveRequestData,
-                                         MousePressRequestData, MouseReleaseRequestData, MenuSelectRequestData>;
+struct ScrollRequestData
+{
+    int amount;
+    int line;
+    int column;
+};
+
+using OutgoingRequestData =
+    std::variant<KeysRequestData, ResizeRequestData, MouseMoveRequestData, MousePressRequestData,
+                 MouseReleaseRequestData, MenuSelectRequestData, ScrollRequestData>;
 
 struct OutgoingRequest
 {

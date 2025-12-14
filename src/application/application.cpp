@@ -72,8 +72,15 @@ void Application::onWindowResize(int width, int height)
     m_editor_controller->onWindowResize(width, height, *m_ui_options.get());
 }
 
+void Application::onMouseScroll(double offset)
+{
+    m_mouse_controller->onMouseScroll(offset, m_mouse_x, m_mouse_y, m_ui_options.get());
+}
+
 void Application::onMouseMove(float x, float y)
 {
+    m_mouse_x = x;
+    m_mouse_y = y;
     domain::MouseMoveResult result = m_mouse_controller->onMouseMove(x, y, m_ui_options.get());
 
     if (result.cursor.has_value()) {

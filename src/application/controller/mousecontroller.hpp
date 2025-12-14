@@ -18,12 +18,19 @@ class MouseController
 
     domain::MouseMoveResult onMouseMove(float x, float y, const UIOptions *ui_options);
     void onMouseButton(domain::MouseButtonEvent event, const UIOptions *ui_options);
+    void onMouseScroll(double offset, float x, float y, const UIOptions *ui_options);
+
+    void setScrollSpeed(double speed);
+    double getScrollSpeed() const;
 
   private:
     KakouneClient *m_kakoune_client;
     EditorController *m_editor_controller;
     MenuController *m_menu_controller;
     InfoBoxController *m_info_box_controller;
+
+    double m_scroll_accumulator = 0.0;
+    double m_scroll_speed = 2.0;
 };
 
 #endif

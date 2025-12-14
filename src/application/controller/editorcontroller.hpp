@@ -21,6 +21,7 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
     void onWindowResize(int width, int height, const UIOptions &ui_options);
     domain::MouseMoveResult onMouseMove(float x, float y, const UIOptions *ui_options, bool obscured);
     void onMouseButton(domain::MouseButtonEvent event, const UIOptions *ui_options, bool obscured);
+    void onMouseScroll(int amount, float x, float y, const UIOptions *ui_options);
 
     int width() const;
     int height() const;

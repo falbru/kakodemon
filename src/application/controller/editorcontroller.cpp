@@ -180,6 +180,20 @@ int EditorController::height() const {
     return m_height;
 }
 
+void EditorController::onMouseScroll(int amount, float x, float y, const UIOptions* ui_options) {
+    int column = x / ui_options->font.get()->getGlyphMetrics(97).width();
+    int line = y / ui_options->font.get()->getLineHeight();
+
+    m_kakoune_client->process->sendRequest(OutgoingRequest{
+        OutgoingRequestType::SCROLL,
+        ScrollRequestData{
+            amount,
+            line,
+            column
+        }
+    });
+}
+
 void EditorController::setClearColor(domain::Color color) {
     m_set_clear_color(color);
 }
