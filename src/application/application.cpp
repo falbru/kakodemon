@@ -1,6 +1,7 @@
 #include "application.hpp"
 #include "application/controller/infoboxcontroller.hpp"
 #include "application/controller/menucontroller.hpp"
+#include "application/controller/mousecontroller.hpp"
 #include "application/view/searchmenu.hpp"
 #include "domain/color.hpp"
 #include "domain/keys.hpp"
@@ -14,7 +15,6 @@
 #include "application/view/statusbar.hpp"
 #include "domain/mouse.hpp"
 #include <memory>
-#include <optional>
 
 Application::Application()
 {
@@ -27,13 +27,15 @@ Application::~Application()
 void Application::init()
 {
     m_kakoune_client = std::make_unique<KakouneClient>();
-    m_kakoune_process = std::make_unique<KakouneClientProcess>("default");
+    m_kakoune_client->process = std::make_unique<KakouneClientProcess>("default");
     m_ui_options = std::make_unique<UIOptions>();
 
     m_editor_controller = std::make_unique<EditorController>();
     m_input_controller = std::make_unique<InputController>();
+    m_mouse_controller = std::make_unique<MouseController>();
     m_menu_controller = std::make_unique<MenuController>();
     m_info_box_controller = std::make_unique<InfoBoxController>();
+
     m_kakoune_content_view = std::make_unique<KakouneContentView>();
     m_status_bar = std::make_unique<StatusBarView>();
     m_prompt_menu = std::make_unique<PromptMenuView>();
@@ -48,12 +50,13 @@ void Application::init()
     m_search_menu->init(m_renderer.get());
     m_info_box->init(m_renderer.get(), m_menu_controller.get(), m_kakoune_content_view.get());
 
-    m_input_controller->init(m_kakoune_client.get(), m_kakoune_process.get());
-    m_editor_controller->init(m_kakoune_client.get(), m_kakoune_process.get(), m_kakoune_content_view.get(), m_status_bar.get(), [&](domain::Color color) { setClearColor(color); });
+    m_input_controller->init(m_kakoune_client.get());
+    m_editor_controller->init(m_kakoune_client.get(), m_kakoune_content_view.get(), m_status_bar.get(), [&](domain::Color color) { setClearColor(color); });
     m_menu_controller->init(m_kakoune_client.get(), m_editor_controller.get(), m_prompt_menu.get(), m_inline_menu.get(), m_search_menu.get());
     m_info_box_controller->init(m_kakoune_client.get(), m_editor_controller.get(), m_info_box.get());
+    m_mouse_controller->init(m_kakoune_client.get(), m_editor_controller.get(), m_menu_controller.get(), m_info_box_controller.get());
 
-    m_kakoune_process->start();
+    m_kakoune_client->process->start();
 }
 
 void Application::updateControllers()
@@ -71,23 +74,16 @@ void Application::onWindowResize(int width, int height)
 
 void Application::onMouseMove(float x, float y)
 {
-    domain::MouseMoveResult mouse_move_result;
-    std::optional<domain::Cursor> cursor;
+    domain::MouseMoveResult result = m_mouse_controller->onMouseMove(x, y, m_ui_options.get());
 
-    mouse_move_result = m_editor_controller->onMouseMove(x, y, m_ui_options.get());
-    cursor = mouse_move_result.cursor;
-
-    mouse_move_result = mouse_move_result = m_menu_controller->onMouseMove(x, y);
-    if (mouse_move_result.cursor != std::nullopt) cursor = mouse_move_result.cursor;
-
-    if (cursor != std::nullopt) {
-        setCursor(cursor.value());
+    if (result.cursor.has_value()) {
+        setCursor(result.cursor.value());
     }
 }
 
 void Application::onMouseButton(domain::MouseButtonEvent event)
 {
-    m_editor_controller->onMouseButton(event, m_ui_options.get());
+    m_mouse_controller->onMouseButton(event, m_ui_options.get());
 }
 
 void Application::onKeyInput(domain::KeyEvent event)

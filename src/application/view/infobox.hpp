@@ -49,12 +49,22 @@ class InfoBoxView
 
     void render(const KakouneClient &kakoune_client, const UIOptions &ui_options, float width, float height);
 
+    float x() const;
+    float y() const;
+    float width() const;
+    float height() const;
+
   private:
     const float MIN_WIDTH = 150.0f;
     const float MAX_WIDTH = 1000.0f;
     domain::Renderer *m_renderer;
     KakouneContentView *m_kakoune_content_view;
     MenuController *m_menu_controller;
+
+    float m_x = 0.0f;
+    float m_y = 0.0f;
+    float m_width = 0.0f;
+    float m_height = 0.0f;
 };
 
 #endif // VIEW_INFOBOX_HPP_INCLUDED

@@ -16,3 +16,19 @@ void InfoBoxController::update(const UIOptions& ui_options) {
 
     m_info_box_view->render(*m_kakoune_client, ui_options, m_editor_controller->width(), m_editor_controller->height());
 }
+
+float InfoBoxController::x() const {
+    return m_info_box_view->x();
+}
+
+float InfoBoxController::y() const {
+    return m_info_box_view->y();
+}
+
+float InfoBoxController::width() const {
+    return m_info_box_view->width();
+}
+
+float InfoBoxController::height() const {
+    return m_info_box_view->height();
+}

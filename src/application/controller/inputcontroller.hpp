@@ -3,7 +3,6 @@
 
 #include "application/model/kakouneclient.hpp"
 #include "domain/keys.hpp"
-#include "kakoune/kakouneclientprocess.hpp"
 
 class InputController
 {
@@ -11,14 +10,13 @@ class InputController
     InputController();
     ~InputController();
 
-    void init(KakouneClient *kakoune_client, KakouneClientProcess *kakoune_process);
+    void init(KakouneClient *kakoune_client);
     void onKeyInput(const domain::KeyEvent &event);
 
   private:
     std::string keyEventToKakouneKey(const domain::KeyEvent &event);
 
     KakouneClient *m_kakoune_client;
-    KakouneClientProcess *m_kakoune_process;
 };
 
 #endif

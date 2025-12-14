@@ -14,6 +14,11 @@ class InfoBoxController
 
     void update(const UIOptions &ui_options);
 
+    float x() const;
+    float y() const;
+    float width() const;
+    float height() const;
+
   private:
     KakouneClient *m_kakoune_client;
     EditorController *m_editor_controller;

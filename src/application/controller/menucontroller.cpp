@@ -2,6 +2,7 @@
 #include "domain/mouse.hpp"
 #include "kakoune/menustyle.hpp"
 #include "application/view/promptmenu.hpp"
+#include "kakoune/kakouneclientprocess.hpp"
 #include <optional>
 
 MenuController::MenuController() {
@@ -95,4 +96,41 @@ float MenuController::height() const {
             return m_search_menu_view->height();
     }
     return 0;
+}
+
+bool MenuController::onMouseButton(domain::MouseButtonEvent event, const UIOptions *ui_options) {
+    if (!m_kakoune_client->menu_visible) {
+        return false;
+    }
+
+    if (event.button != domain::MouseButton::LEFT || event.action != domain::MouseButtonAction::PRESS) {
+        return false;
+    }
+
+
+    std::optional<int> clicked_item_index;
+
+    switch(m_kakoune_client->menu_style) {
+        case kakoune::MenuStyle::INLINE:
+            clicked_item_index = m_inline_menu_view->findItemAtPosition(event.x, event.y, ui_options->font.get(), *m_kakoune_client);
+            break;
+        case kakoune::MenuStyle::PROMPT:
+            clicked_item_index = m_prompt_menu_view->findItemAtPosition(event.x, event.y, ui_options->font.get(), *m_kakoune_client);
+            break;
+        case kakoune::MenuStyle::SEARCH:
+            clicked_item_index = m_search_menu_view->findItemAtPosition(event.x, event.y, ui_options->font.get(), *m_kakoune_client);
+            break;
+    }
+
+    if (clicked_item_index.has_value()) {
+        m_kakoune_client->process->sendRequest(OutgoingRequest{
+            OutgoingRequestType::MENU_SELECT,
+            MenuSelectRequestData{
+                clicked_item_index.value()
+            }
+        });
+        return true;
+    }
+
+    return false;
 }

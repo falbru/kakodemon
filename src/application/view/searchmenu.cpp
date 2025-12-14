@@ -95,3 +95,7 @@ domain::MouseMoveResult SearchMenuView::onMouseMove(float x, float y) {
 
     return domain::MouseMoveResult{std::nullopt};
 }
+
+std::optional<int> SearchMenuView::findItemAtPosition(float x, float y, domain::Font *font, const KakouneClient &kakoune_client) {
+    return m_scrolled_menu_items->findItemAtPosition(x, y, font, kakoune_client);
+}

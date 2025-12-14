@@ -138,17 +138,24 @@ void KakouneClientProcess::sendRequest(const OutgoingRequest &request)
     }
     else if (request.type == OutgoingRequestType::MOUSE_PRESS)
     {
-        auto mouse_move_data = std::get<MousePressRequestData>(request.data);
+        auto mouse_press_data = std::get<MousePressRequestData>(request.data);
 
         data["method"] = "mouse_press";
-        data["params"] = {mouse_move_data.button, mouse_move_data.line, mouse_move_data.column};
+        data["params"] = {mouse_press_data.button, mouse_press_data.line, mouse_press_data.column};
     }
     else if (request.type == OutgoingRequestType::MOUSE_RELEASE)
     {
-        auto mouse_move_data = std::get<MouseReleaseRequestData>(request.data);
+        auto mouse_release_data = std::get<MouseReleaseRequestData>(request.data);
 
         data["method"] = "mouse_release";
-        data["params"] = {mouse_move_data.button, mouse_move_data.line, mouse_move_data.column};
+        data["params"] = {mouse_release_data.button, mouse_release_data.line, mouse_release_data.column};
+    }
+    else if (request.type == OutgoingRequestType::MENU_SELECT)
+    {
+        auto menu_select_data = std::get<MenuSelectRequestData>(request.data);
+
+        data["method"] = "menu_select";
+        data["params"] = {menu_select_data.selected_index};
     }
 
     std::string json_str = data.dump();

@@ -27,6 +27,7 @@ set(SRC
     src/adapters/freetype/freetypefontengine.cpp
     src/application/controller/editorcontroller.cpp
     src/application/controller/inputcontroller.cpp
+    src/application/controller/mousecontroller.cpp
     src/application/controller/menucontroller.cpp
     src/application/controller/infoboxcontroller.cpp
     src/application/view/kakounecontentview.cpp

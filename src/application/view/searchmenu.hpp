@@ -18,6 +18,7 @@ class SearchMenuView
     void render(domain::Font *font, const KakouneClient &kakoune_client, float width, float height);
 
     domain::MouseMoveResult onMouseMove(float x, float y);
+    std::optional<int> findItemAtPosition(float x, float y, domain::Font *font, const KakouneClient &kakoune_client);
 
     float x() const;
     float y() const;

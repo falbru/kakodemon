@@ -324,6 +324,10 @@ void InfoBoxView::render(const KakouneClient &kakoune_client, const UIOptions& u
 {
     if (kakoune_client.info_box_content.empty())
     {
+        m_x = 0.0f;
+        m_y = 0.0f;
+        m_width = 0.0f;
+        m_height = 0.0f;
         return;
     }
 
@@ -416,10 +420,31 @@ void InfoBoxView::render(const KakouneClient &kakoune_client, const UIOptions& u
     LayoutManager layout(placement.bounds.x, placement.bounds.y, placement.bounds.width + SPACING_MEDIUM * 2.0f,
                          placement.bounds.height + SPACING_MEDIUM * 2.0f);
 
+    m_x = layout.current().x;
+    m_y = layout.current().y;
+    m_width = layout.current().width;
+    m_height = layout.current().height;
+
     m_renderer->renderRect(kakoune_client.info_box_face.bg.toCoreColor(kakoune_client.window_default_face.bg, false),
                            layout.current().x, layout.current().y, layout.current().width, layout.current().height);
 
     layout.pad(SPACING_MEDIUM);
 
     m_renderer->renderLines(ui_options.font.get(), placement.content, kakoune_client.info_box_face, layout.current().x, layout.current().y);
+}
+
+float InfoBoxView::x() const {
+    return m_x;
+}
+
+float InfoBoxView::y() const {
+    return m_y;
+}
+
+float InfoBoxView::width() const {
+    return m_width;
+}
+
+float InfoBoxView::height() const {
+    return m_height;
 }

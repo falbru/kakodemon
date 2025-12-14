@@ -13,7 +13,6 @@ EditorController::EditorController()
 }
 
 void EditorController::init(KakouneClient* kakoune_client,
-                            KakouneClientProcess* kakoune_process,
                             KakouneContentView* kakoune_content_view,
                             StatusBarView* status_bar_view,
                             std::function<void(domain::Color)> set_clear_color)
@@ -21,12 +20,11 @@ void EditorController::init(KakouneClient* kakoune_client,
     m_set_clear_color = set_clear_color;
 
     m_kakoune_client = kakoune_client;
-    m_kakoune_process = kakoune_process;
 
     m_kakoune_content_view = kakoune_content_view;
     m_status_bar_view = status_bar_view;
 
-    m_frame_state_manager = std::make_unique<KakouneFrameStateManager>(m_kakoune_process);
+    m_frame_state_manager = std::make_unique<KakouneFrameStateManager>(m_kakoune_client->process.get());
     m_frame_state_manager->start();
 }
 
@@ -81,7 +79,7 @@ void EditorController::onWindowResize(int width, int height, const UIOptions& ui
     int columns = width / m_kakoune_content_view->getCellWidth(ui_options.font.get());
 
     if (rows != m_rows || columns != m_columns) {
-        m_kakoune_process->sendRequest(OutgoingRequest{
+        m_kakoune_client->process->sendRequest(OutgoingRequest{
             OutgoingRequestType::RESIZE,
             ResizeRequestData{
                 rows,
@@ -96,9 +94,13 @@ void EditorController::onWindowResize(int width, int height, const UIOptions& ui
     m_height = height;
 }
 
-domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const UIOptions* ui_options) {
+domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const UIOptions* ui_options, bool obscured) {
     if (y >= m_content_height) {
         return domain::MouseMoveResult{domain::Cursor::DEFAULT};
+    }
+
+    if (obscured) {
+        return domain::MouseMoveResult{domain::Cursor::IBEAM};
     }
 
     bool is_any_mouse_button_pressed = false;
@@ -113,7 +115,7 @@ domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const UI
         int column = x / ui_options->font.get()->getGlyphMetrics(97).width();
         int line = y / ui_options->font.get()->getLineHeight();
 
-        m_kakoune_process->sendRequest(OutgoingRequest{
+        m_kakoune_client->process->sendRequest(OutgoingRequest{
             OutgoingRequestType::MOUSE_MOVE,
             MouseMoveRequestData{
                 line,
@@ -125,7 +127,7 @@ domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const UI
     return domain::MouseMoveResult{domain::Cursor::IBEAM};
 }
 
-void EditorController::onMouseButton(domain::MouseButtonEvent event, const UIOptions* ui_options) {
+void EditorController::onMouseButton(domain::MouseButtonEvent event, const UIOptions* ui_options, bool obscured) {
     int column = event.x / ui_options->font.get()->getGlyphMetrics(97).width();
     int line = event.y / ui_options->font.get()->getLineHeight();
 
@@ -142,8 +144,8 @@ void EditorController::onMouseButton(domain::MouseButtonEvent event, const UIOpt
             break;
     }
 
-    if (event.action == domain::MouseButtonAction::PRESS) {
-        m_kakoune_process->sendRequest(OutgoingRequest{
+    if (!obscured && event.action == domain::MouseButtonAction::PRESS) {
+        m_kakoune_client->process->sendRequest(OutgoingRequest{
             OutgoingRequestType::MOUSE_PRESS,
             MousePressRequestData{
                 button,
@@ -154,14 +156,16 @@ void EditorController::onMouseButton(domain::MouseButtonEvent event, const UIOpt
 
         m_mouse_button_pressed[event.button] = true;
     }else if (event.action == domain::MouseButtonAction::RELEASE) {
-        m_kakoune_process->sendRequest(OutgoingRequest{
-            OutgoingRequestType::MOUSE_RELEASE,
-            MouseReleaseRequestData{
-                button,
-                line,
-                column
-            }
-        });
+        if (!obscured) {
+            m_kakoune_client->process->sendRequest(OutgoingRequest{
+                OutgoingRequestType::MOUSE_RELEASE,
+                MouseReleaseRequestData{
+                    button,
+                    line,
+                    column
+                }
+            });
+        }
 
         m_mouse_button_pressed[event.button] = false;
     }

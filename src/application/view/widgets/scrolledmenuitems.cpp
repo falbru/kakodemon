@@ -88,3 +88,19 @@ float ScrolledMenuItems::x() const {
 float ScrolledMenuItems::y() const {
     return m_y;
 }
+
+std::optional<int> ScrolledMenuItems::findItemAtPosition(float x, float y, domain::Font *font, const KakouneClient &kakoune_client) {
+    if (x < m_x || x >= m_x + m_width || y < m_y || y >= m_y + m_height) {
+        return std::nullopt;
+    }
+
+    float relative_y = y - m_y;
+    int clicked_item_offset = static_cast<int>(relative_y / font->getLineHeight());
+    int clicked_item_index = m_scroll_offset + clicked_item_offset;
+
+    if (clicked_item_index >= 0 && clicked_item_index < kakoune_client.menu_items.size()) {
+        return clicked_item_index;
+    }
+
+    return std::nullopt;
+}

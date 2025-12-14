@@ -7,7 +7,6 @@
 #include "application/view/statusbar.hpp"
 #include "domain/color.hpp"
 #include "domain/mouse.hpp"
-#include "kakoune/kakouneclientprocess.hpp"
 #include "kakoune/kakouneframestatemanager.hpp"
 
 class EditorController // TODO rename to KakouneContentViewController or something?
@@ -15,21 +14,19 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
   public:
     EditorController();
 
-    void init(KakouneClient *kakoune_client, KakouneClientProcess *kakoune_process,
-              KakouneContentView *kakoune_content_view, StatusBarView *status_bar_view,
+    void init(KakouneClient *kakoune_client, KakouneContentView *kakoune_content_view, StatusBarView *status_bar_view,
               std::function<void(domain::Color)> set_clear_color);
     void update(const UIOptions &ui_options);
 
     void onWindowResize(int width, int height, const UIOptions &ui_options);
-    domain::MouseMoveResult onMouseMove(float x, float y, const UIOptions *ui_options);
-    void onMouseButton(domain::MouseButtonEvent event, const UIOptions *ui_options);
+    domain::MouseMoveResult onMouseMove(float x, float y, const UIOptions *ui_options, bool obscured);
+    void onMouseButton(domain::MouseButtonEvent event, const UIOptions *ui_options, bool obscured);
 
     int width() const;
     int height() const;
 
   private:
     KakouneClient *m_kakoune_client;
-    KakouneClientProcess *m_kakoune_process;
     KakouneContentView *m_kakoune_content_view;
     StatusBarView *m_status_bar_view;
 

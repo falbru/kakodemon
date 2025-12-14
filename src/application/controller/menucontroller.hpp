@@ -20,6 +20,7 @@ class MenuController
     void update(const UIOptions &ui_options);
 
     domain::MouseMoveResult onMouseMove(float x, float y);
+    bool onMouseButton(domain::MouseButtonEvent event, const UIOptions *ui_options);
 
     float x() const;
     float y() const;

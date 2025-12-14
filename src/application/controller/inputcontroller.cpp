@@ -14,9 +14,8 @@ InputController::~InputController() {
 
 }
 
-void InputController::init(KakouneClient* kakoune_client, KakouneClientProcess*kakoune_process) {
+void InputController::init(KakouneClient* kakoune_client) {
     m_kakoune_client = kakoune_client;
-    m_kakoune_process = kakoune_process;
 }
 
 void InputController::onKeyInput(const domain::KeyEvent& event) {
@@ -24,7 +23,7 @@ void InputController::onKeyInput(const domain::KeyEvent& event) {
     keys_request.type = OutgoingRequestType::KEYS;
     keys_request.data = KeysRequestData{{keyEventToKakouneKey(event)}};
 
-    m_kakoune_process->sendRequest(keys_request);
+    m_kakoune_client->process->sendRequest(keys_request);
 }
 
 std::string InputController::keyEventToKakouneKey(const domain::KeyEvent& event) {
