@@ -29,6 +29,9 @@ add_subdirectory(vendor/spdlog)
 set(SRC
     src/main.cpp
     src/application/application.cpp
+    src/domain/alignment.cpp
+    src/domain/utf8string.cpp
+    src/domain/geometry.cpp
     src/domain/ports/font.cpp
     src/adapters/fontconfig/fontconfigresolver.cpp
     src/adapters/freetype/freetypefontengine.cpp
@@ -48,8 +51,6 @@ set(SRC
     src/application/view/widgets/input.cpp
     src/application/view/widgets/scrollbar.cpp
     src/application/view/widgets/scrolledmenuitems.cpp
-    src/domain/alignment.cpp
-    src/domain/utf8string.cpp
     src/kakoune/kakouneframestatemanager.cpp
     src/kakoune/kakouneclientprocess.cpp
     src/kakoune/coord.cpp

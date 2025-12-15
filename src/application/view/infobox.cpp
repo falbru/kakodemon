@@ -1,4 +1,5 @@
 #include "application/controller/menucontroller.hpp"
+#include "domain/geometry.hpp"
 #include "domain/utf8string.hpp"
 #include "infobox.hpp"
 #include "kakoune/line.hpp"
@@ -127,7 +128,7 @@ std::pair<std::vector<kakoune::Line>, std::pair<float, float>> InfoBoxView::calc
 
 std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection direction, CrossAxisAlignment alignment,
                                                       const std::vector<kakoune::Line> &content,
-                                                      const domain::Rectangle &anchor, float layout_width, float layout_height, domain::Font* font)
+                                                      const domain::Rectangle &anchor, float layout_width, float layout_height, domain::Font* font, const domain::Rectangle& menu_rectangle)
 {
     std::vector<kakoune::Line> new_content;
     domain::Rectangle info_box;
@@ -191,6 +192,10 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
             info_box.y = std::max(0.0f, m_kakoune_content_view->height() - info_box.height - SPACING_MEDIUM * 2.0f);
         }
 
+        if (info_box.intersects(menu_rectangle)) {
+            return std::nullopt;
+        }
+
         return Placement{new_content, info_box};
     }
     case PlacementDirection::LEFT:
@@ -232,6 +237,10 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
             info_box.y = std::max(0.0f, m_kakoune_content_view->height() - info_box.height - SPACING_MEDIUM * 2.0f);
         }
 
+        if (info_box.intersects(menu_rectangle)) {
+            return std::nullopt;
+        }
+
         return Placement{new_content, info_box};
     }
     case PlacementDirection::ABOVE: {
@@ -264,6 +273,10 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
         if (info_box.x + info_box.width + SPACING_MEDIUM * 2.0f > m_kakoune_content_view->width())
         {
             info_box.x = std::max(0.0f, m_kakoune_content_view->width() - info_box.width - SPACING_MEDIUM * 2.0f);
+        }
+
+        if (info_box.intersects(menu_rectangle)) {
+            return std::nullopt;
         }
 
         return Placement{new_content, info_box};
@@ -300,11 +313,19 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
             info_box.x = std::max(0.0f, m_kakoune_content_view->width() - info_box.width - SPACING_MEDIUM * 2.0f);
         }
 
+        if (info_box.intersects(menu_rectangle)) {
+            return std::nullopt;
+        }
+
         return Placement{new_content, info_box};
     }
     case PlacementDirection::CENTER: {
         info_box.x = anchor.x + (anchor.width - info_box.width) / 2.0f;
         info_box.y = anchor.y + (anchor.height - info_box.height) / 2.0f;
+
+        if (info_box.intersects(menu_rectangle)) {
+            return std::nullopt;
+        }
 
         return Placement{content, info_box};
     }
@@ -407,10 +428,17 @@ void InfoBoxView::render(const KakouneClient &kakoune_client, const UIOptions& u
 
     fallback_directions.insert(fallback_directions.begin(), direction);
 
+    domain::Rectangle menu_rectangle = {
+        m_menu_controller->x(),
+        m_menu_controller->y(),
+        m_menu_controller->width(),
+        m_menu_controller->height(),
+    };
+
     Placement placement;
     for (auto dir : fallback_directions)
     {
-        auto current_placement = tryPlaceInfoBox(dir, alignment, kakoune_client.info_box_content, anchor, width, height, ui_options.font.get());
+        auto current_placement = tryPlaceInfoBox(dir, alignment, kakoune_client.info_box_content, anchor, width, height, ui_options.font.get(), menu_rectangle);
         if (current_placement.has_value()) {
             placement = current_placement.value();
             break;

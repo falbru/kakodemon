@@ -22,6 +22,8 @@ struct Rectangle
     float y;
     float width;
     float height;
+
+    bool intersects(const Rectangle &Rectangle) const;
 };
 
 } // namespace domain
