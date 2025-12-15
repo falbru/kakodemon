@@ -18,6 +18,7 @@ class MenuController
               InlineMenuView *inline_menu_view, SearchMenuView *search_menu_view);
 
     void update(const UIOptions &ui_options);
+    void render(const UIOptions &ui_options);
 
     domain::MouseMoveResult onMouseMove(float x, float y);
     bool onMouseButton(domain::MouseButtonEvent event, const UIOptions *ui_options);

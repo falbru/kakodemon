@@ -66,6 +66,13 @@ void Application::updateControllers()
     m_info_box_controller->update(*m_ui_options.get());
 }
 
+void Application::renderControllers()
+{
+    m_editor_controller->render(*m_ui_options.get());
+    m_menu_controller->render(*m_ui_options.get());
+    m_info_box_controller->render(*m_ui_options.get());
+}
+
 void Application::onWindowResize(int width, int height)
 {
     m_renderer->onWindowResize(width, height);

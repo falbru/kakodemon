@@ -48,6 +48,7 @@ class Application
     std::unique_ptr<domain::Renderer> m_renderer;
 
     void updateControllers();
+    void renderControllers();
 
     domain::Color m_clear_color;
     domain::Cursor m_cursor;

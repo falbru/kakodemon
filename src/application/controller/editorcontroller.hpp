@@ -17,6 +17,7 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
     void init(KakouneClient *kakoune_client, KakouneContentView *kakoune_content_view, StatusBarView *status_bar_view,
               std::function<void(domain::Color)> set_clear_color);
     void update(const UIOptions &ui_options);
+    void render(const UIOptions &ui_options);
 
     void onWindowResize(int width, int height, const UIOptions &ui_options);
     domain::MouseMoveResult onMouseMove(float x, float y, const UIOptions *ui_options, bool obscured);

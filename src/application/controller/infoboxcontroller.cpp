@@ -12,6 +12,9 @@ void InfoBoxController::init(KakouneClient* kakoune_client, EditorController* ed
 }
 
 void InfoBoxController::update(const UIOptions& ui_options) {
+}
+
+void InfoBoxController::render(const UIOptions& ui_options) {
     if (!m_kakoune_client->info_box_visible) return;
 
     m_info_box_view->render(*m_kakoune_client, ui_options, m_editor_controller->width(), m_editor_controller->height());

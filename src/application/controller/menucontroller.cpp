@@ -19,7 +19,9 @@ void MenuController::init(KakouneClient* kakoune_client, EditorController* edito
 
 void MenuController::update(const UIOptions& ui_options) {
     m_current_style = m_kakoune_client->menu_style;
+}
 
+void MenuController::render(const UIOptions& ui_options) {
     switch(m_kakoune_client->menu_style) {
         case kakoune::MenuStyle::INLINE:
             if (m_kakoune_client->menu_visible)

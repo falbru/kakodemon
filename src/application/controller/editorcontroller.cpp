@@ -66,7 +66,10 @@ void EditorController::update(const UIOptions& ui_options)
 
         setClearColor(m_kakoune_client->window_default_face.bg.toCoreColor(std::nullopt, false));
     }
+}
 
+void EditorController::render(const UIOptions& ui_options)
+{
     m_kakoune_content_view->render(ui_options.font.get(), m_kakoune_client->window_content, m_kakoune_client->window_default_face, 0.0f, 0.0f);
     m_kakoune_content_view->setWidth(m_width);
     m_content_height = m_height - m_status_bar_view->getCellHeight(ui_options.font.get());

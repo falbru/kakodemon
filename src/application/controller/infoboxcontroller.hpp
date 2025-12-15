@@ -13,6 +13,7 @@ class InfoBoxController
     void init(KakouneClient *kakoune_client, EditorController *editor_controller, InfoBoxView *info_box_view);
 
     void update(const UIOptions &ui_options);
+    void render(const UIOptions &ui_options);
 
     float x() const;
     float y() const;

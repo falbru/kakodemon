@@ -3,6 +3,7 @@
 
 #include "application/application.hpp"
 #include "opengl.hpp"
+#include <chrono>
 
 namespace opengl
 {
@@ -36,6 +37,8 @@ class GLFWApplication : public Application
 
     float m_cursor_x;
     float m_cursor_y;
+
+    static constexpr double TARGET_FRAME_TIME_MS = 8;
 };
 
 }; // namespace opengl

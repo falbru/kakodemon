@@ -3,6 +3,8 @@
 #include "adapters/freetype/freetypefontengine.hpp"
 #include "adapters/opengl/renderer.hpp"
 #include "domain/mouse.hpp"
+#include <chrono>
+#include <thread>
 
 opengl::GLFWApplication::GLFWApplication() {
 }
@@ -88,13 +90,26 @@ void opengl::GLFWApplication::init() {
 void opengl::GLFWApplication::run() {
     while (!glfwWindowShouldClose(m_window))
     {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(m_clear_color.r, m_clear_color.g, m_clear_color.b, 1.0f);
+        auto frame_start = std::chrono::high_resolution_clock::now();
+
+        glfwPollEvents();
 
         updateControllers();
 
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(m_clear_color.r, m_clear_color.g, m_clear_color.b, 1.0f);
+
+        renderControllers();
+
         glfwSwapBuffers(m_window);
-        glfwPollEvents();
+
+        auto frame_end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::milli> elapsed = frame_end - frame_start;
+
+        double remaining_time = TARGET_FRAME_TIME_MS - elapsed.count();
+        if (remaining_time > 0) {
+            std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(remaining_time));
+        }
     }
 }
 
