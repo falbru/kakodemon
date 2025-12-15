@@ -28,8 +28,8 @@ jobs:
 
     - name: Run clang-format check
       run: |
-        find src/ -name '*.cpp' -o -name '*.hpp' -exec clang-format --style=Microsoft --dry-run --Werror {} \;
+        find src/ test/ -name '*.cpp' -o -name '*.hpp' -exec clang-format --style=Microsoft --dry-run --Werror {} \;
 
     - name: Run clang-tidy
       run: |
-        find src/ -name '*.cpp' -o -name '*.hpp' -exec clang-tidy -p build {} \;
+        find src/ test/ -name '*.cpp' -o -name '*.hpp' -exec clang-tidy -p build {} \;

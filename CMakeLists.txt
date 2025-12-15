@@ -4,6 +4,13 @@ project(kakodemon)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+option(BUILD_TESTS "Build the test suite" OFF)
+
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(test/)
+endif()
+
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "GLFW lib only")
 set(GLFW_INSTALL OFF CACHE BOOL "GLFW lib only")
 add_subdirectory(vendor/glfw)
