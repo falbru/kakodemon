@@ -1,29 +1,16 @@
 #include "color.hpp"
 #include "domain/color.hpp"
-#include <cctype>
 #include <spdlog/spdlog.h>
 
-const std::unordered_map<std::string, domain::Color> NAMED_COLORS = {
-    {"black",          domain::Color{0.0f, 0.0f, 0.0f, 1.0f}},
-    {"red",            domain::Color{1.0f, 0.0f, 0.0f, 1.0f}},
-    {"green",          domain::Color{0.0f, 0.502f, 0.0f, 1.0f}},
-    {"yellow",         domain::Color{1.0f, 1.0f, 0.0f, 1.0f}},
-    {"blue",           domain::Color{0.0f, 0.0f, 1.0f, 1.0f}},
-    {"magenta",        domain::Color{1.0f, 0.0f, 1.0f, 1.0f}},
-    {"cyan",           domain::Color{0.0f, 1.0f, 1.0f, 1.0f}},
-    {"white",          domain::Color{1.0f, 1.0f, 1.0f, 1.0f}},
-    {"bright-black",   domain::Color{0.502f, 0.502f, 0.502f, 1.0f}},
-    {"bright-red",     domain::Color{1.0f, 0.502f, 0.502f, 1.0f}},
-    {"bright-green",   domain::Color{0.502f, 1.0f, 0.502f, 1.0f}},
-    {"bright-yellow",  domain::Color{1.0f, 1.0f, 0.502f, 1.0f}},
-    {"bright-blue",    domain::Color{0.502f, 0.502f, 1.0f, 1.0f}},
-    {"bright-magenta", domain::Color{1.0f, 0.502f, 1.0f, 1.0f}},
-    {"bright-cyan",    domain::Color{0.502f, 1.0f, 1.0f, 1.0f}},
-    {"bright-white",   domain::Color{1.0f, 1.0f, 1.0f, 1.0f}},
-};
+void kakoune::to_json(nlohmann::json &j, const Color &c)
+{
+    j = c.color_string;
+}
 
-const domain::Color default_fg_color = domain::Color{1.0f, 1.0f, 1.0f, 1.0f};
-const domain::Color default_bg_color = domain::Color{0.0f, 0.0f, 0.0f, 1.0f};
+void kakoune::from_json(const nlohmann::json &j, Color &c)
+{
+    c.color_string = j.get<std::string>();
+}
 
 int hexToInt(const std::string& hex) {
     int result = 0;
@@ -46,15 +33,32 @@ bool IsValidHexChar(char c) {
            (c >= 'A' && c <= 'F');
 }
 
-domain::Color kakoune::Color::toCoreColor(std::optional<Color> default_color, bool fg) const {
+domain::OptionalColor kakoune::toDomain(Color c)
+{
+    const std::string& color_string = c.color_string;
+
     if (color_string == "default") {
-        if (default_color.has_value()) {
-            return default_color.value().toCoreColor(std::nullopt, fg);
-        }else {
-            if (fg) return default_fg_color;
-            else return default_bg_color;
-        }
+        return domain::DefaultColor();
     }
+
+    static const std::unordered_map<std::string, domain::FixedColor> NAMED_COLORS = {
+        {"black",          domain::FixedColor::Black},
+        {"red",            domain::FixedColor::Red},
+        {"green",          domain::FixedColor::Green},
+        {"yellow",         domain::FixedColor::Yellow},
+        {"blue",           domain::FixedColor::Blue},
+        {"magenta",        domain::FixedColor::Magenta},
+        {"cyan",           domain::FixedColor::Cyan},
+        {"white",          domain::FixedColor::White},
+        {"bright-black",   domain::FixedColor::BrightBlack},
+        {"bright-red",     domain::FixedColor::BrightRed},
+        {"bright-green",   domain::FixedColor::BrightGreen},
+        {"bright-yellow",  domain::FixedColor::BrightYellow},
+        {"bright-blue",    domain::FixedColor::BrightBlue},
+        {"bright-magenta", domain::FixedColor::BrightMagenta},
+        {"bright-cyan",    domain::FixedColor::BrightCyan},
+        {"bright-white",   domain::FixedColor::BrightWhite},
+    };
 
     auto named_it = NAMED_COLORS.find(color_string);
     if (named_it != NAMED_COLORS.end()) {
@@ -79,7 +83,7 @@ domain::Color kakoune::Color::toCoreColor(std::optional<Color> default_color, bo
         float green = green_int / 255.0f;
         float blue = blue_int / 255.0f;
 
-        return domain::Color{red, green, blue, 1.0f};
+        return domain::RGBAColor{red, green, blue, 1.0f};
     }
 
     // rgba:rrggbbaa
@@ -102,18 +106,8 @@ domain::Color kakoune::Color::toCoreColor(std::optional<Color> default_color, bo
         float blue = blue_int / 255.0f;
         float alpha = alpha_int / 255.0f;
 
-        return domain::Color{red, green, blue, alpha};
+        return domain::RGBAColor{red, green, blue, alpha};
     }
 
     throw std::runtime_error("Unable to convert color: " + color_string);
-}
-
-void kakoune::to_json(nlohmann::json &j, const Color &c)
-{
-    j = c.color_string;
-}
-
-void kakoune::from_json(const nlohmann::json &j, Color &c)
-{
-    c.color_string = j.get<std::string>();
 }

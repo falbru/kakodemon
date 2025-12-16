@@ -20,7 +20,7 @@ domain::MouseMoveResult MouseController::onMouseMove(float x, float y, const UIO
     std::optional<domain::Cursor> cursor;
 
     bool obscured = false;
-    if (m_kakoune_client->menu_visible) {
+    if (m_kakoune_client->state.menu.has_value()) {
         float menu_x = m_menu_controller->x();
         float menu_y = m_menu_controller->y();
         float menu_width = m_menu_controller->width();
@@ -29,7 +29,7 @@ domain::MouseMoveResult MouseController::onMouseMove(float x, float y, const UIO
             obscured = true;
         }
     }
-    if (!obscured && m_kakoune_client->info_box_visible) {
+    if (!obscured && m_kakoune_client->state.info_box.has_value()) {
         float info_box_x = m_info_box_controller->x();
         float info_box_y = m_info_box_controller->y();
         float info_box_width = m_info_box_controller->width();
@@ -52,7 +52,7 @@ domain::MouseMoveResult MouseController::onMouseMove(float x, float y, const UIO
 
 void MouseController::onMouseButton(domain::MouseButtonEvent event, const UIOptions *ui_options) {
     bool obscured = false;
-    if (m_kakoune_client->menu_visible) {
+    if (m_kakoune_client->state.menu.has_value()) {
         float menu_x = m_menu_controller->x();
         float menu_y = m_menu_controller->y();
         float menu_width = m_menu_controller->width();
@@ -61,7 +61,7 @@ void MouseController::onMouseButton(domain::MouseButtonEvent event, const UIOpti
             obscured = true;
         }
     }
-    if (!obscured && m_kakoune_client->info_box_visible) {
+    if (!obscured && m_kakoune_client->state.info_box.has_value()) {
         float info_box_x = m_info_box_controller->x();
         float info_box_y = m_info_box_controller->y();
         float info_box_width = m_info_box_controller->width();
@@ -90,7 +90,7 @@ void MouseController::onMouseScroll(double offset, float x, float y, const UIOpt
 
     if (scroll_amount != 0) {
         bool obscured = false;
-        if (m_kakoune_client->menu_visible) {
+        if (m_kakoune_client->state.menu.has_value()) {
             float menu_x = m_menu_controller->x();
             float menu_y = m_menu_controller->y();
             float menu_width = m_menu_controller->width();
@@ -99,7 +99,7 @@ void MouseController::onMouseScroll(double offset, float x, float y, const UIOpt
                 obscured = true;
             }
         }
-        if (!obscured && m_kakoune_client->info_box_visible) {
+        if (!obscured && m_kakoune_client->state.info_box.has_value()) {
             float info_box_x = m_info_box_controller->x();
             float info_box_y = m_info_box_controller->y();
             float info_box_width = m_info_box_controller->width();

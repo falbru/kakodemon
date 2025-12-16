@@ -10,3 +10,10 @@ void kakoune::from_json(const nlohmann::json &j, Coord &coord)
     j.at("line").get_to(coord.line);
     j.at("column").get_to(coord.column);
 }
+
+domain::Coord kakoune::toDomain(Coord coord) {
+    return domain::Coord{
+        coord.line,
+        coord.column
+    };
+}

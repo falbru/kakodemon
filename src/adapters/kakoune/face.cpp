@@ -49,3 +49,7 @@ void kakoune::from_json(const nlohmann::json &j, Face &f)
     j.at("bg").get_to(f.bg);
     j.at("attributes").get_to(f.attributes);
 }
+
+domain::Face kakoune::toDomain(kakoune::Face face) {
+    return domain::Face(toDomain(face.bg), toDomain(face.fg));
+}

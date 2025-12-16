@@ -1,18 +1,8 @@
 #ifndef KAKOUNECONTENTVIEW_HPP_INCLUDED
 #define KAKOUNECONTENTVIEW_HPP_INCLUDED
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
-
-#include "adapters/opengl/opengl.hpp"
+#include "domain/coord.hpp"
 #include "domain/ports/renderer.hpp"
-#include "kakoune/coord.hpp"
-#include "kakoune/face.hpp"
-#include "kakoune/line.hpp"
-#include <vector>
 
 class KakouneContentView
 {
@@ -21,8 +11,7 @@ class KakouneContentView
 
     void init(domain::Renderer *renderer);
 
-    void render(domain::Font *font, const std::vector<kakoune::Line> &lines, const kakoune::Face &default_face, float x,
-                float y);
+    void render(domain::Font *font, const domain::Lines &lines, const domain::Face &default_face, float x, float y);
 
     float getCellWidth(domain::Font *font) const;
     float getCellHeight(domain::Font *font) const;
@@ -32,7 +21,7 @@ class KakouneContentView
     float width() const;
     float height() const;
 
-    std::pair<float, float> coordToPixels(domain::Font *font, const kakoune::Coord &coord) const;
+    std::pair<float, float> coordToPixels(domain::Font *font, const domain::Coord &coord) const;
 
   private:
     float m_width, m_height;

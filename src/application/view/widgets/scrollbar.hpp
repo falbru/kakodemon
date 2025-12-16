@@ -11,7 +11,7 @@ class ScrollBar
 
     void setValue(float value, float max_value, float visible_range);
 
-    void render(domain::Renderer *renderer, domain::Color color, LayoutManager &layout) const;
+    void render(domain::Renderer *renderer, domain::RGBAColor color, LayoutManager &layout) const;
 
     float width() const;
 

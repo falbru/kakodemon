@@ -10,6 +10,7 @@ namespace domain
 typedef unsigned int Codepoint;
 
 std::string codePointToString(Codepoint codepoint);
+bool isWhitespace(Codepoint codepoint);
 
 enum class TrimDirection
 {

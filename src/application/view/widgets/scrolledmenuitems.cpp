@@ -13,8 +13,8 @@ void ScrolledMenuItems::render(domain::Renderer* renderer, domain::Font* font, c
     m_x = items_layout.current().x;
     m_y = items_layout.current().y;
 
-    int selected_index = kakoune_client.menu_selected_index;
-    if (selected_index >= kakoune_client.menu_items.size())
+    int selected_index = kakoune_client.state.menu->getSelectedIndex();
+    if (selected_index >= kakoune_client.state.menu->getItems().size())
         selected_index = -1;
     if (selected_index < m_scroll_offset)
     {
@@ -25,15 +25,15 @@ void ScrolledMenuItems::render(domain::Renderer* renderer, domain::Font* font, c
         m_scroll_offset = std::max(0, selected_index - m_max_visible_items + 1);
     }
 
-    for (int i = m_scroll_offset; i < m_scroll_offset + m_max_visible_items && i < kakoune_client.menu_items.size(); i++)
+    for (int i = m_scroll_offset; i < m_scroll_offset + m_max_visible_items && i < kakoune_client.state.menu->getItems().size(); i++)
     {
-        auto item = kakoune_client.menu_items.at(i);
+        auto item = kakoune_client.state.menu->getItems().at(i);
 
-        GlyphSequence item_value_glyphs = GlyphSequence(font, item.atoms[0].contents.trim(domain::TrimDirection::Right));
+        GlyphSequence item_value_glyphs = GlyphSequence(font, item.at(0).getContents().trim(domain::TrimDirection::Right));
         float item_secondary_width = 0;
-        if (item.atoms.size() > 1)
+        if (item.getAtoms().size() > 1)
         {
-            item_secondary_width = font->width(item.atoms[1].contents.trim(domain::TrimDirection::Left));
+            item_secondary_width = font->width(item.at(1).getContents().trim(domain::TrimDirection::Left));
         }
 
         if (item_value_glyphs.width() + item_secondary_width > items_layout.current().width)
@@ -41,18 +41,17 @@ void ScrolledMenuItems::render(domain::Renderer* renderer, domain::Font* font, c
             item_value_glyphs.truncate(items_layout.current().width - item_secondary_width);
         }
 
-        auto item_value = kakoune::Line{{item.atoms[0]}};
-        auto item_secondary = item.atoms.size() > 1 ? kakoune::Line{{item.atoms[1]}} : kakoune::Line();
-        item_value.atoms[0].contents = item_value_glyphs.toUTF8String();
+        auto item_value = domain::Line{{domain::Atom(item_value_glyphs.toUTF8String(), item.at(0).getFace())}};
+        auto item_secondary = item.size() > 1 ? domain::Line{{item.at(1)}} : domain::Line();
 
         if (i == selected_index)
         {
             renderer->renderRect(
-                kakoune_client.menu_selected_face.bg.toCoreColor(kakoune_client.window_default_face.bg, false),
+                kakoune_client.state.menu->getSelectedFace().getBg(kakoune_client.state.default_face),
                 items_layout.current().x - SPACING_MEDIUM, items_layout.current().y,
                 items_layout.current().width + SPACING_MEDIUM * 3 + m_scroll_bar->width(), font->getLineHeight());
         }
-        kakoune::Face item_face = i == selected_index ? kakoune_client.menu_selected_face : kakoune_client.menu_face;
+        domain::Face item_face = i == selected_index ? kakoune_client.state.menu->getSelectedFace() : kakoune_client.state.menu->getFace();
 
         renderer->renderLine(font, item_value, item_face, items_layout.current().x, items_layout.current().y);
         renderer->renderLine(font, item_secondary, item_face,
@@ -62,13 +61,13 @@ void ScrolledMenuItems::render(domain::Renderer* renderer, domain::Font* font, c
         items_layout.sliceTop(font->getLineHeight());
     }
 
-    if (kakoune_client.menu_items.size() > m_max_visible_items)
+    if (kakoune_client.state.menu->getItems().size() > m_max_visible_items)
     {
-        m_scroll_bar->setValue(m_scroll_offset, kakoune_client.menu_items.size() - m_max_visible_items, m_max_visible_items);
-        m_scroll_bar->render(renderer, kakoune_client.status_default_face.fg.toCoreColor(std::nullopt, true), layout);
+        m_scroll_bar->setValue(m_scroll_offset, kakoune_client.state.menu->getItems().size() - m_max_visible_items, m_max_visible_items);
+        m_scroll_bar->render(renderer, kakoune_client.state.mode_line.getDefaultFace().getFg(kakoune_client.state.default_face), layout);
     }
 
-    int visible_items = std::min(m_max_visible_items, (int)kakoune_client.menu_items.size());
+    int visible_items = std::min(m_max_visible_items, (int)kakoune_client.state.menu->getItems().size());
     m_width = items_layout.current().width;
     m_height = visible_items * font->getLineHeight();
 }
@@ -98,7 +97,7 @@ std::optional<int> ScrolledMenuItems::findItemAtPosition(float x, float y, domai
     int clicked_item_offset = static_cast<int>(relative_y / font->getLineHeight());
     int clicked_item_index = m_scroll_offset + clicked_item_offset;
 
-    if (clicked_item_index >= 0 && clicked_item_index < kakoune_client.menu_items.size()) {
+    if (clicked_item_index >= 0 && clicked_item_index < kakoune_client.state.menu->getItems().size()) {
         return clicked_item_index;
     }
 

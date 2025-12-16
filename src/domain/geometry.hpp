@@ -16,6 +16,12 @@ struct UIVec2
     unsigned int y;
 };
 
+struct Vec2
+{
+    float x;
+    float y;
+};
+
 struct Rectangle
 {
     float x;

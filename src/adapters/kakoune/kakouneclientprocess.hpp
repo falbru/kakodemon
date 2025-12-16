@@ -7,10 +7,10 @@
 #include <variant>
 #include <vector>
 
-#include "kakoune/coord.hpp"
-#include "kakoune/infostyle.hpp"
-#include "kakoune/menustyle.hpp"
+#include "coord.hpp"
+#include "infostyle.hpp"
 #include "line.hpp"
+#include "menustyle.hpp"
 
 enum class IncomingRequestType
 {

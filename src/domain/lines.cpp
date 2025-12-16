@@ -1,0 +1,147 @@
+#include "lines.hpp"
+#include "domain/atom.hpp"
+#include "domain/line.hpp"
+#include "domain/ports/font.hpp"
+
+namespace domain {
+
+Lines::Lines() {
+
+}
+
+Lines::Lines(std::vector<Line> lines) : m_lines(lines) {
+
+}
+
+const Line& Lines::at(int index) const {
+    return m_lines.at(index);
+}
+
+const std::vector<Line>& Lines::getLines() const {
+    return m_lines;
+}
+
+unsigned int Lines::size() const {
+    return m_lines.size();
+}
+
+GlyphLines::GlyphLines(const Lines& lines, Font* font) : m_line_height(font->getLineHeight()) {
+    m_lines.reserve(lines.size());
+
+    for (int i = 0; i < lines.size(); i++) {
+        m_lines.push_back(GlyphLine(lines.getLines()[i], font));
+    }
+}
+
+Lines GlyphLines::toLines() const {
+    std::vector<Line> lines(m_lines.size());
+
+    for (int i = 0; i < m_lines.size(); i++) {
+        lines[i] = m_lines[i].toLine();
+    }
+
+    return Lines(lines);
+}
+
+const std::vector<GlyphLine>& GlyphLines::getGlyphLines() const {
+    return m_lines;
+}
+
+unsigned int GlyphLines::size() const {
+    return m_lines.size();
+}
+
+float GlyphLines::width() const {
+    float biggest_line_width = 0;
+
+    for (int i = 0; i < m_lines.size(); i++) {
+        float line_width = m_lines[i].width();
+        if (line_width > biggest_line_width) {
+            biggest_line_width = line_width;
+        }
+    }
+
+    return biggest_line_width;
+}
+
+float GlyphLines::height() const {
+    return m_line_height * m_lines.size();
+}
+
+void GlyphLines::wrap(float max_width, WrapMode mode) {
+    std::vector<GlyphAtom> remainder;
+    int original_lines_size = m_lines.size();
+    for (int i = 0; i < original_lines_size || remainder.size() > 0; i++) {
+        std::vector<GlyphAtom> wrapped_line;
+        float width_it = 0.0f;
+        auto atoms = i < original_lines_size ? m_lines[i].getGlyphAtoms() : std::vector<GlyphAtom>();
+
+        if (remainder.size() > 0) {
+            atoms.reserve(atoms.size() + distance(remainder.begin(), remainder.end()));
+            atoms.insert(atoms.end(), remainder.begin(), remainder.end());
+            remainder.clear();  // ← ADD THIS: Clear remainder after using it
+        }
+
+        auto atom_it = atoms.begin();
+        while (atom_it != atoms.end()) {
+            float atom_width = atom_it->width();
+            if (width_it + atom_width > max_width)
+                break;
+            wrapped_line.push_back(*atom_it);
+            width_it += atom_width;
+            atom_it++;
+        }
+
+        if (atom_it != atoms.end()) {
+            std::vector<GlyphMetrics> fitted_glyphs;
+            std::vector<GlyphMetrics> remainder_glyphs;
+            auto glyphs = atom_it->getGlyphs();
+            int last_whitespace_index = -1;
+
+            for (int i = 0; i < glyphs.size(); ++i) {
+                float glyph_width = glyphs[i].width();
+                if (width_it + glyph_width > max_width)
+                    break;
+                if (isWhitespace(glyphs[i].codepoint)) {
+                    last_whitespace_index = i;
+                }
+                fitted_glyphs.push_back(glyphs[i]);
+                width_it += glyph_width;
+            }
+
+            if (mode == WrapMode::WORD && last_whitespace_index >= 0) {
+                size_t split_point = last_whitespace_index + 1;
+                if (split_point < fitted_glyphs.size()) {
+                    remainder_glyphs.assign(
+                        fitted_glyphs.begin() + split_point,
+                        fitted_glyphs.end()
+                    );
+                    fitted_glyphs.erase(
+                        fitted_glyphs.begin() + split_point,
+                        fitted_glyphs.end()
+                    );
+                }
+            }
+
+            wrapped_line.push_back(GlyphAtom(fitted_glyphs, atom_it->getFace()));
+
+            if (!remainder_glyphs.empty()) {  // ← ADD THIS CHECK
+                remainder.push_back(GlyphAtom(remainder_glyphs, atom_it->getFace()));
+            }
+
+            atom_it++;
+            while(atom_it != atoms.end()) {
+                remainder.push_back(*atom_it);
+                atom_it++;
+            }
+        }
+
+        if (i < original_lines_size) {
+            m_lines[i] = GlyphLine(wrapped_line);
+        } else {
+            m_lines.push_back(GlyphLine(wrapped_line));
+        }
+    }
+}
+
+}

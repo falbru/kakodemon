@@ -1,7 +1,6 @@
 #include "inputcontroller.hpp"
 #include "domain/keys.hpp"
 #include "domain/utf8string.hpp"
-#include "kakoune/kakouneclientprocess.hpp"
 #include <string>
 #include <variant>
 #include <spdlog/spdlog.h>
@@ -19,11 +18,7 @@ void InputController::init(KakouneClient* kakoune_client) {
 }
 
 void InputController::onKeyInput(const domain::KeyEvent& event) {
-    OutgoingRequest keys_request;
-    keys_request.type = OutgoingRequestType::KEYS;
-    keys_request.data = KeysRequestData{{keyEventToKakouneKey(event)}};
-
-    m_kakoune_client->process->sendRequest(keys_request);
+    m_kakoune_client->interface->pressKeys({keyEventToKakouneKey(event)});
 }
 
 std::string InputController::keyEventToKakouneKey(const domain::KeyEvent& event) {

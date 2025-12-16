@@ -17,22 +17,17 @@ void PromptMenuView::init(domain::Renderer* renderer,
 
 void PromptMenuView::render(domain::Font* font, const KakouneClient &kakoune_client, float width, float height)
 {
-    if (kakoune_client.status_line.prompt.atoms.size() < 1 && kakoune_client.status_line.content.atoms.size() < 1)
+    if (!kakoune_client.state.menu.has_value())
         return;
 
-    static bool opened_before = false; // TODO remove this???
-    if (!kakoune_client.menu_visible && !opened_before)
-        return;
-    opened_before = true;
-
-    m_input->setPrompt(kakoune_client.status_line.prompt);
-    m_input->setContent(kakoune_client.status_line.content);
+    m_input->setPrompt(kakoune_client.state.menu->getInput().getPrompt());
+    m_input->setContent(kakoune_client.state.menu->getInput().getContent());
 
     m_x = (width - WIDTH) / 2;
     m_height = 2 * SPACING_MEDIUM + m_input->height(font);
 
-    float items_size = std::min(MAX_VISIBLE_ITEMS, (int)kakoune_client.menu_items.size());
-    if (kakoune_client.menu_visible)
+    float items_size = std::min(MAX_VISIBLE_ITEMS, (int)kakoune_client.state.menu->getItems().size());
+    if (kakoune_client.state.menu.has_value())
     {
         m_height += SPACING_MEDIUM + font->getLineHeight() * items_size;
     }
@@ -40,14 +35,14 @@ void PromptMenuView::render(domain::Font* font, const KakouneClient &kakoune_cli
     LayoutManager layout(m_x, Y, WIDTH, m_height);
 
     m_renderer->renderRectWithShadow(
-        kakoune_client.menu_face.bg.toCoreColor(kakoune_client.window_default_face.bg, false), layout.current().x,
+        kakoune_client.state.menu->getFace().getBg(kakoune_client.state.default_face), layout.current().x,
         layout.current().y, layout.current().width, layout.current().height, 15.0f);
 
     layout.pad(SPACING_MEDIUM);
 
     m_input->render(m_renderer, font, kakoune_client, layout);
 
-    if (kakoune_client.menu_visible)
+    if (kakoune_client.state.menu.has_value())
     {
         layout.gapY(SPACING_MEDIUM);
         m_scrolled_menu_items->render(m_renderer, font, kakoune_client, layout);

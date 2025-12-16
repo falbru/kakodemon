@@ -17,11 +17,9 @@
 #include "application/view/promptmenu.hpp"
 #include "application/view/searchmenu.hpp"
 #include "application/view/statusbar.hpp"
-#include "domain/color.hpp"
 #include "domain/keys.hpp"
 #include "domain/mouse.hpp"
 #include "domain/ports/renderer.hpp"
-#include "kakoune/kakouneclientprocess.hpp"
 
 class Application
 {
@@ -32,7 +30,7 @@ class Application
     virtual void init();
     virtual void run() = 0;
 
-    void setClearColor(domain::Color color);
+    void setClearColor(domain::RGBAColor color);
     virtual void setCursor(domain::Cursor cursor);
 
     void onWindowResize(int width, int height);
@@ -50,7 +48,7 @@ class Application
     void updateControllers();
     void renderControllers();
 
-    domain::Color m_clear_color;
+    domain::RGBAColor m_clear_color;
     domain::Cursor m_cursor;
 
     float m_mouse_x = 0.0f;

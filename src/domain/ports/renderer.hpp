@@ -3,8 +3,9 @@
 
 #include "domain/alignment.hpp"
 #include "domain/color.hpp"
+#include "domain/line.hpp"
+#include "domain/lines.hpp"
 #include "domain/ports/font.hpp"
-#include "kakoune/line.hpp"
 
 namespace domain
 {
@@ -17,15 +18,14 @@ class Renderer
     virtual void addBounds(float x, float y, float width, float height) = 0;
     virtual void popBounds() = 0;
 
-    virtual void renderRect(const domain::Color color, float x, float y, float width, float height) const = 0;
-    virtual void renderRectWithShadow(const domain::Color color, float x, float y, float width, float height,
+    virtual void renderRect(const RGBAColor color, float x, float y, float width, float height) const = 0;
+    virtual void renderRectWithShadow(const RGBAColor color, float x, float y, float width, float height,
                                       float shadowRadius) const = 0;
-    virtual void renderLine(Font *font, const kakoune::Line &line, const kakoune::Face &default_face, float x,
-                            float y) const = 0;
-    virtual void renderLine(Font *font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y,
-                            const domain::Alignment &alignment) const = 0;
-    virtual void renderLines(Font *font, const std::vector<kakoune::Line> &lines, const kakoune::Face &default_face,
-                             float x, float y) const = 0;
+    virtual void renderLine(Font *font, const Line &line, const Face &default_face, float x, float y) const = 0;
+    virtual void renderLine(Font *font, const Line &line, const Face &default_face, float x, float y,
+                            const Alignment &alignment) const = 0;
+    virtual void renderLines(Font *font, const Lines &lines, const domain::Face &default_face, float x,
+                             float y) const = 0;
 };
 
 } // namespace domain

@@ -12,3 +12,7 @@ void kakoune::from_json(const nlohmann::json &j, Atom &a)
     j.at("contents").get_to(tmp);
     a.contents = domain::UTF8String(tmp);
 }
+
+domain::Atom kakoune::toDomain(kakoune::Atom atom) {
+    return domain::Atom(atom.contents, toDomain(atom.face));
+}

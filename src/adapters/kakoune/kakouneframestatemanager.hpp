@@ -1,7 +1,6 @@
 #ifndef KAKOUNEFRAMESTATEMANAGER_HPP_INCLUDED
 #define KAKOUNEFRAMESTATEMANAGER_HPP_INCLUDED
 
-#include <memory>
 #include <mutex>
 #include <optional>
 #include <thread>

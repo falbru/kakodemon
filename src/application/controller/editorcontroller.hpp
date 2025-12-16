@@ -7,7 +7,8 @@
 #include "application/view/statusbar.hpp"
 #include "domain/color.hpp"
 #include "domain/mouse.hpp"
-#include "kakoune/kakouneframestatemanager.hpp"
+#include <functional>
+#include <map>
 
 class EditorController // TODO rename to KakouneContentViewController or something?
 {
@@ -15,7 +16,7 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
     EditorController();
 
     void init(KakouneClient *kakoune_client, KakouneContentView *kakoune_content_view, StatusBarView *status_bar_view,
-              std::function<void(domain::Color)> set_clear_color);
+              std::function<void(domain::RGBAColor)> set_clear_color);
     void update(const UIOptions &ui_options);
     void render(const UIOptions &ui_options);
 
@@ -32,10 +33,8 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
     KakouneContentView *m_kakoune_content_view;
     StatusBarView *m_status_bar_view;
 
-    std::function<void(domain::Color)> m_set_clear_color;
-    void setClearColor(domain::Color color);
-
-    std::unique_ptr<KakouneFrameStateManager> m_frame_state_manager;
+    std::function<void(domain::RGBAColor)> m_set_clear_color;
+    void setClearColor(domain::RGBAColor color);
 
     std::map<domain::MouseButton, bool> m_mouse_button_pressed;
 

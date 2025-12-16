@@ -5,15 +5,14 @@
 #include "application/view/layoutmanager.hpp"
 #include "application/view/styling.hpp"
 #include "domain/ports/renderer.hpp"
-#include "kakoune/line.hpp"
 
 class Input
 {
   public:
     Input();
 
-    void setPrompt(const kakoune::Line &prompt);
-    void setContent(const kakoune::Line &content);
+    void setPrompt(const domain::Line &prompt);
+    void setContent(const domain::Line &content);
 
     void render(domain::Renderer *renderer, domain::Font *font, const KakouneClient &kakoune_client,
                 LayoutManager &layout);
@@ -23,8 +22,8 @@ class Input
   private:
     float m_offset_x = 0.0f;
 
-    kakoune::Line m_prompt;
-    kakoune::Line m_content;
+    domain::Line m_prompt;
+    domain::Line m_content;
 
     const float BORDER = 1.0f;
     const float PADDING = SPACING_MEDIUM;

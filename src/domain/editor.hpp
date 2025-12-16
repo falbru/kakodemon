@@ -1,8 +1,7 @@
 #ifndef DOMAIN_EDITOR_HPP_INCLUDED
 #define DOMAIN_EDITOR_HPP_INCLUDED
 
-#include "kakoune/coord.hpp"
-#include "kakoune/line.hpp"
+#include "domain/coord.hpp"
 #include <variant>
 
 namespace domain
@@ -10,7 +9,7 @@ namespace domain
 
 struct BufferContentPosition
 {
-    kakoune::Coord coord;
+    domain::Coord coord;
 };
 
 struct StatusLinePosition
@@ -19,12 +18,6 @@ struct StatusLinePosition
 };
 
 using CursorPosition = std::variant<BufferContentPosition, StatusLinePosition>;
-
-struct StatusLine
-{
-    kakoune::Line prompt;
-    kakoune::Line content;
-};
 
 } // namespace domain
 

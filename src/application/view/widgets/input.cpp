@@ -1,19 +1,18 @@
 #include "input.hpp"
 #include "domain/editor.hpp"
 #include "application/model/kakouneclient.hpp"
-#include "application/view/glyphsequence.hpp"
+#include "domain/line.hpp"
 
 Input::Input() {}
 
-void Input::setPrompt(const kakoune::Line& prompt) { m_prompt = prompt; }
+void Input::setPrompt(const domain::Line& prompt) { m_prompt = prompt; }
 
-void Input::setContent(const kakoune::Line& content) { m_content = content; }
+void Input::setContent(const domain::Line& content) { m_content = content; }
 
 void Input::render(domain::Renderer *renderer, domain::Font* font, const KakouneClient &kakoune_client, LayoutManager &layout) {
   auto input_layout = layout.sliceTop(height(font));
 
-  renderer->renderRect(kakoune_client.menu_selected_face.bg.toCoreColor(
-                           kakoune_client.window_default_face.bg, false),
+  renderer->renderRect(kakoune_client.state.menu->getSelectedFace().getBg(kakoune_client.state.default_face),
                        input_layout.current().x,
                        input_layout.current().y,
                        input_layout.current().width,
@@ -21,8 +20,8 @@ void Input::render(domain::Renderer *renderer, domain::Font* font, const Kakoune
 
   input_layout.border(BORDER);
 
-  renderer->renderRect(kakoune_client.status_default_face.bg.toCoreColor(
-                           kakoune_client.window_default_face.bg, false),
+  renderer->renderRect(kakoune_client.state.mode_line.getDefaultFace().getBg(
+                           kakoune_client.state.default_face),
                        input_layout.current().x,
                        input_layout.current().y,
                        input_layout.current().width,
@@ -30,43 +29,41 @@ void Input::render(domain::Renderer *renderer, domain::Font* font, const Kakoune
 
   input_layout.pad(PADDING);
 
-  if (kakoune_client.status_line.prompt.size() > 0) {
-      GlyphSequence prompt_glyph_seq(font, kakoune_client.status_line.prompt.toUTF8String());
+  if (kakoune_client.state.menu->getInput().getPrompt().size() > 0) {
+      auto prompt_layout = input_layout.sliceLeft(domain::GlyphLine(kakoune_client.state.menu->getInput().getPrompt(), font).width());
 
-      auto prompt_layout = input_layout.sliceLeft(prompt_glyph_seq.width());
-
-      renderer->renderLine(font, kakoune_client.status_line.prompt,
-                           kakoune_client.status_default_face,
+      renderer->renderLine(font, kakoune_client.state.menu->getInput().getPrompt(),
+                           kakoune_client.state.mode_line.getDefaultFace(),
                            prompt_layout.current().x, prompt_layout.current().y);
   }
 
   renderer->addBounds(input_layout.current().x, input_layout.current().y, input_layout.current().width, input_layout.current().height);
 
 
-  int cursor_pos_column = std::get<domain::StatusLinePosition>(kakoune_client.cursor_pos).column;
+  int cursor_pos_column = std::get<domain::StatusLinePosition>(kakoune_client.state.cursor_position).column;
   if (cursor_pos_column >= 0) {
-      GlyphSequence content_glyph_seq(font, kakoune_client.status_line.content.toUTF8String());
+      domain::Line content_line = kakoune_client.state.menu->getInput().getContent();
 
-      float glyphs_left = content_glyph_seq.substr(0, cursor_pos_column).width();
-      if (content_glyph_seq.substr(0, cursor_pos_column).width() < m_offset_x) {
-          m_offset_x = glyphs_left;
+      float cursor_x = domain::GlyphLine(content_line.slice(0, cursor_pos_column), font).width();
+      if (cursor_x < m_offset_x) {
+          m_offset_x = cursor_x;
       }
 
-      if (m_offset_x + input_layout.current().x > content_glyph_seq.width()) {
-          m_offset_x = content_glyph_seq.width() - input_layout.current().x;
-          if (m_offset_x < 0) m_offset_x = 0;
+      float content_width = domain::GlyphLine(content_line, font).width();
+      if (m_offset_x + input_layout.current().x > content_width) {
+          m_offset_x = std::max(0.0f, content_width - input_layout.current().x);
       }
 
-      float glyphs_with_cursor = content_glyph_seq.substr(0, cursor_pos_column+1).width();
-      if (glyphs_with_cursor - m_offset_x > input_layout.current().width) {
-          m_offset_x = glyphs_with_cursor - input_layout.current().width;
+      float cursor_x_right = domain::GlyphLine(content_line.slice(0, cursor_pos_column + 1), font).width();
+      if (cursor_x_right - m_offset_x > input_layout.current().width) {
+          m_offset_x = cursor_x_right - input_layout.current().width;
       }
   }else {
       m_offset_x = 0;
   }
 
-  renderer->renderLine(font, kakoune_client.status_line.content,
-                       kakoune_client.status_default_face,
+  renderer->renderLine(font, kakoune_client.state.menu->getInput().getContent(),
+                       kakoune_client.state.mode_line.getDefaultFace(),
                        input_layout.current().x - m_offset_x, input_layout.current().y);
   renderer->popBounds();
 }

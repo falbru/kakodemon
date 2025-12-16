@@ -15,9 +15,9 @@ void InfoBoxController::update(const UIOptions& ui_options) {
 }
 
 void InfoBoxController::render(const UIOptions& ui_options) {
-    if (!m_kakoune_client->info_box_visible) return;
+    if (!m_kakoune_client->state.info_box.has_value()) return;
 
-    m_info_box_view->render(*m_kakoune_client, ui_options, m_editor_controller->width(), m_editor_controller->height());
+    m_info_box_view->render(m_kakoune_client, ui_options, m_editor_controller->width(), m_editor_controller->height());
 }
 
 float InfoBoxController::x() const {

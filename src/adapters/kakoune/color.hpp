@@ -12,12 +12,12 @@ namespace kakoune
 struct Color
 {
     std::string color_string;
-
-    domain::Color toCoreColor(std::optional<Color> default_color, bool fg) const;
 };
 
 void to_json(nlohmann::json &j, const Color &c);
 void from_json(const nlohmann::json &j, Color &c);
+
+domain::OptionalColor toDomain(Color c);
 
 } // namespace kakoune
 

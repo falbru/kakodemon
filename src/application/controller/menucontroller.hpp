@@ -7,7 +7,6 @@
 #include "application/view/promptmenu.hpp"
 #include "application/view/searchmenu.hpp"
 #include "domain/mouse.hpp"
-#include "kakoune/menustyle.hpp"
 
 class MenuController
 {
@@ -17,7 +16,6 @@ class MenuController
     void init(KakouneClient *kakoune_client, EditorController *editor_controller, PromptMenuView *prompt_menu_view,
               InlineMenuView *inline_menu_view, SearchMenuView *search_menu_view);
 
-    void update(const UIOptions &ui_options);
     void render(const UIOptions &ui_options);
 
     domain::MouseMoveResult onMouseMove(float x, float y);
@@ -34,8 +32,6 @@ class MenuController
     InlineMenuView *m_inline_menu_view;
     PromptMenuView *m_prompt_menu_view;
     SearchMenuView *m_search_menu_view;
-
-    kakoune::MenuStyle m_current_style;
 };
 
 #endif

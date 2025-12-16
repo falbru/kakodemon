@@ -27,43 +27,55 @@ find_package(Fontconfig)
 add_subdirectory(vendor/spdlog)
 
 set(SRC
-    src/main.cpp
-    src/application/application.cpp
-    src/domain/alignment.cpp
-    src/domain/utf8string.cpp
-    src/domain/geometry.cpp
-    src/domain/ports/font.cpp
     src/adapters/fontconfig/fontconfigresolver.cpp
     src/adapters/freetype/freetypefontengine.cpp
+    src/adapters/kakoune/atom.cpp
+    src/adapters/kakoune/color.cpp
+    src/adapters/kakoune/coord.cpp
+    src/adapters/kakoune/face.cpp
+    src/adapters/kakoune/infostyle.cpp
+    src/adapters/kakoune/infostyle.cpp
+    src/adapters/kakoune/jsonrpckakouneinterface.cpp
+    src/adapters/kakoune/kakouneclientprocess.cpp
+    src/adapters/kakoune/kakouneframestatemanager.cpp
+    src/adapters/kakoune/line.cpp
+    src/adapters/kakoune/menustyle.cpp
+    src/adapters/opengl/application.cpp
+    src/adapters/opengl/font.cpp
+    src/adapters/opengl/renderer.cpp
+    src/adapters/opengl/shaderprogram.cpp
+    src/application/application.cpp
     src/application/controller/editorcontroller.cpp
-    src/application/controller/inputcontroller.cpp
-    src/application/controller/mousecontroller.cpp
-    src/application/controller/menucontroller.cpp
     src/application/controller/infoboxcontroller.cpp
-    src/application/view/kakounecontentview.cpp
-    src/application/view/statusbar.cpp
-    src/application/view/promptmenu.cpp
-    src/application/view/inlinemenu.cpp
-    src/application/view/searchmenu.cpp
-    src/application/view/infobox.cpp
-    src/application/view/layoutmanager.cpp
+    src/application/controller/inputcontroller.cpp
+    src/application/controller/menucontroller.cpp
+    src/application/controller/mousecontroller.cpp
+    src/application/model/kakouneclient.cpp
     src/application/view/glyphsequence.cpp
+    src/application/view/infobox.cpp
+    src/application/view/inlinemenu.cpp
+    src/application/view/kakounecontentview.cpp
+    src/application/view/layoutmanager.cpp
+    src/application/view/promptmenu.cpp
+    src/application/view/searchmenu.cpp
+    src/application/view/statusbar.cpp
     src/application/view/widgets/input.cpp
     src/application/view/widgets/scrollbar.cpp
     src/application/view/widgets/scrolledmenuitems.cpp
-    src/kakoune/kakouneframestatemanager.cpp
-    src/kakoune/kakouneclientprocess.cpp
-    src/kakoune/coord.cpp
-    src/kakoune/menustyle.cpp
-    src/kakoune/infostyle.cpp
-    src/kakoune/line.cpp
-    src/kakoune/atom.cpp
-    src/kakoune/face.cpp
-    src/kakoune/color.cpp
-    src/adapters/opengl/application.cpp
-    src/adapters/opengl/renderer.cpp
-    src/adapters/opengl/shaderprogram.cpp
-    src/adapters/opengl/font.cpp
+    src/domain/alignment.cpp
+    src/domain/atom.cpp
+    src/domain/color.cpp
+    src/domain/face.cpp
+    src/domain/geometry.cpp
+    src/domain/line.cpp
+    src/domain/lines.cpp
+    src/domain/menu.cpp
+    src/domain/modeline.cpp
+    src/domain/ports/font.cpp
+    src/domain/ports/kakouneinterface.cpp
+    src/domain/statusline.cpp
+    src/domain/utf8string.cpp
+    src/main.cpp
     vendor/glad/src/glad.c
 )
 

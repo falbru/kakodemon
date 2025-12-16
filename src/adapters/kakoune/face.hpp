@@ -1,7 +1,8 @@
 #ifndef FACE_HPP
 #define FACE_HPP
 
-#include "kakoune/color.hpp"
+#include "color.hpp"
+#include "domain/face.hpp"
 #include "nlohmann/json.hpp"
 
 namespace kakoune
@@ -34,6 +35,8 @@ void from_json(const nlohmann::json &j, Face &f);
 
 void to_json(nlohmann::json &j, const Attribute &a);
 void from_json(const nlohmann::json &j, Attribute &a);
+
+domain::Face toDomain(kakoune::Face face);
 
 } // namespace kakoune
 

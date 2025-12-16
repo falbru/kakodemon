@@ -7,12 +7,12 @@
 #include "domain/keys.hpp"
 #include "application/controller/editorcontroller.hpp"
 #include "application/controller/inputcontroller.hpp"
-#include "application/model/kakouneclient.hpp"
 #include "application/model/uioptions.hpp"
 #include "application/view/infobox.hpp"
 #include "application/view/inlinemenu.hpp"
 #include "application/view/kakounecontentview.hpp"
 #include "application/view/statusbar.hpp"
+#include "adapters/kakoune/jsonrpckakouneinterface.hpp"
 #include "domain/mouse.hpp"
 #include <memory>
 
@@ -26,8 +26,7 @@ Application::~Application()
 
 void Application::init()
 {
-    m_kakoune_client = std::make_unique<KakouneClient>();
-    m_kakoune_client->process = std::make_unique<KakouneClientProcess>("default");
+    m_kakoune_client = std::make_unique<KakouneClient>(std::make_unique<kakoune::JsonRpcKakouneInterface>("default"));
     m_ui_options = std::make_unique<UIOptions>();
 
     m_editor_controller = std::make_unique<EditorController>();
@@ -51,18 +50,15 @@ void Application::init()
     m_info_box->init(m_renderer.get(), m_menu_controller.get(), m_kakoune_content_view.get());
 
     m_input_controller->init(m_kakoune_client.get());
-    m_editor_controller->init(m_kakoune_client.get(), m_kakoune_content_view.get(), m_status_bar.get(), [&](domain::Color color) { setClearColor(color); });
+    m_editor_controller->init(m_kakoune_client.get(), m_kakoune_content_view.get(), m_status_bar.get(), [&](domain::RGBAColor color) { setClearColor(color); });
     m_menu_controller->init(m_kakoune_client.get(), m_editor_controller.get(), m_prompt_menu.get(), m_inline_menu.get(), m_search_menu.get());
     m_info_box_controller->init(m_kakoune_client.get(), m_editor_controller.get(), m_info_box.get());
     m_mouse_controller->init(m_kakoune_client.get(), m_editor_controller.get(), m_menu_controller.get(), m_info_box_controller.get());
-
-    m_kakoune_client->process->start();
 }
 
 void Application::updateControllers()
 {
     m_editor_controller->update(*m_ui_options.get());
-    m_menu_controller->update(*m_ui_options.get());
     m_info_box_controller->update(*m_ui_options.get());
 }
 
@@ -105,7 +101,7 @@ void Application::onKeyInput(domain::KeyEvent event)
     m_input_controller->onKeyInput(event);
 }
 
-void Application::setClearColor(domain::Color color) {
+void Application::setClearColor(domain::RGBAColor color) {
     m_clear_color = color;
 }
 

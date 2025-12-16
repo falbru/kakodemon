@@ -32,12 +32,14 @@ float InlineMenuView::height() const {
 
 void InlineMenuView::render(domain::Font* font, const KakouneClient &kakoune_client, float width, float height)
 {
-    auto anchor = kakoune_client.menu_anchor;
+    if (!kakoune_client.state.menu.has_value()) return;
 
-    auto menu_position = m_kakoune_content_view->coordToPixels(font, kakoune_client.menu_anchor);
+    auto anchor = kakoune_client.state.menu->getAnchor();
+
+    auto menu_position = m_kakoune_content_view->coordToPixels(font, kakoune_client.state.menu->getAnchor());
 
     m_width = std::min(MAX_MENU_WIDTH, width);
-    float items_size = std::min(MAX_VISIBLE_ITEMS, (int)kakoune_client.menu_items.size());
+    float items_size = std::min(MAX_VISIBLE_ITEMS, (int)kakoune_client.state.menu->getItems().size());
     m_height = font->getLineHeight() * items_size;
 
     m_x = menu_position.first;
@@ -54,7 +56,7 @@ void InlineMenuView::render(domain::Font* font, const KakouneClient &kakoune_cli
 
     LayoutManager layout(m_x, m_y, m_width, m_height);
 
-    m_renderer->renderRect(kakoune_client.menu_face.bg.toCoreColor(kakoune_client.window_default_face.bg, false),
+    m_renderer->renderRect(kakoune_client.state.menu->getFace().getBg(kakoune_client.state.default_face),
                            layout.current().x, layout.current().y, layout.current().width, layout.current().height);
 
     layout.pad(0, SPACING_MEDIUM);

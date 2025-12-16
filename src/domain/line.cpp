@@ -1,0 +1,124 @@
+#include "line.hpp"
+
+namespace domain {
+
+Line::Line() {
+
+}
+
+Line::Line(std::vector<Atom> atoms) : m_atoms(atoms) {
+
+}
+
+const Atom& Line::at(int index) const {
+    return m_atoms[index];
+}
+
+Line Line::slice(int start_index, int length) {
+    if (length <= 0) {
+        return Line();
+    }
+
+    int i = 0;
+    int size_it = 0;
+
+    while (i < m_atoms.size() && size_it + m_atoms[i].size() < start_index) {
+        size_it += m_atoms[i].size();
+        i++;
+    }
+
+    if (i == m_atoms.size()) {
+        return Line();
+    }
+
+    int start_atom_index = i;
+    int start_atom_start_index = start_index - size_it;
+
+    if (m_atoms[start_atom_index].size() - start_atom_start_index >= length) {
+        return Line({m_atoms[start_atom_index].slice(start_atom_start_index, length)});
+    }
+
+    int remaining_length = length - (m_atoms[start_atom_index].size() - start_atom_start_index);
+
+    while (i < m_atoms.size() && remaining_length + m_atoms[i].size() > 0) {
+        remaining_length -= m_atoms[i].size();
+        i++;
+    }
+
+    std::vector<Atom> line_atoms;
+    line_atoms.reserve(i - start_atom_index + 1);
+
+    Atom start_atom = m_atoms[start_atom_index].slice(start_atom_start_index);
+    line_atoms.push_back(start_atom);
+
+    if (i > start_atom_index + 1) {
+        line_atoms.insert(line_atoms.end(),
+                          m_atoms.begin() + start_atom_index + 1,
+                          m_atoms.begin() + i);
+    }
+
+    if (i < m_atoms.size()) {
+        auto end_atom = m_atoms[i].slice(0, remaining_length);
+        line_atoms.push_back(end_atom);
+    }
+
+    return Line(line_atoms);
+}
+
+const std::vector<Atom>& Line::getAtoms() const {
+    return m_atoms;
+}
+
+unsigned int Line::size() const {
+    return m_atoms.size();
+}
+
+GlyphLine::GlyphLine(std::vector<GlyphAtom> atoms) : m_atoms(atoms) {
+
+}
+
+GlyphLine::GlyphLine(const Line& line, Font* font) {
+    m_atoms.reserve(line.size());
+
+    auto line_atoms = line.getAtoms();
+    for (int i = 0; i < line.size(); i++) {
+        m_atoms.push_back(GlyphAtom(line_atoms[i], font));
+    }
+}
+
+Line GlyphLine::toLine() const {
+    std::vector<Atom> atoms;
+    atoms.reserve(m_atoms.size());
+
+    for (int i = 0; i < m_atoms.size(); i++) {
+        atoms.push_back(m_atoms[i].toAtom());
+    }
+
+    return Line(atoms);
+}
+
+const std::vector<GlyphAtom>& GlyphLine::getGlyphAtoms() const {
+    return m_atoms;
+}
+
+float GlyphLine::width() const {
+    float width = 0;
+    for (int i = 0; i < m_atoms.size(); i++) {
+        width += m_atoms[i].width();
+    }
+    return width;
+}
+
+float GlyphLine::height() const {
+    float max_height = 0;
+    for (const auto& atom : m_atoms) {
+        for (const auto& glyph : atom.getGlyphs()) {
+            if (glyph.size.y > max_height) {
+                max_height = glyph.size.y;
+            }
+        }
+    }
+    return max_height;
+}
+
+};

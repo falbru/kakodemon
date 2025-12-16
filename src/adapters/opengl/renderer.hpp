@@ -3,14 +3,11 @@
 
 #include <memory>
 #include <stack>
-#include <vector>
 
 #include "domain/alignment.hpp"
 #include "domain/color.hpp"
 #include "domain/ports/renderer.hpp"
 #include "font.hpp"
-#include "kakoune/face.hpp"
-#include "kakoune/line.hpp"
 #include "shaderprogram.hpp"
 
 namespace opengl
@@ -26,22 +23,22 @@ class Renderer : public domain::Renderer
     void addBounds(float x, float y, float width, float height) override;
     void popBounds() override;
 
-    void renderRect(const domain::Color color, float x, float y, float width, float height) const override;
-    void renderRectWithShadow(const domain::Color color, float x, float y, float width, float height,
+    void renderRect(const domain::RGBAColor color, float x, float y, float width, float height) const override;
+    void renderRectWithShadow(const domain::RGBAColor color, float x, float y, float width, float height,
                               float shadowRadius) const override;
-    void renderLine(domain::Font *font, const kakoune::Line &line, const kakoune::Face &default_face, float x,
+    void renderLine(domain::Font *font, const domain::Line &line, const domain::Face &default_face, float x,
                     float y) const override;
-    void renderLine(domain::Font *font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y,
+    void renderLine(domain::Font *font, const domain::Line &line, const domain::Face &default_face, float x, float y,
                     const domain::Alignment &alignment) const override;
-    void renderLines(domain::Font *font, const std::vector<kakoune::Line> &lines, const kakoune::Face &default_face,
-                     float x, float y) const override;
+    void renderLines(domain::Font *font, const domain::Lines &lines, const domain::Face &default_face, float x,
+                     float y) const override;
 
   private:
-    void _renderLine(opengl::Font *font, const kakoune::Line &line, const kakoune::Face &default_face, float x, float y,
+    void _renderLine(opengl::Font *font, const domain::Line &line, const domain::Face &default_face, float x, float y,
                      const domain::Alignment &alignment) const;
-    void _renderShadow(const domain::Color color, float x, float y, float width, float height,
+    void _renderShadow(const domain::RGBAColor color, float x, float y, float width, float height,
                        float shadowRadius) const;
-    void _renderRect(const domain::Color color, float x, float y, float width, float height) const;
+    void _renderRect(const domain::RGBAColor color, float x, float y, float width, float height) const;
     std::unique_ptr<ShaderProgram> m_shader_program;
 
     unsigned int m_text_vao, m_text_vbo;

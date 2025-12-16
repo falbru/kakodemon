@@ -4,6 +4,8 @@
 #include "application/model/kakouneclient.hpp"
 #include "application/model/uioptions.hpp"
 #include "application/view/kakounecontentview.hpp"
+#include "domain/geometry.hpp"
+#include "domain/lines.hpp"
 
 enum class PlacementDirection
 {
@@ -26,7 +28,7 @@ enum class CrossAxisAlignment
 
 struct Placement
 {
-    std::vector<kakoune::Line> content;
+    domain::Lines content;
     domain::Rectangle bounds;
 };
 
@@ -40,15 +42,12 @@ class InfoBoxView
                                                      float info_box_height, float viewport_width, float viewport_height,
                                                      PlacementDirection direction, CrossAxisAlignment alignment) const;
 
-    std::pair<std::vector<kakoune::Line>, std::pair<float, float>> calculateWrappedContent(
-        const std::vector<kakoune::Line> &input_lines, float max_width, domain::Font *font) const;
-
     std::optional<Placement> tryPlaceInfoBox(PlacementDirection direction, CrossAxisAlignment alignment,
-                                             const std::vector<kakoune::Line> &content, const domain::Rectangle &anchor,
+                                             const domain::Lines &content, const domain::Rectangle &anchor,
                                              float layout_width, float layout_height, domain::Font *font,
                                              const domain::Rectangle &menu_rectangle);
 
-    void render(const KakouneClient &kakoune_client, const UIOptions &ui_options, float width, float height);
+    void render(const KakouneClient *kakoune_client, const UIOptions &ui_options, float width, float height);
 
     float x() const;
     float y() const;

@@ -6,10 +6,10 @@
 
 #include <nlohmann/json.hpp>
 
-#include "kakoune/coord.hpp"
-#include "kakoune/face.hpp"
-#include "kakoune/infostyle.hpp"
-#include "kakoune/menustyle.hpp"
+#include "coord.hpp"
+#include "face.hpp"
+#include "infostyle.hpp"
+#include "menustyle.hpp"
 #include "line.hpp"
 #include "spdlog/spdlog.h"
 
@@ -165,7 +165,7 @@ void KakouneClientProcess::sendRequest(const OutgoingRequest &request)
         data["params"] = {scroll_data.amount, scroll_data.line, scroll_data.line};
     }
 
-    std::string json_str = data.dump();
+    std::string json_str = data.dump() + "\n";
 
     ssize_t bytes_written = write(m_stdin_pipefd[1], json_str.c_str(), json_str.size());
     if (bytes_written == -1)

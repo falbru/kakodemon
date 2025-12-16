@@ -1,5 +1,5 @@
 #include "kakouneframestatemanager.hpp"
-#include "kakoune/kakouneclientprocess.hpp"
+#include "kakouneclientprocess.hpp"
 #include <optional>
 
 KakouneFrameStateManager::KakouneFrameStateManager(KakouneClientProcess* process)
@@ -75,8 +75,12 @@ void KakouneFrameStateManager::onRequest(const IncomingRequest& request)
     case IncomingRequestType::REFRESH: {
         m_next_frame_state_ready = true;
     }
-    default:
+    case IncomingRequestType::SET_CURSOR: {
         break;
+    }
+    case IncomingRequestType::SET_UI_OPTIONS: {
+        break;
+    }
     }
 }
 
