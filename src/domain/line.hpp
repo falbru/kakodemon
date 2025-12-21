@@ -2,6 +2,7 @@
 #define DOMAIN_LINE_HPP_INCLUDED
 
 #include "domain/atom.hpp"
+#include "domain/utf8string.hpp"
 
 namespace domain
 {
@@ -17,6 +18,9 @@ class Line
 
     const std::vector<Atom> &getAtoms() const;
     unsigned int size() const;
+    unsigned int length() const;
+
+    UTF8String toUTF8String() const;
 
   private:
     std::vector<Atom> m_atoms;

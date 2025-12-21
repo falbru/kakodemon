@@ -1,5 +1,6 @@
 #include "atom.hpp"
 #include "domain/ports/font.hpp"
+#include "domain/utf8string.hpp"
 
 namespace domain {
 
@@ -28,6 +29,10 @@ Atom Atom::slice(int start_index, int length) {
         return Atom({}, m_face);
 
     return Atom(m_contents.substring(start_index, length), m_face);
+}
+
+UTF8String Atom::toUTF8String() const {
+    return UTF8String(m_contents);
 }
 
 GlyphAtom::GlyphAtom(const std::vector<GlyphMetrics>& glyphs, const Face& face) : m_glyphs(glyphs), m_face(face) {

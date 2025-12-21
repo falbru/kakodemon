@@ -13,3 +13,6 @@
 [submodule "vendor/Catch2"]
 	path = vendor/Catch2
 	url = https://github.com/catchorg/Catch2
+[submodule "vendor/trompeloeil"]
+	path = vendor/trompeloeil
+	url = https://github.com/rollbear/trompeloeil.git

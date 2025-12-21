@@ -38,9 +38,16 @@ class UTF8String
     UTF8String substring(size_t start, size_t length) const;
     UTF8String trim(TrimDirection direction = TrimDirection::Both) const;
 
+    UTF8String &operator+=(const UTF8String &other);
+    bool operator==(const UTF8String &other) const;
+    bool operator!=(const UTF8String &other) const;
+
   private:
     std::vector<Codepoint> m_codepoints;
 };
+
+std::ostream &operator<<(std::ostream &os, const UTF8String &str);
+std::string to_string(const UTF8String &str);
 
 } // namespace domain
 

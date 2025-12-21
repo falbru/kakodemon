@@ -1,4 +1,5 @@
 #include "utf8string.hpp"
+#include <sstream>
 
 namespace domain {
 
@@ -178,6 +179,37 @@ UTF8String UTF8String::substring(size_t start, size_t length) const
 UTF8String UTF8String::substring(size_t start) const
 {
     return substring(start, m_codepoints.size() - start);
+}
+
+UTF8String& UTF8String::operator+=(const UTF8String& string) {
+    for (int i = 0; i < string.size(); i++) {
+        addCodepoint(string.at(i));
+    }
+    return *this;
+}
+
+bool UTF8String::operator==(const UTF8String& other) const {
+    if (size() != other.size()) return false;
+
+    for (int i = 0; i < size(); i++) {
+        if (at(i) != other.at(i))
+            return false;
+    }
+
+    return true;
+}
+
+bool UTF8String::operator!=(const UTF8String& other) const {
+    return !(*this == other);
+}
+
+std::ostream& operator<<(std::ostream& os, const UTF8String& str) {
+    os << str.toString();
+    return os;
+}
+
+std::string to_string(const UTF8String& str) {
+    return str.toString();
 }
 
 }

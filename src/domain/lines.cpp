@@ -2,6 +2,7 @@
 #include "domain/atom.hpp"
 #include "domain/line.hpp"
 #include "domain/ports/font.hpp"
+#include <optional>
 
 namespace domain {
 
@@ -69,18 +70,17 @@ float GlyphLines::height() const {
 }
 
 void GlyphLines::wrap(float max_width, WrapMode mode) {
-    std::vector<GlyphAtom> remainder;
+    std::optional<GlyphLine> remainder = std::nullopt;
+
+    std::vector<GlyphLine> wrapped_lines;
+
     int original_lines_size = m_lines.size();
-    for (int i = 0; i < original_lines_size || remainder.size() > 0; i++) {
+    int line_index = 0;
+    while (line_index < original_lines_size || remainder.has_value()) {
         std::vector<GlyphAtom> wrapped_line;
         float width_it = 0.0f;
-        auto atoms = i < original_lines_size ? m_lines[i].getGlyphAtoms() : std::vector<GlyphAtom>();
 
-        if (remainder.size() > 0) {
-            atoms.reserve(atoms.size() + distance(remainder.begin(), remainder.end()));
-            atoms.insert(atoms.end(), remainder.begin(), remainder.end());
-            remainder.clear();  // ← ADD THIS: Clear remainder after using it
-        }
+        auto atoms = remainder.has_value() ? remainder->getGlyphAtoms() : m_lines[line_index].getGlyphAtoms();
 
         auto atom_it = atoms.begin();
         while (atom_it != atoms.end()) {
@@ -97,23 +97,25 @@ void GlyphLines::wrap(float max_width, WrapMode mode) {
             std::vector<GlyphMetrics> remainder_glyphs;
             auto glyphs = atom_it->getGlyphs();
             int last_whitespace_index = -1;
+            int glyph_index = 0;
 
-            for (int i = 0; i < glyphs.size(); ++i) {
-                float glyph_width = glyphs[i].width();
+            while (glyph_index < glyphs.size()) {
+                float glyph_width = glyphs[glyph_index].width();
                 if (width_it + glyph_width > max_width)
                     break;
-                if (isWhitespace(glyphs[i].codepoint)) {
-                    last_whitespace_index = i;
+                if (isWhitespace(glyphs[glyph_index].codepoint)) {
+                    last_whitespace_index = glyph_index;
                 }
-                fitted_glyphs.push_back(glyphs[i]);
+                fitted_glyphs.push_back(glyphs[glyph_index]);
                 width_it += glyph_width;
+                glyph_index++;
             }
 
             if (mode == WrapMode::WORD && last_whitespace_index >= 0) {
-                size_t split_point = last_whitespace_index + 1;
+                size_t split_point = last_whitespace_index;
                 if (split_point < fitted_glyphs.size()) {
                     remainder_glyphs.assign(
-                        fitted_glyphs.begin() + split_point,
+                        fitted_glyphs.begin() + split_point + 1,
                         fitted_glyphs.end()
                     );
                     fitted_glyphs.erase(
@@ -123,25 +125,35 @@ void GlyphLines::wrap(float max_width, WrapMode mode) {
                 }
             }
 
-            wrapped_line.push_back(GlyphAtom(fitted_glyphs, atom_it->getFace()));
+            while (glyph_index < glyphs.size()) {
+                remainder_glyphs.push_back(glyphs[glyph_index]);
+                glyph_index++;
+            }
 
-            if (!remainder_glyphs.empty()) {  // ← ADD THIS CHECK
-                remainder.push_back(GlyphAtom(remainder_glyphs, atom_it->getFace()));
+            if (fitted_glyphs.size() > 0) wrapped_line.push_back(GlyphAtom(fitted_glyphs, atom_it->getFace()));
+
+            std::vector<GlyphAtom> remainder_atoms;;
+
+            if (!remainder_glyphs.empty()) {
+                remainder_atoms.push_back(GlyphAtom(remainder_glyphs, atom_it->getFace()));
             }
 
             atom_it++;
             while(atom_it != atoms.end()) {
-                remainder.push_back(*atom_it);
+                remainder_atoms.push_back(*atom_it);
                 atom_it++;
             }
+
+            remainder = GlyphLine(remainder_atoms);
+        }else {
+            remainder = std::nullopt;
+            line_index++;
         }
 
-        if (i < original_lines_size) {
-            m_lines[i] = GlyphLine(wrapped_line);
-        } else {
-            m_lines.push_back(GlyphLine(wrapped_line));
-        }
+        wrapped_lines.push_back(GlyphLine(wrapped_line));
     }
+
+    m_lines = wrapped_lines;
 }
 
 }

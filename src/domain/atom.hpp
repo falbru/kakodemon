@@ -20,6 +20,8 @@ class Atom
     Atom slice(int start_index);
     Atom slice(int start_index, int length);
 
+    UTF8String toUTF8String() const;
+
   private:
     UTF8String m_contents;
     Face m_face;

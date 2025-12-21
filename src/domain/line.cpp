@@ -1,4 +1,5 @@
 #include "line.hpp"
+#include "domain/utf8string.hpp"
 
 namespace domain {
 
@@ -71,6 +72,22 @@ const std::vector<Atom>& Line::getAtoms() const {
 
 unsigned int Line::size() const {
     return m_atoms.size();
+}
+
+unsigned int Line::length() const {
+    int length = 0;
+    for (int i = 0; i < m_atoms.size(); i++) {
+        length += m_atoms[i].size();
+    }
+    return length;
+}
+
+UTF8String Line::toUTF8String() const {
+    UTF8String string;
+    for (int i = 0; i < m_atoms.size(); i++) {
+        string += m_atoms[i].toUTF8String();
+    }
+    return string;
 }
 
 GlyphLine::GlyphLine(std::vector<GlyphAtom> atoms) : m_atoms(atoms) {
