@@ -40,6 +40,8 @@ set(SRC
     src/adapters/kakoune/kakouneframestatemanager.cpp
     src/adapters/kakoune/line.cpp
     src/adapters/kakoune/menustyle.cpp
+    src/adapters/kakoune/localsession.cpp
+    src/adapters/kakoune/remotesession.cpp
     src/adapters/opengl/application.cpp
     src/adapters/opengl/font.cpp
     src/adapters/opengl/renderer.cpp

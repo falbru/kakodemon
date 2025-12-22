@@ -1,4 +1,5 @@
 #include "application.hpp"
+#include "adapters/kakoune/localsession.hpp"
 #include "application/controller/infoboxcontroller.hpp"
 #include "application/controller/menucontroller.hpp"
 #include "application/controller/mousecontroller.hpp"
@@ -13,6 +14,7 @@
 #include "application/view/kakounecontentview.hpp"
 #include "application/view/statusbar.hpp"
 #include "adapters/kakoune/jsonrpckakouneinterface.hpp"
+#include "adapters/kakoune/remotesession.hpp"
 #include "domain/mouse.hpp"
 #include <memory>
 
@@ -26,7 +28,10 @@ Application::~Application()
 
 void Application::init()
 {
-    m_kakoune_client = std::make_unique<KakouneClient>(std::make_unique<kakoune::JsonRpcKakouneInterface>("default"));
+    auto session = std::make_unique<LocalSession>("default2");
+    session->start();
+    auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*session);
+    m_kakoune_client = std::make_unique<KakouneClient>(std::move(session), std::move(interface));
     m_ui_options = std::make_unique<UIOptions>();
 
     m_editor_controller = std::make_unique<EditorController>();

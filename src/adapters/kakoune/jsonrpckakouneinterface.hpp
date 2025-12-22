@@ -12,7 +12,7 @@ namespace kakoune
 class JsonRpcKakouneInterface : public domain::KakouneInterface
 {
   public:
-    JsonRpcKakouneInterface(const std::string &session_id);
+    JsonRpcKakouneInterface(const domain::KakouneSession &session);
     ~JsonRpcKakouneInterface();
 
     std::optional<domain::KakouneState> getNextKakouneState();

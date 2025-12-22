@@ -5,6 +5,20 @@ add_executable(tests
     test.cpp
     unit/test_glyphlines.cpp
     unit/test_utf8string.cpp
+    integration/test_localsession.cpp
+    ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/atom.cpp
+    ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/color.cpp
+    ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/coord.cpp
+    ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/face.cpp
+    ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/infostyle.cpp
+    ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/jsonrpckakouneinterface.cpp
+    ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/kakouneclientprocess.cpp
+    ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/kakouneframestatemanager.cpp
+    ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/line.cpp
+    ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/menustyle.cpp
+    ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/localsession.cpp
+    ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/remotesession.cpp
+    ${CMAKE_SOURCE_DIR}/src/application/model/kakouneclient.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/alignment.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/atom.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/color.cpp
@@ -21,7 +35,7 @@ add_executable(tests
 )
 
 target_include_directories(tests PRIVATE mocks/ ${CMAKE_SOURCE_DIR}/src/)
-target_link_libraries(tests PRIVATE Catch2::Catch2WithMain trompeloeil::trompeloeil)
+target_link_libraries(tests PRIVATE Catch2::Catch2WithMain trompeloeil::trompeloeil nlohmann_json::nlohmann_json spdlog::spdlog)
 
 include(CTest)
 include(Catch)

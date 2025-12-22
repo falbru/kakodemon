@@ -16,6 +16,7 @@ domain::KakouneState getEmptyState() {
     };
 }
 
-KakouneClient::KakouneClient(std::unique_ptr<domain::KakouneInterface> inter) : interface(std::move(inter)), state(getEmptyState()) {
+KakouneClient::KakouneClient(std::unique_ptr<domain::KakouneSession> session, std::unique_ptr<domain::KakouneInterface> interface)
+    : session(std::move(session)), interface(std::move(interface)), state(getEmptyState()) {
 
 }

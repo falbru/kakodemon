@@ -3,6 +3,7 @@
 
 #include "domain/editor.hpp"
 #include "domain/infobox.hpp"
+#include "domain/kakounesession.hpp"
 #include "domain/lines.hpp"
 #include "domain/menu.hpp"
 #include "domain/modeline.hpp"
@@ -40,7 +41,7 @@ class KakouneInterface
     virtual void selectMenuItem(int index) = 0;
 
   protected:
-    KakouneInterface(const std::string &session_id);
+    KakouneInterface(const KakouneSession &session);
 
     std::string m_session_id;
 };
