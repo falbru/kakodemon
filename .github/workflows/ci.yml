@@ -20,11 +20,15 @@ jobs:
 
     - name: Configure CMake
       run: |
-        cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_TESTS=ON
 
     - name: Build with CMake
       run: |
         cmake --build build --config Release
+
+    - name: Run tests
+      run: |
+        cd build && ctest --output-on-failure
 
     - name: Run clang-format check
       run: |
