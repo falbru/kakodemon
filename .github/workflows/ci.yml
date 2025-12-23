@@ -16,7 +16,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y cmake build-essential libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libwayland-dev libxkbcommon-dev libfreetype-dev libfontconfig-dev clang-format clang-tidy
+        sudo apt-get install -y cmake build-essential libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libwayland-dev libxkbcommon-dev libfreetype-dev libfontconfig-dev clang-format clang-tidy kakoune
 
     - name: Configure CMake
       run: |
