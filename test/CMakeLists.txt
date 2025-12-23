@@ -2,7 +2,6 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/Catch2 ${CMAKE_BINARY_DIR}/vendor/Ca
 add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/trompeloeil ${CMAKE_BINARY_DIR}/vendor/trompeloeil EXCLUDE_FROM_ALL)
 
 add_executable(tests
-    test.cpp
     unit/test_glyphlines.cpp
     unit/test_utf8string.cpp
     integration/test_localsession.cpp
