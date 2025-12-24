@@ -30,7 +30,7 @@ void Application::init()
 {
     auto session = std::make_unique<LocalSession>("default2");
     session->start();
-    auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*session);
+    auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*session, std::nullopt);
     m_kakoune_client = std::make_unique<KakouneClient>(std::move(session), std::move(interface));
     m_ui_options = std::make_unique<UIOptions>();
 

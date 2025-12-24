@@ -1,5 +1,7 @@
 #include "kakouneclientprocess.hpp"
 
+#include <exception>
+#include <optional>
 #include <sys/poll.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -31,21 +33,25 @@ KakouneClientProcess::~KakouneClientProcess()
 
 void KakouneClientProcess::start()
 {
-    if (pipe(m_stdout_pipefd) == 0)
+    start(std::nullopt);
+}
+
+void KakouneClientProcess::start(std::optional<std::string> startup_command)
+{
+    if (pipe(m_stdout_pipefd) != 0)
     {
-        // something worng
+        throw std::runtime_error("stdout pipe creation failed");
     }
 
     if (pipe(m_stdin_pipefd) != 0)
     {
-        // something wrong
-        return;
+        throw std::runtime_error("stdin pipe creation failed");
     }
 
     pid_t pid = fork();
     if (pid == -1)
     {
-        // something wrong happened
+        throw std::runtime_error("fork failed");
     }
 
     if (pid == 0)
@@ -58,7 +64,12 @@ void KakouneClientProcess::start()
         dup2(m_stdout_pipefd[1], STDOUT_FILENO);
         close(m_stdout_pipefd[1]);
 
-        execlp("/usr/local/bin/kak", "kak", "-ui", "json", "-c", m_session_name.c_str(), nullptr);
+        if (startup_command.has_value()) {
+            execlp("/usr/local/bin/kak", "kak", "-ui", "json", "-c", m_session_name.c_str(), "-e", startup_command->c_str(), nullptr);
+        }else {
+            execlp("/usr/local/bin/kak", "kak", "-ui", "json", "-c", m_session_name.c_str(), nullptr);
+        }
+
         perror("execlp");
         _exit(1);
     }

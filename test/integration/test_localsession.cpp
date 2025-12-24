@@ -37,7 +37,7 @@ TEST_CASE("KakouneClient can connect immediately after LocalSession starts", "[i
         REQUIRE(WEXITSTATUS(result) == 0);
 
         auto remote_session = std::make_unique<RemoteSession>(session_id);
-        auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*remote_session);
+        auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*remote_session, std::nullopt);
 
         REQUIRE_NOTHROW([&]() {
             auto client = std::make_unique<KakouneClient>(std::move(remote_session), std::move(interface));
@@ -97,6 +97,6 @@ TEST_CASE("RemoteSession connects to existing session", "[integration][remoteses
     }
 
     REQUIRE_NOTHROW([&]() {
-        auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*remote_session);
+        auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*remote_session, std::nullopt);
     }());
 }

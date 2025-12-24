@@ -12,9 +12,9 @@
 
 namespace kakoune {
 
-JsonRpcKakouneInterface::JsonRpcKakouneInterface(const domain::KakouneSession& session) : domain::KakouneInterface(session) {
+JsonRpcKakouneInterface::JsonRpcKakouneInterface(const domain::KakouneSession& session, std::optional<std::string> startup_command) : domain::KakouneInterface(session) {
     m_process = std::make_unique<KakouneClientProcess>(session.getSessionId());
-    m_process->start();
+    m_process->start(startup_command);
 
     m_frame_state_manager = std::make_unique<KakouneFrameStateManager>(m_process.get());
 

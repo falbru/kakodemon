@@ -5,6 +5,7 @@ add_executable(tests
     unit/test_glyphlines.cpp
     unit/test_utf8string.cpp
     integration/test_localsession.cpp
+    integration/test_kakouneclientprocess.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/atom.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/color.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/coord.cpp
