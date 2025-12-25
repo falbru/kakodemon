@@ -159,6 +159,7 @@ class KakouneClientProcess
 
     void start();
     void start(std::optional<std::string> startup_command);
+    void start(std::optional<std::string> startup_command, const std::vector<std::string> &file_arguments);
 
     void pollForRequests();
     void setRequestCallback(std::function<void(const IncomingRequest &)> callback);

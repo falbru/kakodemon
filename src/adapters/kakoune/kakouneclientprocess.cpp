@@ -38,6 +38,11 @@ void KakouneClientProcess::start()
 
 void KakouneClientProcess::start(std::optional<std::string> startup_command)
 {
+    start(startup_command, {});
+}
+
+void KakouneClientProcess::start(std::optional<std::string> startup_command, const std::vector<std::string>& file_arguments)
+{
     if (pipe(m_stdout_pipefd) != 0)
     {
         throw std::runtime_error("stdout pipe creation failed");
@@ -64,13 +69,27 @@ void KakouneClientProcess::start(std::optional<std::string> startup_command)
         dup2(m_stdout_pipefd[1], STDOUT_FILENO);
         close(m_stdout_pipefd[1]);
 
+        std::vector<const char*> args;
+        args.push_back("kak");
+        args.push_back("-ui");
+        args.push_back("json");
+        args.push_back("-c");
+        args.push_back(m_session_name.c_str());
+
         if (startup_command.has_value()) {
-            execlp("/usr/local/bin/kak", "kak", "-ui", "json", "-c", m_session_name.c_str(), "-e", startup_command->c_str(), nullptr);
-        }else {
-            execlp("/usr/local/bin/kak", "kak", "-ui", "json", "-c", m_session_name.c_str(), nullptr);
+            args.push_back("-e");
+            args.push_back(startup_command->c_str());
         }
 
-        perror("execlp");
+        for (const auto& file_arg : file_arguments) {
+            args.push_back(file_arg.c_str());
+        }
+
+        args.push_back(nullptr);
+
+        execv("/usr/local/bin/kak", const_cast<char* const*>(args.data()));
+
+        perror("execv");
         _exit(1);
     }
     else

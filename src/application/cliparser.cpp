@@ -74,5 +74,10 @@ ParsedCliArgs parseCliArgs(int argc, char* argv[])
         result.config.session_id = generate_random_session_id();
     }
 
+    for (int i = optind; i < argc; i++)
+    {
+        result.config.file_arguments.push_back(argv[i]);
+    }
+
     return result;
 }

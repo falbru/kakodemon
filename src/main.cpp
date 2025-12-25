@@ -7,13 +7,17 @@
 
 void print_help(const char* program_name)
 {
-    std::cout << "Usage: " << program_name << " [OPTIONS]\n\n"
+    std::cout << "Usage: " << program_name << " [OPTIONS] [file]... [+<line>[:<col>]|+:]\n\n"
               << "Options:\n"
               << "  -c <session>      Connect to remote Kakoune session\n"
               << "  -s <session>      Set session name\n"
               << "  -e <command>      Execute command on client initialisation\n"
               << "  --version         Print version and exit\n"
-              << "  --help            Print this help message and exit\n";
+              << "  --help            Print this help message and exit\n\n"
+              << "File arguments:\n"
+              << "  [file]...         Files to edit\n"
+              << "  [+<line>[:<col>]] Edit file at specific line (and column)\n"
+              << "  [+:]              Edit file at last position\n";
 }
 
 void print_version()
