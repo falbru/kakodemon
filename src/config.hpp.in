@@ -1,0 +1,6 @@
+#pragma once
+
+#define KAKODEMON_VERSION_MAJOR @kakodemon_VERSION_MAJOR@
+#define KAKODEMON_VERSION_MINOR @kakodemon_VERSION_MINOR@
+#define KAKODEMON_VERSION_PATCH @kakodemon_VERSION_PATCH@
+#define KAKODEMON_VERSION "@kakodemon_VERSION@"

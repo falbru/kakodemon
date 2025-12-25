@@ -4,8 +4,10 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/trompeloeil ${CMAKE_BINARY_DIR}/vend
 add_executable(tests
     unit/test_glyphlines.cpp
     unit/test_utf8string.cpp
+    unit/test_cliparser.cpp
     integration/test_localsession.cpp
     integration/test_kakouneclientprocess.cpp
+    ${CMAKE_SOURCE_DIR}/src/application/cliparser.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/atom.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/color.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/coord.cpp
@@ -34,7 +36,7 @@ add_executable(tests
     ${CMAKE_SOURCE_DIR}/src/domain/utf8string.cpp
 )
 
-target_include_directories(tests PRIVATE mocks/ ${CMAKE_SOURCE_DIR}/src/)
+target_include_directories(tests PRIVATE mocks/ ${CMAKE_SOURCE_DIR}/src/ ${CMAKE_BINARY_DIR})
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain trompeloeil::trompeloeil nlohmann_json::nlohmann_json spdlog::spdlog)
 
 include(CTest)

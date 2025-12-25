@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "adapters/opengl/opengl.hpp"
+#include "application/cliconfig.hpp"
 #include "application/controller/editorcontroller.hpp"
 #include "application/controller/infoboxcontroller.hpp"
 #include "application/controller/inputcontroller.hpp"
@@ -27,7 +28,7 @@ class Application
     Application();
     virtual ~Application();
 
-    virtual void init();
+    virtual void init(const CliConfig &config);
     virtual void run() = 0;
 
     void setClearColor(domain::RGBAColor color);

@@ -16,7 +16,7 @@ opengl::GLFWApplication::~GLFWApplication() {
     glfwTerminate();
 }
 
-void opengl::GLFWApplication::init() {
+void opengl::GLFWApplication::init(const CliConfig& config) {
     if (!glfwInit()) {
         return;
     }
@@ -81,7 +81,7 @@ void opengl::GLFWApplication::init() {
     m_cursor_ibeam = glfwCreateStandardCursor(GLFW_IBEAM_CURSOR);
     m_cursor_pointer = glfwCreateStandardCursor(GLFW_POINTING_HAND_CURSOR);
 
-    Application::init();
+    Application::init(config);
 
     m_ui_options->font = std::make_unique<opengl::Font>(new FreeTypeFontEngine("/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf", 14)); // TODO TMP.
     onWindowResize(framebuffer_width, framebuffer_height); // TODO ensure it is called after controller initialization

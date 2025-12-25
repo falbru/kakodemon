@@ -2,6 +2,7 @@
 #define OPENGL_APPLICATION_HPP_INCLUDED
 
 #include "application/application.hpp"
+#include "application/cliconfig.hpp"
 #include "opengl.hpp"
 #include <chrono>
 
@@ -14,7 +15,7 @@ class GLFWApplication : public Application
     GLFWApplication();
     ~GLFWApplication();
 
-    void init() override;
+    void init(const CliConfig &config) override;
     void run() override;
 
     void setCursor(domain::Cursor cursor) override;

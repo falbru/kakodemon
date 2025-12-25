@@ -1,10 +1,12 @@
 #include "application.hpp"
 #include "adapters/kakoune/localsession.hpp"
+#include "application/cliconfig.hpp"
 #include "application/controller/infoboxcontroller.hpp"
 #include "application/controller/menucontroller.hpp"
 #include "application/controller/mousecontroller.hpp"
 #include "application/view/searchmenu.hpp"
 #include "domain/color.hpp"
+#include "domain/kakounesession.hpp"
 #include "domain/keys.hpp"
 #include "application/controller/editorcontroller.hpp"
 #include "application/controller/inputcontroller.hpp"
@@ -26,11 +28,20 @@ Application::~Application()
 {
 }
 
-void Application::init()
+void Application::init(const CliConfig &config)
 {
-    auto session = std::make_unique<LocalSession>("default2");
-    session->start();
-    auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*session, std::nullopt);
+    std::unique_ptr<domain::KakouneSession> session;
+
+    if (config.session_type == SessionType::Remote)
+    {
+        session = std::make_unique<LocalSession>(config.session_id);
+    }else {
+        auto local_session = std::make_unique<LocalSession>(config.session_id);
+        local_session->start();
+        session = std::move(local_session);
+    }
+
+    auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*session, config.startup_command);
     m_kakoune_client = std::make_unique<KakouneClient>(std::move(session), std::move(interface));
     m_ui_options = std::make_unique<UIOptions>();
 

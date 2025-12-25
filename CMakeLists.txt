@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
-project(kakodemon)
+project(kakodemon VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+configure_file(src/config.hpp.in config.hpp)
 
 option(BUILD_TESTS "Build the test suite" OFF)
 
@@ -47,6 +49,7 @@ set(SRC
     src/adapters/opengl/renderer.cpp
     src/adapters/opengl/shaderprogram.cpp
     src/application/application.cpp
+    src/application/cliparser.cpp
     src/application/controller/editorcontroller.cpp
     src/application/controller/infoboxcontroller.cpp
     src/application/controller/inputcontroller.cpp
@@ -83,5 +86,5 @@ set(SRC
 
 add_executable(kakod ${SRC})
 
-target_include_directories(kakod PRIVATE src/ vendor/glad/include)
+target_include_directories(kakod PRIVATE src/ vendor/glad/include ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(kakod glfw glm::glm nlohmann_json::nlohmann_json Freetype::Freetype Fontconfig::Fontconfig spdlog::spdlog)
