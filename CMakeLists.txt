@@ -8,11 +8,6 @@ configure_file(src/config.hpp.in config.hpp)
 
 option(BUILD_TESTS "Build the test suite" OFF)
 
-if(BUILD_TESTS)
-    enable_testing()
-    add_subdirectory(test/)
-endif()
-
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "GLFW lib only")
 set(GLFW_INSTALL OFF CACHE BOOL "GLFW lib only")
 add_subdirectory(vendor/glfw)
@@ -28,9 +23,15 @@ find_package(Fontconfig)
 
 add_subdirectory(vendor/spdlog)
 
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(test/)
+endif()
+
 set(SRC
     src/adapters/fontconfig/fontconfigresolver.cpp
     src/adapters/freetype/freetypefontengine.cpp
+    src/adapters/freetype/freetypelibrary.cpp
     src/adapters/kakoune/atom.cpp
     src/adapters/kakoune/color.cpp
     src/adapters/kakoune/coord.cpp
@@ -41,8 +42,8 @@ set(SRC
     src/adapters/kakoune/kakouneclientprocess.cpp
     src/adapters/kakoune/kakouneframestatemanager.cpp
     src/adapters/kakoune/line.cpp
-    src/adapters/kakoune/menustyle.cpp
     src/adapters/kakoune/localsession.cpp
+    src/adapters/kakoune/menustyle.cpp
     src/adapters/kakoune/remotesession.cpp
     src/adapters/opengl/application.cpp
     src/adapters/opengl/font.cpp
@@ -71,12 +72,16 @@ set(SRC
     src/domain/atom.cpp
     src/domain/color.cpp
     src/domain/face.cpp
+    src/domain/fontmanager.cpp
     src/domain/geometry.cpp
+    src/domain/glyphatom.cpp
+    src/domain/glyphline.cpp
+    src/domain/glyphlines.cpp
+    src/domain/glyphlinesbuilder.cpp
     src/domain/line.cpp
     src/domain/lines.cpp
     src/domain/menu.cpp
     src/domain/modeline.cpp
-    src/domain/ports/font.cpp
     src/domain/ports/kakouneinterface.cpp
     src/domain/statusline.cpp
     src/domain/utf8string.cpp

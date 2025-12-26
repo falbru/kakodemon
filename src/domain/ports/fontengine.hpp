@@ -8,12 +8,19 @@
 namespace domain
 {
 
+enum class PixelFormat
+{
+    GRAYSCALE,
+    BGRA
+};
+
 struct RasterizedGlyph
 {
     GlyphMetrics metrics;
     unsigned int width;
     unsigned int height;
     unsigned char *bitmap;
+    PixelFormat format;
 };
 
 class FontEngine
@@ -23,6 +30,7 @@ class FontEngine
 
     virtual bool hasGlyph(Codepoint c) const = 0;
     virtual std::optional<RasterizedGlyph> rasterizeGlyph(Codepoint c) = 0;
+    virtual std::optional<RasterizedGlyph> rasterizeFallbackGlyph() = 0;
 
     virtual float getAscender() const = 0;
     virtual float getLineHeight() const = 0;

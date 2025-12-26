@@ -11,7 +11,8 @@ class StatusBarView
 
     void init(domain::Renderer *renderer);
 
-    void render(domain::Font *font, const domain::ModeLine &mode_line, float width, float height);
+    void render(domain::Font *font, domain::FontManager *font_manager, const domain::ModeLine &mode_line, float width,
+                float height);
 
     int getCellWidth(domain::Font *font);
     int getCellHeight(domain::Font *font);

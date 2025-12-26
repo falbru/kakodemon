@@ -1,6 +1,7 @@
 #ifndef GLYPHSEQUENCE_HPP_INCLUDED
 #define GLYPHSEQUENCE_HPP_INCLUDED
 
+#include "domain/fontmanager.hpp"
 #include "domain/ports/font.hpp"
 #include "domain/utf8string.hpp"
 #include <optional>
@@ -14,8 +15,9 @@ enum class CutMode
 class GlyphSequence
 {
   public:
-    GlyphSequence(domain::Font *font, const domain::UTF8String &string);
-    GlyphSequence(domain::Font *font, const std::vector<domain::GlyphMetrics> &glyphs);
+    GlyphSequence(domain::Font *font, domain::FontManager *font_manager, const domain::UTF8String &string);
+    GlyphSequence(domain::Font *font, domain::FontManager *font_manager,
+                  const std::vector<domain::GlyphMetrics> &glyphs);
 
     float width() const;
 
@@ -29,9 +31,9 @@ class GlyphSequence
     domain::UTF8String toUTF8String();
 
   private:
-    std::vector<domain::GlyphMetrics> m_glyphs;
-
     domain::Font *m_font;
+    domain::FontManager *m_font_manager;
+    std::vector<domain::GlyphMetrics> m_glyphs;
 };
 
 #endif

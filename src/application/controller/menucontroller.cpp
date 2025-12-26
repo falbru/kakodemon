@@ -7,9 +7,10 @@ MenuController::MenuController() {
 
 }
 
-void MenuController::init(KakouneClient* kakoune_client, EditorController* editor_controller, PromptMenuView* prompt_menu_view, InlineMenuView* inline_menu_view, SearchMenuView *search_menu_view) {
+void MenuController::init(KakouneClient* kakoune_client, EditorController* editor_controller, domain::FontManager* font_manager, PromptMenuView* prompt_menu_view, InlineMenuView* inline_menu_view, SearchMenuView *search_menu_view) {
     m_kakoune_client = kakoune_client;
     m_editor_controller = editor_controller;
+    m_font_manager = font_manager;
     m_inline_menu_view = inline_menu_view;
     m_prompt_menu_view = prompt_menu_view;
     m_search_menu_view = search_menu_view;
@@ -22,12 +23,12 @@ void MenuController::render(const UIOptions& ui_options) {
 
     switch(m_kakoune_client->state.menu->getStyle()) {
         case domain::MenuStyle::INLINE:
-            m_inline_menu_view->render(ui_options.font.get(), *m_kakoune_client, m_editor_controller->width(), m_editor_controller->height());
+            m_inline_menu_view->render(ui_options.font, m_font_manager, *m_kakoune_client, m_editor_controller->width(), m_editor_controller->height());
         case domain::MenuStyle::PROMPT:
-            m_prompt_menu_view->render(ui_options.font.get(), *m_kakoune_client, m_editor_controller->width(), m_editor_controller->height());
+            m_prompt_menu_view->render(ui_options.font, m_font_manager, *m_kakoune_client, m_editor_controller->width(), m_editor_controller->height());
             break;
         case domain::MenuStyle::SEARCH:
-            m_search_menu_view->render(ui_options.font.get(), *m_kakoune_client, m_editor_controller->width(), m_editor_controller->height());
+            m_search_menu_view->render(ui_options.font, m_font_manager, *m_kakoune_client, m_editor_controller->width(), m_editor_controller->height());
             break;
     }
 }
@@ -118,13 +119,13 @@ bool MenuController::onMouseButton(domain::MouseButtonEvent event, const UIOptio
 
     switch(m_kakoune_client->state.menu->getStyle()) {
         case domain::MenuStyle::INLINE:
-            clicked_item_index = m_inline_menu_view->findItemAtPosition(event.x, event.y, ui_options->font.get(), *m_kakoune_client);
+            clicked_item_index = m_inline_menu_view->findItemAtPosition(event.x, event.y, ui_options->font, *m_kakoune_client);
             break;
         case domain::MenuStyle::PROMPT:
-            clicked_item_index = m_prompt_menu_view->findItemAtPosition(event.x, event.y, ui_options->font.get(), *m_kakoune_client);
+            clicked_item_index = m_prompt_menu_view->findItemAtPosition(event.x, event.y, ui_options->font, *m_kakoune_client);
             break;
         case domain::MenuStyle::SEARCH:
-            clicked_item_index = m_search_menu_view->findItemAtPosition(event.x, event.y, ui_options->font.get(), *m_kakoune_client);
+            clicked_item_index = m_search_menu_view->findItemAtPosition(event.x, event.y, ui_options->font, *m_kakoune_client);
             break;
     }
 

@@ -18,6 +18,7 @@
 #include "application/view/promptmenu.hpp"
 #include "application/view/searchmenu.hpp"
 #include "application/view/statusbar.hpp"
+#include "domain/fontmanager.hpp"
 #include "domain/keys.hpp"
 #include "domain/mouse.hpp"
 #include "domain/ports/renderer.hpp"
@@ -45,6 +46,7 @@ class Application
     const int DEFAULT_WINDOW_HEIGHT = 480;
 
     std::unique_ptr<domain::Renderer> m_renderer;
+    std::unique_ptr<domain::FontManager> m_font_manager;
 
     void updateControllers();
     void renderControllers();

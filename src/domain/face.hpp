@@ -17,6 +17,8 @@ class Face
     RGBAColor getFg() const;
     RGBAColor getBg() const;
 
+    bool operator==(const Face &other) const;
+
   private:
     OptionalColor m_bg;
     OptionalColor m_fg;

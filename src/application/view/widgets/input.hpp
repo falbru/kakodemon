@@ -14,8 +14,8 @@ class Input
     void setPrompt(const domain::Line &prompt);
     void setContent(const domain::Line &content);
 
-    void render(domain::Renderer *renderer, domain::Font *font, const KakouneClient &kakoune_client,
-                LayoutManager &layout);
+    void render(domain::Renderer *renderer, domain::Font *font, domain::FontManager *font_manager,
+                const KakouneClient &kakoune_client, LayoutManager &layout);
 
     float height(domain::Font *font) const;
 

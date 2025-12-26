@@ -63,4 +63,12 @@ RGBAColor getRGBAColor(FixedColor color) {
     }
 }
 
+bool DefaultColor::operator==(const DefaultColor&) const {
+    return true;
+}
+
+bool RGBAColor::operator==(const RGBAColor& other) const {
+    return r == other.r && g == other.g && b == other.b && a == other.a;
+}
+
 }

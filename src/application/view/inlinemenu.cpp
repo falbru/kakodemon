@@ -30,7 +30,7 @@ float InlineMenuView::height() const {
     return m_height;
 }
 
-void InlineMenuView::render(domain::Font* font, const KakouneClient &kakoune_client, float width, float height)
+void InlineMenuView::render(domain::Font* font, domain::FontManager* font_manager, const KakouneClient &kakoune_client, float width, float height)
 {
     if (!kakoune_client.state.menu.has_value()) return;
 
@@ -61,7 +61,7 @@ void InlineMenuView::render(domain::Font* font, const KakouneClient &kakoune_cli
 
     layout.pad(0, SPACING_MEDIUM);
 
-    m_scrolled_menu_items->render(m_renderer, font, kakoune_client, layout);
+    m_scrolled_menu_items->render(m_renderer, font, font_manager, kakoune_client, layout);
 }
 
 float InlineMenuView::scrolledItemsX() const {

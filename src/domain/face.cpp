@@ -48,4 +48,8 @@ RGBAColor Face::getBg() const {
     }
 }
 
+bool Face::operator==(const Face& other) const {
+    return m_bg == other.m_bg && m_fg == other.m_fg;
+}
+
 }

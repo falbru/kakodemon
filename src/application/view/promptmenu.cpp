@@ -15,7 +15,7 @@ void PromptMenuView::init(domain::Renderer* renderer,
     m_input = std::make_unique<Input>();
 }
 
-void PromptMenuView::render(domain::Font* font, const KakouneClient &kakoune_client, float width, float height)
+void PromptMenuView::render(domain::Font* font, domain::FontManager* font_manager, const KakouneClient &kakoune_client, float width, float height)
 {
     if (!kakoune_client.state.menu.has_value())
         return;
@@ -40,12 +40,12 @@ void PromptMenuView::render(domain::Font* font, const KakouneClient &kakoune_cli
 
     layout.pad(SPACING_MEDIUM);
 
-    m_input->render(m_renderer, font, kakoune_client, layout);
+    m_input->render(m_renderer, font, font_manager, kakoune_client, layout);
 
     if (kakoune_client.state.menu.has_value())
     {
         layout.gapY(SPACING_MEDIUM);
-        m_scrolled_menu_items->render(m_renderer, font, kakoune_client, layout);
+        m_scrolled_menu_items->render(m_renderer, font, font_manager, kakoune_client, layout);
     }
 }
 

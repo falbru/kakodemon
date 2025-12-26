@@ -26,23 +26,6 @@ class Line
     std::vector<Atom> m_atoms;
 };
 
-class GlyphLine
-{
-  public:
-    GlyphLine(std::vector<GlyphAtom> atoms);
-    GlyphLine(const Line &line, Font *font);
-
-    Line toLine() const;
-
-    const std::vector<GlyphAtom> &getGlyphAtoms() const;
-
-    float width() const;
-    float height() const;
-
-  private:
-    std::vector<GlyphAtom> m_atoms;
-};
-
 } // namespace domain
 
 #endif

@@ -6,7 +6,7 @@ ScrolledMenuItems::ScrolledMenuItems(int max_visible_items) : m_max_visible_item
     m_scroll_bar = std::make_unique<ScrollBar>();
 }
 
-void ScrolledMenuItems::render(domain::Renderer* renderer, domain::Font* font, const KakouneClient &kakoune_client, LayoutManager &layout) {
+void ScrolledMenuItems::render(domain::Renderer* renderer, domain::Font* font, domain::FontManager* font_manager, const KakouneClient &kakoune_client, LayoutManager &layout) {
     auto items_layout = layout.copy();
     items_layout.padRight(SPACING_MEDIUM + m_scroll_bar->width());
 
@@ -29,11 +29,11 @@ void ScrolledMenuItems::render(domain::Renderer* renderer, domain::Font* font, c
     {
         auto item = kakoune_client.state.menu->getItems().at(i);
 
-        GlyphSequence item_value_glyphs = GlyphSequence(font, item.at(0).getContents().trim(domain::TrimDirection::Right));
+        GlyphSequence item_value_glyphs = GlyphSequence(font, font_manager, item.at(0).getContents().trim(domain::TrimDirection::Right));
         float item_secondary_width = 0;
         if (item.getAtoms().size() > 1)
         {
-            item_secondary_width = font->width(item.at(1).getContents().trim(domain::TrimDirection::Left));
+            item_secondary_width = GlyphSequence(font, font_manager, item.at(1).getContents().trim(domain::TrimDirection::Left)).width();
         }
 
         if (item_value_glyphs.width() + item_secondary_width > items_layout.current().width)
@@ -53,8 +53,8 @@ void ScrolledMenuItems::render(domain::Renderer* renderer, domain::Font* font, c
         }
         domain::Face item_face = i == selected_index ? kakoune_client.state.menu->getSelectedFace() : kakoune_client.state.menu->getFace();
 
-        renderer->renderLine(font, item_value, item_face, items_layout.current().x, items_layout.current().y);
-        renderer->renderLine(font, item_secondary, item_face,
+        renderer->renderLine(font, font_manager, item_value, item_face, items_layout.current().x, items_layout.current().y);
+        renderer->renderLine(font, font_manager, item_secondary, item_face,
                                items_layout.current().x + items_layout.current().width, items_layout.current().y,
                                domain::Alignment::topRight());
 

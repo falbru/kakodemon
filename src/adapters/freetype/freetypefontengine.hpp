@@ -2,31 +2,37 @@
 #define FREETYPEENGINE_HPP_INCLUDED
 
 #include "domain/ports/fontengine.hpp"
+#include "freetypelibrary.hpp"
 #include <freetype/freetype.h>
 #include <ft2build.h>
 #include <map>
+#include <memory>
 #include FT_FREETYPE_H
 
 class FreeTypeFontEngine : public domain::FontEngine
 {
   public:
-    FreeTypeFontEngine(const std::string path, int size);
+    FreeTypeFontEngine(std::shared_ptr<FreeTypeLibrary> library, const std::string &path, int size);
     ~FreeTypeFontEngine();
 
     bool hasGlyph(domain::Codepoint c) const override;
     std::optional<domain::RasterizedGlyph> rasterizeGlyph(domain::Codepoint c) override;
+    std::optional<domain::RasterizedGlyph> rasterizeFallbackGlyph() override;
 
     float getAscender() const override;
     float getLineHeight() const override;
 
   private:
-    FT_Library m_library;
+    std::shared_ptr<FreeTypeLibrary> m_library;
     FT_Face m_face;
 
     float m_ascender;
     float m_line_height;
+    int m_requested_size;
+    float m_scale;
 
     std::map<domain::Codepoint, domain::RasterizedGlyph> m_glyphs;
+    std::optional<domain::RasterizedGlyph> fallback_glyph;
 };
 
 #endif

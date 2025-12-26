@@ -12,11 +12,13 @@ EditorController::EditorController()
 void EditorController::init(KakouneClient* kakoune_client,
                             KakouneContentView* kakoune_content_view,
                             StatusBarView* status_bar_view,
+                            domain::FontManager* font_manager,
                             std::function<void(domain::RGBAColor)> set_clear_color)
 {
     m_kakoune_client = kakoune_client;
     m_kakoune_content_view = kakoune_content_view;
     m_status_bar_view = status_bar_view;
+    m_font_manager = font_manager;
     m_set_clear_color = set_clear_color;
 }
 
@@ -31,16 +33,16 @@ void EditorController::update(const UIOptions& ui_options)
 
 void EditorController::render(const UIOptions& ui_options)
 {
-    m_kakoune_content_view->render(ui_options.font.get(), m_kakoune_client->state.content, m_kakoune_client->state.default_face, 0.0f, 0.0f);
+    m_kakoune_content_view->render(ui_options.font, m_font_manager, m_kakoune_client->state.content, m_kakoune_client->state.default_face, 0.0f, 0.0f);
     m_kakoune_content_view->setWidth(m_width);
-    m_content_height = m_height - m_status_bar_view->getCellHeight(ui_options.font.get());
+    m_content_height = m_height - m_status_bar_view->getCellHeight(ui_options.font);
     m_kakoune_content_view->setHeight(m_content_height);
-    m_status_bar_view->render(ui_options.font.get(), m_kakoune_client->state.mode_line, m_width, m_height);
+    m_status_bar_view->render(ui_options.font, m_font_manager, m_kakoune_client->state.mode_line, m_width, m_height);
 }
 
 void EditorController::onWindowResize(int width, int height, const UIOptions& ui_options) {
-    int rows = (height - m_status_bar_view->getCellHeight(ui_options.font.get())) / m_kakoune_content_view->getCellHeight(ui_options.font.get());
-    int columns = width / m_kakoune_content_view->getCellWidth(ui_options.font.get());
+    int rows = (height - m_status_bar_view->getCellHeight(ui_options.font)) / m_kakoune_content_view->getCellHeight(ui_options.font);
+    int columns = width / m_kakoune_content_view->getCellWidth(ui_options.font);
 
     if (rows != m_rows || columns != m_columns) {
         m_kakoune_client->interface->resize(rows, columns);
@@ -70,8 +72,8 @@ domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const UI
     }
 
     if (is_any_mouse_button_pressed) {
-        int column = x / ui_options->font.get()->getGlyphMetrics(97).width();
-        int line = y / ui_options->font.get()->getLineHeight();
+        int column = x / ui_options->font->getGlyphMetrics(97).advance;
+        int line = y / ui_options->font->getLineHeight();
 
         m_kakoune_client->interface->moveMouse(line, column);
     }
@@ -80,8 +82,8 @@ domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const UI
 }
 
 void EditorController::onMouseButton(domain::MouseButtonEvent event, const UIOptions* ui_options, bool obscured) {
-    int column = event.x / ui_options->font.get()->getGlyphMetrics(97).width();
-    int line = event.y / ui_options->font.get()->getLineHeight();
+    int column = event.x / ui_options->font->getGlyphMetrics(97).advance;
+    int line = event.y / ui_options->font->getLineHeight();
 
     if (!obscured && event.action == domain::MouseButtonAction::PRESS) {
         m_kakoune_client->interface->pressMouseButton(event.button, line, column);
@@ -105,8 +107,8 @@ int EditorController::height() const {
 }
 
 void EditorController::onMouseScroll(int amount, float x, float y, const UIOptions* ui_options) {
-    int column = x / ui_options->font.get()->getGlyphMetrics(97).width();
-    int line = y / ui_options->font.get()->getLineHeight();
+    int column = x / ui_options->font->getGlyphMetrics(97).advance;
+    int line = y / ui_options->font->getLineHeight();
 
     m_kakoune_client->interface->scroll(amount, line, column);
 }

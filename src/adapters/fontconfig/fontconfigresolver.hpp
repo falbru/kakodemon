@@ -9,7 +9,8 @@ class FontconfigResolver : public domain::FontResolver
     FontconfigResolver();
     ~FontconfigResolver();
 
-    domain::FontMatch resolve(std::string pattern) override;
+    domain::FontMatch resolve(const std::string &pattern) override;
+    std::optional<domain::FontMatch> resolveForCodepoint(domain::Codepoint codepoint) override;
 };
 
 #endif

@@ -18,7 +18,7 @@ class Renderer : public domain::Renderer
   public:
     Renderer();
 
-    void init(int width, int height) override;
+    void init(int width, int height, domain::FontManager *font_manager) override;
     void onWindowResize(int width, int height) override;
     void addBounds(float x, float y, float width, float height) override;
     void popBounds() override;
@@ -26,16 +26,17 @@ class Renderer : public domain::Renderer
     void renderRect(const domain::RGBAColor color, float x, float y, float width, float height) const override;
     void renderRectWithShadow(const domain::RGBAColor color, float x, float y, float width, float height,
                               float shadowRadius) const override;
-    void renderLine(domain::Font *font, const domain::Line &line, const domain::Face &default_face, float x,
-                    float y) const override;
-    void renderLine(domain::Font *font, const domain::Line &line, const domain::Face &default_face, float x, float y,
+    void renderLine(domain::Font *font, domain::FontManager *font_manager, const domain::Line &line,
+                    const domain::Face &default_face, float x, float y) const override;
+    void renderLine(domain::Font *font, domain::FontManager *font_manager, const domain::Line &line,
+                    const domain::Face &default_face, float x, float y,
                     const domain::Alignment &alignment) const override;
-    void renderLines(domain::Font *font, const domain::Lines &lines, const domain::Face &default_face, float x,
-                     float y) const override;
+    void renderLines(domain::Font *font, domain::FontManager *font_manager, const domain::Lines &lines,
+                     const domain::Face &default_face, float x, float y) const override;
 
   private:
-    void _renderLine(opengl::Font *font, const domain::Line &line, const domain::Face &default_face, float x, float y,
-                     const domain::Alignment &alignment) const;
+    void _renderLine(opengl::Font *font, domain::FontManager *font_manager, const domain::Line &line,
+                     const domain::Face &default_face, float x, float y, const domain::Alignment &alignment) const;
     void _renderShadow(const domain::RGBAColor color, float x, float y, float width, float height,
                        float shadowRadius) const;
     void _renderRect(const domain::RGBAColor color, float x, float y, float width, float height) const;

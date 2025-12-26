@@ -43,7 +43,7 @@ void main()
        color = textColor * sampled;
    } else if (renderType == 1) { // Rectangle
        color = rectColor;
-   } else { // Shadow
+   } else if (renderType == 2) { // Shadow
       vec2 rectPos = rectBounds.xy + rectBounds.zw * 0.5;
       vec2 rectSize = rectBounds.zw;
       vec2 pixelPos = gl_FragCoord.xy;
@@ -53,6 +53,8 @@ void main()
       float shadowAlpha = 1.0 - smoothstep(0.0, shadowRadius, dist);
 
       color = vec4(vec3(0.0), 0.5 * shadowAlpha);
+   } else if (renderType == 3) {
+       color = texture(text, TexCoords);
    }
 }
 )";

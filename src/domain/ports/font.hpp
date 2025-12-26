@@ -13,8 +13,6 @@ struct GlyphMetrics
     UIVec2 size;
     IVec2 bearing;
     long advance;
-
-    float width() const;
 };
 
 class Font
@@ -24,14 +22,12 @@ class Font
 
     virtual bool hasGlyph(Codepoint c) const = 0;
     virtual const GlyphMetrics &getGlyphMetrics(Codepoint c) const = 0;
+    virtual const GlyphMetrics &getFallbackGlyphMetrics() const = 0;
 
-    virtual void loadGlyph(Codepoint c) = 0;
-    virtual const GlyphMetrics &ensureGlyph(Codepoint c) = 0;
+    virtual bool loadGlyph(Codepoint c) = 0;
 
     virtual float getAscender() const = 0;
     virtual float getLineHeight() const = 0;
-
-    virtual float width(UTF8String string) = 0;
 };
 
 } // namespace domain

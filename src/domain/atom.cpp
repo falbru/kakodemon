@@ -1,5 +1,4 @@
 #include "atom.hpp"
-#include "domain/ports/font.hpp"
 #include "domain/utf8string.hpp"
 
 namespace domain {
@@ -33,47 +32,6 @@ Atom Atom::slice(int start_index, int length) {
 
 UTF8String Atom::toUTF8String() const {
     return UTF8String(m_contents);
-}
-
-GlyphAtom::GlyphAtom(const std::vector<GlyphMetrics>& glyphs, const Face& face) : m_glyphs(glyphs), m_face(face) {
-
-}
-
-GlyphAtom::GlyphAtom(const Atom& atom, Font* font) : m_face(atom.getFace()) {
-    auto contents = atom.getContents();
-
-    m_glyphs = std::vector<GlyphMetrics>(contents.size());
-    for (int i = 0; i < contents.size(); i++) {
-        m_glyphs[i] = font->ensureGlyph(contents.at(i));
-    }
-}
-
-Atom GlyphAtom::toAtom() const {
-    std::vector<Codepoint> codepoints(m_glyphs.size());
-
-    for (int i = 0; i < m_glyphs.size(); i++) {
-        codepoints[i] = m_glyphs[i].codepoint;
-    }
-
-    return Atom(codepoints, m_face);
-}
-
-const std::vector<GlyphMetrics>& GlyphAtom::getGlyphs() const {
-    return m_glyphs;
-}
-
-const Face& GlyphAtom::getFace() const {
-    return m_face;
-}
-
-float GlyphAtom::width() const {
-    float width = 0;
-
-    for (int i = 0; i < m_glyphs.size(); i++) {
-        width += m_glyphs[i].width();
-    }
-
-    return width;
 }
 
 }

@@ -1,6 +1,8 @@
 #ifndef DOMAIN_FONTRESOLVER_HPP_INCLUDED
 #define DOMAIN_FONTRESOLVER_HPP_INCLUDED
 
+#include "domain/utf8string.hpp"
+#include <optional>
 #include <string>
 
 namespace domain
@@ -17,7 +19,8 @@ class FontResolver
   public:
     virtual ~FontResolver() = default;
 
-    virtual FontMatch resolve(std::string pattern) = 0;
+    virtual FontMatch resolve(const std::string &pattern) = 0;
+    virtual std::optional<FontMatch> resolveForCodepoint(Codepoint codepoint) = 0;
 };
 
 } // namespace domain

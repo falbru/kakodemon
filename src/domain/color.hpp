@@ -8,6 +8,7 @@ namespace domain
 
 struct DefaultColor
 {
+    bool operator==(const DefaultColor &) const;
 };
 
 enum class FixedColor
@@ -33,6 +34,8 @@ enum class FixedColor
 struct RGBAColor
 {
     float r, g, b, a;
+
+    bool operator==(const RGBAColor &other) const;
 };
 
 typedef std::variant<FixedColor, RGBAColor> ExplicitColor;

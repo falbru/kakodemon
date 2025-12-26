@@ -45,9 +45,11 @@ class InfoBoxView
     std::optional<Placement> tryPlaceInfoBox(PlacementDirection direction, CrossAxisAlignment alignment,
                                              const domain::Lines &content, const domain::Rectangle &anchor,
                                              float layout_width, float layout_height, domain::Font *font,
+                                             domain::FontManager *font_manager,
                                              const domain::Rectangle &menu_rectangle);
 
-    void render(const KakouneClient *kakoune_client, const UIOptions &ui_options, float width, float height);
+    void render(const KakouneClient *kakoune_client, domain::FontManager *font_manager, const UIOptions &ui_options,
+                float width, float height);
 
     float x() const;
     float y() const;

@@ -14,6 +14,7 @@ struct Glyph
 {
     unsigned int texture_id;
     domain::GlyphMetrics metrics;
+    domain::PixelFormat format;
 };
 
 class Font : public domain::Font
@@ -24,18 +25,17 @@ class Font : public domain::Font
 
     bool hasGlyph(domain::Codepoint c) const override;
     const domain::GlyphMetrics &getGlyphMetrics(domain::Codepoint c) const override;
+    const domain::GlyphMetrics &getFallbackGlyphMetrics() const override;
 
     const Glyph &getGlyph(domain::Codepoint c) const;
 
-    void loadGlyph(domain::Codepoint c) override;
-    const domain::GlyphMetrics &ensureGlyph(domain::Codepoint c) override;
+    bool loadGlyph(domain::Codepoint c) override;
 
     float getAscender() const override;
     float getLineHeight() const override;
 
-    float width(domain::UTF8String string) override;
-
   private:
+    std::optional<Glyph> fallback_glyph;
     std::map<domain::Codepoint, Glyph> m_glyphs;
     domain::FontEngine *m_font_engine;
 };

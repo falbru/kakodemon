@@ -9,13 +9,13 @@ void KakouneContentView::init(domain::Renderer* renderer)
     m_renderer = renderer;
 }
 
-void KakouneContentView::render(domain::Font* font, const domain::Lines &lines, const domain::Face& default_face, float x, float y)
+void KakouneContentView::render(domain::Font* font, domain::FontManager* font_manager, const domain::Lines &lines, const domain::Face& default_face, float x, float y)
 {
-    m_renderer->renderLines(font, lines, default_face, x, y);
+    m_renderer->renderLines(font, font_manager, lines, default_face, x, y);
 }
 
 float KakouneContentView::getCellWidth(domain::Font* font) const {
-    return font->getGlyphMetrics('A').width();
+    return font->getGlyphMetrics('A').advance;
 }
 
 float KakouneContentView::getCellHeight(domain::Font* font) const {

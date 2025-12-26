@@ -16,7 +16,7 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
     EditorController();
 
     void init(KakouneClient *kakoune_client, KakouneContentView *kakoune_content_view, StatusBarView *status_bar_view,
-              std::function<void(domain::RGBAColor)> set_clear_color);
+              domain::FontManager *font_manager, std::function<void(domain::RGBAColor)> set_clear_color);
     void update(const UIOptions &ui_options);
     void render(const UIOptions &ui_options);
 
@@ -32,6 +32,7 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
     KakouneClient *m_kakoune_client;
     KakouneContentView *m_kakoune_content_view;
     StatusBarView *m_status_bar_view;
+    domain::FontManager *m_font_manager;
 
     std::function<void(domain::RGBAColor)> m_set_clear_color;
     void setClearColor(domain::RGBAColor color);

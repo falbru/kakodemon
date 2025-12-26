@@ -1,7 +1,10 @@
 #include "application.hpp"
 #include "GLFW/glfw3.h"
+#include "adapters/fontconfig/fontconfigresolver.hpp"
 #include "adapters/freetype/freetypefontengine.hpp"
+#include "adapters/opengl/font.hpp"
 #include "adapters/opengl/renderer.hpp"
+#include "domain/fontmanager.hpp"
 #include "domain/mouse.hpp"
 #include <chrono>
 #include <thread>
@@ -76,15 +79,34 @@ void opengl::GLFWApplication::init(const CliConfig& config) {
     glfwGetFramebufferSize(m_window, &framebuffer_width, &framebuffer_height);
 
     m_renderer = std::make_unique<opengl::Renderer>();
-    m_renderer->init(framebuffer_width, framebuffer_height);
 
     m_cursor_ibeam = glfwCreateStandardCursor(GLFW_IBEAM_CURSOR);
     m_cursor_pointer = glfwCreateStandardCursor(GLFW_POINTING_HAND_CURSOR);
 
+    m_freetype_library = std::make_shared<FreeTypeLibrary>();
+
+    auto resolver = std::make_unique<FontconfigResolver>();
+
+    auto engine_factory = [this](const domain::FontMatch &match) -> std::unique_ptr<domain::FontEngine> {
+        return std::make_unique<FreeTypeFontEngine>(m_freetype_library, match.path, match.size); // TODO do not hardcode
+    };
+
+    auto font_factory = [](domain::FontEngine *engine, domain::FontManager *font_manager) -> std::unique_ptr<domain::Font> {
+        return std::make_unique<opengl::Font>(engine);
+    };
+
+    m_font_manager = std::make_unique<domain::FontManager>(
+        std::move(resolver),
+        engine_factory,
+        font_factory
+    );
+
+    m_renderer->init(framebuffer_width, framebuffer_height, m_font_manager.get());
+
     Application::init(config);
 
-    m_ui_options->font = std::make_unique<opengl::Font>(new FreeTypeFontEngine("/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf", 14)); // TODO TMP.
-    onWindowResize(framebuffer_width, framebuffer_height); // TODO ensure it is called after controller initialization
+    m_ui_options->font = m_font_manager->getFontFromName("Ubuntu Mono:size=14");
+    onWindowResize(framebuffer_width, framebuffer_height);
 }
 
 void opengl::GLFWApplication::run() {

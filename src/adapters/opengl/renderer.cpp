@@ -1,14 +1,17 @@
 #include "renderer.hpp"
+#include "adapters/opengl/font.hpp"
 #include "domain/alignment.hpp"
 #include "domain/color.hpp"
+#include "domain/glyphlinesbuilder.hpp"
 #include "domain/line.hpp"
+#include "domain/ports/fontengine.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "opengl.hpp"
 
 opengl::Renderer::Renderer() {
 }
 
-void opengl::Renderer::init(int width, int height) {
+void opengl::Renderer::init(int width, int height, domain::FontManager *font_manager) {
     m_shader_program = std::make_unique<ShaderProgram>();
     m_shader_program->compile();
 
@@ -62,12 +65,12 @@ void opengl::Renderer::popBounds() {
     }
 }
 
-void opengl::Renderer::renderLine(domain::Font* font, const domain::Line &line, const domain::Face &default_face, float x,
+void opengl::Renderer::renderLine(domain::Font* font, domain::FontManager* font_manager, const domain::Line &line, const domain::Face &default_face, float x,
                      float y) const {
-    renderLine(font, line, default_face, x, y, domain::Alignment());
+    renderLine(font, font_manager, line, default_face, x, y, domain::Alignment());
 }
 
-void opengl::Renderer::renderLine(domain::Font* font, const domain::Line &line, const domain::Face &default_face, float x, float y, const domain::Alignment& alignment) const
+void opengl::Renderer::renderLine(domain::Font* font, domain::FontManager* font_manager, const domain::Line &line, const domain::Face &default_face, float x, float y, const domain::Alignment& alignment) const
 {
     opengl::Font* opengl_font = dynamic_cast<opengl::Font*>(font);
 
@@ -76,7 +79,7 @@ void opengl::Renderer::renderLine(domain::Font* font, const domain::Line &line, 
     m_shader_program->use();
     glBindVertexArray(m_text_vao);
 
-    _renderLine(opengl_font, line, default_face, x, y, alignment);
+    _renderLine(opengl_font, font_manager, line, default_face, x, y, alignment);
 
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -101,7 +104,7 @@ void opengl::Renderer::renderRectWithShadow(const domain::RGBAColor color, float
     glBindVertexArray(0);
 }
 
-void opengl::Renderer::renderLines(domain::Font* font, const domain::Lines& lines, const domain::Face& default_face, float x, float y) const {
+void opengl::Renderer::renderLines(domain::Font* font, domain::FontManager* font_manager, const domain::Lines& lines, const domain::Face& default_face, float x, float y) const {
     opengl::Font* opengl_font = dynamic_cast<opengl::Font*>(font);
 
     if (!opengl_font) return;
@@ -112,7 +115,7 @@ void opengl::Renderer::renderLines(domain::Font* font, const domain::Lines& line
     float y_it = y;
     for (auto line : lines.getLines())
     {
-        _renderLine(opengl_font, line, default_face, x, y_it, domain::Alignment());
+        _renderLine(opengl_font, font_manager, line, default_face, x, y_it, domain::Alignment());
         y_it += font->getLineHeight();
     }
 
@@ -120,12 +123,12 @@ void opengl::Renderer::renderLines(domain::Font* font, const domain::Lines& line
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void opengl::Renderer::_renderLine(opengl::Font* font, const domain::Line& line, const domain::Face& default_face, float x, float y, const domain::Alignment& alignment) const {
+void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font_manager, const domain::Line& line, const domain::Face& default_face, float x, float y, const domain::Alignment& alignment) const {
 
     float start_x = x;
     float start_y = y;
 
-    auto glyph_line = domain::GlyphLine(line, font);
+    auto glyph_line = domain::GlyphLinesBuilder::build(line, font, font_manager);
 
     if (alignment.h == domain::Alignment::HorizontalAlignment::Right) {
         start_x -= glyph_line.width();
@@ -147,28 +150,40 @@ void opengl::Renderer::_renderLine(opengl::Font* font, const domain::Line& line,
 
         domain::RGBAColor color = atom.getFace().getFg(default_face);
         m_shader_program->setVector4f("textColor", color.r, color.g, color.b, color.a);
-        m_shader_program->setInt("renderType", 0);
-        for (auto glyph : atom.getGlyphs())
+
+        for (auto run : atom.getRuns())
         {
-            if (glyph.codepoint == '\n') continue; // TODO clean way of stripping the last newline?
+            opengl::Font* run_font = dynamic_cast<opengl::Font*>(run.font);
+            for (auto glyph : run.glyphs)
+            {
+                if (glyph.codepoint == '\n' || glyph.codepoint == 0) continue; // TODO clean way of stripping the last newline?
+                if (run_font->getGlyph(glyph.codepoint).format == domain::PixelFormat::GRAYSCALE) {
+                    m_shader_program->setInt("renderType", 0);
+                }else {
+                    m_shader_program->setInt("renderType", 3);
+                    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+                }
 
-            float xpos = x_it + glyph.bearing.x;
-            float ypos = y_it + font->getAscender() - glyph.bearing.y;
+                float xpos = x_it + glyph.bearing.x;
+                float ypos = y_it + run_font->getAscender() - glyph.bearing.y;
 
-            float w = glyph.size.x;
-            float h = glyph.size.y;
-            float vertices[6][4] = {
-                {xpos, ypos, 0.0f, 0.0f}, {xpos, ypos + h, 0.0f, 1.0f},     {xpos + w, ypos + h, 1.0f, 1.0f},
+                float w = glyph.size.x;
+                float h = glyph.size.y;
+                float vertices[6][4] = {
+                    {xpos, ypos, 0.0f, 0.0f}, {xpos, ypos + h, 0.0f, 1.0f},     {xpos + w, ypos + h, 1.0f, 1.0f},
 
-                {xpos, ypos, 0.0f, 0.0f}, {xpos + w, ypos + h, 1.0f, 1.0f}, {xpos + w, ypos, 1.0f, 0.0f}};
+                    {xpos, ypos, 0.0f, 0.0f}, {xpos + w, ypos + h, 1.0f, 1.0f}, {xpos + w, ypos, 1.0f, 0.0f}};
 
-            glBindVertexArray(m_text_vao);
-            glBindTexture(GL_TEXTURE_2D, font->getGlyph(glyph.codepoint).texture_id);
-            glBindBuffer(GL_ARRAY_BUFFER, m_text_vbo);
-            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
-            x_it += glyph.width();
+                glBindVertexArray(m_text_vao);
+                glBindTexture(GL_TEXTURE_2D, run_font->getGlyph(glyph.codepoint).texture_id);
+                glBindBuffer(GL_ARRAY_BUFFER, m_text_vbo);
+                glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
+                glDrawArrays(GL_TRIANGLES, 0, 6);
+                x_it += glyph.advance;
+
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            }
         }
     }
 }

@@ -20,18 +20,20 @@ class FontMock : public domain::Font
         return metrics_cache.at(cp);
     }
 
-    void loadGlyph(domain::Codepoint cp) override
+    const domain::GlyphMetrics &getFallbackGlyphMetrics() const override
     {
+        static domain::GlyphMetrics fallback{.codepoint = 0xFFFD, .size = {10, 10}, .bearing = {0, 0}, .advance = 640};
+        return fallback;
     }
 
-    const domain::GlyphMetrics &ensureGlyph(domain::Codepoint cp) override
+    bool loadGlyph(domain::Codepoint cp) override
     {
         if (metrics_cache.find(cp) == metrics_cache.end())
         {
             metrics_cache[cp] =
-                domain::GlyphMetrics{.codepoint = cp, .size = {10, 10}, .bearing = {0, 0}, .advance = 640};
+                domain::GlyphMetrics{.codepoint = cp, .size = {10, 10}, .bearing = {0, 0}, .advance = 10};
         }
-        return metrics_cache[cp];
+        return true;
     }
 
     float getAscender() const override
@@ -42,11 +44,6 @@ class FontMock : public domain::Font
     float getLineHeight() const override
     {
         return 24.0f;
-    }
-
-    float width(domain::UTF8String string) override
-    {
-        return string.size() * 10.0f;
     }
 };
 

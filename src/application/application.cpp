@@ -34,7 +34,7 @@ void Application::init(const CliConfig &config)
 
     if (config.session_type == SessionType::Remote)
     {
-        session = std::make_unique<LocalSession>(config.session_id);
+        session = std::make_unique<RemoteSession>(config.session_id);
     }else {
         auto local_session = std::make_unique<LocalSession>(config.session_id);
         local_session->start();
@@ -66,9 +66,9 @@ void Application::init(const CliConfig &config)
     m_info_box->init(m_renderer.get(), m_menu_controller.get(), m_kakoune_content_view.get());
 
     m_input_controller->init(m_kakoune_client.get());
-    m_editor_controller->init(m_kakoune_client.get(), m_kakoune_content_view.get(), m_status_bar.get(), [&](domain::RGBAColor color) { setClearColor(color); });
-    m_menu_controller->init(m_kakoune_client.get(), m_editor_controller.get(), m_prompt_menu.get(), m_inline_menu.get(), m_search_menu.get());
-    m_info_box_controller->init(m_kakoune_client.get(), m_editor_controller.get(), m_info_box.get());
+    m_editor_controller->init(m_kakoune_client.get(), m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager.get(), [&](domain::RGBAColor color) { setClearColor(color); });
+    m_menu_controller->init(m_kakoune_client.get(), m_editor_controller.get(), m_font_manager.get(), m_prompt_menu.get(), m_inline_menu.get(), m_search_menu.get());
+    m_info_box_controller->init(m_kakoune_client.get(), m_editor_controller.get(), m_font_manager.get(), m_info_box.get());
     m_mouse_controller->init(m_kakoune_client.get(), m_editor_controller.get(), m_menu_controller.get(), m_info_box_controller.get());
 }
 

@@ -10,10 +10,12 @@
 namespace domain
 {
 
+class FontManager;
+
 class Renderer
 {
   public:
-    virtual void init(int width, int height) = 0;
+    virtual void init(int width, int height, FontManager *font_manager) = 0;
     virtual void onWindowResize(int width, int height) = 0;
     virtual void addBounds(float x, float y, float width, float height) = 0;
     virtual void popBounds() = 0;
@@ -21,11 +23,12 @@ class Renderer
     virtual void renderRect(const RGBAColor color, float x, float y, float width, float height) const = 0;
     virtual void renderRectWithShadow(const RGBAColor color, float x, float y, float width, float height,
                                       float shadowRadius) const = 0;
-    virtual void renderLine(Font *font, const Line &line, const Face &default_face, float x, float y) const = 0;
-    virtual void renderLine(Font *font, const Line &line, const Face &default_face, float x, float y,
-                            const Alignment &alignment) const = 0;
-    virtual void renderLines(Font *font, const Lines &lines, const domain::Face &default_face, float x,
-                             float y) const = 0;
+    virtual void renderLine(Font *font, domain::FontManager *font_manager, const Line &line, const Face &default_face,
+                            float x, float y) const = 0;
+    virtual void renderLine(Font *font, domain::FontManager *font_manager, const Line &line, const Face &default_face,
+                            float x, float y, const Alignment &alignment) const = 0;
+    virtual void renderLines(Font *font, domain::FontManager *font_manager, const Lines &lines,
+                             const domain::Face &default_face, float x, float y) const = 0;
 };
 
 } // namespace domain
