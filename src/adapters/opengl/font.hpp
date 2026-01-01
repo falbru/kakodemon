@@ -6,6 +6,7 @@
 #include "domain/utf8string.hpp"
 #include "opengl.hpp"
 #include <map>
+#include <set>
 
 namespace opengl
 {
@@ -38,6 +39,7 @@ class Font : public domain::Font
   private:
     std::optional<Glyph> fallback_glyph;
     std::map<domain::Codepoint, Glyph> m_glyphs;
+    std::set<domain::Codepoint> m_failed_glyphs;
     domain::FontEngine *m_font_engine;
 };
 

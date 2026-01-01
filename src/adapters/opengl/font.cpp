@@ -67,6 +67,10 @@ bool opengl::Font::loadGlyph(domain::Codepoint c) {
         return true;
     }
 
+    if (m_failed_glyphs.find(c) != m_failed_glyphs.end()) {
+        return false;
+    }
+
     if (auto rasterized_glyph = m_font_engine->rasterizeGlyph(c)) {
         unsigned int texture;
         glGenTextures(1, &texture);
@@ -89,6 +93,8 @@ bool opengl::Font::loadGlyph(domain::Codepoint c) {
         m_glyphs.insert(std::pair<domain::Codepoint, Glyph>(c, glyph));
         return true;
     }
+
+    m_failed_glyphs.insert(c);
 
     return false;
 }
