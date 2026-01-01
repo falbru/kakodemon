@@ -100,3 +100,7 @@ float opengl::Font::getAscender() const {
 float opengl::Font::getLineHeight() const {
     return m_font_engine->getLineHeight();
 }
+
+int opengl::Font::getSize() const {
+    return m_font_engine->getSize();
+}

@@ -140,3 +140,13 @@ float FreeTypeFontEngine::getAscender() const {
 float FreeTypeFontEngine::getLineHeight() const {
     return m_line_height;
 }
+
+int FreeTypeFontEngine::getSize() const {
+    return m_requested_size;
+}
+
+FontEngineFactory FreeTypeFontEngine::createFactory(std::shared_ptr<FreeTypeLibrary> library) {
+    return [library](const domain::FontMatch &match) -> std::unique_ptr<domain::FontEngine> {
+        return std::make_unique<FreeTypeFontEngine>(library, match.path, match.size);
+    };
+}

@@ -2,12 +2,16 @@
 #define FREETYPEENGINE_HPP_INCLUDED
 
 #include "domain/ports/fontengine.hpp"
+#include "domain/ports/fontresolver.hpp"
 #include "freetypelibrary.hpp"
 #include <freetype/freetype.h>
 #include <ft2build.h>
+#include <functional>
 #include <map>
 #include <memory>
 #include FT_FREETYPE_H
+
+using FontEngineFactory = std::function<std::unique_ptr<domain::FontEngine>(const domain::FontMatch &)>;
 
 class FreeTypeFontEngine : public domain::FontEngine
 {
@@ -15,12 +19,15 @@ class FreeTypeFontEngine : public domain::FontEngine
     FreeTypeFontEngine(std::shared_ptr<FreeTypeLibrary> library, const std::string &path, int size);
     ~FreeTypeFontEngine();
 
+    static FontEngineFactory createFactory(std::shared_ptr<FreeTypeLibrary> library);
+
     bool hasGlyph(domain::Codepoint c) const override;
     std::optional<domain::RasterizedGlyph> rasterizeGlyph(domain::Codepoint c) override;
     std::optional<domain::RasterizedGlyph> rasterizeFallbackGlyph() override;
 
     float getAscender() const override;
     float getLineHeight() const override;
+    int getSize() const override;
 
   private:
     std::shared_ptr<FreeTypeLibrary> m_library;

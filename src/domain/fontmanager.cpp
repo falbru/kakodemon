@@ -43,10 +43,13 @@ Font *FontManager::getFontFromName(const std::string &pattern)
     return getOrCreateFont(match);
 }
 
-Font *FontManager::getFontForCodepoint(Codepoint c)
+Font *FontManager::getFontForCodepoint(Codepoint c, Font *primary_font)
 {
-    auto it = m_codepoint_cache.find(c);
-    if (it != m_codepoint_cache.end())
+    int primary_size = primary_font->getSize();
+
+    auto &size_cache = m_codepoint_cache[c];
+    auto it = size_cache.find(primary_size);
+    if (it != size_cache.end())
     {
         return it->second;
     }
@@ -57,9 +60,12 @@ Font *FontManager::getFontForCodepoint(Codepoint c)
         return nullptr;
     }
 
-    Font *font = getOrCreateFont(match_opt.value());
+    FontMatch match = match_opt.value();
+    match.size = primary_size;
 
-    m_codepoint_cache[c] = font;
+    Font *font = getOrCreateFont(match);
+
+    size_cache[primary_size] = font;
 
     return font;
 }
@@ -70,7 +76,7 @@ const GlyphMetrics& FontManager::getGlyph(Codepoint c, Font* primary_font)
         return primary_font->getGlyphMetrics(c);
     }
 
-    auto fallback_font = getFontForCodepoint(c);
+    auto fallback_font = getFontForCodepoint(c, primary_font);
     if (fallback_font == nullptr || !fallback_font->loadGlyph(c)) {
         return primary_font->getFallbackGlyphMetrics();
     }
@@ -84,7 +90,7 @@ GlyphWithFont FontManager::getGlyphWithFont(Codepoint c, Font* primary_font)
         return GlyphWithFont{primary_font->getGlyphMetrics(c), primary_font};
     }
 
-    auto fallback_font = getFontForCodepoint(c);
+    auto fallback_font = getFontForCodepoint(c, primary_font);
     if (fallback_font == nullptr || !fallback_font->loadGlyph(c)) {
         return GlyphWithFont{primary_font->getFallbackGlyphMetrics(), primary_font};
     }

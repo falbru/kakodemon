@@ -1,9 +1,9 @@
 #include "application/application.hpp"
+#include "application/applicationbuilder.hpp"
 #include "application/cliparser.hpp"
-#include "adapters/opengl/application.hpp"
 #include "config.hpp"
-#include <memory>
 #include <iostream>
+#include <memory>
 
 void print_help(const char* program_name)
 {
@@ -44,7 +44,13 @@ int main(int argc, char* argv[])
             break;
     }
 
-    std::unique_ptr<Application> app = std::make_unique<opengl::GLFWApplication>();
+    ApplicationBuilder builder;
+    std::unique_ptr<Application> app = builder
+        .withPlatform(PlatformType::OPENGL_GLFW)
+        .withFontResolver(FontResolverType::FONTCONFIG)
+        .withFontEngine(FontEngineType::FREETYPE)
+        .build();
+
     app->init(parsed_args.config);
     app->run();
     return 0;

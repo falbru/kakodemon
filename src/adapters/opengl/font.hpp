@@ -33,6 +33,7 @@ class Font : public domain::Font
 
     float getAscender() const override;
     float getLineHeight() const override;
+    int getSize() const override;
 
   private:
     std::optional<Glyph> fallback_glyph;

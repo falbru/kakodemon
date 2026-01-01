@@ -1,7 +1,6 @@
 #ifndef OPENGL_APPLICATION_HPP_INCLUDED
 #define OPENGL_APPLICATION_HPP_INCLUDED
 
-#include "adapters/freetype/freetypelibrary.hpp"
 #include "application/application.hpp"
 #include "application/cliconfig.hpp"
 #include "opengl.hpp"
@@ -40,8 +39,6 @@ class GLFWApplication : public Application
 
     float m_cursor_x;
     float m_cursor_y;
-
-    std::shared_ptr<FreeTypeLibrary> m_freetype_library;
 
     static constexpr double TARGET_FRAME_TIME_MS = 8;
 };

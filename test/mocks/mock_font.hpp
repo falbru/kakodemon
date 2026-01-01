@@ -45,6 +45,11 @@ class FontMock : public domain::Font
     {
         return 24.0f;
     }
+
+    int getSize() const override
+    {
+        return 14;
+    }
 };
 
 #endif

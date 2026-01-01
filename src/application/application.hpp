@@ -1,6 +1,7 @@
 #ifndef APPLICATION_APPLICATION_HPP_INCLUDED
 #define APPLICATION_APPLICATION_HPP_INCLUDED
 
+#include <functional>
 #include <memory>
 
 #include "adapters/opengl/opengl.hpp"
@@ -21,13 +22,20 @@
 #include "domain/fontmanager.hpp"
 #include "domain/keys.hpp"
 #include "domain/mouse.hpp"
+#include "domain/ports/font.hpp"
+#include "domain/ports/fontengine.hpp"
+#include "domain/ports/fontresolver.hpp"
 #include "domain/ports/renderer.hpp"
+
+using FontEngineFactory = std::function<std::unique_ptr<domain::FontEngine>(const domain::FontMatch &)>;
 
 class Application
 {
   public:
     Application();
     virtual ~Application();
+
+    void setFontDependencies(std::unique_ptr<domain::FontResolver> resolver, FontEngineFactory engine_factory);
 
     virtual void init(const CliConfig &config);
     virtual void run() = 0;
@@ -47,6 +55,9 @@ class Application
 
     std::unique_ptr<domain::Renderer> m_renderer;
     std::unique_ptr<domain::FontManager> m_font_manager;
+
+    std::unique_ptr<domain::FontResolver> m_font_resolver;
+    FontEngineFactory m_font_engine_factory;
 
     void updateControllers();
     void renderControllers();

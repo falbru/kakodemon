@@ -50,6 +50,7 @@ set(SRC
     src/adapters/opengl/renderer.cpp
     src/adapters/opengl/shaderprogram.cpp
     src/application/application.cpp
+    src/application/applicationbuilder.cpp
     src/application/cliparser.cpp
     src/application/controller/editorcontroller.cpp
     src/application/controller/infoboxcontroller.cpp

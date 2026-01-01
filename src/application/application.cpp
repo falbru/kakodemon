@@ -28,6 +28,14 @@ Application::~Application()
 {
 }
 
+void Application::setFontDependencies(
+    std::unique_ptr<domain::FontResolver> resolver,
+    FontEngineFactory engine_factory)
+{
+    m_font_resolver = std::move(resolver);
+    m_font_engine_factory = engine_factory;
+}
+
 void Application::init(const CliConfig &config)
 {
     std::unique_ptr<domain::KakouneSession> session;

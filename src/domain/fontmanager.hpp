@@ -30,7 +30,7 @@ class FontManager
     FontManager(std::unique_ptr<FontResolver> resolver, FontEngineFactory engine_factory, FontFactory font_factory);
 
     Font *getFontFromName(const std::string &pattern);
-    Font *getFontForCodepoint(Codepoint c);
+    Font *getFontForCodepoint(Codepoint c, Font *primary_font);
 
     const GlyphMetrics &getGlyph(Codepoint c, Font *primary_font);
     GlyphWithFont getGlyphWithFont(Codepoint c, Font *primary_font);
@@ -50,7 +50,7 @@ class FontManager
     FontFactory m_font_factory;
 
     std::map<std::string, CachedFont> m_fonts;
-    std::map<Codepoint, Font *> m_codepoint_cache;
+    std::map<Codepoint, std::map<int, Font *>> m_codepoint_cache;
 };
 
 } // namespace domain
