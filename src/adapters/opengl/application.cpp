@@ -29,12 +29,18 @@ void opengl::GLFWApplication::init(const CliConfig& config) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+    glfwWindowHintString(GLFW_WAYLAND_APP_ID, "kakodemon");
+    glfwWindowHintString(GLFW_X11_CLASS_NAME, "Kakodemon");
+    glfwWindowHintString(GLFW_X11_INSTANCE_NAME, "kakodemon");
+
     m_window = glfwCreateWindow(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, "Kakodemon", NULL, NULL);
     if (!m_window)
     {
         glfwTerminate();
         return;
     }
+
+    glfwSetWindowSizeLimits(m_window, 636, 424, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
     glfwMakeContextCurrent(m_window);
     glfwSwapInterval(0);
