@@ -21,6 +21,7 @@ FreeTypeFontEngine::FreeTypeFontEngine(std::shared_ptr<FreeTypeLibrary> library,
     }
 
     m_ascender = (m_face->size->metrics.ascender >> 6) * m_scale;
+    m_descender = (m_face->size->metrics.descender >> 6) * m_scale;
     m_line_height = (m_face->size->metrics.height >> 6) * m_scale;
 }
 
@@ -135,6 +136,10 @@ std::optional<domain::RasterizedGlyph> FreeTypeFontEngine::rasterizeFallbackGlyp
 
 float FreeTypeFontEngine::getAscender() const {
     return m_ascender;
+}
+
+float FreeTypeFontEngine::getDescender() const {
+    return m_descender;
 }
 
 float FreeTypeFontEngine::getLineHeight() const {

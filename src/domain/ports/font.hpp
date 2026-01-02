@@ -27,6 +27,7 @@ class Font
     virtual bool loadGlyph(Codepoint c) = 0;
 
     virtual float getAscender() const = 0;
+    virtual float getDescender() const = 0;
     virtual float getLineHeight() const = 0;
     virtual int getSize() const = 0;
 };

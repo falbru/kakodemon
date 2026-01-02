@@ -133,7 +133,7 @@ void opengl::Renderer::renderLines(domain::Font* font, domain::FontManager* font
 void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font_manager, const domain::Line& line, const domain::Face& default_face, float x, float y, const domain::Alignment& alignment, RenderPass pass) const {
 
     float start_x = x;
-    float start_y = y;
+    float start_y = y + font->getLineHeight();
 
     auto glyph_line = domain::GlyphLinesBuilder::build(line, font, font_manager);
 
@@ -155,7 +155,7 @@ void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font
             float width = atom.width();
 
             // Background color
-            _renderRect(atom.getFace().getBg(default_face), x_it, y_it, width, height);
+            _renderRect(atom.getFace().getBg(default_face), x_it, y_it - height, width, height);
 
             x_it += width;
         }
@@ -164,7 +164,7 @@ void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font
     // Second pass: Render all text
     if (pass == RenderPass::TextOnly || pass == RenderPass::Both) {
         float x_it = start_x;
-        float y_it = start_y;
+        float y_it = start_y + font->getDescender();
         for (auto atom : glyph_line.getGlyphAtoms())
         {
             domain::RGBAColor color = atom.getFace().getFg(default_face);
@@ -184,7 +184,7 @@ void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font
                     }
 
                     float xpos = x_it + glyph.bearing.x;
-                    float ypos = y_it + run_font->getAscender() - glyph.bearing.y;
+                    float ypos = y_it - glyph.bearing.y;
 
                     float w = glyph.size.x;
                     float h = glyph.size.y;

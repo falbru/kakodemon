@@ -26,6 +26,7 @@ class FreeTypeFontEngine : public domain::FontEngine
     std::optional<domain::RasterizedGlyph> rasterizeFallbackGlyph() override;
 
     float getAscender() const override;
+    float getDescender() const override;
     float getLineHeight() const override;
     int getSize() const override;
 
@@ -34,6 +35,7 @@ class FreeTypeFontEngine : public domain::FontEngine
     FT_Face m_face;
 
     float m_ascender;
+    float m_descender;
     float m_line_height;
     int m_requested_size;
     float m_scale;

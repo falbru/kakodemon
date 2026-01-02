@@ -33,6 +33,7 @@ class Font : public domain::Font
     bool loadGlyph(domain::Codepoint c) override;
 
     float getAscender() const override;
+    float getDescender() const override;
     float getLineHeight() const override;
     int getSize() const override;
 

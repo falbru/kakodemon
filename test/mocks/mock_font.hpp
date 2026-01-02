@@ -41,6 +41,11 @@ class FontMock : public domain::Font
         return 20.0f;
     }
 
+    float getDescender() const override
+    {
+        return -4.0f;
+    }
+
     float getLineHeight() const override
     {
         return 24.0f;
