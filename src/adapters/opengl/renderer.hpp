@@ -13,6 +13,13 @@
 namespace opengl
 {
 
+enum class RenderPass
+{
+    BackgroundOnly,
+    TextOnly,
+    Both
+};
+
 class Renderer : public domain::Renderer
 {
   public:
@@ -36,7 +43,8 @@ class Renderer : public domain::Renderer
 
   private:
     void _renderLine(opengl::Font *font, domain::FontManager *font_manager, const domain::Line &line,
-                     const domain::Face &default_face, float x, float y, const domain::Alignment &alignment) const;
+                     const domain::Face &default_face, float x, float y, const domain::Alignment &alignment,
+                     RenderPass pass) const;
     void _renderShadow(const domain::RGBAColor color, float x, float y, float width, float height,
                        float shadowRadius) const;
     void _renderRect(const domain::RGBAColor color, float x, float y, float width, float height) const;
