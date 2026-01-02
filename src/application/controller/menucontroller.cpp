@@ -24,6 +24,7 @@ void MenuController::render(const UIOptions& ui_options) {
     switch(m_kakoune_client->state.menu->getStyle()) {
         case domain::MenuStyle::INLINE:
             m_inline_menu_view->render(ui_options.font, m_font_manager, *m_kakoune_client, m_editor_controller->width(), m_editor_controller->height());
+            break;
         case domain::MenuStyle::PROMPT:
             m_prompt_menu_view->render(ui_options.font, m_font_manager, *m_kakoune_client, m_editor_controller->width(), m_editor_controller->height());
             break;
