@@ -13,7 +13,10 @@ void Input::setContent(const domain::Line& content) { m_content = content; }
 void Input::render(domain::Renderer *renderer, domain::Font* font, domain::FontManager* font_manager, const KakouneClient &kakoune_client, LayoutManager &layout) {
   auto input_layout = layout.sliceTop(height(font));
 
-  renderer->renderRect(kakoune_client.state.menu->getSelectedFace().getBg(kakoune_client.state.default_face),
+  domain::Face input_bg_face = kakoune_client.state.menu->hasItems() ?
+      kakoune_client.state.menu->getItems().selected_face :
+      kakoune_client.state.default_face;
+  renderer->renderRect(input_bg_face.getBg(kakoune_client.state.default_face),
                        input_layout.current().x,
                        input_layout.current().y,
                        input_layout.current().width,

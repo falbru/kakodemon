@@ -26,23 +26,27 @@ void PromptMenuView::render(domain::Font* font, domain::FontManager* font_manage
     m_x = (width - WIDTH) / 2;
     m_height = 2 * SPACING_MEDIUM + m_input->height(font);
 
-    float items_size = std::min(MAX_VISIBLE_ITEMS, (int)kakoune_client.state.menu->getItems().size());
-    if (kakoune_client.state.menu.has_value())
+    float items_size = kakoune_client.state.menu->hasItems() ?
+        std::min(MAX_VISIBLE_ITEMS, (int)kakoune_client.state.menu->getItems().items.size()) : 0;
+    if (items_size > 0)
     {
         m_height += SPACING_MEDIUM + font->getLineHeight() * items_size;
     }
 
     LayoutManager layout(m_x, Y, WIDTH, m_height);
 
+    domain::Face bg_face = kakoune_client.state.menu->hasItems() ?
+        kakoune_client.state.menu->getItems().face :
+        kakoune_client.state.default_face;
     m_renderer->renderRectWithShadow(
-        kakoune_client.state.menu->getFace().getBg(kakoune_client.state.default_face), layout.current().x,
+        bg_face.getBg(kakoune_client.state.default_face), layout.current().x,
         layout.current().y, layout.current().width, layout.current().height, 15.0f);
 
     layout.pad(SPACING_MEDIUM);
 
     m_input->render(m_renderer, font, font_manager, kakoune_client, layout);
 
-    if (kakoune_client.state.menu.has_value())
+    if (kakoune_client.state.menu->hasItems())
     {
         layout.gapY(SPACING_MEDIUM);
         m_scrolled_menu_items->render(m_renderer, font, font_manager, kakoune_client, layout);

@@ -5,6 +5,7 @@
 #include "domain/line.hpp"
 #include "domain/lines.hpp"
 #include "domain/statusline.hpp"
+#include <optional>
 
 namespace domain
 {
@@ -16,28 +17,36 @@ enum class MenuStyle
     SEARCH
 };
 
+struct MenuItems
+{
+    Lines items;
+    Coord anchor;
+    Face face;
+    Face selected_face;
+    int selected_index;
+
+    MenuItems(Lines items, Coord anchor, Face face, Face selected_face, int selected_index)
+        : items(std::move(items)), anchor(anchor), face(face), selected_face(selected_face),
+          selected_index(selected_index)
+    {
+    }
+};
+
 class Menu
 
 {
   public:
-    Menu(std::vector<Line> items, int selected_index, StatusLine input, Coord anchor, Face face, Face selected_face,
-         MenuStyle style);
+    Menu(StatusLine input, MenuItems items, MenuStyle style);
+    Menu(StatusLine input, MenuStyle style);
 
-    const Lines &getItems() const;
     const StatusLine &getInput() const;
-    const Coord &getAnchor() const;
-    const Face &getFace() const;
-    const Face &getSelectedFace() const;
-    int getSelectedIndex() const;
+    bool hasItems() const;
+    const MenuItems &getItems() const;
     MenuStyle getStyle() const;
 
   private:
-    Lines m_items;
     StatusLine m_input;
-    Coord m_anchor;
-    Face m_face;
-    Face m_selected_face;
-    int m_selected_index;
+    std::optional<MenuItems> m_items;
     MenuStyle m_style;
 };
 

@@ -47,25 +47,31 @@ std::optional<domain::KakouneState> JsonRpcKakouneInterface::getNextKakouneState
 
     std::optional<domain::StatusLine> status_line = domain::StatusLine(toDomain(frame_state.draw_status.status_line_prompt), toDomain(frame_state.draw_status.status_line_content));
 
+    bool status_line_has_content = !(status_line->getPrompt().size() == 0 && status_line->getContent().size() == 0);
+
     std::optional<domain::Menu> menu;
     if (frame_state.menu.has_value()) {
         menu = domain::Menu(
-            toDomain(frame_state.menu->items),
-            frame_state.menu_selected_index,
             status_line.value(),
-            toDomain(frame_state.menu->anchor),
-            toDomain(frame_state.menu->face),
-            toDomain(frame_state.menu->selected_face),
+            domain::MenuItems(
+                toDomain(frame_state.menu->items),
+                toDomain(frame_state.menu->anchor),
+                toDomain(frame_state.menu->face),
+                toDomain(frame_state.menu->selected_face),
+                frame_state.menu_selected_index
+            ),
             toDomain(frame_state.menu->style)
         );
+    } else if (status_line_has_content) {
+        menu = domain::Menu(status_line.value(), domain::MenuStyle::PROMPT);
     }
 
-    if (status_line->getPrompt().size() == 0 && status_line->getContent().size() == 0) {
+    if (!status_line_has_content) {
         status_line = std::nullopt;
     }
 
     domain::CursorPosition cursor_position;
-    if (frame_state.menu.has_value()) {
+    if (menu.has_value()) {
         cursor_position = domain::StatusLinePosition{ frame_state.draw_status.cursor_pos };
     }else {
         cursor_position = domain::BufferContentPosition{ domain::Coord{ frame_state.draw.cursor_pos.line, frame_state.draw.cursor_pos.column } };
