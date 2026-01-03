@@ -4,7 +4,11 @@
 
 namespace domain {
 
-Face::Face(OptionalColor bg, OptionalColor fg) : m_bg(bg), m_fg(fg) {
+Face::Face(OptionalColor bg, OptionalColor fg) : m_bg(bg), m_fg(fg), m_attributes() {
+
+}
+
+Face::Face(OptionalColor bg, OptionalColor fg, std::vector<Attribute> attributes) : m_bg(bg), m_fg(fg), m_attributes(std::move(attributes)) {
 
 }
 
@@ -48,8 +52,12 @@ RGBAColor Face::getBg() const {
     }
 }
 
+const std::vector<Attribute>& Face::getAttributes() const {
+    return m_attributes;
+}
+
 bool Face::operator==(const Face& other) const {
-    return m_bg == other.m_bg && m_fg == other.m_fg;
+    return m_bg == other.m_bg && m_fg == other.m_fg && m_attributes == other.m_attributes;
 }
 
 }

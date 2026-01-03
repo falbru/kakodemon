@@ -3,12 +3,12 @@
 #include "spdlog/spdlog.h"
 #include <freetype/freetype.h>
 
-FreeTypeFontEngine::FreeTypeFontEngine(std::shared_ptr<FreeTypeLibrary> library, const std::string &path, int size)
+FreeTypeFontEngine::FreeTypeFontEngine(std::shared_ptr<FreeTypeLibrary> library, const std::string &path, int size, int face_index)
     : m_library(library), m_requested_size(size), m_scale(1.0f)
 {
-    if (FT_New_Face(m_library->get(), path.c_str(), 0, &m_face))
+    if (FT_New_Face(m_library->get(), path.c_str(), face_index, &m_face))
     {
-        spdlog::error("FreeType: Failed to load font for path {}", path);
+        spdlog::error("FreeType: Failed to load font for path {} with face index {}", path, face_index);
     }
 
     if (FT_Set_Pixel_Sizes(m_face, 0, size))
@@ -152,6 +152,6 @@ int FreeTypeFontEngine::getSize() const {
 
 FontEngineFactory FreeTypeFontEngine::createFactory(std::shared_ptr<FreeTypeLibrary> library) {
     return [library](const domain::FontMatch &match) -> std::unique_ptr<domain::FontEngine> {
-        return std::make_unique<FreeTypeFontEngine>(library, match.path, match.size);
+        return std::make_unique<FreeTypeFontEngine>(library, match.path, match.size, match.face_index);
     };
 }

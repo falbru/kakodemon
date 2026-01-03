@@ -13,7 +13,7 @@ FontManager::FontManager(std::unique_ptr<FontResolver> resolver,
 
 std::string FontManager::makeCacheKey(const FontMatch &match) const
 {
-    return match.path + ":" + std::to_string(match.size);
+    return match.path + ":" + std::to_string(match.size) + ":" + std::to_string(match.face_index);
 }
 
 Font *FontManager::getOrCreateFont(const FontMatch &match)

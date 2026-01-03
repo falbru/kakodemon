@@ -20,6 +20,7 @@ struct FontMatch
 {
     std::string path;
     int size;
+    int face_index;
 };
 
 class FontResolver

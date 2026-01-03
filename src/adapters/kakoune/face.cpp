@@ -50,6 +50,27 @@ void kakoune::from_json(const nlohmann::json &j, Face &f)
     j.at("attributes").get_to(f.attributes);
 }
 
+domain::Attribute toDomain(kakoune::Attribute attr) {
+    switch (attr) {
+        case kakoune::UNDERLINE:        return domain::Attribute::Underline;
+        case kakoune::CURLY_UNDERLINE:  return domain::Attribute::CurlyUnderline;
+        case kakoune::DOUBLE_UNDERLINE: return domain::Attribute::DoubleUnderline;
+        case kakoune::REVERSE:          return domain::Attribute::Reverse;
+        case kakoune::BLINK:            return domain::Attribute::Blink;
+        case kakoune::BOLD:             return domain::Attribute::Bold;
+        case kakoune::DIM:              return domain::Attribute::Dim;
+        case kakoune::ITALIC:           return domain::Attribute::Italic;
+        case kakoune::FINAL_FG:         return domain::Attribute::FinalFg;
+        case kakoune::FINAL_BG:         return domain::Attribute::FinalBg;
+        case kakoune::FINAL_ATTR:       return domain::Attribute::FinalAttr;
+    }
+}
+
 domain::Face kakoune::toDomain(kakoune::Face face) {
-    return domain::Face(toDomain(face.bg), toDomain(face.fg));
+    std::vector<domain::Attribute> attributes;
+    attributes.reserve(face.attributes.size());
+    for (auto attr : face.attributes) {
+        attributes.push_back(::toDomain(attr));
+    }
+    return domain::Face(toDomain(face.bg), toDomain(face.fg), std::move(attributes));
 }

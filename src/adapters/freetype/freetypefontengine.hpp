@@ -16,7 +16,7 @@ using FontEngineFactory = std::function<std::unique_ptr<domain::FontEngine>(cons
 class FreeTypeFontEngine : public domain::FontEngine
 {
   public:
-    FreeTypeFontEngine(std::shared_ptr<FreeTypeLibrary> library, const std::string &path, int size);
+    FreeTypeFontEngine(std::shared_ptr<FreeTypeLibrary> library, const std::string &path, int size, int face_index);
     ~FreeTypeFontEngine();
 
     static FontEngineFactory createFactory(std::shared_ptr<FreeTypeLibrary> library);

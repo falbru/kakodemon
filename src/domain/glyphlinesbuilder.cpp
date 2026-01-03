@@ -1,4 +1,5 @@
 #include "glyphlinesbuilder.hpp"
+#include <algorithm>
 
 namespace domain
 {
@@ -32,7 +33,29 @@ GlyphLine GlyphLinesBuilder::build(const Line& line, Font* font, FontManager* fo
 GlyphAtom GlyphLinesBuilder::build(const Atom& atom, Font* font, FontManager* font_manager)
 {
     auto contents = atom.getContents();
-    auto runs = buildGlyphRuns(contents, font, font_manager);
+    const auto& attributes = atom.getFace().getAttributes();
+
+    bool has_bold = std::find(attributes.begin(), attributes.end(), Attribute::Bold) != attributes.end();
+    bool has_italic = std::find(attributes.begin(), attributes.end(), Attribute::Italic) != attributes.end();
+
+    Font* active_font = font;
+    if (has_bold || has_italic) {
+        FontStyle style;
+        if (has_bold && has_italic) {
+            style = FontStyle::BoldItalic;
+        } else if (has_bold) {
+            style = FontStyle::Bold;
+        } else {
+            style = FontStyle::Italic;
+        }
+
+        Font* variant_font = font_manager->getFontStyleVariant(font, style);
+        if (variant_font != nullptr) {
+            active_font = variant_font;
+        }
+    }
+
+    auto runs = buildGlyphRuns(contents, active_font, font_manager);
     return GlyphAtom(runs, atom.getFace());
 }
 

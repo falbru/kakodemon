@@ -39,7 +39,7 @@ domain::FontMatch FontconfigResolver::resolve(const std::string& pattern)
     FcResult result;
     FcPattern *font = FcFontMatch(config, pat, &result);
 
-    domain::FontMatch match{"", 0};
+    domain::FontMatch match{"", 0, 0};
 
     if (font && result == FcResultMatch)
     {
@@ -58,6 +58,12 @@ domain::FontMatch FontconfigResolver::resolve(const std::string& pattern)
         else if (FcPatternGetDouble(pat, FC_SIZE, 0, &size) == FcResultMatch)
         {
             match.size = static_cast<int>(size);
+        }
+
+        int face_index = 0;
+        if (FcPatternGetInteger(font, FC_INDEX, 0, &face_index) == FcResultMatch)
+        {
+            match.face_index = face_index;
         }
 
         FcPatternDestroy(font);
@@ -158,7 +164,17 @@ std::optional<domain::FontMatch> FontconfigResolver::resolveStyleVariant(const d
             font_match.path = reinterpret_cast<char*>(file);
             font_match.size = base_font.size;
 
-            spdlog::debug("Resolved style variant for '{}' to: {}", base_font.path, font_match.path);
+            int face_index = 0;
+            if (FcPatternGetInteger(font, FC_INDEX, 0, &face_index) == FcResultMatch)
+            {
+                font_match.face_index = face_index;
+            }
+            else
+            {
+                font_match.face_index = 0;
+            }
+
+            spdlog::debug("Resolved style variant for '{}' to: {} (face index: {})", base_font.path, font_match.path, font_match.face_index);
             match = font_match;
         }
 
@@ -224,8 +240,19 @@ std::optional<domain::FontMatch> FontconfigResolver::resolveForCodepoint(domain:
                 fontMatch.size = static_cast<int>(size);
             }
 
+            int face_index = 0;
+            if (FcPatternGetInteger(font, FC_INDEX, 0, &face_index) == FcResultMatch)
+            {
+                fontMatch.face_index = face_index;
+            }
+            else
+            {
+                fontMatch.face_index = 0;
+            }
+
             spdlog::info("Resolved codepoint U+{:X} to font: {}", codepoint, fontMatch.path);
             spdlog::info("Resolved codepoint U+{:X} to font size: {}", codepoint, fontMatch.size);
+            spdlog::info("Resolved codepoint U+{:X} to font face index: {}", codepoint, fontMatch.face_index);
             match = fontMatch;
         }
 
