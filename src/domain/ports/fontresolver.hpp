@@ -8,6 +8,14 @@
 namespace domain
 {
 
+enum class FontStyle
+{
+    Normal,
+    Bold,
+    Italic,
+    BoldItalic
+};
+
 struct FontMatch
 {
     std::string path;
@@ -21,6 +29,7 @@ class FontResolver
 
     virtual FontMatch resolve(const std::string &pattern) = 0;
     virtual std::optional<FontMatch> resolveForCodepoint(Codepoint codepoint) = 0;
+    virtual std::optional<FontMatch> resolveStyleVariant(const FontMatch &base_font, FontStyle style) = 0;
 };
 
 } // namespace domain

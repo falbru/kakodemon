@@ -33,6 +33,7 @@ Font *FontManager::getOrCreateFont(const FontMatch &match)
     Font *font_ptr = cached.font.get();
 
     m_fonts[key] = std::move(cached);
+    m_font_to_match[font_ptr] = match;
 
     return font_ptr;
 }
@@ -96,6 +97,37 @@ GlyphWithFont FontManager::getGlyphWithFont(Codepoint c, Font* primary_font)
     }
 
     return GlyphWithFont{fallback_font->getGlyphMetrics(c), fallback_font};
+}
+
+Font *FontManager::getFontStyleVariant(Font *base_font, FontStyle style)
+{
+    auto &style_cache = m_style_variant_cache[base_font];
+    auto it = style_cache.find(style);
+    if (it != style_cache.end())
+    {
+        return it->second;
+    }
+
+    auto match_it = m_font_to_match.find(base_font);
+    if (match_it == m_font_to_match.end())
+    {
+        style_cache[style] = nullptr;
+        return nullptr;
+    }
+
+    const FontMatch &base_match = match_it->second;
+    auto variant_match_opt = m_resolver->resolveStyleVariant(base_match, style);
+
+    if (!variant_match_opt.has_value())
+    {
+        style_cache[style] = nullptr;
+        return nullptr;
+    }
+
+    Font *variant_font = getOrCreateFont(variant_match_opt.value());
+    style_cache[style] = variant_font;
+
+    return variant_font;
 }
 
 }

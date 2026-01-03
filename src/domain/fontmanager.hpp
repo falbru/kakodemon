@@ -31,6 +31,7 @@ class FontManager
 
     Font *getFontFromName(const std::string &pattern);
     Font *getFontForCodepoint(Codepoint c, Font *primary_font);
+    Font *getFontStyleVariant(Font *base_font, FontStyle style);
 
     const GlyphMetrics &getGlyph(Codepoint c, Font *primary_font);
     GlyphWithFont getGlyphWithFont(Codepoint c, Font *primary_font);
@@ -51,6 +52,8 @@ class FontManager
 
     std::map<std::string, CachedFont> m_fonts;
     std::map<Codepoint, std::map<int, Font *>> m_codepoint_cache;
+    std::map<Font *, FontMatch> m_font_to_match;
+    std::map<Font *, std::map<FontStyle, Font *>> m_style_variant_cache;
 };
 
 } // namespace domain
