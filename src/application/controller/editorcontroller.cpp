@@ -22,12 +22,17 @@ void EditorController::init(KakouneClient* kakoune_client,
     m_set_clear_color = set_clear_color;
 }
 
-void EditorController::update(const UIOptions& ui_options)
+void EditorController::update(UIOptions& ui_options)
 {
     auto frame_state = m_kakoune_client->interface->getNextKakouneState();
     if (frame_state.has_value()) {
         m_kakoune_client->state = frame_state.value();
         setClearColor(m_kakoune_client->state.default_face.getBg());
+    }
+
+    auto font_option = m_kakoune_client->interface->getUIOptionsFont();
+    if (font_option.has_value()) {
+        ui_options.font = m_font_manager->getFontFromName(font_option.value());
     }
 }
 

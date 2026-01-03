@@ -31,6 +31,7 @@ class KakouneInterface
     virtual ~KakouneInterface() = default;
 
     virtual std::optional<KakouneState> getNextKakouneState() = 0;
+    virtual std::optional<std::string> getUIOptionsFont() = 0;
 
     virtual void pressKeys(const std::vector<std::string> &keys) = 0;
     virtual void resize(int rows, int columns) = 0;

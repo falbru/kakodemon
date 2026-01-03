@@ -23,6 +23,7 @@ add_executable(tests
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/menustyle.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/localsession.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/remotesession.cpp
+    ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/uioptions.cpp
     ${CMAKE_SOURCE_DIR}/src/application/model/kakouneclient.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/alignment.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/atom.cpp

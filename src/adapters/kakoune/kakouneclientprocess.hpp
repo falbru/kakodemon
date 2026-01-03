@@ -7,6 +7,7 @@
 #include <variant>
 #include <vector>
 
+#include "adapters/kakoune/uioptions.hpp"
 #include "coord.hpp"
 #include "infostyle.hpp"
 #include "line.hpp"
@@ -21,7 +22,6 @@ enum class IncomingRequestType
     MENU_HIDE,
     INFO_SHOW,
     INFO_HIDE,
-    SET_CURSOR,
     SET_UI_OPTIONS,
     REFRESH
 };
@@ -78,8 +78,13 @@ struct RefreshRequestData
     bool force;
 };
 
+struct UIOptionsData
+{
+    kakoune::UIOptions ui_options;
+};
+
 using IncomingRequestData = std::variant<DrawRequestData, DrawStatusRequestData, RefreshRequestData, MenuShowData,
-                                         MenuHideData, MenuSelectData, InfoShowData, InfoHideData>;
+                                         MenuHideData, MenuSelectData, InfoShowData, InfoHideData, UIOptionsData>;
 
 struct IncomingRequest
 {

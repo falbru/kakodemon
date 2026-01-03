@@ -8,6 +8,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include "adapters/kakoune/uioptions.hpp"
 #include "coord.hpp"
 #include "face.hpp"
 #include "infostyle.hpp"
@@ -263,6 +264,13 @@ std::optional<IncomingRequest> KakouneClientProcess::parseRequest(std::string re
     {
         parsed_request.type = IncomingRequestType::INFO_HIDE;
         parsed_request.data = {};
+        return parsed_request;
+    }
+    if (method == "set_ui_options")
+    {
+        parsed_request.type = IncomingRequestType::SET_UI_OPTIONS;
+        parsed_request.data = UIOptionsData{params[0].get<kakoune::UIOptions>()};
+
         return parsed_request;
     }
 

@@ -16,7 +16,8 @@ class JsonRpcKakouneInterface : public domain::KakouneInterface
                             const std::vector<std::string> &file_arguments = {});
     ~JsonRpcKakouneInterface();
 
-    std::optional<domain::KakouneState> getNextKakouneState();
+    std::optional<domain::KakouneState> getNextKakouneState() override;
+    std::optional<std::string> getUIOptionsFont() override;
 
     void pressKeys(const std::vector<std::string> &keys) override;
     void resize(int rows, int columns) override;
@@ -29,6 +30,7 @@ class JsonRpcKakouneInterface : public domain::KakouneInterface
   private:
     std::unique_ptr<KakouneClientProcess> m_process;
     std::unique_ptr<KakouneFrameStateManager> m_frame_state_manager;
+    UIOptions m_ui_options;
 
     std::string getMouseButtonString(domain::MouseButton button);
 };

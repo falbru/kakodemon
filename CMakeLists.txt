@@ -45,6 +45,7 @@ set(SRC
     src/adapters/kakoune/localsession.cpp
     src/adapters/kakoune/menustyle.cpp
     src/adapters/kakoune/remotesession.cpp
+    src/adapters/kakoune/uioptions.cpp
     src/adapters/opengl/application.cpp
     src/adapters/opengl/font.cpp
     src/adapters/opengl/renderer.cpp

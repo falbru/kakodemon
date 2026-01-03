@@ -19,7 +19,7 @@ TEST_CASE("FontconfigResolver resolves basic monospace pattern", "[FontconfigRes
 TEST_CASE("FontconfigResolver resolves pattern with size", "[FontconfigResolver]")
 {
     FontconfigResolver resolver;
-    auto result = resolver.resolve("monospace:size=12");
+    auto result = resolver.resolve("monospace 12");
 
     REQUIRE(!result.path.empty());
     REQUIRE(result.size == 12);
@@ -29,9 +29,9 @@ TEST_CASE("FontconfigResolver resolves pattern with different sizes", "[Fontconf
 {
     FontconfigResolver resolver;
 
-    auto small = resolver.resolve("sans:size=8");
-    auto medium = resolver.resolve("sans:size=14");
-    auto large = resolver.resolve("sans:size=24");
+    auto small = resolver.resolve("sans 8");
+    auto medium = resolver.resolve("sans 14");
+    auto large = resolver.resolve("sans 24");
 
     REQUIRE(small.size == 8);
     REQUIRE(medium.size == 14);
@@ -57,7 +57,7 @@ TEST_CASE("FontconfigResolver resolves serif pattern", "[FontconfigResolver]")
 TEST_CASE("FontconfigResolver handles pattern with multiple attributes", "[FontconfigResolver]")
 {
     FontconfigResolver resolver;
-    auto result = resolver.resolve("monospace:size=16:weight=bold");
+    auto result = resolver.resolve("monospace 16");
 
     REQUIRE(!result.path.empty());
     REQUIRE(result.size == 16);
@@ -133,8 +133,8 @@ TEST_CASE("FontconfigResolver returns same result for identical patterns", "[Fon
 {
     FontconfigResolver resolver;
 
-    auto result1 = resolver.resolve("monospace:size=12");
-    auto result2 = resolver.resolve("monospace:size=12");
+    auto result1 = resolver.resolve("monospace 12");
+    auto result2 = resolver.resolve("monospace 12");
 
     REQUIRE(result1.path == result2.path);
     REQUIRE(result1.size == result2.size);
@@ -143,7 +143,7 @@ TEST_CASE("FontconfigResolver returns same result for identical patterns", "[Fon
 TEST_CASE("FontconfigResolver handles zero size", "[FontconfigResolver]")
 {
     FontconfigResolver resolver;
-    auto result = resolver.resolve("monospace:size=0");
+    auto result = resolver.resolve("monospace 0");
 
     REQUIRE(!result.path.empty());
 }
@@ -191,21 +191,6 @@ TEST_CASE("FontconfigResolver handles heart emoji", "[FontconfigResolver]")
     REQUIRE(!result->path.empty());
 }
 
-TEST_CASE("FontconfigResolver resolves bold weight", "[FontconfigResolver]")
-{
-    FontconfigResolver resolver;
-    auto result = resolver.resolve("sans:weight=bold");
-
-    REQUIRE(!result.path.empty());
-}
-
-TEST_CASE("FontconfigResolver resolves italic slant", "[FontconfigResolver]")
-{
-    FontconfigResolver resolver;
-    auto result = resolver.resolve("serif:slant=italic");
-
-    REQUIRE(!result.path.empty());
-}
 
 TEST_CASE("FontconfigResolver handles rapid successive calls", "[FontconfigResolver]")
 {

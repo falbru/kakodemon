@@ -74,11 +74,10 @@ void KakouneFrameStateManager::onRequest(const IncomingRequest& request)
     }
     case IncomingRequestType::REFRESH: {
         m_next_frame_state_ready = true;
-    }
-    case IncomingRequestType::SET_CURSOR: {
         break;
     }
     case IncomingRequestType::SET_UI_OPTIONS: {
+        m_next_frame_state.ui_options = std::get<UIOptionsData>(request.data).ui_options;
         break;
     }
     }

@@ -2,6 +2,8 @@
 #include "spdlog/spdlog.h"
 #include "fontconfigresolver.hpp"
 #include <fontconfig/fontconfig.h>
+#include <optional>
+#include <string>
 
 FontconfigResolver::FontconfigResolver()
 {
@@ -25,7 +27,44 @@ domain::FontMatch FontconfigResolver::resolve(const std::string& pattern)
         return domain::FontMatch{"", 0};
     }
 
-    FcPattern *pat = FcNameParse(reinterpret_cast<const FcChar8*>(pattern.c_str()));
+    std::string family_name;
+    std::optional<int> size;
+
+    size_t last_space = pattern.rfind(' ');
+    if (last_space != std::string::npos)
+    {
+        std::string size_str = pattern.substr(last_space + 1);
+        try
+        {
+            size_t pos;
+            int parsed_size = std::stoi(size_str, &pos);
+            if (pos == size_str.length() && parsed_size > 0)
+            {
+                family_name = pattern.substr(0, last_space);
+                size = parsed_size;
+            }
+            else
+            {
+                family_name = pattern;
+            }
+        }
+        catch (const std::exception&)
+        {
+            family_name = pattern;
+        }
+    }
+    else
+    {
+        family_name = pattern;
+    }
+
+    std::string fc_pattern = family_name;
+    if (size.has_value())
+    {
+        fc_pattern += ":size=" + std::to_string(size.value());
+    }
+
+    FcPattern *pat = FcNameParse(reinterpret_cast<const FcChar8*>(fc_pattern.c_str()));
     if (!pat)
     {
         spdlog::error("Failed to parse font pattern: {}", pattern);

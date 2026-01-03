@@ -6,6 +6,7 @@
 #include "application/view/kakounecontentview.hpp"
 #include "application/view/statusbar.hpp"
 #include "domain/color.hpp"
+#include "domain/fontmanager.hpp"
 #include "domain/mouse.hpp"
 #include <functional>
 #include <map>
@@ -17,7 +18,7 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
 
     void init(KakouneClient *kakoune_client, KakouneContentView *kakoune_content_view, StatusBarView *status_bar_view,
               domain::FontManager *font_manager, std::function<void(domain::RGBAColor)> set_clear_color);
-    void update(const UIOptions &ui_options);
+    void update(UIOptions &ui_options);
     void render(const UIOptions &ui_options);
 
     void onWindowResize(int width, int height, const UIOptions &ui_options);

@@ -104,7 +104,7 @@ void opengl::GLFWApplication::init(const CliConfig& config) {
 
     Application::init(config);
 
-    m_ui_options->font = m_font_manager->getFontFromName("Ubuntu Mono:size=14");
+    m_ui_options->font = m_font_manager->getFontFromName("monospace 14");
     onWindowResize(framebuffer_width, framebuffer_height);
 }
 

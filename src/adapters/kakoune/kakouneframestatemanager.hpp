@@ -5,6 +5,7 @@
 #include <optional>
 #include <thread>
 
+#include "adapters/kakoune/uioptions.hpp"
 #include "kakouneclientprocess.hpp"
 
 struct FrameState
@@ -13,6 +14,7 @@ struct FrameState
     DrawStatusRequestData draw_status;
     std::optional<MenuShowData> menu;
     std::optional<InfoShowData> info_box;
+    std::optional<kakoune::UIOptions> ui_options;
     int menu_selected_index;
 };
 

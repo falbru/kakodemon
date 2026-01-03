@@ -34,6 +34,8 @@ std::optional<domain::KakouneState> JsonRpcKakouneInterface::getNextKakouneState
 
     FrameState frame_state = frame_state_opt.value();
 
+    if (frame_state.ui_options.has_value()) m_ui_options = frame_state.ui_options.value();
+
     std::optional<domain::InfoBox> info_box;
     if (frame_state.info_box.has_value()) {
        info_box = domain::InfoBox{
@@ -85,6 +87,10 @@ std::optional<domain::KakouneState> JsonRpcKakouneInterface::getNextKakouneState
         .menu = menu,
         .default_face = toDomain(frame_state.draw.default_face),
     };
+}
+
+std::optional<std::string> JsonRpcKakouneInterface::getUIOptionsFont() {
+    return m_ui_options.font;
 }
 
 void JsonRpcKakouneInterface::pressKeys(const std::vector<std::string>& keys) {
