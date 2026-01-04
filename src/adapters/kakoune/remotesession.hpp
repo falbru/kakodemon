@@ -1,7 +1,7 @@
 #ifndef REMOTESESSION_HPP_INCLUDED
 #define REMOTESESSION_HPP_INCLUDED
 
-#include "domain/kakounesession.hpp"
+#include "domain/ports/kakounesession.hpp"
 #include <string>
 
 class RemoteSession : public domain::KakouneSession

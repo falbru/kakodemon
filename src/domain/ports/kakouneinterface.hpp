@@ -3,11 +3,11 @@
 
 #include "domain/editor.hpp"
 #include "domain/infobox.hpp"
-#include "domain/kakounesession.hpp"
 #include "domain/lines.hpp"
 #include "domain/menu.hpp"
 #include "domain/modeline.hpp"
 #include "domain/mouse.hpp"
+#include "domain/ports/kakounesession.hpp"
 
 #include <string>
 #include <vector>

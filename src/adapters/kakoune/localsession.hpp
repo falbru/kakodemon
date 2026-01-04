@@ -1,7 +1,7 @@
 #ifndef LOCALSESSION_HPP_INCLUDED
 #define LOCALSESSION_HPP_INCLUDED
 
-#include "domain/kakounesession.hpp"
+#include "domain/ports/kakounesession.hpp"
 #include <string>
 #include <sys/types.h>
 
