@@ -1,4 +1,5 @@
 #include "glyphlinesbuilder.hpp"
+#include "domain/utf8string.hpp"
 #include <algorithm>
 
 namespace domain
@@ -71,6 +72,8 @@ std::vector<GlyphRun> GlyphLinesBuilder::buildGlyphRuns(const UTF8String& conten
     Font* current_font = nullptr;
 
     for (int i = 0; i < contents.size(); i++) {
+        if (isControlCharacter(contents.at(i))) continue;
+
         auto glyph_with_font = font_manager->getGlyphWithFont(contents.at(i), font);
 
         if (current_font == nullptr || current_font == glyph_with_font.font) {

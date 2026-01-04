@@ -11,6 +11,8 @@ typedef unsigned int Codepoint;
 
 std::string codePointToString(Codepoint codepoint);
 bool isWhitespace(Codepoint codepoint);
+bool isControlCharacter(Codepoint codepoint);
+bool isEmoji(Codepoint codepoint);
 
 enum class TrimDirection
 {

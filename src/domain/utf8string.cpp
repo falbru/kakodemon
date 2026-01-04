@@ -129,6 +129,16 @@ bool isWhitespace(Codepoint cp)
            cp == 0x202F || cp == 0x205F || cp == 0x3000;
 }
 
+bool isControlCharacter(Codepoint codepoint)
+{
+    return codepoint < 0x20 || codepoint == 0x7F;
+}
+
+bool isEmoji(Codepoint codepoint)
+{
+    return codepoint >= 0x1F300;
+}
+
 UTF8String UTF8String::trim(TrimDirection direction) const
 {
     if (m_codepoints.empty())

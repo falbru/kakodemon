@@ -1,4 +1,5 @@
 #include "domain/ports/fontresolver.hpp"
+#include "domain/utf8string.hpp"
 #include "spdlog/spdlog.h"
 #include "fontconfigresolver.hpp"
 #include <fontconfig/fontconfig.h>
@@ -252,7 +253,7 @@ std::optional<domain::FontMatch> FontconfigResolver::resolveForCodepoint(domain:
     FcCharSetAddChar(charset, codepoint);
     FcPatternAddCharSet(pat, FC_CHARSET, charset);
 
-    if (codepoint >= 0x1F300)
+    if (domain::isEmoji(codepoint))
     {
         FcPatternAddBool(pat, FC_COLOR, FcTrue);
     }
