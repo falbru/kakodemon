@@ -4,8 +4,6 @@
 #include "application/application.hpp"
 #include "application/cliconfig.hpp"
 #include "opengl.hpp"
-#include <chrono>
-#include <memory>
 
 namespace opengl
 {

@@ -1,10 +1,12 @@
 #include "renderer.hpp"
 #include "adapters/opengl/font.hpp"
+#include "adapters/opengl/shaderprogram.hpp"
 #include "domain/alignment.hpp"
 #include "domain/color.hpp"
 #include "domain/glyphlinesbuilder.hpp"
 #include "domain/line.hpp"
 #include "domain/ports/fontengine.hpp"
+#include "domain/utf8string.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "opengl.hpp"
 
@@ -43,7 +45,8 @@ void opengl::Renderer::onWindowResize(int width, int height) {
     glViewport(0, 0, width, height);
 
     glm::mat4 projection = glm::ortho(0.0f, (float)width, (float)height, 0.0f);
-    m_shader_program->setMatrix4("projection", projection, true);
+    m_shader_program->use();
+    m_shader_program->setMatrix4("projection", projection);
     m_screen_width = width;
     m_screen_height = height;
 }
@@ -175,11 +178,12 @@ void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font
                 opengl::Font* run_font = dynamic_cast<opengl::Font*>(run.font);
                 for (auto glyph : run.glyphs)
                 {
-                    if (glyph.codepoint == '\n' || glyph.codepoint == 0) continue; // TODO clean way of stripping the last newline?
+                    if (domain::isControlCharacter(glyph.codepoint)) continue; // TODO clean way of stripping the last newline?
+
                     if (run_font->getGlyph(glyph.codepoint).format == domain::PixelFormat::GRAYSCALE) {
-                        m_shader_program->setInt("renderType", 0);
+                        m_shader_program->setRenderType(RenderType::Text);
                     }else {
-                        m_shader_program->setInt("renderType", 3);
+                        m_shader_program->setRenderType(RenderType::ColoredText);
                         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
                     }
 
@@ -214,7 +218,7 @@ void opengl::Renderer::_renderShadow(const domain::RGBAColor color, float x, flo
         {x - shadowRadius, y - shadowRadius}, {x + width + shadowRadius, y + height + shadowRadius}, {x + width + shadowRadius, y - shadowRadius}};
 
     glBindVertexArray(m_rect_vao);
-    m_shader_program->setInt("renderType", 2);
+    m_shader_program->setRenderType(RenderType::Shadow);
     m_shader_program->setFloat("shadowRadius", shadowRadius);
     m_shader_program->setVector4f("rectBounds", x, (float)m_screen_height - y - height, width, height);
     glBindBuffer(GL_ARRAY_BUFFER, m_rect_vbo);
@@ -229,7 +233,7 @@ void opengl::Renderer::_renderRect(const domain::RGBAColor color, float x, float
 
     glBindVertexArray(m_rect_vao);
     m_shader_program->setVector4f("rectColor", color.r, color.g, color.b, 1.0f);
-    m_shader_program->setInt("renderType", 1);
+    m_shader_program->setRenderType(RenderType::Rectangle);
     glBindBuffer(GL_ARRAY_BUFFER, m_rect_vbo);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
     glDrawArrays(GL_TRIANGLES, 0, 6);

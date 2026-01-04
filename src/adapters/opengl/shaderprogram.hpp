@@ -7,6 +7,14 @@
 namespace opengl
 {
 
+enum class RenderType
+{
+    Text,
+    ColoredText,
+    Rectangle,
+    Shadow
+};
+
 class ShaderProgram
 {
   public:
@@ -15,10 +23,11 @@ class ShaderProgram
     bool compile();
     void use();
 
-    void setInt(const std::string &name, int value, bool useShader = false);
-    void setFloat(const std::string &name, float value, bool useShader = false);
-    void setVector4f(const std::string &name, float x, float y, float z, float w, bool useShader = false);
-    void setMatrix4(const std::string &name, const glm::mat4 &mat, bool useShader = false);
+    void setRenderType(RenderType type);
+    void setInt(const std::string &name, int value);
+    void setFloat(const std::string &name, float value);
+    void setVector4f(const std::string &name, float x, float y, float z, float w);
+    void setMatrix4(const std::string &name, const glm::mat4 &mat);
 
   private:
     unsigned int m_shader_program;

@@ -41,9 +41,11 @@ void main()
    if (renderType == 0) { // Text
        vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, TexCoords).r);
        color = textColor * sampled;
-   } else if (renderType == 1) { // Rectangle
+   } else if (renderType == 1) { // ColoredText
+       color = texture(text, TexCoords);
+   } else if (renderType == 2) { // Rectangle
        color = rectColor;
-   } else if (renderType == 2) { // Shadow
+   } else if (renderType == 3) { // Shadow
       vec2 rectPos = rectBounds.xy + rectBounds.zw * 0.5;
       vec2 rectSize = rectBounds.zw;
       vec2 pixelPos = gl_FragCoord.xy;
@@ -53,8 +55,6 @@ void main()
       float shadowAlpha = 1.0 - smoothstep(0.0, shadowRadius, dist);
 
       color = vec4(vec3(0.0), 0.5 * shadowAlpha);
-   } else if (renderType == 3) {
-       color = texture(text, TexCoords);
    }
 }
 )";
@@ -66,7 +66,7 @@ bool opengl::ShaderProgram::compile() {
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);
-    // check for shader compile errors
+
     int success;
     char infoLog[512];
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
@@ -76,11 +76,11 @@ bool opengl::ShaderProgram::compile() {
         spdlog::error("ERROR::SHADER::VERTEX::COMPILATION_FAILED: {}", infoLog);
         return false;
     }
-    // fragment shader
+
     unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
     glCompileShader(fragmentShader);
-    // check for shader compile errors
+
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
     if (!success)
     {
@@ -88,12 +88,12 @@ bool opengl::ShaderProgram::compile() {
         spdlog::error("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED: {}", infoLog);
         return false;
     }
-    // link shaders
+
     m_shader_program = glCreateProgram();
     glAttachShader(m_shader_program, vertexShader);
     glAttachShader(m_shader_program, fragmentShader);
     glLinkProgram(m_shader_program);
-    // check for linking errors
+
     glGetProgramiv(m_shader_program, GL_LINK_STATUS, &success);
     if (!success)
     {
@@ -114,23 +114,23 @@ void opengl::ShaderProgram::use() {
     glUseProgram(m_shader_program);
 }
 
-void opengl::ShaderProgram::setFloat(const std::string &name, float value, bool useShader) {
-    if (useShader) use();
+void opengl::ShaderProgram::setRenderType(opengl::RenderType type) {
+    setInt("renderType", (int)type);
+}
+
+void opengl::ShaderProgram::setFloat(const std::string &name, float value) {
     glUniform1f(glGetUniformLocation(m_shader_program, name.c_str()), value);
 }
 
-void opengl::ShaderProgram::setInt(const std::string& name, int value, bool useShader) {
-    if (useShader) use();
+void opengl::ShaderProgram::setInt(const std::string& name, int value) {
     glUniform1i(glGetUniformLocation(m_shader_program, name.c_str()), value);
 }
 
-void opengl::ShaderProgram::setVector4f(const std::string& name, float x, float y, float z, float w, bool useShader) {
-    if (useShader) use();
+void opengl::ShaderProgram::setVector4f(const std::string& name, float x, float y, float z, float w) {
     glUniform4f(glGetUniformLocation(m_shader_program, name.c_str()), x, y, z, w);
 }
 
-void opengl::ShaderProgram::setMatrix4(const std::string& name, const glm::mat4& mat, bool useShader)
+void opengl::ShaderProgram::setMatrix4(const std::string& name, const glm::mat4& mat)
 {
-    if (useShader) use();
     glUniformMatrix4fv(glGetUniformLocation(m_shader_program, "projection"), 1, GL_FALSE, glm::value_ptr(mat));
 }
