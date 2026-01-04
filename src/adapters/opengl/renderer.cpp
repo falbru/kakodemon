@@ -142,7 +142,7 @@ void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font
     }
 
     if (alignment.v == domain::Alignment::VerticalAlignment::Bottom) {
-        start_y -= glyph_line.height();
+        start_y -= font->getLineHeight();
     }
 
     // First pass: Render all backgrounds
