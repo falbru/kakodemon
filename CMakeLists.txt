@@ -84,6 +84,7 @@ set(SRC
     src/domain/lines.cpp
     src/domain/menu.cpp
     src/domain/modeline.cpp
+    src/domain/ports/font.cpp
     src/domain/ports/kakouneinterface.cpp
     src/domain/statusline.cpp
     src/domain/utf8string.cpp

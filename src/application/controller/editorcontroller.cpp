@@ -32,7 +32,11 @@ void EditorController::update(UIOptions& ui_options)
 
     auto font_option = m_kakoune_client->interface->getUIOptionsFont();
     if (font_option.has_value()) {
+        domain::Font* prev_font = ui_options.font;
         ui_options.font = m_font_manager->getFontFromName(font_option.value());
+        if (prev_font != ui_options.font) {
+            loadBasicGlyphs(ui_options.font);
+        }
     }
 }
 

@@ -32,6 +32,8 @@ class Font
     virtual int getSize() const = 0;
 };
 
+void loadBasicGlyphs(Font *font);
+
 } // namespace domain
 
 #endif

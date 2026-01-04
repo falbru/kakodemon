@@ -8,13 +8,6 @@ opengl::Font::Font(domain::FontEngine* font_engine)
     : m_font_engine(font_engine) {
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-    for (domain::Codepoint c = 0x20; c < 128; c++)
-    {
-        if (c == 0x7F) continue;
-
-        loadGlyph(c);
-    }
-
     if(auto fallback_rasterized_glyph = m_font_engine->rasterizeFallbackGlyph()) {
         unsigned int texture;
         glGenTextures(1, &texture);
