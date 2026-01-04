@@ -116,6 +116,12 @@ void opengl::ShaderProgram::use() {
 
 void opengl::ShaderProgram::setRenderType(opengl::RenderType type) {
     setInt("renderType", (int)type);
+
+    if (type == RenderType::ColoredText) {
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    }else {
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
 }
 
 void opengl::ShaderProgram::setFloat(const std::string &name, float value) {

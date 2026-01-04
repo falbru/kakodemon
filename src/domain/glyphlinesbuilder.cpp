@@ -71,10 +71,17 @@ std::vector<GlyphRun> GlyphLinesBuilder::buildGlyphRuns(const UTF8String& conten
     std::vector<GlyphMetrics> current_glyphs;
     Font* current_font = nullptr;
 
+    Codepoint cp;
     for (int i = 0; i < contents.size(); i++) {
-        if (isControlCharacter(contents.at(i))) continue;
+        if (contents.at(i) == '\n') {
+            cp = ' ';
+        }else if (isControlCharacter(contents.at(i))) {
+            continue;
+        }else {
+            cp = contents.at(i);
+        }
 
-        auto glyph_with_font = font_manager->getGlyphWithFont(contents.at(i), font);
+        auto glyph_with_font = font_manager->getGlyphWithFont(cp, font);
 
         if (current_font == nullptr || current_font == glyph_with_font.font) {
             current_font = glyph_with_font.font;

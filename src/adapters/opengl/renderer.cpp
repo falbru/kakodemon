@@ -184,7 +184,6 @@ void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font
                         m_shader_program->setRenderType(RenderType::Text);
                     }else {
                         m_shader_program->setRenderType(RenderType::ColoredText);
-                        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
                     }
 
                     float xpos = x_it + glyph.bearing.x;
@@ -204,8 +203,6 @@ void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font
                     glBindBuffer(GL_ARRAY_BUFFER, 0);
                     glDrawArrays(GL_TRIANGLES, 0, 6);
                     x_it += glyph.advance;
-
-                    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                 }
             }
         }
