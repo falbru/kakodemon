@@ -1,12 +1,11 @@
 #include "freetypelibrary.hpp"
-#include <spdlog/spdlog.h>
+#include <stdexcept>
 
 FreeTypeLibrary::FreeTypeLibrary() : m_library(nullptr)
 {
     if (FT_Init_FreeType(&m_library))
     {
-        spdlog::error("FreeType: Could not init FreeType Library");
-        m_library = nullptr;
+        throw std::runtime_error("FreeType: Could not init FreeType Library");
     }
 }
 

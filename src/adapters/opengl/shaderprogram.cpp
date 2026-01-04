@@ -62,7 +62,7 @@ void main()
 opengl::ShaderProgram::ShaderProgram() {
 }
 
-bool opengl::ShaderProgram::compile() {
+void opengl::ShaderProgram::compile() {
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);
@@ -73,8 +73,7 @@ bool opengl::ShaderProgram::compile() {
     if (!success)
     {
         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        spdlog::error("ERROR::SHADER::VERTEX::COMPILATION_FAILED: {}", infoLog);
-        return false;
+        throw std::runtime_error("Shader vertex compilation failed: " + std::string(infoLog));
     }
 
     unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -85,8 +84,7 @@ bool opengl::ShaderProgram::compile() {
     if (!success)
     {
         glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        spdlog::error("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED: {}", infoLog);
-        return false;
+        throw std::runtime_error("Shader fragment compilation failed: " + std::string(infoLog));
     }
 
     m_shader_program = glCreateProgram();
@@ -98,16 +96,13 @@ bool opengl::ShaderProgram::compile() {
     if (!success)
     {
         glGetProgramInfoLog(m_shader_program, 512, NULL, infoLog);
-        spdlog::error("ERROR::SHADER::PROGRAM::LINKING_FAILED", infoLog);
-        return false;
+        throw std::runtime_error("Shader program linking failed: " + std::string(infoLog));
     }
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    return true;
 }
 
 void opengl::ShaderProgram::use() {

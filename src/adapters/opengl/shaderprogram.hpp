@@ -20,7 +20,7 @@ class ShaderProgram
   public:
     ShaderProgram();
 
-    bool compile();
+    void compile();
     void use();
 
     void setRenderType(RenderType type);

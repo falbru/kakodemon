@@ -10,7 +10,7 @@ FontconfigResolver::FontconfigResolver()
 {
     if (!FcInit())
     {
-        spdlog::error("Failed to initialize fontconfig");
+        throw std::runtime_error("Failed to initialize fontconfig");
     }
 }
 

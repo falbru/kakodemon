@@ -2,13 +2,14 @@
 #include "domain/ports/fontengine.hpp"
 #include "spdlog/spdlog.h"
 #include <freetype/freetype.h>
+#include <string>
 
 FreeTypeFontEngine::FreeTypeFontEngine(std::shared_ptr<FreeTypeLibrary> library, const std::string &path, int size, int face_index)
     : m_library(library), m_requested_size(size), m_scale(1.0f)
 {
     if (FT_New_Face(m_library->get(), path.c_str(), face_index, &m_face))
     {
-        spdlog::error("FreeType: Failed to load font for path {} with face index {}", path, face_index);
+        throw std::runtime_error("FreeType: Failed to load font for path '" + path + "' with face index " + std::to_string(face_index));
     }
 
     if (FT_Set_Pixel_Sizes(m_face, 0, size))
@@ -54,13 +55,13 @@ std::optional<domain::RasterizedGlyph> FreeTypeFontEngine::rasterizeGlyph(domain
     }
     if (FT_Load_Glyph(m_face, glyph_index, load_flags))
     {
-        spdlog::error("FreeType: Failed to load glyph for codepoint {}", c);
+        spdlog::warn("FreeType: Failed to load glyph for codepoint {}", c);
         return std::nullopt;
     }
 
     if (FT_Render_Glyph(m_face->glyph, FT_RENDER_MODE_NORMAL))
     {
-        spdlog::error("FreeType: Failed to rasterize glyph for codepoint {}", c);
+        spdlog::warn("FreeType: Failed to rasterize glyph for codepoint {}", c);
         return std::nullopt;
     }
 
