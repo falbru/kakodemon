@@ -3,7 +3,6 @@
 #include "adapters/freetype/freetypefontengine.hpp"
 #include "adapters/freetype/freetypelibrary.hpp"
 #include "adapters/opengl/application.hpp"
-#include "domain/fontmanager.hpp"
 
 ApplicationBuilder::ApplicationBuilder()
     : m_platform(PlatformType::OPENGL_GLFW),
