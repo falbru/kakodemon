@@ -21,12 +21,7 @@ FontconfigResolver::~FontconfigResolver()
 
 domain::FontMatch FontconfigResolver::resolve(const std::string& pattern)
 {
-    FcConfig *config = FcInitLoadConfigAndFonts();
-    if (!config)
-    {
-        spdlog::error("Failed to load fontconfig configuration");
-        return domain::FontMatch{"", 0};
-    }
+    FcConfig *config = FcConfigGetCurrent();
 
     std::string family_name;
     std::optional<int> size;
@@ -69,7 +64,6 @@ domain::FontMatch FontconfigResolver::resolve(const std::string& pattern)
     if (!pat)
     {
         spdlog::error("Failed to parse font pattern: {}", pattern);
-        FcConfigDestroy(config);
         return domain::FontMatch{"", 0};
     }
 
@@ -114,19 +108,13 @@ domain::FontMatch FontconfigResolver::resolve(const std::string& pattern)
     }
 
     FcPatternDestroy(pat);
-    FcConfigDestroy(config);
 
     return match;
 }
 
 std::optional<domain::FontMatch> FontconfigResolver::resolveStyleVariant(const domain::FontMatch &base_font, domain::FontStyle style)
 {
-    FcConfig *config = FcInitLoadConfigAndFonts();
-    if (!config)
-    {
-        spdlog::error("Failed to load fontconfig configuration");
-        return std::nullopt;
-    }
+    FcConfig *config = FcConfigGetCurrent();
 
     FcPattern *base_pattern = FcFreeTypeQuery(
         reinterpret_cast<const FcChar8*>(base_font.path.c_str()),
@@ -136,7 +124,6 @@ std::optional<domain::FontMatch> FontconfigResolver::resolveStyleVariant(const d
     if (!base_pattern)
     {
         spdlog::error("Failed to query font file: {}", base_font.path);
-        FcConfigDestroy(config);
         return std::nullopt;
     }
 
@@ -145,7 +132,6 @@ std::optional<domain::FontMatch> FontconfigResolver::resolveStyleVariant(const d
     {
         spdlog::error("Failed to get family name from font: {}", base_font.path);
         FcPatternDestroy(base_pattern);
-        FcConfigDestroy(config);
         return std::nullopt;
     }
 
@@ -154,7 +140,6 @@ std::optional<domain::FontMatch> FontconfigResolver::resolveStyleVariant(const d
     {
         spdlog::error("Failed to create font pattern");
         FcPatternDestroy(base_pattern);
-        FcConfigDestroy(config);
         return std::nullopt;
     }
 
@@ -227,25 +212,18 @@ std::optional<domain::FontMatch> FontconfigResolver::resolveStyleVariant(const d
 
     FcPatternDestroy(pat);
     FcPatternDestroy(base_pattern);
-    FcConfigDestroy(config);
 
     return match;
 }
 
 std::optional<domain::FontMatch> FontconfigResolver::resolveForCodepoint(domain::Codepoint codepoint)
 {
-    FcConfig *config = FcInitLoadConfigAndFonts();
-    if (!config)
-    {
-        spdlog::error("Failed to load fontconfig configuration");
-        return std::nullopt;
-    }
+    FcConfig *config = FcConfigGetCurrent();
 
     FcPattern *pat = FcPatternCreate();
     if (!pat)
     {
         spdlog::error("Failed to create font pattern");
-        FcConfigDestroy(config);
         return std::nullopt;
     }
 
@@ -305,7 +283,6 @@ std::optional<domain::FontMatch> FontconfigResolver::resolveForCodepoint(domain:
 
     FcCharSetDestroy(charset);
     FcPatternDestroy(pat);
-    FcConfigDestroy(config);
 
     return match;
 }
