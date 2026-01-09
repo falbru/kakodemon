@@ -20,6 +20,8 @@ class MenuController
 
     domain::MouseMoveResult onMouseMove(float x, float y);
     bool onMouseButton(domain::MouseButtonEvent event, const UIOptions *ui_options);
+    void onMouseScroll(int scroll_amount);
+    void ensureSelectedItemVisible(int selected_index);
 
     float x() const;
     float y() const;

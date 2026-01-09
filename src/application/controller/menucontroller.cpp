@@ -137,3 +137,39 @@ bool MenuController::onMouseButton(domain::MouseButtonEvent event, const UIOptio
 
     return false;
 }
+
+void MenuController::onMouseScroll(int scroll_amount) {
+    if (!m_kakoune_client->state.menu.has_value()) {
+        return;
+    }
+
+    switch(m_kakoune_client->state.menu->getStyle()) {
+        case domain::MenuStyle::INLINE:
+            m_inline_menu_view->onMouseScroll(scroll_amount, *m_kakoune_client);
+            break;
+        case domain::MenuStyle::PROMPT:
+            m_prompt_menu_view->onMouseScroll(scroll_amount, *m_kakoune_client);
+            break;
+        case domain::MenuStyle::SEARCH:
+            m_search_menu_view->onMouseScroll(scroll_amount, *m_kakoune_client);
+            break;
+    }
+}
+
+void MenuController::ensureSelectedItemVisible(int selected_index) {
+    if (!m_kakoune_client->state.menu.has_value()) {
+        return;
+    }
+
+    switch(m_kakoune_client->state.menu->getStyle()) {
+        case domain::MenuStyle::INLINE:
+            m_inline_menu_view->ensureSelectedItemVisible(selected_index);
+            break;
+        case domain::MenuStyle::PROMPT:
+            m_prompt_menu_view->ensureSelectedItemVisible(selected_index);
+            break;
+        case domain::MenuStyle::SEARCH:
+            m_search_menu_view->ensureSelectedItemVisible(selected_index);
+            break;
+    }
+}

@@ -1,4 +1,5 @@
 #include "editorcontroller.hpp"
+#include "application/controller/menucontroller.hpp"
 #include "application/model/uioptions.hpp"
 #include "domain/color.hpp"
 #include "domain/mouse.hpp"
@@ -13,21 +14,31 @@ void EditorController::init(KakouneClient* kakoune_client,
                             KakouneContentView* kakoune_content_view,
                             StatusBarView* status_bar_view,
                             domain::FontManager* font_manager,
-                            std::function<void(domain::RGBAColor)> set_clear_color)
+                            std::function<void(domain::RGBAColor)> set_clear_color,
+                            MenuController* menu_controller)
 {
     m_kakoune_client = kakoune_client;
     m_kakoune_content_view = kakoune_content_view;
     m_status_bar_view = status_bar_view;
     m_font_manager = font_manager;
     m_set_clear_color = set_clear_color;
+    m_menu_controller = menu_controller;
 }
 
-void EditorController::update(UIOptions& ui_options)
+bool EditorController::update(UIOptions& ui_options)
 {
-    auto frame_state = m_kakoune_client->interface->getNextKakouneState();
-    if (frame_state.has_value()) {
-        m_kakoune_client->state = frame_state.value();
+    bool state_updated = false;
+    auto result = m_kakoune_client->interface->getNextKakouneStateAndEvents();
+    if (result.has_value()) {
+        m_kakoune_client->state = result->first;
+        domain::FrameEvents events = result->second;
+
         setClearColor(m_kakoune_client->state.default_face.getBg());
+        state_updated = true;
+
+        if (events.menu_select && m_kakoune_client->state.menu.has_value() && m_kakoune_client->state.menu->hasItems()) {
+            m_menu_controller->ensureSelectedItemVisible(events.menu_selected_index);
+        }
     }
 
     auto font_option = m_kakoune_client->interface->getUIOptionsFont();
@@ -38,6 +49,8 @@ void EditorController::update(UIOptions& ui_options)
             loadBasicGlyphs(ui_options.font);
         }
     }
+
+    return state_updated;
 }
 
 void EditorController::render(const UIOptions& ui_options)

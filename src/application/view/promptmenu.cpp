@@ -105,3 +105,14 @@ domain::MouseMoveResult PromptMenuView::onMouseMove(float x, float y) {
 std::optional<int> PromptMenuView::findItemAtPosition(float x, float y, domain::Font *font, const KakouneClient &kakoune_client) {
     return m_scrolled_menu_items->findItemAtPosition(x, y, font, kakoune_client);
 }
+
+void PromptMenuView::onMouseScroll(int scroll_amount, const KakouneClient &kakoune_client) {
+    if (!kakoune_client.state.menu.has_value() || !kakoune_client.state.menu->hasItems()) return;
+
+    int total_items = kakoune_client.state.menu->getItems().items.size();
+    m_scrolled_menu_items->scroll(scroll_amount, total_items);
+}
+
+void PromptMenuView::ensureSelectedItemVisible(int selected_index) {
+    m_scrolled_menu_items->ensureSelectedItemVisible(selected_index);
+}

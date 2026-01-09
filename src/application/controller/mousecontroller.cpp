@@ -89,27 +89,31 @@ void MouseController::onMouseScroll(double offset, float x, float y, const UIOpt
     }
 
     if (scroll_amount != 0) {
-        bool obscured = false;
+        bool over_menu = false;
         if (m_kakoune_client->state.menu.has_value()) {
             float menu_x = m_menu_controller->x();
             float menu_y = m_menu_controller->y();
             float menu_width = m_menu_controller->width();
             float menu_height = m_menu_controller->height();
             if (x >= menu_x && x <= menu_x + menu_width && y >= menu_y && y <= menu_y + menu_height) {
-                obscured = true;
+                over_menu = true;
             }
         }
-        if (!obscured && m_kakoune_client->state.info_box.has_value()) {
+
+        bool over_info_box = false;
+        if (!over_menu && m_kakoune_client->state.info_box.has_value()) {
             float info_box_x = m_info_box_controller->x();
             float info_box_y = m_info_box_controller->y();
             float info_box_width = m_info_box_controller->width();
             float info_box_height = m_info_box_controller->height();
             if (x >= info_box_x && x <= info_box_x + info_box_width && y >= info_box_y && y <= info_box_y + info_box_height) {
-                obscured = true;
+                over_info_box = true;
             }
         }
 
-        if (!obscured) {
+        if (over_menu) {
+            m_menu_controller->onMouseScroll(-scroll_amount);
+        } else if (!over_info_box) {
             m_editor_controller->onMouseScroll(-scroll_amount, x, y, ui_options);
         }
     }

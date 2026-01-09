@@ -15,16 +15,6 @@ void ScrolledMenuItems::render(domain::Renderer* renderer, domain::Font* font, d
 
     const auto& menu_items = kakoune_client.state.menu->getItems();
     int selected_index = menu_items.selected_index;
-    if (selected_index >= menu_items.items.size())
-        selected_index = -1;
-    if (selected_index < m_scroll_offset)
-    {
-        m_scroll_offset = std::max(0, selected_index);
-    }
-    else if (selected_index >= m_scroll_offset + m_max_visible_items)
-    {
-        m_scroll_offset = std::max(0, selected_index - m_max_visible_items + 1);
-    }
 
     for (int i = m_scroll_offset; i < m_scroll_offset + m_max_visible_items && i < menu_items.items.size(); i++)
     {
@@ -103,4 +93,21 @@ std::optional<int> ScrolledMenuItems::findItemAtPosition(float x, float y, domai
     }
 
     return std::nullopt;
+}
+
+void ScrolledMenuItems::scroll(int amount, int total_items) {
+    m_scroll_offset += amount;
+    int max_scroll = std::max(0, total_items - m_max_visible_items);
+    m_scroll_offset = std::max(0.0f, std::min((float)max_scroll, m_scroll_offset));
+}
+
+void ScrolledMenuItems::ensureSelectedItemVisible(int selected_index) {
+    if (selected_index < m_scroll_offset)
+    {
+        m_scroll_offset = std::max(0, selected_index);
+    }
+    else if (selected_index >= m_scroll_offset + m_max_visible_items)
+    {
+        m_scroll_offset = std::max(0, selected_index - m_max_visible_items + 1);
+    }
 }

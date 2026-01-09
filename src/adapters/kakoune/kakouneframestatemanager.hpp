@@ -18,6 +18,13 @@ struct FrameState
     int menu_selected_index;
 };
 
+struct FrameEvents
+{
+    bool menu_show = false;
+    bool menu_select = false;
+    int menu_selected_index = -1;
+};
+
 class KakouneFrameStateManager
 {
   public:
@@ -28,14 +35,19 @@ class KakouneFrameStateManager
     void stop();
 
     std::optional<FrameState> getNextFrameState();
+    FrameEvents getEvents();
+    std::optional<std::pair<FrameState, FrameEvents>> getNextFrameStateAndEvents();
 
   private:
     void onRequest(const IncomingRequest &request);
 
     KakouneClientProcess *m_process;
 
+    FrameState m_active_frame_state;
+    bool m_active_frame_state_ready;
     FrameState m_next_frame_state;
-    bool m_next_frame_state_ready;
+    FrameEvents m_active_frame_events;
+    FrameEvents m_next_frame_events;
 
     bool m_running;
 

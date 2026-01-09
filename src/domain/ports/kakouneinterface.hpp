@@ -25,6 +25,12 @@ struct KakouneState
     Face default_face;
 };
 
+struct FrameEvents
+{
+    bool menu_select = false;
+    int menu_selected_index = -1;
+};
+
 class KakouneInterface
 {
   public:
@@ -32,6 +38,8 @@ class KakouneInterface
 
     virtual std::optional<KakouneState> getNextKakouneState() = 0;
     virtual std::optional<std::string> getUIOptionsFont() = 0;
+    virtual FrameEvents getEvents() = 0;
+    virtual std::optional<std::pair<KakouneState, FrameEvents>> getNextKakouneStateAndEvents() = 0;
 
     virtual void pressKeys(const std::vector<std::string> &keys) = 0;
     virtual void resize(int rows, int columns) = 0;

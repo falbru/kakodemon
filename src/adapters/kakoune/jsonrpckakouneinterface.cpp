@@ -25,17 +25,7 @@ JsonRpcKakouneInterface::~JsonRpcKakouneInterface() {
     m_frame_state_manager->stop();
 }
 
-std::optional<domain::KakouneState> JsonRpcKakouneInterface::getNextKakouneState() {
-    auto frame_state_opt = m_frame_state_manager->getNextFrameState();
-
-    if (!frame_state_opt.has_value()) {
-        return std::nullopt;
-    }
-
-    FrameState frame_state = frame_state_opt.value();
-
-    if (frame_state.ui_options.has_value()) m_ui_options = frame_state.ui_options.value();
-
+domain::KakouneState JsonRpcKakouneInterface::convertFrameStateToKakouneState(const FrameState& frame_state) {
     std::optional<domain::InfoBox> info_box;
     if (frame_state.info_box.has_value()) {
        info_box = domain::InfoBox{
@@ -89,8 +79,53 @@ std::optional<domain::KakouneState> JsonRpcKakouneInterface::getNextKakouneState
     };
 }
 
+std::optional<domain::KakouneState> JsonRpcKakouneInterface::getNextKakouneState() {
+    auto frame_state_opt = m_frame_state_manager->getNextFrameState();
+
+    if (!frame_state_opt.has_value()) {
+        return std::nullopt;
+    }
+
+    FrameState frame_state = frame_state_opt.value();
+
+    if (frame_state.ui_options.has_value()) m_ui_options = frame_state.ui_options.value();
+
+    return convertFrameStateToKakouneState(frame_state);
+}
+
 std::optional<std::string> JsonRpcKakouneInterface::getUIOptionsFont() {
     return m_ui_options.font;
+}
+
+domain::FrameEvents JsonRpcKakouneInterface::getEvents() {
+    FrameEvents adapter_events = m_frame_state_manager->getEvents();
+
+    return domain::FrameEvents{
+        .menu_select = adapter_events.menu_select,
+        .menu_selected_index = adapter_events.menu_selected_index
+    };
+}
+
+std::optional<std::pair<domain::KakouneState, domain::FrameEvents>> JsonRpcKakouneInterface::getNextKakouneStateAndEvents() {
+    auto result = m_frame_state_manager->getNextFrameStateAndEvents();
+
+    if (!result.has_value()) {
+        return std::nullopt;
+    }
+
+    FrameState frame_state = result->first;
+    FrameEvents adapter_events = result->second;
+
+    if (frame_state.ui_options.has_value()) m_ui_options = frame_state.ui_options.value();
+
+    domain::KakouneState kakoune_state = convertFrameStateToKakouneState(frame_state);
+
+    domain::FrameEvents events{
+        .menu_select = adapter_events.menu_select,
+        .menu_selected_index = adapter_events.menu_selected_index
+    };
+
+    return std::make_pair(kakoune_state, events);
 }
 
 void JsonRpcKakouneInterface::pressKeys(const std::vector<std::string>& keys) {

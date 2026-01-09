@@ -19,6 +19,8 @@ class PromptMenuView
 
     domain::MouseMoveResult onMouseMove(float x, float y);
     std::optional<int> findItemAtPosition(float x, float y, domain::Font *font, const KakouneClient &kakoune_client);
+    void onMouseScroll(int scroll_amount, const KakouneClient &kakoune_client);
+    void ensureSelectedItemVisible(int selected_index);
 
     float x() const;
     float y() const;

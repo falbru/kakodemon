@@ -3,7 +3,7 @@
 #include <optional>
 
 KakouneFrameStateManager::KakouneFrameStateManager(KakouneClientProcess* process)
-    : m_process(process), m_next_frame_state_ready(false), m_running(false) {
+    : m_process(process), m_active_frame_state_ready(false), m_running(false) {
     m_process->setRequestCallback([this](const IncomingRequest& request) {
         onRequest(request);
     });
@@ -53,6 +53,7 @@ void KakouneFrameStateManager::onRequest(const IncomingRequest& request)
     case IncomingRequestType::MENU_SHOW: {
         m_next_frame_state.menu = std::get<MenuShowData>(request.data);
         m_next_frame_state.menu_selected_index = -1;
+        m_next_frame_events.menu_show = true;
         break;
     }
     case IncomingRequestType::MENU_HIDE: {
@@ -69,11 +70,16 @@ void KakouneFrameStateManager::onRequest(const IncomingRequest& request)
         break;
     }
     case IncomingRequestType::MENU_SELECT: {
-        m_next_frame_state.menu_selected_index = std::get<MenuSelectData>(request.data).selected;
+        int selected_index = std::get<MenuSelectData>(request.data).selected;
+        m_next_frame_state.menu_selected_index = selected_index;
+        m_next_frame_events.menu_select = true;
+        m_next_frame_events.menu_selected_index = selected_index;
         break;
     }
     case IncomingRequestType::REFRESH: {
-        m_next_frame_state_ready = true;
+        m_active_frame_state = m_next_frame_state;
+        m_active_frame_state_ready = true;
+        m_active_frame_events = m_next_frame_events;
         break;
     }
     case IncomingRequestType::SET_UI_OPTIONS: {
@@ -86,9 +92,39 @@ void KakouneFrameStateManager::onRequest(const IncomingRequest& request)
 std::optional<FrameState> KakouneFrameStateManager::getNextFrameState() {
     std::lock_guard<std::mutex> lock(m_state_mutex);
 
-    if (!m_next_frame_state_ready) return std::nullopt;
+    if (!m_active_frame_state_ready) {
+        return std::nullopt;
+    }
 
-    m_next_frame_state_ready = false;
+    m_active_frame_state_ready = false;
 
-    return m_next_frame_state;
+    return m_active_frame_state;
+}
+
+FrameEvents KakouneFrameStateManager::getEvents() {
+    std::lock_guard<std::mutex> lock(m_state_mutex);
+
+    FrameEvents events = m_active_frame_events;
+    m_active_frame_events = FrameEvents{};
+    m_next_frame_events = FrameEvents{};
+
+    return events;
+}
+
+std::optional<std::pair<FrameState, FrameEvents>> KakouneFrameStateManager::getNextFrameStateAndEvents() {
+    std::lock_guard<std::mutex> lock(m_state_mutex);
+
+    if (!m_active_frame_state_ready) {
+        return std::nullopt;
+    }
+
+    m_active_frame_state_ready = false;
+
+    FrameState state = m_active_frame_state;
+    FrameEvents events = m_active_frame_events;
+
+    m_active_frame_events = FrameEvents{};
+    m_next_frame_events = FrameEvents{};
+
+    return std::make_pair(state, events);
 }
