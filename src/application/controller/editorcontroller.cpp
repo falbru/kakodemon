@@ -86,7 +86,7 @@ domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const UI
     }
 
     bool is_any_mouse_button_pressed = false;
-    for (auto mouse_button : m_mouse_button_pressed) {
+    for (const auto& mouse_button : m_mouse_button_pressed) {
         if (mouse_button.second) {
             is_any_mouse_button_pressed = true;
             break;

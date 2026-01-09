@@ -115,7 +115,7 @@ void opengl::Renderer::renderLines(domain::Font* font, domain::FontManager* font
     m_shader_program->use();
 
     float y_it = y;
-    for (auto line : lines.getLines())
+    for (const auto& line : lines.getLines())
     {
         _renderLine(opengl_font, font_manager, line, default_face, x, y_it, domain::Alignment(), RenderPass::BackgroundOnly);
         y_it += font->getLineHeight();
@@ -123,7 +123,7 @@ void opengl::Renderer::renderLines(domain::Font* font, domain::FontManager* font
 
     glBindVertexArray(m_text_vao);
     y_it = y;
-    for (auto line : lines.getLines())
+    for (const auto& line : lines.getLines())
     {
         _renderLine(opengl_font, font_manager, line, default_face, x, y_it, domain::Alignment(), RenderPass::TextOnly);
         y_it += font->getLineHeight();
@@ -152,7 +152,7 @@ void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font
     if (pass == RenderPass::BackgroundOnly || pass == RenderPass::Both) {
         float x_it = start_x;
         float y_it = start_y;
-        for (auto atom : glyph_line.getGlyphAtoms())
+        for (const auto& atom : glyph_line.getGlyphAtoms())
         {
             float height = font->getLineHeight();
             float width = atom.width();
@@ -168,15 +168,15 @@ void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font
     if (pass == RenderPass::TextOnly || pass == RenderPass::Both) {
         float x_it = start_x;
         float y_it = start_y + font->getDescender();
-        for (auto atom : glyph_line.getGlyphAtoms())
+        for (const auto& atom : glyph_line.getGlyphAtoms())
         {
             domain::RGBAColor color = atom.getFace().getFg(default_face);
             m_shader_program->setVector4f("textColor", color.r, color.g, color.b, color.a);
 
-            for (auto run : atom.getRuns())
+            for (const auto& run : atom.getRuns())
             {
                 opengl::Font* run_font = dynamic_cast<opengl::Font*>(run.font);
-                for (auto glyph : run.glyphs)
+                for (const auto& glyph : run.glyphs)
                 {
                     if (domain::isControlCharacter(glyph.codepoint)) continue; // TODO clean way of stripping the last newline?
 

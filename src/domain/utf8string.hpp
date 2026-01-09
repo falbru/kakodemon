@@ -32,6 +32,7 @@ class UTF8String
 
     void addCodepoint(Codepoint codepoint);
     void insertCodepoint(int index, Codepoint codepoint);
+    void reserve(size_t capacity);
 
     int size() const;
     Codepoint at(unsigned int index) const;

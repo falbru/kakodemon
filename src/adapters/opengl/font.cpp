@@ -83,7 +83,7 @@ bool opengl::Font::loadGlyph(domain::Codepoint c) {
 
         Glyph glyph = {texture, rasterized_glyph->metrics, rasterized_glyph->format};
 
-        m_glyphs.insert(std::pair<domain::Codepoint, Glyph>(c, glyph));
+        m_glyphs.emplace(c, glyph);
         return true;
     }
 

@@ -122,6 +122,11 @@ void UTF8String::insertCodepoint(int index, Codepoint codepoint)
     m_codepoints.insert(m_codepoints.begin() + index, codepoint);
 }
 
+void UTF8String::reserve(size_t capacity)
+{
+    m_codepoints.reserve(capacity);
+}
+
 bool isWhitespace(Codepoint cp)
 {
     return cp == 0x09 || cp == 0x0A || cp == 0x0B || cp == 0x0C || cp == 0x0D || cp == 0x20 || cp == 0x85 ||
@@ -192,9 +197,8 @@ UTF8String UTF8String::substring(size_t start) const
 }
 
 UTF8String& UTF8String::operator+=(const UTF8String& string) {
-    for (int i = 0; i < string.size(); i++) {
-        addCodepoint(string.at(i));
-    }
+    m_codepoints.reserve(m_codepoints.size() + string.m_codepoints.size());
+    m_codepoints.insert(m_codepoints.end(), string.m_codepoints.begin(), string.m_codepoints.end());
     return *this;
 }
 

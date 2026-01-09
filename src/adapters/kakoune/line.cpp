@@ -18,10 +18,13 @@ int kakoune::Line::size() const {
 
 domain::UTF8String kakoune::Line::toUTF8String() const {
     domain::UTF8String string;
+    size_t total_size = 0;
     for (int i = 0; i < atoms.size(); i++) {
-        for (int j = 0; j < atoms[i].contents.size(); j++) {
-            string.addCodepoint(atoms[i].contents.at(j));
-        }
+        total_size += atoms[i].contents.size();
+    }
+    string.reserve(total_size);
+    for (int i = 0; i < atoms.size(); i++) {
+        string += atoms[i].contents;
     }
     return string;
 }

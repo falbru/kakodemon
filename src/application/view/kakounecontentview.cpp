@@ -25,7 +25,7 @@ float KakouneContentView::getCellHeight(domain::Font* font) const {
 std::pair<float, float> KakouneContentView::coordToPixels(domain::Font* font, const domain::Coord& coord) const {
     float x = getCellWidth(font) * coord.column;
     float y = getCellHeight(font) * coord.line;
-    return std::make_pair(x, y);
+    return {x, y};
 }
 
 void KakouneContentView::setWidth(float width) {

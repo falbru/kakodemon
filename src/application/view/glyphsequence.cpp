@@ -13,7 +13,7 @@ GlyphSequence::GlyphSequence(domain::Font* font, domain::FontManager* font_manag
 
 float GlyphSequence::width() const {
     float w = 0;
-    for (auto glyph : m_glyphs) {
+    for (const auto& glyph : m_glyphs) {
         w += glyph.advance;
     }
     return w;

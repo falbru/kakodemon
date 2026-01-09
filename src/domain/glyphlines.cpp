@@ -6,10 +6,11 @@ namespace domain {
 GlyphLines::GlyphLines(const std::vector<GlyphLine>& lines, float line_height) : m_lines(lines), m_line_height(line_height) { }
 
 Lines GlyphLines::toLines() const {
-    std::vector<Line> lines(m_lines.size());
+    std::vector<Line> lines;
+    lines.reserve(m_lines.size());
 
     for (int i = 0; i < m_lines.size(); i++) {
-        lines[i] = m_lines[i].toLine();
+        lines.push_back(m_lines[i].toLine());
     }
 
     return Lines(lines);

@@ -84,6 +84,11 @@ unsigned int Line::length() const {
 
 UTF8String Line::toUTF8String() const {
     UTF8String string;
+    size_t total_size = 0;
+    for (int i = 0; i < m_atoms.size(); i++) {
+        total_size += m_atoms[i].size();
+    }
+    string.reserve(total_size);
     for (int i = 0; i < m_atoms.size(); i++) {
         string += m_atoms[i].toUTF8String();
     }

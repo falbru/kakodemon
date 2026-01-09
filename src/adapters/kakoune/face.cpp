@@ -69,7 +69,7 @@ domain::Attribute toDomain(kakoune::Attribute attr) {
 domain::Face kakoune::toDomain(kakoune::Face face) {
     std::vector<domain::Attribute> attributes;
     attributes.reserve(face.attributes.size());
-    for (auto attr : face.attributes) {
+    for (const auto& attr : face.attributes) {
         attributes.push_back(::toDomain(attr));
     }
     return domain::Face(toDomain(face.bg), toDomain(face.fg), std::move(attributes));

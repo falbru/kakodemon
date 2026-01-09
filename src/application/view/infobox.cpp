@@ -309,7 +309,7 @@ void InfoBoxView::render(const KakouneClient *kakoune_client, domain::FontManage
     };
 
     Placement placement;
-    for (auto dir : fallback_directions)
+    for (const auto& dir : fallback_directions)
     {
         auto current_placement = tryPlaceInfoBox(dir, alignment, kakoune_client->state.info_box->content, anchor, width, height, ui_options.font, font_manager, menu_rectangle);
         if (current_placement.has_value()) {
