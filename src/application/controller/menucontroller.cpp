@@ -41,11 +41,11 @@ domain::MouseMoveResult MenuController::onMouseMove(float x, float y) {
 
     switch(m_kakoune_client->state.menu->getStyle()) {
         case domain::MenuStyle::INLINE:
-            return m_inline_menu_view->onMouseMove(x, y);
+            return m_inline_menu_view->onMouseMove(x, y, *m_kakoune_client);
         case domain::MenuStyle::PROMPT:
-            return m_prompt_menu_view->onMouseMove(x, y);
+            return m_prompt_menu_view->onMouseMove(x, y, *m_kakoune_client);
         case domain::MenuStyle::SEARCH:
-            return m_search_menu_view->onMouseMove(x, y);
+            return m_search_menu_view->onMouseMove(x, y, *m_kakoune_client);
     }
     return domain::MouseMoveResult{std::nullopt};
 }
@@ -107,7 +107,7 @@ float MenuController::height() const {
 }
 
 bool MenuController::onMouseButton(domain::MouseButtonEvent event, const UIOptions *ui_options) {
-    if (!m_kakoune_client->state.menu) {
+    if (!m_kakoune_client->state.menu || !m_kakoune_client->state.menu->hasItems()) {
         return false;
     }
 

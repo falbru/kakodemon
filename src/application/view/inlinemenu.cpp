@@ -80,14 +80,16 @@ float InlineMenuView::scrolledItemsHeight() const {
     return m_scrolled_menu_items->height();
 }
 
-domain::MouseMoveResult InlineMenuView::onMouseMove(float x, float y) {
-    float items_x = m_scrolled_menu_items->x();
-    float items_y = m_scrolled_menu_items->y();
-    float items_width = m_scrolled_menu_items->width();
-    float items_height = m_scrolled_menu_items->height();
+domain::MouseMoveResult InlineMenuView::onMouseMove(float x, float y, const KakouneClient &kakoune_client) {
+    if (kakoune_client.state.menu.has_value() && kakoune_client.state.menu->hasItems()) {
+        float items_x = m_scrolled_menu_items->x();
+        float items_y = m_scrolled_menu_items->y();
+        float items_width = m_scrolled_menu_items->width();
+        float items_height = m_scrolled_menu_items->height();
 
-    if (x >= items_x && x < items_x + items_width && y >= items_y && y < items_y + items_height) {
-        return domain::MouseMoveResult{domain::Cursor::POINTER};
+        if (x >= items_x && x < items_x + items_width && y >= items_y && y < items_y + items_height) {
+            return domain::MouseMoveResult{domain::Cursor::POINTER};
+        }
     }
 
     if (x >= this->x() && x < this->x() + width() && y >= this->y() && y < this->y() + height()) {

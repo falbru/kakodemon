@@ -17,7 +17,7 @@ class InlineMenuView
     void render(domain::Font *font, domain::FontManager *font_manager, const KakouneClient &kakoune_client, float width,
                 float height);
 
-    domain::MouseMoveResult onMouseMove(float x, float y);
+    domain::MouseMoveResult onMouseMove(float x, float y, const KakouneClient &kakoune_client);
     std::optional<int> findItemAtPosition(float x, float y, domain::Font *font, const KakouneClient &kakoune_client);
     void onMouseScroll(int scroll_amount, const KakouneClient &kakoune_client);
     void ensureSelectedItemVisible(int selected_index);
