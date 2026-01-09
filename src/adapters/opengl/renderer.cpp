@@ -3,6 +3,7 @@
 #include "adapters/opengl/shaderprogram.hpp"
 #include "domain/alignment.hpp"
 #include "domain/color.hpp"
+#include "domain/face.hpp"
 #include "domain/glyphlinesbuilder.hpp"
 #include "domain/line.hpp"
 #include "domain/ports/fontengine.hpp"
@@ -173,6 +174,8 @@ void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font
             domain::RGBAColor color = atom.getFace().getFg(default_face);
             m_shader_program->setVector4f("textColor", color.r, color.g, color.b, color.a);
 
+            float atom_x = x_it;
+
             for (const auto& run : atom.getRuns())
             {
                 opengl::Font* run_font = dynamic_cast<opengl::Font*>(run.font);
@@ -204,6 +207,10 @@ void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font
                     glDrawArrays(GL_TRIANGLES, 0, 6);
                     x_it += glyph.advance;
                 }
+            }
+
+            if (atom.getFace().hasAttribute(domain::Attribute::Underline) && font->getUnderlineThickness() > 0) {
+                _renderRect(atom.getFace().getFg(default_face), atom_x, y_it + font->getUnderlineOffset(), x_it - atom_x, font->getUnderlineThickness());
             }
         }
     }

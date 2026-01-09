@@ -1,4 +1,5 @@
 #include "glyphlinesbuilder.hpp"
+#include "domain/face.hpp"
 #include "domain/utf8string.hpp"
 #include <algorithm>
 
@@ -34,10 +35,9 @@ GlyphLine GlyphLinesBuilder::build(const Line& line, Font* font, FontManager* fo
 GlyphAtom GlyphLinesBuilder::build(const Atom& atom, Font* font, FontManager* font_manager)
 {
     auto contents = atom.getContents();
-    const auto& attributes = atom.getFace().getAttributes();
 
-    bool has_bold = std::find(attributes.begin(), attributes.end(), Attribute::Bold) != attributes.end();
-    bool has_italic = std::find(attributes.begin(), attributes.end(), Attribute::Italic) != attributes.end();
+    bool has_bold = atom.getFace().hasAttribute(Attribute::Bold);
+    bool has_italic = atom.getFace().hasAttribute(Attribute::Italic);
 
     Font* active_font = font;
     if (has_bold || has_italic) {

@@ -29,6 +29,8 @@ class Font
     virtual float getAscender() const = 0;
     virtual float getDescender() const = 0;
     virtual float getLineHeight() const = 0;
+    virtual float getUnderlineOffset() const = 0;
+    virtual float getUnderlineThickness() const = 0;
     virtual int getSize() const = 0;
 };
 

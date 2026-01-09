@@ -46,6 +46,16 @@ class FontMock : public domain::Font
         return -4.0f;
     }
 
+    float getUnderlineOffset() const override
+    {
+        return 0.0f;
+    }
+
+    float getUnderlineThickness() const override
+    {
+        return 1;
+    }
+
     float getLineHeight() const override
     {
         return 24.0f;

@@ -35,6 +35,7 @@ class Face
     RGBAColor getBg() const;
 
     const std::vector<Attribute> &getAttributes() const;
+    bool hasAttribute(Attribute attribute) const;
 
     bool operator==(const Face &other) const;
 

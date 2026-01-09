@@ -104,6 +104,14 @@ float opengl::Font::getLineHeight() const {
     return m_font_engine->getLineHeight();
 }
 
+float opengl::Font::getUnderlineOffset() const {
+    return m_font_engine->getUnderlineOffset();
+}
+
+float opengl::Font::getUnderlineThickness() const {
+    return m_font_engine->getUnderlineThickness();
+}
+
 int opengl::Font::getSize() const {
     return m_font_engine->getSize();
 }

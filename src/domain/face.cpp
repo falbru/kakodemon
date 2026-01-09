@@ -1,5 +1,6 @@
 #include "face.hpp"
 #include "domain/color.hpp"
+#include <algorithm>
 #include <variant>
 
 namespace domain {
@@ -54,6 +55,10 @@ RGBAColor Face::getBg() const {
 
 const std::vector<Attribute>& Face::getAttributes() const {
     return m_attributes;
+}
+
+bool Face::hasAttribute(Attribute attribute) const {
+    return std::find(m_attributes.begin(), m_attributes.end(), attribute) != m_attributes.end();
 }
 
 bool Face::operator==(const Face& other) const {

@@ -35,6 +35,8 @@ class Font : public domain::Font
     float getAscender() const override;
     float getDescender() const override;
     float getLineHeight() const override;
+    float getUnderlineOffset() const override;
+    float getUnderlineThickness() const override;
     int getSize() const override;
 
   private:

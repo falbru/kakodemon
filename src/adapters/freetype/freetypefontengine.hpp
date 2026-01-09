@@ -28,6 +28,8 @@ class FreeTypeFontEngine : public domain::FontEngine
     float getAscender() const override;
     float getDescender() const override;
     float getLineHeight() const override;
+    float getUnderlineOffset() const override;
+    float getUnderlineThickness() const override;
     int getSize() const override;
 
   private:
@@ -37,6 +39,8 @@ class FreeTypeFontEngine : public domain::FontEngine
     float m_ascender;
     float m_descender;
     float m_line_height;
+    float m_underline_offset;
+    float m_underline_thickness;
     int m_requested_size;
     float m_scale;
 

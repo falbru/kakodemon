@@ -24,6 +24,8 @@ FreeTypeFontEngine::FreeTypeFontEngine(std::shared_ptr<FreeTypeLibrary> library,
     m_ascender = (m_face->size->metrics.ascender >> 6) * m_scale;
     m_descender = (m_face->size->metrics.descender >> 6) * m_scale;
     m_line_height = (m_face->size->metrics.height >> 6) * m_scale;
+    m_underline_offset = -(m_face->underline_position / 64.0f) * m_scale;
+    m_underline_thickness = (m_face->underline_thickness / 64.0f) * m_scale;
 }
 
 FreeTypeFontEngine::~FreeTypeFontEngine()
@@ -145,6 +147,14 @@ float FreeTypeFontEngine::getDescender() const {
 
 float FreeTypeFontEngine::getLineHeight() const {
     return m_line_height;
+}
+
+float FreeTypeFontEngine::getUnderlineOffset() const {
+    return m_underline_offset;
+}
+
+float FreeTypeFontEngine::getUnderlineThickness() const {
+    return m_underline_thickness;
 }
 
 int FreeTypeFontEngine::getSize() const {
