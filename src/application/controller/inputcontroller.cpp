@@ -18,7 +18,14 @@ void InputController::init(KakouneClient* kakoune_client) {
 }
 
 void InputController::onKeyInput(const domain::KeyEvent& event) {
-    m_kakoune_client->interface->pressKeys({keyEventToKakouneKey(event)});
+    m_pending_keys.push_back(keyEventToKakouneKey(event));
+}
+
+void InputController::update() {
+    if (!m_pending_keys.empty()) {
+        m_kakoune_client->interface->pressKeys(m_pending_keys);
+        m_pending_keys.clear();
+    }
 }
 
 std::string InputController::keyEventToKakouneKey(const domain::KeyEvent& event) {

@@ -85,6 +85,7 @@ void Application::init(const CliConfig &config)
 
 void Application::updateControllers()
 {
+    m_input_controller->update();
     m_editor_controller->update(*m_ui_options.get());
     m_info_box_controller->update(*m_ui_options.get());
 }

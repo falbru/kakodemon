@@ -12,11 +12,13 @@ class InputController
 
     void init(KakouneClient *kakoune_client);
     void onKeyInput(const domain::KeyEvent &event);
+    void update();
 
   private:
     std::string keyEventToKakouneKey(const domain::KeyEvent &event);
 
     KakouneClient *m_kakoune_client;
+    std::vector<std::string> m_pending_keys;
 };
 
 #endif
