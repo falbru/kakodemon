@@ -21,9 +21,9 @@ FreeTypeFontEngine::FreeTypeFontEngine(std::shared_ptr<FreeTypeLibrary> library,
         m_scale = static_cast<float>(m_requested_size) / m_face->size->metrics.y_ppem;
     }
 
-    m_ascender = (m_face->size->metrics.ascender >> 6) * m_scale;
-    m_descender = (m_face->size->metrics.descender >> 6) * m_scale;
-    m_line_height = (m_face->size->metrics.height >> 6) * m_scale;
+    m_ascender = (m_face->size->metrics.ascender / 64.0f) * m_scale;
+    m_descender = (m_face->size->metrics.descender / 64.0f) * m_scale;
+    m_line_height = (m_face->size->metrics.height / 64.0f) * m_scale;
     m_underline_offset = -(m_face->underline_position / 64.0f) * m_scale;
     m_underline_thickness = (m_face->underline_thickness / 64.0f) * m_scale;
 }
@@ -78,7 +78,7 @@ std::optional<domain::RasterizedGlyph> FreeTypeFontEngine::rasterizeGlyph(domain
                 static_cast<int>(m_face->glyph->bitmap_left * m_scale),
                 static_cast<int>(m_face->glyph->bitmap_top * m_scale)
             },
-            .advance = static_cast<long>(m_face->glyph->advance.x * m_scale) >> 6,
+            .advance = static_cast<long>(m_face->glyph->advance.x * m_scale / 64.0),
         },
         .width = m_face->glyph->bitmap.width,
         .height = m_face->glyph->bitmap.rows,
@@ -124,7 +124,7 @@ std::optional<domain::RasterizedGlyph> FreeTypeFontEngine::rasterizeFallbackGlyp
                 static_cast<int>(m_face->glyph->bitmap_left * m_scale),
                 static_cast<int>(m_face->glyph->bitmap_top * m_scale)
             },
-            .advance = static_cast<long>(m_face->glyph->advance.x * m_scale) >> 6,
+            .advance = static_cast<long>(m_face->glyph->advance.x * m_scale / 64.0),
         },
         .width = m_face->glyph->bitmap.width,
         .height = m_face->glyph->bitmap.rows,
