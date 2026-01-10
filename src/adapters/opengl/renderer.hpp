@@ -38,6 +38,11 @@ class Renderer : public domain::Renderer
     void renderRoundedRect(const domain::RGBAColor color, float x, float y, float width, float height,
                            float top_left_radius, float top_right_radius, float bottom_right_radius,
                            float bottom_left_radius) const override;
+    void renderRoundedRectWithShadow(const domain::RGBAColor color, float x, float y, float width, float height,
+                                     float corner_radius, float shadowRadius) const override;
+    void renderRoundedRectWithShadow(const domain::RGBAColor color, float x, float y, float width, float height,
+                                     float top_left_radius, float top_right_radius, float bottom_right_radius,
+                                     float bottom_left_radius, float shadowRadius) const override;
     void renderLine(domain::Font *font, domain::FontManager *font_manager, const domain::Line &line,
                     const domain::Face &default_face, float x, float y) const override;
     void renderLine(domain::Font *font, domain::FontManager *font_manager, const domain::Line &line,
@@ -56,6 +61,9 @@ class Renderer : public domain::Renderer
     void _renderRoundedRect(const domain::RGBAColor color, float x, float y, float width, float height,
                             float top_left_radius, float top_right_radius, float bottom_right_radius,
                             float bottom_left_radius) const;
+    void _renderRoundedRectWithShadow(const domain::RGBAColor color, float x, float y, float width, float height,
+                                      float top_left_radius, float top_right_radius, float bottom_right_radius,
+                                      float bottom_left_radius, float shadowRadius) const;
     std::unique_ptr<ShaderProgram> m_shader_program;
 
     unsigned int m_text_vao, m_text_vbo;

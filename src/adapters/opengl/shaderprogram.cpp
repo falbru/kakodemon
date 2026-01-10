@@ -87,6 +87,16 @@ void main()
       float alpha = 1.0 - smoothstep(-1.0, 1.0, dist);
 
       color = vec4(rectColor.rgb, rectColor.a * alpha);
+   } else if (renderType == 5) { // RoundedShadow
+      vec2 rectPos = rectBounds.xy + rectBounds.zw * 0.5;
+      vec2 rectSize = rectBounds.zw;
+      vec2 pixelPos = gl_FragCoord.xy;
+      vec2 localPos = pixelPos - rectPos;
+
+      float dist = sdRoundedBoxPerCorner(localPos, rectSize * 0.5, cornerRadii);
+      float shadowAlpha = 1.0 - smoothstep(0.0, shadowRadius, dist);
+
+      color = vec4(vec3(0.0), 0.5 * shadowAlpha);
    }
 }
 )";

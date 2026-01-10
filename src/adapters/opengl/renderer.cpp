@@ -122,6 +122,21 @@ void opengl::Renderer::renderRoundedRect(const domain::RGBAColor color, float x,
     glBindVertexArray(0);
 }
 
+void opengl::Renderer::renderRoundedRectWithShadow(const domain::RGBAColor color, float x, float y, float width, float height, float corner_radius, float shadowRadius) const
+{
+    renderRoundedRectWithShadow(color, x, y, width, height, corner_radius, corner_radius, corner_radius, corner_radius, shadowRadius);
+}
+
+void opengl::Renderer::renderRoundedRectWithShadow(const domain::RGBAColor color, float x, float y, float width, float height, float top_left_radius, float top_right_radius, float bottom_right_radius, float bottom_left_radius, float shadowRadius) const
+{
+    m_shader_program->use();
+
+    _renderRoundedRectWithShadow(color, x, y, width, height, top_left_radius, top_right_radius, bottom_right_radius, bottom_left_radius, shadowRadius);
+    _renderRoundedRect(color, x, y, width, height, top_left_radius, top_right_radius, bottom_right_radius, bottom_left_radius);
+
+    glBindVertexArray(0);
+}
+
 void opengl::Renderer::renderLines(domain::Font* font, domain::FontManager* font_manager, const domain::Lines& lines, const domain::Face& default_face, float x, float y) const {
     opengl::Font* opengl_font = dynamic_cast<opengl::Font*>(font);
 
@@ -265,6 +280,21 @@ void opengl::Renderer::_renderRoundedRect(const domain::RGBAColor color, float x
     glBindVertexArray(m_rect_vao);
     m_shader_program->setVector4f("rectColor", color.r, color.g, color.b, 1.0f);
     m_shader_program->setRenderType(RenderType::RoundedRectangle);
+    m_shader_program->setVector4f("cornerRadii", bottom_left_radius, bottom_right_radius, top_right_radius, top_left_radius);
+    m_shader_program->setVector4f("rectBounds", x, (float)m_screen_height - y - height, width, height);
+    glBindBuffer(GL_ARRAY_BUFFER, m_rect_vbo);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void opengl::Renderer::_renderRoundedRectWithShadow(const domain::RGBAColor color, float x, float y, float width, float height, float top_left_radius, float top_right_radius, float bottom_right_radius, float bottom_left_radius, float shadowRadius) const {
+    float vertices[6][2] = {
+        {x - shadowRadius, y - shadowRadius}, {x - shadowRadius, y + height + shadowRadius},     {x + width + shadowRadius, y + height + shadowRadius},
+        {x - shadowRadius, y - shadowRadius}, {x + width + shadowRadius, y + height + shadowRadius}, {x + width + shadowRadius, y - shadowRadius}};
+
+    glBindVertexArray(m_rect_vao);
+    m_shader_program->setRenderType(RenderType::RoundedShadow);
+    m_shader_program->setFloat("shadowRadius", shadowRadius);
     m_shader_program->setVector4f("cornerRadii", bottom_left_radius, bottom_right_radius, top_right_radius, top_left_radius);
     m_shader_program->setVector4f("rectBounds", x, (float)m_screen_height - y - height, width, height);
     glBindBuffer(GL_ARRAY_BUFFER, m_rect_vbo);
