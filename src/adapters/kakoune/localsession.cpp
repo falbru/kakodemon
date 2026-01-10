@@ -54,7 +54,7 @@ LocalSession::~LocalSession()
             close(pipefd[1]);
 
             waitpid(pid, nullptr, 0);
-            spdlog::info("Killed Kakoune session: {}", m_session_id);
+            spdlog::debug("Killed Kakoune session: {}", m_session_id);
         }
     }
 }
@@ -110,7 +110,7 @@ void LocalSession::start()
         else
         {
             m_session_started = true;
-            spdlog::info("Kakoune daemon started successfully for session: {}", m_session_id);
+            spdlog::debug("Kakoune daemon started successfully for session: {}", m_session_id);
         }
     }
 }

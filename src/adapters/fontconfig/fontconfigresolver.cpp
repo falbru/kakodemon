@@ -268,9 +268,9 @@ std::optional<domain::FontMatch> FontconfigResolver::resolveForCodepoint(domain:
                 fontMatch.face_index = 0;
             }
 
-            spdlog::info("Resolved codepoint U+{:X} to font: {}", codepoint, fontMatch.path);
-            spdlog::info("Resolved codepoint U+{:X} to font size: {}", codepoint, fontMatch.size);
-            spdlog::info("Resolved codepoint U+{:X} to font face index: {}", codepoint, fontMatch.face_index);
+            spdlog::debug("Resolved codepoint U+{:X} to font: {}", codepoint, fontMatch.path);
+            spdlog::debug("Resolved codepoint U+{:X} to font size: {}", codepoint, fontMatch.size);
+            spdlog::debug("Resolved codepoint U+{:X} to font face index: {}", codepoint, fontMatch.face_index);
             match = fontMatch;
         }
 
