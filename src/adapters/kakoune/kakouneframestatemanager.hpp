@@ -20,9 +20,7 @@ struct FrameState
 
 struct FrameEvents
 {
-    bool menu_show = false;
     bool menu_select = false;
-    int menu_selected_index = -1;
 };
 
 class KakouneFrameStateManager

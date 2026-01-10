@@ -156,20 +156,20 @@ void MenuController::onMouseScroll(int scroll_amount) {
     }
 }
 
-void MenuController::ensureSelectedItemVisible(int selected_index) {
+void MenuController::ensureItemVisible(int index) {
     if (!m_kakoune_client->state.menu.has_value()) {
         return;
     }
 
     switch(m_kakoune_client->state.menu->getStyle()) {
         case domain::MenuStyle::INLINE:
-            m_inline_menu_view->ensureSelectedItemVisible(selected_index);
+            m_inline_menu_view->ensureItemVisible(index);
             break;
         case domain::MenuStyle::PROMPT:
-            m_prompt_menu_view->ensureSelectedItemVisible(selected_index);
+            m_prompt_menu_view->ensureItemVisible(index);
             break;
         case domain::MenuStyle::SEARCH:
-            m_search_menu_view->ensureSelectedItemVisible(selected_index);
+            m_search_menu_view->ensureItemVisible(index);
             break;
     }
 }

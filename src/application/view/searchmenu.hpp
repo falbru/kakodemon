@@ -21,7 +21,7 @@ class SearchMenuView
     domain::MouseMoveResult onMouseMove(float x, float y, const KakouneClient &kakoune_client);
     std::optional<int> findItemAtPosition(float x, float y, domain::Font *font, const KakouneClient &kakoune_client);
     void onMouseScroll(int scroll_amount, const KakouneClient &kakoune_client);
-    void ensureSelectedItemVisible(int selected_index);
+    void ensureItemVisible(int index);
 
     float x() const;
     float y() const;

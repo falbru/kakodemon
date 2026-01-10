@@ -53,7 +53,6 @@ void KakouneFrameStateManager::onRequest(const IncomingRequest& request)
     case IncomingRequestType::MENU_SHOW: {
         m_next_frame_state.menu = std::get<MenuShowData>(request.data);
         m_next_frame_state.menu_selected_index = -1;
-        m_next_frame_events.menu_show = true;
         break;
     }
     case IncomingRequestType::MENU_HIDE: {
@@ -73,7 +72,6 @@ void KakouneFrameStateManager::onRequest(const IncomingRequest& request)
         int selected_index = std::get<MenuSelectData>(request.data).selected;
         m_next_frame_state.menu_selected_index = selected_index;
         m_next_frame_events.menu_select = true;
-        m_next_frame_events.menu_selected_index = selected_index;
         break;
     }
     case IncomingRequestType::REFRESH: {

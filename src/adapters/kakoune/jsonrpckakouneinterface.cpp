@@ -43,6 +43,8 @@ domain::KakouneState JsonRpcKakouneInterface::convertFrameStateToKakouneState(co
 
     std::optional<domain::Menu> menu;
     if (frame_state.menu.has_value()) {
+        int menu_selected_index = (frame_state.menu_selected_index >= frame_state.menu->items.size()) ? -1 : frame_state.menu_selected_index;
+
         menu = domain::Menu(
             status_line.value(),
             domain::MenuItems(
@@ -50,7 +52,7 @@ domain::KakouneState JsonRpcKakouneInterface::convertFrameStateToKakouneState(co
                 toDomain(frame_state.menu->anchor),
                 toDomain(frame_state.menu->face),
                 toDomain(frame_state.menu->selected_face),
-                frame_state.menu_selected_index
+                menu_selected_index
             ),
             toDomain(frame_state.menu->style)
         );
@@ -102,7 +104,6 @@ domain::FrameEvents JsonRpcKakouneInterface::getEvents() {
 
     return domain::FrameEvents{
         .menu_select = adapter_events.menu_select,
-        .menu_selected_index = adapter_events.menu_selected_index
     };
 }
 
@@ -122,7 +123,6 @@ std::optional<std::pair<domain::KakouneState, domain::FrameEvents>> JsonRpcKakou
 
     domain::FrameEvents events{
         .menu_select = adapter_events.menu_select,
-        .menu_selected_index = adapter_events.menu_selected_index
     };
 
     return std::make_pair(kakoune_state, events);

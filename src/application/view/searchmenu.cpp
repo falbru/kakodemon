@@ -113,6 +113,6 @@ void SearchMenuView::onMouseScroll(int scroll_amount, const KakouneClient &kakou
     m_scrolled_menu_items->scroll(scroll_amount, total_items);
 }
 
-void SearchMenuView::ensureSelectedItemVisible(int selected_index) {
-    m_scrolled_menu_items->ensureSelectedItemVisible(selected_index);
+void SearchMenuView::ensureItemVisible(int index) {
+    m_scrolled_menu_items->ensureItemVisible(index);
 }

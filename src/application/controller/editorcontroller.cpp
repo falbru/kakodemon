@@ -37,7 +37,7 @@ bool EditorController::update(UIOptions& ui_options)
         state_updated = true;
 
         if (events.menu_select && m_kakoune_client->state.menu.has_value() && m_kakoune_client->state.menu->hasItems()) {
-            m_menu_controller->ensureSelectedItemVisible(events.menu_selected_index);
+            m_menu_controller->ensureItemVisible(m_kakoune_client->state.menu->getItems().selected_index);
         }
     }
 

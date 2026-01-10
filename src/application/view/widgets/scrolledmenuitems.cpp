@@ -101,13 +101,13 @@ void ScrolledMenuItems::scroll(int amount, int total_items) {
     m_scroll_offset = std::max(0.0f, std::min((float)max_scroll, m_scroll_offset));
 }
 
-void ScrolledMenuItems::ensureSelectedItemVisible(int selected_index) {
-    if (selected_index < m_scroll_offset)
+void ScrolledMenuItems::ensureItemVisible(int index) {
+    if (index < m_scroll_offset)
     {
-        m_scroll_offset = std::max(0, selected_index);
+        m_scroll_offset = std::max(0, index);
     }
-    else if (selected_index >= m_scroll_offset + m_max_visible_items)
+    else if (index >= m_scroll_offset + m_max_visible_items)
     {
-        m_scroll_offset = std::max(0, selected_index - m_max_visible_items + 1);
+        m_scroll_offset = std::max(0, index - m_max_visible_items + 1);
     }
 }

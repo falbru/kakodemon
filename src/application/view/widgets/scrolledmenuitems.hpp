@@ -23,7 +23,7 @@ class ScrolledMenuItems
     std::optional<int> findItemAtPosition(float x, float y, domain::Font *font, const KakouneClient &kakoune_client);
 
     void scroll(int amount, int total_items);
-    void ensureSelectedItemVisible(int selected_index);
+    void ensureItemVisible(int index);
 
   private:
     float m_scroll_offset = 0;

@@ -115,6 +115,6 @@ void PromptMenuView::onMouseScroll(int scroll_amount, const KakouneClient &kakou
     m_scrolled_menu_items->scroll(scroll_amount, total_items);
 }
 
-void PromptMenuView::ensureSelectedItemVisible(int selected_index) {
-    m_scrolled_menu_items->ensureSelectedItemVisible(selected_index);
+void PromptMenuView::ensureItemVisible(int index) {
+    m_scrolled_menu_items->ensureItemVisible(index);
 }
