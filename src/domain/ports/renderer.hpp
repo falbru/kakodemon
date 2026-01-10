@@ -23,6 +23,11 @@ class Renderer
     virtual void renderRect(const RGBAColor color, float x, float y, float width, float height) const = 0;
     virtual void renderRectWithShadow(const RGBAColor color, float x, float y, float width, float height,
                                       float shadowRadius) const = 0;
+    virtual void renderRoundedRect(const RGBAColor color, float x, float y, float width, float height,
+                                   float corner_radius) const = 0;
+    virtual void renderRoundedRect(const RGBAColor color, float x, float y, float width, float height,
+                                   float top_left_radius, float top_right_radius, float bottom_right_radius,
+                                   float bottom_left_radius) const = 0;
     virtual void renderLine(Font *font, domain::FontManager *font_manager, const Line &line, const Face &default_face,
                             float x, float y) const = 0;
     virtual void renderLine(Font *font, domain::FontManager *font_manager, const Line &line, const Face &default_face,

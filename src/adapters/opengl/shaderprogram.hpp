@@ -12,7 +12,8 @@ enum class RenderType
     Text,
     ColoredText,
     Rectangle,
-    Shadow
+    Shadow,
+    RoundedRectangle
 };
 
 class ShaderProgram

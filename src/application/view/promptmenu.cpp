@@ -38,9 +38,9 @@ void PromptMenuView::render(domain::Font* font, domain::FontManager* font_manage
     domain::Face bg_face = kakoune_client.state.menu->hasItems() ?
         kakoune_client.state.menu->getItems().face :
         kakoune_client.state.default_face;
-    m_renderer->renderRectWithShadow(
+    m_renderer->renderRoundedRect(
         bg_face.getBg(kakoune_client.state.default_face), layout.current().x,
-        layout.current().y, layout.current().width, layout.current().height, 15.0f);
+        layout.current().y, layout.current().width, layout.current().height, 10.0f);
 
     layout.pad(SPACING_MEDIUM);
 
