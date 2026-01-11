@@ -76,7 +76,7 @@ void main()
       float dist = sdBox(localPos, rectSize * 0.5);
       float shadowAlpha = 1.0 - smoothstep(0.0, shadowRadius, dist);
 
-      color = vec4(vec3(0.0), 0.5 * shadowAlpha);
+      color = vec4(vec3(0.0), 0.25 * shadowAlpha);
    } else if (renderType == 4) { // RoundedRectangle
       vec2 rectPos = rectBounds.xy + rectBounds.zw * 0.5;
       vec2 rectSize = rectBounds.zw;
@@ -96,7 +96,7 @@ void main()
       float dist = sdRoundedBoxPerCorner(localPos, rectSize * 0.5, cornerRadii);
       float shadowAlpha = 1.0 - smoothstep(0.0, shadowRadius, dist);
 
-      color = vec4(vec3(0.0), 0.5 * shadowAlpha);
+      color = vec4(vec3(0.0), 0.25 * shadowAlpha);
    }
 }
 )";
