@@ -9,11 +9,13 @@ struct Alignment
     enum class HorizontalAlignment
     {
         Left,
+        Center,
         Right
     } h = HorizontalAlignment::Left;
     enum class VerticalAlignment
     {
         Top,
+        Center,
         Bottom
     } v = VerticalAlignment::Top;
 
@@ -21,8 +23,13 @@ struct Alignment
     Alignment(HorizontalAlignment horizontal, VerticalAlignment vertical);
 
     static Alignment topLeft();
+    static Alignment topCenter();
     static Alignment topRight();
+    static Alignment centerLeft();
+    static Alignment centerCenter();
+    static Alignment centerRight();
     static Alignment bottomLeft();
+    static Alignment bottomCenter();
     static Alignment bottomRight();
 };
 

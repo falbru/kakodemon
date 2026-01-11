@@ -172,10 +172,14 @@ void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font
 
     if (alignment.h == domain::Alignment::HorizontalAlignment::Right) {
         start_x -= glyph_line.width();
+    } else if (alignment.h == domain::Alignment::HorizontalAlignment::Center) {
+        start_x -= glyph_line.width() / 2.0f;
     }
 
     if (alignment.v == domain::Alignment::VerticalAlignment::Bottom) {
         start_y -= font->getLineHeight();
+    } else if (alignment.v == domain::Alignment::VerticalAlignment::Center) {
+        start_y -= font->getLineHeight() / 2.0f;
     }
 
     // First pass: Render all backgrounds

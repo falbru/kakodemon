@@ -1,5 +1,6 @@
 #include "application/controller/menucontroller.hpp"
 #include "application/model/kakouneclient.hpp"
+#include "domain/alignment.hpp"
 #include "domain/color.hpp"
 #include "domain/geometry.hpp"
 #include "domain/glyphlinesbuilder.hpp"
@@ -319,8 +320,15 @@ void InfoBoxView::render(const KakouneClient *kakoune_client, domain::FontManage
         }
     }
 
+    float infobox_height = placement.bounds.height + SPACING_MEDIUM * 2.0f + BORDER_THICKNESS * 2.0f;
+
+    float title_height = ui_options.font->getLineHeight() + BORDER_THICKNESS + SPACING_SMALL + SPACING_MEDIUM;
+    if (kakoune_client->state.info_box->title.size() > 0) {
+        infobox_height += title_height;
+    }
+
     LayoutManager layout(placement.bounds.x, placement.bounds.y, placement.bounds.width + SPACING_MEDIUM * 2.0f + BORDER_THICKNESS * 2.0f,
-                         placement.bounds.height + SPACING_MEDIUM * 2.0f + BORDER_THICKNESS * 2.0f);
+                         infobox_height);
 
     m_x = layout.current().x;
     m_y = layout.current().y;
@@ -336,6 +344,21 @@ void InfoBoxView::render(const KakouneClient *kakoune_client, domain::FontManage
                            layout.current().x, layout.current().y, layout.current().width, layout.current().height);
 
     layout.pad(SPACING_MEDIUM);
+
+    if (kakoune_client->state.info_box->title.size() > 0) {
+        m_renderer->renderLine(ui_options.font, font_manager, kakoune_client->state.info_box->title, kakoune_client->state.info_box->default_face, layout.current().x, layout.current().y);
+
+        layout.gapY(ui_options.font->getLineHeight());
+
+        layout.gapY(SPACING_SMALL);
+
+        m_renderer->renderRect(domain::RGBAColor{0.5, 0.5, 0.5, 1}, layout.current().x, layout.current().y, layout.current().width, 1);
+
+        layout.gapY(BORDER_THICKNESS);
+
+        layout.gapY(SPACING_MEDIUM);
+
+    }
 
     m_renderer->renderLines(ui_options.font, font_manager, placement.content, kakoune_client->state.info_box->default_face, layout.current().x, layout.current().y);
 }
