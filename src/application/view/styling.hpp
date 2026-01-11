@@ -7,4 +7,6 @@ const float SPACING_LARGE = 8.0f;
 const float SPACING_XL = 16.0f;
 const float SPACING_XXL = 32.0f;
 
+const float BORDER_THICKNESS = 1.0f;
+
 #endif

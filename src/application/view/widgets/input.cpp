@@ -16,13 +16,6 @@ void Input::render(domain::Renderer *renderer, domain::Font* font, domain::FontM
   domain::Face input_bg_face = kakoune_client.state.menu->hasItems() ?
       kakoune_client.state.menu->getItems().selected_face :
       kakoune_client.state.default_face;
-  renderer->renderRect(input_bg_face.getBg(kakoune_client.state.default_face),
-                       input_layout.current().x,
-                       input_layout.current().y,
-                       input_layout.current().width,
-                       input_layout.current().height);
-
-  input_layout.border(BORDER);
 
   renderer->renderRect(kakoune_client.state.mode_line.getDefaultFace().getBg(
                            kakoune_client.state.default_face),
@@ -73,5 +66,5 @@ void Input::render(domain::Renderer *renderer, domain::Font* font, domain::FontM
 }
 
 float Input::height(domain::Font* font) const {
-  return BORDER * 2 + PADDING * 2 + font->getLineHeight();
+  return PADDING * 2 + font->getLineHeight();
 }
