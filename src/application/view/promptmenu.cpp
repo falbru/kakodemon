@@ -36,9 +36,6 @@ void PromptMenuView::render(domain::Font* font, domain::FontManager* font_manage
 
     LayoutManager layout(m_x, Y, WIDTH, m_height);
 
-    float CORNER_RADIUS = 5.0f;
-    float SHADOW_LENGTH = 15.0f;
-
     m_renderer->renderRoundedRectWithShadow(
         domain::RGBAColor{0.5, 0.5, 0.5, 1.0}, layout.current().x,
         layout.current().y, layout.current().width, layout.current().height, CORNER_RADIUS, SHADOW_LENGTH);

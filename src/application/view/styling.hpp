@@ -9,4 +9,7 @@ const float SPACING_XXL = 32.0f;
 
 const float BORDER_THICKNESS = 1.0f;
 
+const float CORNER_RADIUS = 5.0f;
+const float SHADOW_LENGTH = 15.0f;
+
 #endif
