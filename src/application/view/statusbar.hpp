@@ -2,6 +2,7 @@
 #define STATUSBAR_HPP_INCLUDED
 
 #include "domain/modeline.hpp"
+#include "domain/ports/font.hpp"
 #include "domain/ports/renderer.hpp"
 
 class StatusBarView
@@ -14,8 +15,7 @@ class StatusBarView
     void render(domain::Font *font, domain::FontManager *font_manager, const domain::ModeLine &mode_line, float width,
                 float height);
 
-    int getCellWidth(domain::Font *font);
-    int getCellHeight(domain::Font *font);
+    float height(domain::Font *font);
 
   private:
     domain::Renderer *m_renderer;
