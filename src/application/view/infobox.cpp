@@ -1,5 +1,6 @@
 #include "application/controller/menucontroller.hpp"
 #include "application/model/kakouneclient.hpp"
+#include "domain/color.hpp"
 #include "domain/geometry.hpp"
 #include "domain/glyphlinesbuilder.hpp"
 #include "domain/infobox.hpp"
@@ -318,13 +319,18 @@ void InfoBoxView::render(const KakouneClient *kakoune_client, domain::FontManage
         }
     }
 
-    LayoutManager layout(placement.bounds.x, placement.bounds.y, placement.bounds.width + SPACING_MEDIUM * 2.0f,
-                         placement.bounds.height + SPACING_MEDIUM * 2.0f);
+    LayoutManager layout(placement.bounds.x, placement.bounds.y, placement.bounds.width + SPACING_MEDIUM * 2.0f + BORDER_THICKNESS * 2.0f,
+                         placement.bounds.height + SPACING_MEDIUM * 2.0f + BORDER_THICKNESS * 2.0f);
 
     m_x = layout.current().x;
     m_y = layout.current().y;
     m_width = layout.current().width;
     m_height = layout.current().height;
+
+    m_renderer->renderRect(domain::RGBAColor{0.5, 0.5, 0.5, 1},
+                           layout.current().x, layout.current().y, layout.current().width, layout.current().height);
+
+    layout.pad(BORDER_THICKNESS);
 
     m_renderer->renderRect(kakoune_client->state.info_box->default_face.getBg(kakoune_client->state.default_face),
                            layout.current().x, layout.current().y, layout.current().width, layout.current().height);
