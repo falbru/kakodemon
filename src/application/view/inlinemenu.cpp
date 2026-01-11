@@ -1,4 +1,5 @@
 #include "inlinemenu.hpp"
+#include "domain/color.hpp"
 #include "styling.hpp"
 #include "widgets/scrolledmenuitems.hpp"
 
@@ -40,7 +41,7 @@ void InlineMenuView::render(domain::Font* font, domain::FontManager* font_manage
 
     m_width = std::min(MAX_MENU_WIDTH, width);
     float items_size = std::min(MAX_VISIBLE_ITEMS, (int)kakoune_client.state.menu->getItems().items.size());
-    m_height = font->getLineHeight() * items_size;
+    m_height = font->getLineHeight() * items_size + BORDER_THICKNESS * 2.0f;
 
     m_x = menu_position.first;
     if (m_x + m_width > width)
@@ -55,6 +56,11 @@ void InlineMenuView::render(domain::Font* font, domain::FontManager* font_manage
     }
 
     LayoutManager layout(m_x, m_y, m_width, m_height);
+
+    m_renderer->renderRect(domain::RGBAColor{0.5, 0.5, 0.5, 1},
+                           layout.current().x, layout.current().y, layout.current().width, layout.current().height);
+
+    layout.pad(BORDER_THICKNESS);
 
     m_renderer->renderRect(kakoune_client.state.menu->getItems().face.getBg(kakoune_client.state.default_face),
                            layout.current().x, layout.current().y, layout.current().width, layout.current().height);
