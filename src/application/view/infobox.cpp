@@ -10,6 +10,7 @@
 #include "application/view/layoutmanager.hpp"
 #include "application/view/styling.hpp"
 #include <optional>
+#include <variant>
 #include <spdlog/spdlog.h>
 
 InfoBoxView::InfoBoxView()
@@ -27,9 +28,22 @@ void InfoBoxView::init(domain::Renderer* renderer, MenuController* menu_controll
 
 std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection direction, CrossAxisAlignment alignment,
                                                       const domain::Lines &content,
-                                                      const domain::Rectangle &anchor, float layout_width, float layout_height, domain::Font* font, domain::FontManager* font_manager, const domain::Rectangle& menu_rectangle)
+                                                      const domain::Rectangle &anchor, float layout_width, float layout_height, domain::Font* font, domain::FontManager* font_manager, const domain::Rectangle& menu_rectangle, const domain::CursorPosition &cursor_position)
 {
     domain::GlyphLines glyph_lines = domain::GlyphLinesBuilder::build(content, font, font_manager);
+
+    domain::Rectangle cursor_rect;
+    bool has_cursor = false;
+
+    if (std::holds_alternative<domain::BufferContentPosition>(cursor_position)) {
+        auto buffer_pos = std::get<domain::BufferContentPosition>(cursor_position);
+        auto cursor_pixel_pos = m_kakoune_content_view->coordToPixels(font, buffer_pos.coord);
+        cursor_rect.x = cursor_pixel_pos.first;
+        cursor_rect.y = cursor_pixel_pos.second;
+        cursor_rect.width = m_kakoune_content_view->getCellWidth(font);
+        cursor_rect.height = m_kakoune_content_view->getCellHeight(font);
+        has_cursor = true;
+    }
 
     domain::Rectangle info_box;
 
@@ -107,6 +121,10 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
             return std::nullopt;
         }
 
+        if (has_cursor && info_box.intersects(cursor_rect)) {
+            return std::nullopt;
+        }
+
         return Placement{glyph_lines.toLines(), info_box};
     }
     case PlacementDirection::LEFT:
@@ -169,6 +187,10 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
             return std::nullopt;
         }
 
+        if (has_cursor && info_box.intersects(cursor_rect)) {
+            return std::nullopt;
+        }
+
         return Placement{glyph_lines.toLines(), info_box};
     }
     case PlacementDirection::ABOVE: {
@@ -210,6 +232,10 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
         }
 
         if (info_box.intersects(menu_rectangle)) {
+            return std::nullopt;
+        }
+
+        if (has_cursor && info_box.intersects(cursor_rect)) {
             return std::nullopt;
         }
 
@@ -256,6 +282,10 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
             return std::nullopt;
         }
 
+        if (has_cursor && info_box.intersects(cursor_rect)) {
+            return std::nullopt;
+        }
+
         return Placement{glyph_lines.toLines(), info_box};
     }
     case PlacementDirection::CENTER: {
@@ -271,6 +301,10 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
         info_box.y = anchor.y + (anchor.height - info_box.height) / 2.0f;
 
         if (info_box.intersects(menu_rectangle)) {
+            return std::nullopt;
+        }
+
+        if (has_cursor && info_box.intersects(cursor_rect)) {
             return std::nullopt;
         }
 
@@ -376,7 +410,7 @@ void InfoBoxView::render(const KakouneClient *kakoune_client, domain::FontManage
     Placement placement;
     for (const auto& dir : fallback_directions)
     {
-        auto current_placement = tryPlaceInfoBox(dir, alignment, kakoune_client->state.info_box->content, anchor, width, height, ui_options.font, font_manager, menu_rectangle);
+        auto current_placement = tryPlaceInfoBox(dir, alignment, kakoune_client->state.info_box->content, anchor, width, height, ui_options.font, font_manager, menu_rectangle, kakoune_client->state.cursor_position);
         if (current_placement.has_value()) {
             placement = current_placement.value();
             break;
