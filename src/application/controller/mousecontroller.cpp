@@ -1,7 +1,7 @@
 #include "application/controller/mousecontroller.hpp"
 #include "application/controller/infoboxcontroller.hpp"
 #include "application/model/kakouneclient.hpp"
-#include "application/model/uioptions.hpp"
+#include "domain/uioptions.hpp"
 #include "domain/mouse.hpp"
 
 MouseController::MouseController() {
@@ -15,7 +15,7 @@ void MouseController::init(KakouneClient* kakoune_client, EditorController* edit
     m_info_box_controller = info_box_controller;
 }
 
-domain::MouseMoveResult MouseController::onMouseMove(float x, float y, const UIOptions* ui_options) {
+domain::MouseMoveResult MouseController::onMouseMove(float x, float y, const domain::UIOptions* ui_options) {
     domain::MouseMoveResult mouse_move_result;
     std::optional<domain::Cursor> cursor;
 
@@ -50,7 +50,7 @@ domain::MouseMoveResult MouseController::onMouseMove(float x, float y, const UIO
     return mouse_move_result;
 }
 
-void MouseController::onMouseButton(domain::MouseButtonEvent event, const UIOptions *ui_options) {
+void MouseController::onMouseButton(domain::MouseButtonEvent event, const domain::UIOptions *ui_options) {
     bool obscured = false;
     if (m_kakoune_client->state.menu.has_value()) {
         float menu_x = m_menu_controller->x();
@@ -76,7 +76,7 @@ void MouseController::onMouseButton(domain::MouseButtonEvent event, const UIOpti
     m_editor_controller->onMouseButton(event, ui_options, obscured | handled_by_menu);
 }
 
-void MouseController::onMouseScroll(double offset, float x, float y, const UIOptions *ui_options) {
+void MouseController::onMouseScroll(double offset, float x, float y, const domain::UIOptions *ui_options) {
     m_scroll_accumulator += offset * m_scroll_speed;
 
     int scroll_amount = 0;

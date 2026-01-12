@@ -322,7 +322,7 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
     return std::nullopt;
 }
 
-void InfoBoxView::render(const KakouneClient *kakoune_client, domain::FontManager* font_manager, const UIOptions& ui_options, float width, float height)
+void InfoBoxView::render(const KakouneClient *kakoune_client, domain::FontManager* font_manager, const domain::UIOptions& ui_options, float width, float height)
 {
     domain::Rectangle anchor;
     PlacementDirection direction = PlacementDirection::BELOW;

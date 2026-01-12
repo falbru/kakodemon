@@ -1,9 +1,12 @@
 #include "adapters/kakoune/jsonrpckakouneinterface.hpp"
+#include "adapters/kakoune/color.hpp"
 #include "domain/editor.hpp"
 #include "domain/modeline.hpp"
 #include "domain/mouse.hpp"
+#include "domain/ports/font.hpp"
 #include "domain/ports/kakouneinterface.hpp"
 #include "domain/statusline.hpp"
+#include "domain/uioptions.hpp"
 #include "kakouneclientprocess.hpp"
 #include "kakouneframestatemanager.hpp"
 #include "spdlog/spdlog.h"
@@ -94,13 +97,24 @@ std::optional<domain::KakouneState> JsonRpcKakouneInterface::getNextKakouneState
 
     FrameState frame_state = frame_state_opt.value();
 
-    if (frame_state.ui_options.has_value()) m_ui_options = frame_state.ui_options.value();
+    if (frame_state.ui_options.has_value()) mergeUIOptions(m_ui_options, frame_state.ui_options.value());
 
     return convertFrameStateToKakouneState(frame_state);
 }
 
-std::optional<std::string> JsonRpcKakouneInterface::getUIOptionsFont() {
-    return m_ui_options.font;
+domain::UIOptions JsonRpcKakouneInterface::getUIOptions(domain::FontManager* font_manager) {
+    domain::UIOptions ui_options;
+
+    if (m_ui_options.font.has_value()) {
+        ui_options.font = font_manager->getFontFromName(m_ui_options.font.value());
+        domain::loadBasicGlyphs(ui_options.font); // TODO check if the font is new
+    }
+
+    if (m_ui_options.color_border.has_value()) {
+        ui_options.color_border = toDomain(m_ui_options.color_border.value());
+    }
+
+    return ui_options;
 }
 
 domain::FrameEvents JsonRpcKakouneInterface::getEvents() {
@@ -121,7 +135,7 @@ std::optional<std::pair<domain::KakouneState, domain::FrameEvents>> JsonRpcKakou
     FrameState frame_state = result->first;
     FrameEvents adapter_events = result->second;
 
-    if (frame_state.ui_options.has_value()) m_ui_options = frame_state.ui_options.value();
+    if (frame_state.ui_options.has_value()) mergeUIOptions(m_ui_options, frame_state.ui_options.value());
 
     domain::KakouneState kakoune_state = convertFrameStateToKakouneState(frame_state);
 
@@ -193,6 +207,16 @@ std::string JsonRpcKakouneInterface::getMouseButtonString(domain::MouseButton bu
             spdlog::warn("Can't convert MouseButton {} to kakoune button", (int)button);
             return "right";
         }
+    }
+}
+
+void JsonRpcKakouneInterface::mergeUIOptions(UIOptions& original, UIOptions updated) {
+    if (updated.font.has_value()) {
+        original.font = updated.font.value();
+    }
+
+    if (updated.color_border.has_value()) {
+        original.color_border = updated.color_border.value();
     }
 }
 

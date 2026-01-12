@@ -12,7 +12,6 @@
 #include "application/controller/menucontroller.hpp"
 #include "application/controller/mousecontroller.hpp"
 #include "application/model/kakouneclient.hpp"
-#include "application/model/uioptions.hpp"
 #include "application/view/infobox.hpp"
 #include "application/view/inlinemenu.hpp"
 #include "application/view/kakounecontentview.hpp"
@@ -26,6 +25,7 @@
 #include "domain/ports/fontengine.hpp"
 #include "domain/ports/fontresolver.hpp"
 #include "domain/ports/renderer.hpp"
+#include "domain/uioptions.hpp"
 
 using FontEngineFactory = std::function<std::unique_ptr<domain::FontEngine>(const domain::FontMatch &)>;
 
@@ -75,7 +75,7 @@ class Application
     bool m_needs_render = true;
 
     std::unique_ptr<KakouneClient> m_kakoune_client;
-    std::unique_ptr<UIOptions> m_ui_options;
+    std::unique_ptr<domain::UIOptions> m_ui_options;
 
     std::unique_ptr<EditorController> m_editor_controller;
     std::unique_ptr<InputController> m_input_controller;

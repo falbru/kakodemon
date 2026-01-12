@@ -1,6 +1,6 @@
 #include "editorcontroller.hpp"
 #include "application/controller/menucontroller.hpp"
-#include "application/model/uioptions.hpp"
+#include "domain/uioptions.hpp"
 #include "domain/color.hpp"
 #include "domain/mouse.hpp"
 #include "application/view/statusbar.hpp"
@@ -25,7 +25,7 @@ void EditorController::init(KakouneClient* kakoune_client,
     m_menu_controller = menu_controller;
 }
 
-bool EditorController::update(UIOptions& ui_options)
+bool EditorController::update(domain::UIOptions& ui_options)
 {
     bool state_updated = false;
     auto result = m_kakoune_client->interface->getNextKakouneStateAndEvents();
@@ -39,21 +39,14 @@ bool EditorController::update(UIOptions& ui_options)
         if (events.menu_select && m_kakoune_client->state.menu.has_value() && m_kakoune_client->state.menu->hasItems()) {
             m_menu_controller->ensureItemVisible(m_kakoune_client->state.menu->getItems().selected_index);
         }
-    }
 
-    auto font_option = m_kakoune_client->interface->getUIOptionsFont();
-    if (font_option.has_value()) {
-        domain::Font* prev_font = ui_options.font;
-        ui_options.font = m_font_manager->getFontFromName(font_option.value());
-        if (prev_font != ui_options.font) {
-            loadBasicGlyphs(ui_options.font);
-        }
+        ui_options = m_kakoune_client->interface->getUIOptions(m_font_manager);
     }
 
     return state_updated;
 }
 
-void EditorController::render(const UIOptions& ui_options)
+void EditorController::render(const domain::UIOptions& ui_options)
 {
     m_kakoune_content_view->render(ui_options.font, m_font_manager, m_kakoune_client->state.content, m_kakoune_client->state.default_face, 0.0f, 0.0f);
     m_kakoune_content_view->setWidth(m_width);
@@ -62,7 +55,7 @@ void EditorController::render(const UIOptions& ui_options)
     m_status_bar_view->render(ui_options.font, m_font_manager, m_kakoune_client->state.mode_line, m_width, m_height);
 }
 
-void EditorController::onWindowResize(int width, int height, const UIOptions& ui_options) {
+void EditorController::onWindowResize(int width, int height, const domain::UIOptions& ui_options) {
     int rows = (height - m_status_bar_view->height(ui_options.font)) / m_kakoune_content_view->getCellHeight(ui_options.font);
     int columns = width / m_kakoune_content_view->getCellWidth(ui_options.font);
 
@@ -76,7 +69,7 @@ void EditorController::onWindowResize(int width, int height, const UIOptions& ui
     m_height = height;
 }
 
-domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const UIOptions* ui_options, bool obscured) {
+domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const domain::UIOptions* ui_options, bool obscured) {
     if (y >= m_content_height) {
         return domain::MouseMoveResult{domain::Cursor::DEFAULT};
     }
@@ -103,7 +96,7 @@ domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const UI
     return domain::MouseMoveResult{domain::Cursor::IBEAM};
 }
 
-void EditorController::onMouseButton(domain::MouseButtonEvent event, const UIOptions* ui_options, bool obscured) {
+void EditorController::onMouseButton(domain::MouseButtonEvent event, const domain::UIOptions* ui_options, bool obscured) {
     int column = event.x / ui_options->font->getGlyphMetrics(97).advance;
     int line = event.y / ui_options->font->getLineHeight();
 
@@ -128,7 +121,7 @@ int EditorController::height() const {
     return m_height;
 }
 
-void EditorController::onMouseScroll(int amount, float x, float y, const UIOptions* ui_options) {
+void EditorController::onMouseScroll(int amount, float x, float y, const domain::UIOptions* ui_options) {
     int column = x / ui_options->font->getGlyphMetrics(97).advance;
     int line = y / ui_options->font->getLineHeight();
 

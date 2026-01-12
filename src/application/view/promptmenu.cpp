@@ -1,5 +1,6 @@
 #include "promptmenu.hpp"
 #include "domain/color.hpp"
+#include "domain/uioptions.hpp"
 #include "styling.hpp"
 #include "widgets/scrolledmenuitems.hpp"
 
@@ -16,7 +17,7 @@ void PromptMenuView::init(domain::Renderer* renderer,
     m_input = std::make_unique<Input>();
 }
 
-void PromptMenuView::render(domain::Font* font, domain::FontManager* font_manager, const KakouneClient &kakoune_client, float width, float height)
+void PromptMenuView::render(domain::UIOptions ui_options, domain::FontManager* font_manager, const KakouneClient &kakoune_client, float width, float height)
 {
     if (!kakoune_client.state.menu.has_value())
         return;
@@ -25,34 +26,34 @@ void PromptMenuView::render(domain::Font* font, domain::FontManager* font_manage
     m_input->setContent(kakoune_client.state.menu->getInput().getContent());
 
     m_x = (width - WIDTH) / 2;
-    m_height = 2 * BORDER_THICKNESS + 2 * SPACING_MEDIUM + m_input->height(font);
+    m_height = 2 * BORDER_THICKNESS + 2 * SPACING_MEDIUM + m_input->height(ui_options.font);
 
     float items_size = kakoune_client.state.menu->hasItems() ?
         std::min(MAX_VISIBLE_ITEMS, (int)kakoune_client.state.menu->getItems().items.size()) : 0;
     if (items_size > 0)
     {
-        m_height += BORDER_THICKNESS + font->getLineHeight() * items_size;
+        m_height += BORDER_THICKNESS + ui_options.font->getLineHeight() * items_size;
     }
 
     LayoutManager layout(m_x, Y, WIDTH, m_height);
 
     m_renderer->renderRoundedRectWithShadow(
-        domain::RGBAColor{0.5, 0.5, 0.5, 1.0}, layout.current().x,
+        getRGBAColor(ui_options.color_border, default_border_color), layout.current().x,
         layout.current().y, layout.current().width, layout.current().height, CORNER_RADIUS, SHADOW_LENGTH);
 
     layout.pad(BORDER_THICKNESS);
 
     m_renderer->renderRoundedRect(
         kakoune_client.state.mode_line.getDefaultFace().getBg(kakoune_client.state.default_face), layout.current().x,
-        layout.current().y, layout.current().width, SPACING_MEDIUM + m_input->height(font) + SPACING_MEDIUM, CORNER_RADIUS, CORNER_RADIUS, items_size > 0 ? 0.0f : CORNER_RADIUS, items_size > 0 ? 0.0f : CORNER_RADIUS);
+        layout.current().y, layout.current().width, SPACING_MEDIUM + m_input->height(ui_options.font) + SPACING_MEDIUM, CORNER_RADIUS, CORNER_RADIUS, items_size > 0 ? 0.0f : CORNER_RADIUS, items_size > 0 ? 0.0f : CORNER_RADIUS);
 
     layout.pad(SPACING_MEDIUM);
 
-    m_input->render(m_renderer, font, font_manager, kakoune_client, layout);
+    m_input->render(m_renderer, ui_options.font, font_manager, kakoune_client, layout);
 
     if (kakoune_client.state.menu->hasItems())
     {
-        m_renderer->renderRect(domain::RGBAColor{0.5, 0.5, 0.5, 1.0}, layout.current().x - SPACING_MEDIUM, layout.current().y, layout.current().width + SPACING_MEDIUM * 2, 1);
+        m_renderer->renderRect(getRGBAColor(ui_options.color_border, default_border_color), layout.current().x - SPACING_MEDIUM, layout.current().y, layout.current().width + SPACING_MEDIUM * 2, 1);
 
         layout.gapY(BORDER_THICKNESS);
 
@@ -60,7 +61,7 @@ void PromptMenuView::render(domain::Font* font, domain::FontManager* font_manage
             kakoune_client.state.menu->getItems().face.getBg(kakoune_client.state.default_face), layout.current().x - SPACING_MEDIUM,
             layout.current().y, layout.current().width + SPACING_MEDIUM*2, layout.current().height + SPACING_MEDIUM, 0.0f, 0.0f, CORNER_RADIUS, CORNER_RADIUS);
 
-        m_scrolled_menu_items->render(m_renderer, font, font_manager, kakoune_client, layout);
+        m_scrolled_menu_items->render(m_renderer, ui_options.font, font_manager, kakoune_client, layout);
     }
 }
 

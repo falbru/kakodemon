@@ -17,7 +17,7 @@ void MenuController::init(KakouneClient* kakoune_client, EditorController* edito
     m_mark_dirty = mark_dirty;
 }
 
-void MenuController::render(const UIOptions& ui_options) {
+void MenuController::render(const domain::UIOptions& ui_options) {
     if (!m_kakoune_client->state.menu.has_value()) {
         return;
     }
@@ -27,7 +27,7 @@ void MenuController::render(const UIOptions& ui_options) {
             m_inline_menu_view->render(ui_options.font, m_font_manager, *m_kakoune_client, m_editor_controller->width(), m_editor_controller->height());
             break;
         case domain::MenuStyle::PROMPT:
-            m_prompt_menu_view->render(ui_options.font, m_font_manager, *m_kakoune_client, m_editor_controller->width(), m_editor_controller->height());
+            m_prompt_menu_view->render(ui_options, m_font_manager, *m_kakoune_client, m_editor_controller->width(), m_editor_controller->height());
             break;
         case domain::MenuStyle::SEARCH:
             m_search_menu_view->render(ui_options.font, m_font_manager, *m_kakoune_client, m_editor_controller->width(), m_editor_controller->height());
@@ -107,7 +107,7 @@ float MenuController::height() const {
     return 0;
 }
 
-bool MenuController::onMouseButton(domain::MouseButtonEvent event, const UIOptions *ui_options) {
+bool MenuController::onMouseButton(domain::MouseButtonEvent event, const domain::UIOptions *ui_options) {
     if (!m_kakoune_client->state.menu || !m_kakoune_client->state.menu->hasItems()) {
         return false;
     }

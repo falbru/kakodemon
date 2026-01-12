@@ -1,6 +1,8 @@
 #ifndef KAKOUNE_JSONRPCKAKOUNEINTERFACE_HPP_INCLUDED
 #define KAKOUNE_JSONRPCKAKOUNEINTERFACE_HPP_INCLUDED
 
+#include "adapters/kakoune/uioptions.hpp"
+#include "domain/fontmanager.hpp"
 #include "domain/mouse.hpp"
 #include "domain/ports/kakouneinterface.hpp"
 #include "kakouneclientprocess.hpp"
@@ -19,7 +21,7 @@ class JsonRpcKakouneInterface : public domain::KakouneInterface
     void setWakeEventLoopCallback(std::function<void()> callback);
 
     std::optional<domain::KakouneState> getNextKakouneState() override;
-    std::optional<std::string> getUIOptionsFont() override;
+    domain::UIOptions getUIOptions(domain::FontManager *font_manager) override;
     domain::FrameEvents getEvents() override;
     std::optional<std::pair<domain::KakouneState, domain::FrameEvents>> getNextKakouneStateAndEvents() override;
 
@@ -38,6 +40,8 @@ class JsonRpcKakouneInterface : public domain::KakouneInterface
 
     std::string getMouseButtonString(domain::MouseButton button);
     domain::KakouneState convertFrameStateToKakouneState(const FrameState &frame_state);
+
+    void mergeUIOptions(UIOptions &original, UIOptions updated);
 };
 
 } // namespace kakoune

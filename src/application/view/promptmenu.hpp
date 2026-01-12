@@ -14,8 +14,8 @@ class PromptMenuView
 
     void init(domain::Renderer *renderer, KakouneContentView *kakoune_content_view);
 
-    void render(domain::Font *font, domain::FontManager *font_manager, const KakouneClient &kakoune_client, float width,
-                float height);
+    void render(domain::UIOptions ui_options, domain::FontManager *font_manager, const KakouneClient &kakoune_client,
+                float width, float height);
 
     domain::MouseMoveResult onMouseMove(float x, float y, const KakouneClient &kakoune_client);
     std::optional<int> findItemAtPosition(float x, float y, domain::Font *font, const KakouneClient &kakoune_client);

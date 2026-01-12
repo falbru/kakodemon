@@ -5,8 +5,8 @@
 #include "application/controller/infoboxcontroller.hpp"
 #include "application/controller/menucontroller.hpp"
 #include "application/model/kakouneclient.hpp"
-#include "application/model/uioptions.hpp"
 #include "domain/mouse.hpp"
+#include "domain/uioptions.hpp"
 
 class MouseController
 {
@@ -16,9 +16,9 @@ class MouseController
     void init(KakouneClient *kakoune_client, EditorController *editor_controller, MenuController *menu_controller,
               InfoBoxController *info_box_controller);
 
-    domain::MouseMoveResult onMouseMove(float x, float y, const UIOptions *ui_options);
-    void onMouseButton(domain::MouseButtonEvent event, const UIOptions *ui_options);
-    void onMouseScroll(double offset, float x, float y, const UIOptions *ui_options);
+    domain::MouseMoveResult onMouseMove(float x, float y, const domain::UIOptions *ui_options);
+    void onMouseButton(domain::MouseButtonEvent event, const domain::UIOptions *ui_options);
+    void onMouseScroll(double offset, float x, float y, const domain::UIOptions *ui_options);
 
     void setScrollSpeed(double speed);
     double getScrollSpeed() const;

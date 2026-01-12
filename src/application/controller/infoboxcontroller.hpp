@@ -14,8 +14,8 @@ class InfoBoxController
     void init(KakouneClient *kakoune_client, EditorController *editor_controller, domain::FontManager *font_manager,
               InfoBoxView *info_box_view, std::function<void()> mark_dirty);
 
-    void update(const UIOptions &ui_options);
-    void render(const UIOptions &ui_options);
+    void update(const domain::UIOptions &ui_options);
+    void render(const domain::UIOptions &ui_options);
 
     void onMouseScroll(int scroll_amount);
 

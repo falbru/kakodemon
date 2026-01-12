@@ -45,6 +45,7 @@ typedef std::variant<DefaultColor, FixedColor, RGBAColor> OptionalColor;
 RGBAColor getDefaultBg();
 RGBAColor getDefaultFg();
 RGBAColor getRGBAColor(FixedColor color);
+RGBAColor getRGBAColor(OptionalColor color, RGBAColor fallback_color);
 
 } // namespace domain
 

@@ -2,12 +2,14 @@
 #define DOMAIN_KAKOUNEINTERFACE_HPP_INCLUDED
 
 #include "domain/editor.hpp"
+#include "domain/fontmanager.hpp"
 #include "domain/infobox.hpp"
 #include "domain/lines.hpp"
 #include "domain/menu.hpp"
 #include "domain/modeline.hpp"
 #include "domain/mouse.hpp"
 #include "domain/ports/kakounesession.hpp"
+#include "domain/uioptions.hpp"
 
 #include <string>
 #include <vector>
@@ -36,7 +38,7 @@ class KakouneInterface
     virtual ~KakouneInterface() = default;
 
     virtual std::optional<KakouneState> getNextKakouneState() = 0;
-    virtual std::optional<std::string> getUIOptionsFont() = 0;
+    virtual UIOptions getUIOptions(FontManager *font_manager) = 0;
     virtual FrameEvents getEvents() = 0;
     virtual std::optional<std::pair<KakouneState, FrameEvents>> getNextKakouneStateAndEvents() = 0;
 

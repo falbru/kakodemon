@@ -1,4 +1,5 @@
 #include "domain/color.hpp"
+#include <variant>
 
 namespace domain {
 
@@ -60,6 +61,16 @@ RGBAColor getRGBAColor(FixedColor color) {
         case FixedColor::BrightWhite:
             return RGBAColor{1.0f, 1.0f, 1.0f, 1.0f};
             break;
+    }
+}
+
+RGBAColor getRGBAColor(OptionalColor color, RGBAColor fallback_color) {
+    if (std::holds_alternative<RGBAColor>(color)) {
+        return std::get<RGBAColor>(color);
+    }else if (std::holds_alternative<FixedColor>(color)) {
+        return getRGBAColor(std::get<FixedColor>(color));
+    }else {
+        return fallback_color;
     }
 }
 

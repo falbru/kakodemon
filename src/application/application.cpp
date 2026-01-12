@@ -10,7 +10,7 @@
 #include "domain/keys.hpp"
 #include "application/controller/editorcontroller.hpp"
 #include "application/controller/inputcontroller.hpp"
-#include "application/model/uioptions.hpp"
+#include "domain/uioptions.hpp"
 #include "application/view/infobox.hpp"
 #include "application/view/inlinemenu.hpp"
 #include "application/view/kakounecontentview.hpp"
@@ -52,7 +52,7 @@ void Application::init(const CliConfig &config)
     auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*session, config.startup_command, config.file_arguments);
     interface->setWakeEventLoopCallback([this]() { wakeEventLoop(); });
     m_kakoune_client = std::make_unique<KakouneClient>(std::move(session), std::move(interface));
-    m_ui_options = std::make_unique<UIOptions>();
+    m_ui_options = std::make_unique<domain::UIOptions>();
 
     m_editor_controller = std::make_unique<EditorController>();
     m_input_controller = std::make_unique<InputController>();
