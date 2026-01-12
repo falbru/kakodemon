@@ -1,5 +1,6 @@
 #include "inlinemenu.hpp"
 #include "domain/color.hpp"
+#include "domain/glyphlinesbuilder.hpp"
 #include "styling.hpp"
 #include "widgets/scrolledmenuitems.hpp"
 
@@ -39,7 +40,9 @@ void InlineMenuView::render(const domain::UIOptions &ui_options, domain::FontMan
 
     auto menu_position = m_kakoune_content_view->coordToPixels(ui_options.font, anchor);
 
-    m_width = std::min(MAX_MENU_WIDTH, width);
+    auto menu_item_width = domain::GlyphLinesBuilder::build(kakoune_client.state.menu->getItems().items.at(0), ui_options.font, font_manager).width(); // For the menu, all lines will have the same length
+
+    m_width = std::min(menu_item_width, std::min(MAX_MENU_WIDTH, width));
     float items_size = std::min(MAX_VISIBLE_ITEMS, (int)kakoune_client.state.menu->getItems().items.size());
     m_height = ui_options.font->getLineHeight() * items_size + BORDER_THICKNESS * 2.0f;
 
