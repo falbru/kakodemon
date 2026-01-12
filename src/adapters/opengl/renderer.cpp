@@ -70,11 +70,11 @@ void opengl::Renderer::popBounds() {
 }
 
 void opengl::Renderer::renderLine(domain::Font* font, domain::FontManager* font_manager, const domain::Line &line, const domain::Face &default_face, float x,
-                     float y) const {
-    renderLine(font, font_manager, line, default_face, x, y, domain::Alignment());
+                     float y, const std::unordered_map<domain::FixedColor, domain::RGBAColor> &color_overrides) const {
+    renderLine(font, font_manager, line, default_face, x, y, domain::Alignment(), color_overrides);
 }
 
-void opengl::Renderer::renderLine(domain::Font* font, domain::FontManager* font_manager, const domain::Line &line, const domain::Face &default_face, float x, float y, const domain::Alignment& alignment) const
+void opengl::Renderer::renderLine(domain::Font* font, domain::FontManager* font_manager, const domain::Line &line, const domain::Face &default_face, float x, float y, const domain::Alignment& alignment, const std::unordered_map<domain::FixedColor, domain::RGBAColor> &color_overrides) const
 {
     opengl::Font* opengl_font = dynamic_cast<opengl::Font*>(font);
 
@@ -83,7 +83,7 @@ void opengl::Renderer::renderLine(domain::Font* font, domain::FontManager* font_
     m_shader_program->use();
     glBindVertexArray(m_text_vao);
 
-    _renderLine(opengl_font, font_manager, line, default_face, x, y, alignment, RenderPass::Both);
+    _renderLine(opengl_font, font_manager, line, default_face, x, y, alignment, RenderPass::Both, color_overrides);
 
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -137,7 +137,7 @@ void opengl::Renderer::renderRoundedRectWithShadow(const domain::RGBAColor color
     glBindVertexArray(0);
 }
 
-void opengl::Renderer::renderLines(domain::Font* font, domain::FontManager* font_manager, const domain::Lines& lines, const domain::Face& default_face, float x, float y) const {
+void opengl::Renderer::renderLines(domain::Font* font, domain::FontManager* font_manager, const domain::Lines& lines, const domain::Face& default_face, float x, float y, const std::unordered_map<domain::FixedColor, domain::RGBAColor> &color_overrides) const {
     opengl::Font* opengl_font = dynamic_cast<opengl::Font*>(font);
 
     if (!opengl_font) return;
@@ -147,7 +147,7 @@ void opengl::Renderer::renderLines(domain::Font* font, domain::FontManager* font
     float y_it = y;
     for (const auto& line : lines.getLines())
     {
-        _renderLine(opengl_font, font_manager, line, default_face, x, y_it, domain::Alignment(), RenderPass::BackgroundOnly);
+        _renderLine(opengl_font, font_manager, line, default_face, x, y_it, domain::Alignment(), RenderPass::BackgroundOnly, color_overrides);
         y_it += font->getLineHeight();
     }
 
@@ -155,7 +155,7 @@ void opengl::Renderer::renderLines(domain::Font* font, domain::FontManager* font
     y_it = y;
     for (const auto& line : lines.getLines())
     {
-        _renderLine(opengl_font, font_manager, line, default_face, x, y_it, domain::Alignment(), RenderPass::TextOnly);
+        _renderLine(opengl_font, font_manager, line, default_face, x, y_it, domain::Alignment(), RenderPass::TextOnly, color_overrides);
         y_it += font->getLineHeight();
     }
 
@@ -163,7 +163,7 @@ void opengl::Renderer::renderLines(domain::Font* font, domain::FontManager* font
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font_manager, const domain::Line& line, const domain::Face& default_face, float x, float y, const domain::Alignment& alignment, RenderPass pass) const {
+void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font_manager, const domain::Line& line, const domain::Face& default_face, float x, float y, const domain::Alignment& alignment, RenderPass pass, const std::unordered_map<domain::FixedColor, domain::RGBAColor> &color_overrides) const {
 
     float start_x = x;
     float start_y = y + font->getLineHeight();
@@ -192,7 +192,7 @@ void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font
             float width = atom.width();
 
             // Background color
-            _renderRect(atom.getFace().getBg(default_face), x_it, y_it - height, width, height);
+            _renderRect(atom.getFace().getBg(default_face, color_overrides), x_it, y_it - height, width, height);
 
             x_it += width;
         }
@@ -204,7 +204,7 @@ void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font
         float y_it = start_y + font->getDescender();
         for (const auto& atom : glyph_line.getGlyphAtoms())
         {
-            domain::RGBAColor color = atom.getFace().getFg(default_face);
+            domain::RGBAColor color = atom.getFace().getFg(default_face, color_overrides);
             m_shader_program->setVector4f("textColor", color.r, color.g, color.b, color.a);
 
             float atom_x = x_it;
@@ -243,7 +243,7 @@ void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font
             }
 
             if (atom.getFace().hasAttribute(domain::Attribute::Underline) && font->getUnderlineThickness() > 0) {
-                _renderRect(atom.getFace().getFg(default_face), atom_x, y_it + font->getUnderlineOffset(), x_it - atom_x, font->getUnderlineThickness());
+                _renderRect(atom.getFace().getFg(default_face, color_overrides), atom_x, y_it + font->getUnderlineOffset(), x_it - atom_x, font->getUnderlineThickness());
             }
         }
     }

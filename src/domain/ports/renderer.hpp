@@ -6,6 +6,7 @@
 #include "domain/line.hpp"
 #include "domain/lines.hpp"
 #include "domain/ports/font.hpp"
+#include <unordered_map>
 
 namespace domain
 {
@@ -34,11 +35,14 @@ class Renderer
                                              float top_left_radius, float top_right_radius, float bottom_right_radius,
                                              float bottom_left_radius, float shadowRadius) const = 0;
     virtual void renderLine(Font *font, domain::FontManager *font_manager, const Line &line, const Face &default_face,
-                            float x, float y) const = 0;
+                            float x, float y,
+                            const std::unordered_map<FixedColor, RGBAColor> &color_overrides) const = 0;
     virtual void renderLine(Font *font, domain::FontManager *font_manager, const Line &line, const Face &default_face,
-                            float x, float y, const Alignment &alignment) const = 0;
+                            float x, float y, const Alignment &alignment,
+                            const std::unordered_map<FixedColor, RGBAColor> &color_overrides) const = 0;
     virtual void renderLines(Font *font, domain::FontManager *font_manager, const Lines &lines,
-                             const domain::Face &default_face, float x, float y) const = 0;
+                             const domain::Face &default_face, float x, float y,
+                             const std::unordered_map<FixedColor, RGBAColor> &color_overrides) const = 0;
 };
 
 } // namespace domain

@@ -31,17 +31,17 @@ float InlineMenuView::height() const {
     return m_height;
 }
 
-void InlineMenuView::render(domain::Font* font, domain::FontManager* font_manager, const KakouneClient &kakoune_client, float width, float height)
+void InlineMenuView::render(const domain::UIOptions &ui_options, domain::FontManager* font_manager, const KakouneClient &kakoune_client, float width, float height)
 {
     if (!kakoune_client.state.menu.has_value() || !kakoune_client.state.menu->hasItems()) return;
 
     auto anchor = kakoune_client.state.menu->getItems().anchor;
 
-    auto menu_position = m_kakoune_content_view->coordToPixels(font, anchor);
+    auto menu_position = m_kakoune_content_view->coordToPixels(ui_options.font, anchor);
 
     m_width = std::min(MAX_MENU_WIDTH, width);
     float items_size = std::min(MAX_VISIBLE_ITEMS, (int)kakoune_client.state.menu->getItems().items.size());
-    m_height = font->getLineHeight() * items_size + BORDER_THICKNESS * 2.0f;
+    m_height = ui_options.font->getLineHeight() * items_size + BORDER_THICKNESS * 2.0f;
 
     m_x = menu_position.first;
     if (m_x + m_width > width)
@@ -49,7 +49,7 @@ void InlineMenuView::render(domain::Font* font, domain::FontManager* font_manage
         m_x = width - m_width;
     }
 
-    m_y = menu_position.second + SPACING_SMALL + font->getLineHeight();
+    m_y = menu_position.second + SPACING_SMALL + ui_options.font->getLineHeight();
     if (m_y + m_height > height)
     {
         m_y = menu_position.second - SPACING_SMALL - m_height;
@@ -62,12 +62,12 @@ void InlineMenuView::render(domain::Font* font, domain::FontManager* font_manage
 
     layout.pad(BORDER_THICKNESS);
 
-    m_renderer->renderRect(kakoune_client.state.menu->getItems().face.getBg(kakoune_client.state.default_face),
+    m_renderer->renderRect(kakoune_client.state.menu->getItems().face.getBg(kakoune_client.state.default_face, ui_options.color_overrides),
                            layout.current().x, layout.current().y, layout.current().width, layout.current().height);
 
     layout.pad(0, SPACING_MEDIUM);
 
-    m_scrolled_menu_items->render(m_renderer, font, font_manager, kakoune_client, layout);
+    m_scrolled_menu_items->render(m_renderer, ui_options, font_manager, kakoune_client, layout);
 }
 
 float InlineMenuView::scrolledItemsX() const {

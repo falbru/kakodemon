@@ -5,6 +5,7 @@
 #include "application/view/layoutmanager.hpp"
 #include "application/view/widgets/scrollbar.hpp"
 #include "domain/ports/renderer.hpp"
+#include "domain/uioptions.hpp"
 #include <memory>
 
 class ScrolledMenuItems
@@ -12,7 +13,7 @@ class ScrolledMenuItems
   public:
     ScrolledMenuItems(int max_items);
 
-    void render(domain::Renderer *renderer, domain::Font *font, domain::FontManager *font_manager,
+    void render(domain::Renderer *renderer, const domain::UIOptions &ui_options, domain::FontManager *font_manager,
                 const KakouneClient &kakoune_client, LayoutManager &layout);
 
     float width() const;

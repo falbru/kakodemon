@@ -48,11 +48,11 @@ bool EditorController::update(domain::UIOptions& ui_options)
 
 void EditorController::render(const domain::UIOptions& ui_options)
 {
-    m_kakoune_content_view->render(ui_options.font, m_font_manager, m_kakoune_client->state.content, m_kakoune_client->state.default_face, 0.0f, 0.0f);
+    m_kakoune_content_view->render(ui_options, m_font_manager, m_kakoune_client->state.content, m_kakoune_client->state.default_face, 0.0f, 0.0f);
     m_kakoune_content_view->setWidth(m_width);
     m_content_height = m_height - m_status_bar_view->height(ui_options.font);
     m_kakoune_content_view->setHeight(m_content_height);
-    m_status_bar_view->render(ui_options.font, m_font_manager, m_kakoune_client->state.mode_line, m_width, m_height);
+    m_status_bar_view->render(ui_options, m_font_manager, m_kakoune_client->state.mode_line, m_width, m_height);
 }
 
 void EditorController::onWindowResize(int width, int height, const domain::UIOptions& ui_options) {

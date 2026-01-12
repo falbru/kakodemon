@@ -437,13 +437,13 @@ void InfoBoxView::render(const KakouneClient *kakoune_client, domain::FontManage
 
     layout.pad(BORDER_THICKNESS);
 
-    m_renderer->renderRect(kakoune_client->state.info_box->default_face.getBg(kakoune_client->state.default_face),
+    m_renderer->renderRect(kakoune_client->state.info_box->default_face.getBg(kakoune_client->state.default_face, ui_options.color_overrides),
                            layout.current().x, layout.current().y, layout.current().width, layout.current().height);
 
     layout.pad(SPACING_MEDIUM);
 
     if (kakoune_client->state.info_box->title.size() > 0) {
-        m_renderer->renderLine(ui_options.font, font_manager, kakoune_client->state.info_box->title, kakoune_client->state.info_box->default_face, layout.current().x, layout.current().y);
+        m_renderer->renderLine(ui_options.font, font_manager, kakoune_client->state.info_box->title, kakoune_client->state.info_box->default_face, layout.current().x, layout.current().y, ui_options.color_overrides);
 
         layout.gapY(ui_options.font->getLineHeight());
 
@@ -479,7 +479,7 @@ void InfoBoxView::render(const KakouneClient *kakoune_client, domain::FontManage
     {
         m_renderer->renderLine(ui_options.font, font_manager, placement.content.at(i),
                              kakoune_client->state.info_box->default_face,
-                             content_layout.current().x, y_pos);
+                             content_layout.current().x, y_pos, ui_options.color_overrides);
         y_pos += line_height;
     }
 
@@ -488,7 +488,7 @@ void InfoBoxView::render(const KakouneClient *kakoune_client, domain::FontManage
         int max_scroll = total_lines - visible_lines;
         m_scroll_bar->setValue(m_scroll_offset, max_scroll, visible_lines);
         m_scroll_bar->render(m_renderer,
-                           kakoune_client->state.info_box->default_face.getFg(kakoune_client->state.default_face),
+                           kakoune_client->state.info_box->default_face.getFg(kakoune_client->state.default_face, ui_options.color_overrides),
                            layout);
     }
 }

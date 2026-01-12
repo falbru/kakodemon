@@ -7,6 +7,7 @@
 #include "application/view/widgets/scrolledmenuitems.hpp"
 #include "domain/mouse.hpp"
 #include "domain/ports/renderer.hpp"
+#include "domain/uioptions.hpp"
 
 class SearchMenuView
 {
@@ -15,8 +16,8 @@ class SearchMenuView
 
     void init(domain::Renderer *renderer);
 
-    void render(domain::Font *font, domain::FontManager *font_manager, const KakouneClient &kakoune_client, float width,
-                float height);
+    void render(const domain::UIOptions &ui_options, domain::FontManager *font_manager,
+                const KakouneClient &kakoune_client, float width, float height);
 
     domain::MouseMoveResult onMouseMove(float x, float y, const KakouneClient &kakoune_client);
     std::optional<int> findItemAtPosition(float x, float y, domain::Font *font, const KakouneClient &kakoune_client);

@@ -53,6 +53,46 @@ RGBAColor Face::getBg() const {
     }
 }
 
+RGBAColor Face::getFg(const Face& default_face, const std::unordered_map<FixedColor, RGBAColor> &color_overrides) const {
+    if (std::holds_alternative<DefaultColor>(m_fg)) {
+        return default_face.getFg(color_overrides);
+    }else if (std::holds_alternative<FixedColor>(m_fg)) {
+        return getRGBAColor(std::get<FixedColor>(m_fg), color_overrides);
+    }else {
+        return std::get<RGBAColor>(m_fg);
+    }
+}
+
+RGBAColor Face::getBg(const Face& default_face, const std::unordered_map<FixedColor, RGBAColor> &color_overrides) const {
+    if (std::holds_alternative<DefaultColor>(m_bg)) {
+        return default_face.getBg(color_overrides);
+    }else if (std::holds_alternative<FixedColor>(m_bg)) {
+        return getRGBAColor(std::get<FixedColor>(m_bg), color_overrides);
+    }else {
+        return std::get<RGBAColor>(m_bg);
+    }
+}
+
+RGBAColor Face::getFg(const std::unordered_map<FixedColor, RGBAColor> &color_overrides) const {
+    if (std::holds_alternative<DefaultColor>(m_fg)) {
+        return getDefaultFg();
+    }else if (std::holds_alternative<FixedColor>(m_fg)) {
+        return getRGBAColor(std::get<FixedColor>(m_fg), color_overrides);
+    }else {
+        return std::get<RGBAColor>(m_fg);
+    }
+}
+
+RGBAColor Face::getBg(const std::unordered_map<FixedColor, RGBAColor> &color_overrides) const {
+    if (std::holds_alternative<DefaultColor>(m_bg)) {
+        return getDefaultBg();
+    }else if (std::holds_alternative<FixedColor>(m_bg)) {
+        return getRGBAColor(std::get<FixedColor>(m_bg), color_overrides);
+    }else {
+        return std::get<RGBAColor>(m_bg);
+    }
+}
+
 const std::vector<Attribute>& Face::getAttributes() const {
     return m_attributes;
 }

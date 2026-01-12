@@ -5,6 +5,7 @@
 #include "application/view/layoutmanager.hpp"
 #include "application/view/styling.hpp"
 #include "domain/ports/renderer.hpp"
+#include "domain/uioptions.hpp"
 
 class Input
 {
@@ -14,7 +15,7 @@ class Input
     void setPrompt(const domain::Line &prompt);
     void setContent(const domain::Line &content);
 
-    void render(domain::Renderer *renderer, domain::Font *font, domain::FontManager *font_manager,
+    void render(domain::Renderer *renderer, const domain::UIOptions &ui_options, domain::FontManager *font_manager,
                 const KakouneClient &kakoune_client, LayoutManager &layout);
 
     float height(domain::Font *font) const;

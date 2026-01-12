@@ -14,7 +14,7 @@ void SearchMenuView::init(domain::Renderer *renderer) {
     m_input = std::make_unique<Input>();
 }
 
-void SearchMenuView::render(domain::Font *font, domain::FontManager *font_manager, const KakouneClient &kakoune_client, float width, float height) {
+void SearchMenuView::render(const domain::UIOptions &ui_options, domain::FontManager *font_manager, const KakouneClient &kakoune_client, float width, float height) {
     if (!kakoune_client.state.menu.has_value())
         return;
 
@@ -22,13 +22,13 @@ void SearchMenuView::render(domain::Font *font, domain::FontManager *font_manage
     m_input->setContent(kakoune_client.state.menu->getInput().getContent());
 
     m_x = width - WIDTH;
-    m_height = BORDER_THICKNESS + 2 * SPACING_MEDIUM + m_input->height(font);
+    m_height = BORDER_THICKNESS + 2 * SPACING_MEDIUM + m_input->height(ui_options.font);
 
     float items_size = kakoune_client.state.menu->hasItems() ?
         std::min(MAX_VISIBLE_ITEMS, (int)kakoune_client.state.menu->getItems().items.size()) : 0;
     if (items_size > 0)
     {
-        m_height += BORDER_THICKNESS + font->getLineHeight() * items_size;
+        m_height += BORDER_THICKNESS + ui_options.font->getLineHeight() * items_size;
     }
 
     LayoutManager layout(m_x, 0, WIDTH, m_height);
@@ -43,17 +43,17 @@ void SearchMenuView::render(domain::Font *font, domain::FontManager *font_manage
 
     if (items_size > 0) {
         m_renderer->renderRect(
-            kakoune_client.state.mode_line.getDefaultFace().getBg(kakoune_client.state.default_face), layout.current().x,
-            layout.current().y, layout.current().width, SPACING_MEDIUM + m_input->height(font));
+            kakoune_client.state.mode_line.getDefaultFace().getBg(kakoune_client.state.default_face, ui_options.color_overrides), layout.current().x,
+            layout.current().y, layout.current().width, SPACING_MEDIUM + m_input->height(ui_options.font));
     } else {
         m_renderer->renderRoundedRect(
-            kakoune_client.state.mode_line.getDefaultFace().getBg(kakoune_client.state.default_face), layout.current().x,
-            layout.current().y, layout.current().width, SPACING_MEDIUM + m_input->height(font) + SPACING_MEDIUM, 0, 0, CORNER_RADIUS, CORNER_RADIUS);
+            kakoune_client.state.mode_line.getDefaultFace().getBg(kakoune_client.state.default_face, ui_options.color_overrides), layout.current().x,
+            layout.current().y, layout.current().width, SPACING_MEDIUM + m_input->height(ui_options.font) + SPACING_MEDIUM, 0, 0, CORNER_RADIUS, CORNER_RADIUS);
     }
 
     layout.pad(SPACING_MEDIUM);
 
-    m_input->render(m_renderer, font, font_manager, kakoune_client, layout);
+    m_input->render(m_renderer, ui_options, font_manager, kakoune_client, layout);
 
     if (kakoune_client.state.menu->hasItems())
     {
@@ -62,10 +62,10 @@ void SearchMenuView::render(domain::Font *font, domain::FontManager *font_manage
         layout.gapY(BORDER_THICKNESS);
 
         m_renderer->renderRoundedRect(
-            kakoune_client.state.menu->getItems().face.getBg(kakoune_client.state.default_face), layout.current().x - SPACING_MEDIUM,
+            kakoune_client.state.menu->getItems().face.getBg(kakoune_client.state.default_face, ui_options.color_overrides), layout.current().x - SPACING_MEDIUM,
             layout.current().y, layout.current().width + SPACING_MEDIUM*2, layout.current().height + SPACING_MEDIUM, 0.0f, 0.0f, CORNER_RADIUS, CORNER_RADIUS);
 
-        m_scrolled_menu_items->render(m_renderer, font, font_manager, kakoune_client, layout);
+        m_scrolled_menu_items->render(m_renderer, ui_options, font_manager, kakoune_client, layout);
     }
 }
 

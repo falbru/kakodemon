@@ -64,6 +64,14 @@ RGBAColor getRGBAColor(FixedColor color) {
     }
 }
 
+RGBAColor getRGBAColor(FixedColor color, const std::unordered_map<FixedColor, RGBAColor> &overrides) {
+    auto it = overrides.find(color);
+    if (it != overrides.end()) {
+        return it->second;
+    }
+    return getRGBAColor(color);
+}
+
 RGBAColor getRGBAColor(OptionalColor color, RGBAColor fallback_color) {
     if (std::holds_alternative<RGBAColor>(color)) {
         return std::get<RGBAColor>(color);

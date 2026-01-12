@@ -44,17 +44,20 @@ class Renderer : public domain::Renderer
                                      float top_left_radius, float top_right_radius, float bottom_right_radius,
                                      float bottom_left_radius, float shadowRadius) const override;
     void renderLine(domain::Font *font, domain::FontManager *font_manager, const domain::Line &line,
-                    const domain::Face &default_face, float x, float y) const override;
-    void renderLine(domain::Font *font, domain::FontManager *font_manager, const domain::Line &line,
                     const domain::Face &default_face, float x, float y,
-                    const domain::Alignment &alignment) const override;
+                    const std::unordered_map<domain::FixedColor, domain::RGBAColor> &color_overrides) const override;
+    void renderLine(domain::Font *font, domain::FontManager *font_manager, const domain::Line &line,
+                    const domain::Face &default_face, float x, float y, const domain::Alignment &alignment,
+                    const std::unordered_map<domain::FixedColor, domain::RGBAColor> &color_overrides) const override;
     void renderLines(domain::Font *font, domain::FontManager *font_manager, const domain::Lines &lines,
-                     const domain::Face &default_face, float x, float y) const override;
+                     const domain::Face &default_face, float x, float y,
+                     const std::unordered_map<domain::FixedColor, domain::RGBAColor> &color_overrides) const override;
 
   private:
     void _renderLine(opengl::Font *font, domain::FontManager *font_manager, const domain::Line &line,
                      const domain::Face &default_face, float x, float y, const domain::Alignment &alignment,
-                     RenderPass pass) const;
+                     RenderPass pass,
+                     const std::unordered_map<domain::FixedColor, domain::RGBAColor> &color_overrides) const;
     void _renderShadow(const domain::RGBAColor color, float x, float y, float width, float height,
                        float shadowRadius) const;
     void _renderRect(const domain::RGBAColor color, float x, float y, float width, float height) const;

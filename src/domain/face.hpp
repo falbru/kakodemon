@@ -2,6 +2,7 @@
 #define DOMAIN_FACE_HPP_INCLUDED
 
 #include "domain/color.hpp"
+#include <unordered_map>
 #include <vector>
 
 namespace domain
@@ -33,6 +34,12 @@ class Face
 
     RGBAColor getFg() const;
     RGBAColor getBg() const;
+
+    RGBAColor getFg(const Face &default_face, const std::unordered_map<FixedColor, RGBAColor> &color_overrides) const;
+    RGBAColor getBg(const Face &default_face, const std::unordered_map<FixedColor, RGBAColor> &color_overrides) const;
+
+    RGBAColor getFg(const std::unordered_map<FixedColor, RGBAColor> &color_overrides) const;
+    RGBAColor getBg(const std::unordered_map<FixedColor, RGBAColor> &color_overrides) const;
 
     const std::vector<Attribute> &getAttributes() const;
     bool hasAttribute(Attribute attribute) const;
