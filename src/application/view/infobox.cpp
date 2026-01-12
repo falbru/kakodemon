@@ -27,10 +27,15 @@ void InfoBoxView::init(domain::Renderer* renderer, MenuController* menu_controll
 }
 
 std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection direction, CrossAxisAlignment alignment,
-                                                      const domain::Lines &content,
+                                                      const domain::Lines &content, const domain::Line &title,
                                                       const domain::Rectangle &anchor, float layout_width, float layout_height, domain::Font* font, domain::FontManager* font_manager, const domain::Rectangle& menu_rectangle, const domain::CursorPosition &cursor_position)
 {
     domain::GlyphLines glyph_lines = domain::GlyphLinesBuilder::build(content, font, font_manager);
+
+    float title_height = 0.0f;
+    if (title.size() > 0) {
+        title_height = font->getLineHeight() + BORDER_THICKNESS + SPACING_SMALL + SPACING_MEDIUM;
+    }
 
     domain::Rectangle cursor_rect;
     bool has_cursor = false;
@@ -207,7 +212,8 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
             info_box.height = MAX_HEIGHT;
         }
 
-        info_box.y = anchor.y - info_box.height - SPACING_MEDIUM * 2.0f;
+        float total_height = info_box.height + SPACING_MEDIUM * 2.0f + BORDER_THICKNESS * 2.0f + title_height;
+        info_box.y = anchor.y - total_height;
 
         if (info_box.y < 0)
         {
@@ -256,7 +262,8 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
             info_box.height = MAX_HEIGHT;
         }
 
-        if (info_box.y + info_box.height + SPACING_MEDIUM * 2.0f > layout_height)
+        float total_height = info_box.height + SPACING_MEDIUM * 2.0f + BORDER_THICKNESS * 2.0f + title_height;
+        if (info_box.y + total_height > layout_height)
         {
             return std::nullopt;
         }
@@ -410,7 +417,7 @@ void InfoBoxView::render(const KakouneClient *kakoune_client, domain::FontManage
     Placement placement;
     for (const auto& dir : fallback_directions)
     {
-        auto current_placement = tryPlaceInfoBox(dir, alignment, kakoune_client->state.info_box->content, anchor, width, height, ui_options.font, font_manager, menu_rectangle, kakoune_client->state.cursor_position);
+        auto current_placement = tryPlaceInfoBox(dir, alignment, kakoune_client->state.info_box->content, kakoune_client->state.info_box->title, anchor, width, height, ui_options.font, font_manager, menu_rectangle, kakoune_client->state.cursor_position);
         if (current_placement.has_value()) {
             placement = current_placement.value();
             break;

@@ -45,9 +45,10 @@ class InfoBoxView
                                                      PlacementDirection direction, CrossAxisAlignment alignment) const;
 
     std::optional<Placement> tryPlaceInfoBox(PlacementDirection direction, CrossAxisAlignment alignment,
-                                             const domain::Lines &content, const domain::Rectangle &anchor,
-                                             float layout_width, float layout_height, domain::Font *font,
-                                             domain::FontManager *font_manager, const domain::Rectangle &menu_rectangle,
+                                             const domain::Lines &content, const domain::Line &title,
+                                             const domain::Rectangle &anchor, float layout_width, float layout_height,
+                                             domain::Font *font, domain::FontManager *font_manager,
+                                             const domain::Rectangle &menu_rectangle,
                                              const domain::CursorPosition &cursor_position);
 
     void render(const KakouneClient *kakoune_client, domain::FontManager *font_manager,
