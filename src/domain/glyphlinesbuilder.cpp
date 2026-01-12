@@ -1,7 +1,6 @@
 #include "glyphlinesbuilder.hpp"
 #include "domain/face.hpp"
 #include "domain/utf8string.hpp"
-#include <algorithm>
 
 namespace domain
 {

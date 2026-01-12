@@ -4,8 +4,6 @@
 #include "adapters/opengl/renderer.hpp"
 #include "domain/fontmanager.hpp"
 #include "domain/mouse.hpp"
-#include <chrono>
-#include <thread>
 
 opengl::GLFWApplication::GLFWApplication() {
 }

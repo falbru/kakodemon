@@ -3,7 +3,6 @@
 #include "domain/utf8string.hpp"
 #include <string>
 #include <variant>
-#include <spdlog/spdlog.h>
 
 InputController::InputController() {
 

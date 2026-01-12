@@ -2,8 +2,6 @@
 #include "domain/utf8string.hpp"
 #include "domain/ports/fontengine.hpp"
 
-#include <spdlog/spdlog.h>
-
 opengl::Font::Font(domain::FontEngine* font_engine)
     : m_font_engine(font_engine) {
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

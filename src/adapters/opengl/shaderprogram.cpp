@@ -1,7 +1,7 @@
 #include "shaderprogram.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "opengl.hpp"
-#include <spdlog/spdlog.h>
+#include <stdexcept>
 
 const char *vertexShaderSource = R"(
 #version 330 core
