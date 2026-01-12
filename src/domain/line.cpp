@@ -23,7 +23,7 @@ Line Line::slice(int start_index, int length) {
     int i = 0;
     int size_it = 0;
 
-    while (i < m_atoms.size() && size_it + m_atoms[i].size() < start_index) {
+    while (i < m_atoms.size() && size_it + m_atoms[i].size() <= start_index) {
         size_it += m_atoms[i].size();
         i++;
     }
@@ -41,7 +41,8 @@ Line Line::slice(int start_index, int length) {
 
     int remaining_length = length - (m_atoms[start_atom_index].size() - start_atom_start_index);
 
-    while (i < m_atoms.size() && remaining_length + m_atoms[i].size() > 0) {
+    i = start_atom_index + 1;
+    while (i < m_atoms.size() && remaining_length > m_atoms[i].size()) {
         remaining_length -= m_atoms[i].size();
         i++;
     }
@@ -58,7 +59,7 @@ Line Line::slice(int start_index, int length) {
                           m_atoms.begin() + i);
     }
 
-    if (i < m_atoms.size()) {
+    if (i < m_atoms.size() && remaining_length > 0) {
         auto end_atom = m_atoms[i].slice(0, remaining_length);
         line_atoms.push_back(end_atom);
     }

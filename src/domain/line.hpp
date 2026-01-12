@@ -14,7 +14,7 @@ class Line
     Line(std::vector<Atom> m_atoms);
 
     const Atom &at(int index) const;
-    Line slice(int start_index, int end_index);
+    Line slice(int start_index, int length);
 
     const std::vector<Atom> &getAtoms() const;
     unsigned int size() const;

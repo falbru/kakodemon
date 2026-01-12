@@ -13,10 +13,6 @@ void Input::setContent(const domain::Line& content) { m_content = content; }
 void Input::render(domain::Renderer *renderer, const domain::UIOptions &ui_options, domain::FontManager* font_manager, const KakouneClient &kakoune_client, LayoutManager &layout) {
   auto input_layout = layout.sliceTop(height(ui_options.font));
 
-  domain::Face input_bg_face = kakoune_client.state.menu->hasItems() ?
-      kakoune_client.state.menu->getItems().selected_face :
-      kakoune_client.state.default_face;
-
   renderer->renderRect(kakoune_client.state.mode_line.getDefaultFace().getBg(
                            kakoune_client.state.default_face, ui_options.color_overrides),
                        input_layout.current().x,
@@ -47,8 +43,9 @@ void Input::render(domain::Renderer *renderer, const domain::UIOptions &ui_optio
       }
 
       float content_width = domain::GlyphLinesBuilder::build(content_line, ui_options.font, font_manager).width();
-      if (m_offset_x + input_layout.current().x > content_width) {
-          m_offset_x = std::max(0.0f, content_width - input_layout.current().x);
+      float cursor_space = ui_options.font->getGlyphMetrics(' ').advance;
+      if (m_offset_x + input_layout.current().width > content_width + cursor_space) {
+          m_offset_x = std::max(0.0f, content_width + cursor_space - input_layout.current().width);
       }
 
       float cursor_x_right = domain::GlyphLinesBuilder::build(content_line.slice(0, cursor_pos_column + 1), ui_options.font, font_manager).width();
