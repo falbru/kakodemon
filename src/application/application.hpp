@@ -49,6 +49,10 @@ class Application
     void onMouseButton(domain::MouseButtonEvent event);
     void onMouseScroll(double offset);
 
+    void markDirty();
+    bool needsRender() const;
+    virtual void wakeEventLoop() = 0;
+
   protected:
     const int DEFAULT_WINDOW_WIDTH = 640;
     const int DEFAULT_WINDOW_HEIGHT = 480;
@@ -67,6 +71,8 @@ class Application
 
     float m_mouse_x = 0.0f;
     float m_mouse_y = 0.0f;
+
+    bool m_needs_render = true;
 
     std::unique_ptr<KakouneClient> m_kakoune_client;
     std::unique_ptr<UIOptions> m_ui_options;

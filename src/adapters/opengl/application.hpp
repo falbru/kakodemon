@@ -18,6 +18,7 @@ class GLFWApplication : public Application
     void run() override;
 
     void setCursor(domain::Cursor cursor) override;
+    void wakeEventLoop() override;
 
   private:
     void onGLFWKeyInput(int key, int scancode, int action, int mods);

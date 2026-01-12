@@ -110,25 +110,19 @@ void opengl::GLFWApplication::init(const CliConfig& config) {
 void opengl::GLFWApplication::run() {
     while (!glfwWindowShouldClose(m_window))
     {
-        auto frame_start = std::chrono::high_resolution_clock::now();
-
-        glfwPollEvents();
+        glfwWaitEvents();
 
         updateControllers();
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(m_clear_color.r, m_clear_color.g, m_clear_color.b, 1.0f);
+        if (needsRender()) {
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glClearColor(m_clear_color.r, m_clear_color.g, m_clear_color.b, 1.0f);
 
-        renderControllers();
+            renderControllers();
 
-        glfwSwapBuffers(m_window);
+            glfwSwapBuffers(m_window);
 
-        auto frame_end = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double, std::milli> elapsed = frame_end - frame_start;
-
-        double remaining_time = TARGET_FRAME_TIME_MS - elapsed.count();
-        if (remaining_time > 0) {
-            std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(remaining_time));
+            m_needs_render = false;
         }
     }
 }
@@ -269,4 +263,8 @@ void opengl::GLFWApplication::setCursor(domain::Cursor cursor) {
             glfwSetCursor(m_window, m_cursor_pointer);
             break;
     }
+}
+
+void opengl::GLFWApplication::wakeEventLoop() {
+    glfwPostEmptyEvent();
 }

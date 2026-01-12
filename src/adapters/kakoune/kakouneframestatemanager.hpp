@@ -1,6 +1,7 @@
 #ifndef KAKOUNEFRAMESTATEMANAGER_HPP_INCLUDED
 #define KAKOUNEFRAMESTATEMANAGER_HPP_INCLUDED
 
+#include <functional>
 #include <mutex>
 #include <optional>
 #include <thread>
@@ -32,6 +33,8 @@ class KakouneFrameStateManager
     void start();
     void stop();
 
+    void setWakeEventLoopCallback(std::function<void()> callback);
+
     std::optional<FrameState> getNextFrameState();
     FrameEvents getEvents();
     std::optional<std::pair<FrameState, FrameEvents>> getNextFrameStateAndEvents();
@@ -51,6 +54,8 @@ class KakouneFrameStateManager
 
     std::thread m_polling_thread;
     std::mutex m_state_mutex;
+
+    std::function<void()> m_wake_event_loop_callback;
 };
 
 #endif

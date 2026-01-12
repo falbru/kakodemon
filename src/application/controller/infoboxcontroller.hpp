@@ -4,6 +4,7 @@
 #include "application/controller/editorcontroller.hpp"
 #include "application/model/kakouneclient.hpp"
 #include "application/view/infobox.hpp"
+#include <functional>
 
 class InfoBoxController
 {
@@ -11,7 +12,7 @@ class InfoBoxController
     InfoBoxController();
 
     void init(KakouneClient *kakoune_client, EditorController *editor_controller, domain::FontManager *font_manager,
-              InfoBoxView *info_box_view);
+              InfoBoxView *info_box_view, std::function<void()> mark_dirty);
 
     void update(const UIOptions &ui_options);
     void render(const UIOptions &ui_options);
@@ -28,6 +29,8 @@ class InfoBoxController
     EditorController *m_editor_controller;
     domain::FontManager *m_font_manager;
     InfoBoxView *m_info_box_view;
+
+    std::function<void()> m_mark_dirty;
 };
 
 #endif

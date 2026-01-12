@@ -25,6 +25,10 @@ JsonRpcKakouneInterface::~JsonRpcKakouneInterface() {
     m_frame_state_manager->stop();
 }
 
+void JsonRpcKakouneInterface::setWakeEventLoopCallback(std::function<void()> callback) {
+    m_frame_state_manager->setWakeEventLoopCallback(callback);
+}
+
 domain::KakouneState JsonRpcKakouneInterface::convertFrameStateToKakouneState(const FrameState& frame_state) {
     std::optional<domain::InfoBox> info_box;
     if (frame_state.info_box.has_value()) {

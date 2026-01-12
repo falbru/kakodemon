@@ -50,6 +50,7 @@ void Application::init(const CliConfig &config)
     }
 
     auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*session, config.startup_command, config.file_arguments);
+    interface->setWakeEventLoopCallback([this]() { wakeEventLoop(); });
     m_kakoune_client = std::make_unique<KakouneClient>(std::move(session), std::move(interface));
     m_ui_options = std::make_unique<UIOptions>();
 
@@ -74,9 +75,9 @@ void Application::init(const CliConfig &config)
     m_info_box->init(m_renderer.get(), m_menu_controller.get(), m_kakoune_content_view.get());
 
     m_input_controller->init(m_kakoune_client.get());
-    m_menu_controller->init(m_kakoune_client.get(), m_editor_controller.get(), m_font_manager.get(), m_prompt_menu.get(), m_inline_menu.get(), m_search_menu.get());
+    m_menu_controller->init(m_kakoune_client.get(), m_editor_controller.get(), m_font_manager.get(), m_prompt_menu.get(), m_inline_menu.get(), m_search_menu.get(), [this]() { markDirty(); });
     m_editor_controller->init(m_kakoune_client.get(), m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager.get(), [&](domain::RGBAColor color) { setClearColor(color); }, m_menu_controller.get());
-    m_info_box_controller->init(m_kakoune_client.get(), m_editor_controller.get(), m_font_manager.get(), m_info_box.get());
+    m_info_box_controller->init(m_kakoune_client.get(), m_editor_controller.get(), m_font_manager.get(), m_info_box.get(), [this]() { markDirty(); });
     m_mouse_controller->init(m_kakoune_client.get(), m_editor_controller.get(), m_menu_controller.get(), m_info_box_controller.get());
 
     m_ui_options->font = m_font_manager->getFontFromName("monospace 14");
@@ -86,7 +87,10 @@ void Application::init(const CliConfig &config)
 void Application::updateControllers()
 {
     m_input_controller->update();
-    m_editor_controller->update(*m_ui_options.get());
+    bool state_updated = m_editor_controller->update(*m_ui_options.get());
+    if (state_updated) {
+        markDirty();
+    }
     m_info_box_controller->update(*m_ui_options.get());
 }
 
@@ -101,6 +105,7 @@ void Application::onWindowResize(int width, int height)
 {
     m_renderer->onWindowResize(width, height);
     m_editor_controller->onWindowResize(width, height, *m_ui_options.get());
+    markDirty();
 }
 
 void Application::onMouseScroll(double offset)
@@ -116,17 +121,20 @@ void Application::onMouseMove(float x, float y)
 
     if (result.cursor.has_value()) {
         setCursor(result.cursor.value());
+        markDirty();
     }
 }
 
 void Application::onMouseButton(domain::MouseButtonEvent event)
 {
     m_mouse_controller->onMouseButton(event, m_ui_options.get());
+    markDirty();
 }
 
 void Application::onKeyInput(domain::KeyEvent event)
 {
     m_input_controller->onKeyInput(event);
+    markDirty();
 }
 
 void Application::setClearColor(domain::RGBAColor color) {
@@ -135,4 +143,12 @@ void Application::setClearColor(domain::RGBAColor color) {
 
 void Application::setCursor(domain::Cursor cursor) {
     m_cursor = cursor;
+}
+
+void Application::markDirty() {
+    m_needs_render = true;
+}
+
+bool Application::needsRender() const {
+    return m_needs_render;
 }

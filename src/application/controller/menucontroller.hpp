@@ -7,6 +7,7 @@
 #include "application/view/promptmenu.hpp"
 #include "application/view/searchmenu.hpp"
 #include "domain/mouse.hpp"
+#include <functional>
 
 class MenuController
 {
@@ -14,7 +15,8 @@ class MenuController
     MenuController();
 
     void init(KakouneClient *kakoune_client, EditorController *editor_controller, domain::FontManager *font_manager,
-              PromptMenuView *prompt_menu_view, InlineMenuView *inline_menu_view, SearchMenuView *search_menu_view);
+              PromptMenuView *prompt_menu_view, InlineMenuView *inline_menu_view, SearchMenuView *search_menu_view,
+              std::function<void()> mark_dirty);
 
     void render(const UIOptions &ui_options);
 
@@ -35,6 +37,8 @@ class MenuController
     InlineMenuView *m_inline_menu_view;
     PromptMenuView *m_prompt_menu_view;
     SearchMenuView *m_search_menu_view;
+
+    std::function<void()> m_mark_dirty;
 };
 
 #endif

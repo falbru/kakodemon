@@ -16,6 +16,8 @@ class JsonRpcKakouneInterface : public domain::KakouneInterface
                             const std::vector<std::string> &file_arguments = {});
     ~JsonRpcKakouneInterface();
 
+    void setWakeEventLoopCallback(std::function<void()> callback);
+
     std::optional<domain::KakouneState> getNextKakouneState() override;
     std::optional<std::string> getUIOptionsFont() override;
     domain::FrameEvents getEvents() override;

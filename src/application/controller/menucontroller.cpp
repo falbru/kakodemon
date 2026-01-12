@@ -7,13 +7,14 @@ MenuController::MenuController() {
 
 }
 
-void MenuController::init(KakouneClient* kakoune_client, EditorController* editor_controller, domain::FontManager* font_manager, PromptMenuView* prompt_menu_view, InlineMenuView* inline_menu_view, SearchMenuView *search_menu_view) {
+void MenuController::init(KakouneClient* kakoune_client, EditorController* editor_controller, domain::FontManager* font_manager, PromptMenuView* prompt_menu_view, InlineMenuView* inline_menu_view, SearchMenuView *search_menu_view, std::function<void()> mark_dirty) {
     m_kakoune_client = kakoune_client;
     m_editor_controller = editor_controller;
     m_font_manager = font_manager;
     m_inline_menu_view = inline_menu_view;
     m_prompt_menu_view = prompt_menu_view;
     m_search_menu_view = search_menu_view;
+    m_mark_dirty = mark_dirty;
 }
 
 void MenuController::render(const UIOptions& ui_options) {
@@ -153,6 +154,10 @@ void MenuController::onMouseScroll(int scroll_amount) {
         case domain::MenuStyle::SEARCH:
             m_search_menu_view->onMouseScroll(scroll_amount, *m_kakoune_client);
             break;
+    }
+
+    if (m_mark_dirty) {
+        m_mark_dirty();
     }
 }
 

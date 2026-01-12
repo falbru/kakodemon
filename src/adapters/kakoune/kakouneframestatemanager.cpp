@@ -36,6 +36,10 @@ void KakouneFrameStateManager::stop()
     }
 }
 
+void KakouneFrameStateManager::setWakeEventLoopCallback(std::function<void()> callback) {
+    m_wake_event_loop_callback = callback;
+}
+
 void KakouneFrameStateManager::onRequest(const IncomingRequest& request)
 {
     std::lock_guard<std::mutex> lock(m_state_mutex);
@@ -78,6 +82,9 @@ void KakouneFrameStateManager::onRequest(const IncomingRequest& request)
         m_active_frame_state = m_next_frame_state;
         m_active_frame_state_ready = true;
         m_active_frame_events = m_next_frame_events;
+        if (m_wake_event_loop_callback) {
+            m_wake_event_loop_callback();
+        }
         break;
     }
     case IncomingRequestType::SET_UI_OPTIONS: {

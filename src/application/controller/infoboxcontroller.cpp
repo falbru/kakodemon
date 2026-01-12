@@ -5,11 +5,12 @@ InfoBoxController::InfoBoxController() {
 
 }
 
-void InfoBoxController::init(KakouneClient* kakoune_client, EditorController* editor_controller, domain::FontManager* font_manager, InfoBoxView* info_box_view) {
+void InfoBoxController::init(KakouneClient* kakoune_client, EditorController* editor_controller, domain::FontManager* font_manager, InfoBoxView* info_box_view, std::function<void()> mark_dirty) {
     m_kakoune_client = kakoune_client;
     m_editor_controller = editor_controller;
     m_font_manager = font_manager;
     m_info_box_view = info_box_view;
+    m_mark_dirty = mark_dirty;
 }
 
 void InfoBoxController::update(const UIOptions& ui_options) {
@@ -26,6 +27,10 @@ void InfoBoxController::onMouseScroll(int scroll_amount)
     if (!m_kakoune_client->state.info_box.has_value()) return;
 
     m_info_box_view->onMouseScroll(scroll_amount);
+
+    if (m_mark_dirty) {
+        m_mark_dirty();
+    }
 }
 
 float InfoBoxController::x() const {
