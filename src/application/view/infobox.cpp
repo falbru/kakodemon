@@ -33,8 +33,11 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
     domain::GlyphLines glyph_lines = domain::GlyphLinesBuilder::build(content, font, font_manager);
 
     float title_height = 0.0f;
+    float title_width = 0.0f;
     if (title.size() > 0) {
         title_height = font->getLineHeight() + BORDER_THICKNESS + SPACING_SMALL + SPACING_MEDIUM;
+        domain::GlyphLine title_glyph_line = domain::GlyphLinesBuilder::build(title, font, font_manager);
+        title_width = title_glyph_line.width();
     }
 
     domain::Rectangle cursor_rect;
@@ -52,13 +55,13 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
 
     domain::Rectangle info_box;
 
-    info_box.width = glyph_lines.width();
+    info_box.width = std::max(glyph_lines.width(), title_width);
     info_box.height = glyph_lines.height();
 
     if (info_box.width > MAX_WIDTH - SPACING_MEDIUM * 2.0f)
     {
         glyph_lines.wrap(MAX_WIDTH - SPACING_MEDIUM * 2.0f);
-        info_box.width = glyph_lines.width();
+        info_box.width = std::max(glyph_lines.width(), title_width);
         info_box.height = glyph_lines.height();
     }
 
@@ -78,13 +81,13 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
                 return std::nullopt;
 
             glyph_lines.wrap(available_width);
-            info_box.width = glyph_lines.width();
+            info_box.width = std::max(glyph_lines.width(), title_width);
             info_box.height = glyph_lines.height();
 
             if (info_box.height > MAX_HEIGHT)
             {
                 glyph_lines.wrap(available_width - scrollbar_space);
-                info_box.width = glyph_lines.width() + scrollbar_space;
+                info_box.width = std::max(glyph_lines.width() + scrollbar_space, title_width);
                 info_box.height = glyph_lines.height();
             }
         }
@@ -99,7 +102,7 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
             {
                 float wrap_width = info_box.width - scrollbar_space;
                 glyph_lines.wrap(wrap_width);
-                info_box.width = glyph_lines.width() + scrollbar_space;
+                info_box.width = std::max(glyph_lines.width() + scrollbar_space, title_width);
                 info_box.height = glyph_lines.height();
             }
             info_box.height = MAX_HEIGHT;
@@ -141,13 +144,13 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
                 return std::nullopt;
 
             glyph_lines.wrap(available_width);
-            info_box.width = glyph_lines.width();
+            info_box.width = std::max(glyph_lines.width(), title_width);
             info_box.height = glyph_lines.height();
 
             if (info_box.height > MAX_HEIGHT)
             {
                 glyph_lines.wrap(available_width - scrollbar_space);
-                info_box.width = glyph_lines.width() + scrollbar_space;
+                info_box.width = std::max(glyph_lines.width() + scrollbar_space, title_width);
                 info_box.height = glyph_lines.height();
             }
         }
@@ -158,7 +161,7 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
             {
                 float wrap_width = info_box.width - scrollbar_space;
                 glyph_lines.wrap(wrap_width);
-                info_box.width = glyph_lines.width() + scrollbar_space;
+                info_box.width = std::max(glyph_lines.width() + scrollbar_space, title_width);
                 info_box.height = glyph_lines.height();
             }
             info_box.height = MAX_HEIGHT;
@@ -202,13 +205,13 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
         info_box.x = anchor.x;
 
         glyph_lines.wrap(layout_width);
-        info_box.width = glyph_lines.width();
+        info_box.width = std::max(glyph_lines.width(), title_width);
         info_box.height = glyph_lines.height();
 
         if (info_box.height > MAX_HEIGHT)
         {
             glyph_lines.wrap(layout_width - scrollbar_space);
-            info_box.width = glyph_lines.width() + scrollbar_space;
+            info_box.width = std::max(glyph_lines.width() + scrollbar_space, title_width);
             info_box.height = MAX_HEIGHT;
         }
 
@@ -252,13 +255,13 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
         info_box.y = anchor.y + anchor.height;
 
         glyph_lines.wrap(layout_width);
-        info_box.width = glyph_lines.width();
+        info_box.width = std::max(glyph_lines.width(), title_width);
         info_box.height = glyph_lines.height();
 
         if (info_box.height > MAX_HEIGHT)
         {
             glyph_lines.wrap(layout_width - scrollbar_space);
-            info_box.width = glyph_lines.width() + scrollbar_space;
+            info_box.width = std::max(glyph_lines.width() + scrollbar_space, title_width);
             info_box.height = MAX_HEIGHT;
         }
 
@@ -300,7 +303,7 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
         {
             float wrap_width = info_box.width - scrollbar_space;
             glyph_lines.wrap(wrap_width);
-            info_box.width = glyph_lines.width() + scrollbar_space;
+            info_box.width = std::max(glyph_lines.width() + scrollbar_space, title_width);
             info_box.height = MAX_HEIGHT;
         }
 
