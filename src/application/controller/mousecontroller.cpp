@@ -113,7 +113,9 @@ void MouseController::onMouseScroll(double offset, float x, float y, const UIOpt
 
         if (over_menu) {
             m_menu_controller->onMouseScroll(-scroll_amount);
-        } else if (!over_info_box) {
+        } else if (over_info_box) {
+            m_info_box_controller->onMouseScroll(-scroll_amount);
+        } else {
             m_editor_controller->onMouseScroll(-scroll_amount, x, y, ui_options);
         }
     }

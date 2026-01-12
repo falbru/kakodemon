@@ -21,6 +21,13 @@ void InfoBoxController::render(const UIOptions& ui_options) {
     m_info_box_view->render(m_kakoune_client, m_font_manager, ui_options, m_editor_controller->width(), m_editor_controller->height());
 }
 
+void InfoBoxController::onMouseScroll(int scroll_amount)
+{
+    if (!m_kakoune_client->state.info_box.has_value()) return;
+
+    m_info_box_view->onMouseScroll(scroll_amount);
+}
+
 float InfoBoxController::x() const {
     return m_info_box_view->x();
 }

@@ -14,6 +14,7 @@
 
 InfoBoxView::InfoBoxView()
 {
+    m_scroll_bar = std::make_unique<ScrollBar>();
 }
 
 void InfoBoxView::init(domain::Renderer* renderer, MenuController* menu_controller,
@@ -42,6 +43,7 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
         info_box.height = glyph_lines.height();
     }
 
+    float scrollbar_space = SPACING_MEDIUM + m_scroll_bar->width();
 
     switch (direction)
     {
@@ -59,10 +61,29 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
             glyph_lines.wrap(available_width);
             info_box.width = glyph_lines.width();
             info_box.height = glyph_lines.height();
+
+            if (info_box.height > MAX_HEIGHT)
+            {
+                glyph_lines.wrap(available_width - scrollbar_space);
+                info_box.width = glyph_lines.width() + scrollbar_space;
+                info_box.height = glyph_lines.height();
+            }
         }
         else if (info_box.x + info_box.width + SPACING_MEDIUM * 2.0f > layout_width)
         {
             return std::nullopt;
+        }
+
+        if (info_box.height > MAX_HEIGHT)
+        {
+            if (direction != PlacementDirection::RIGHT_WRAPPED)
+            {
+                float wrap_width = info_box.width - scrollbar_space;
+                glyph_lines.wrap(wrap_width);
+                info_box.width = glyph_lines.width() + scrollbar_space;
+                info_box.height = glyph_lines.height();
+            }
+            info_box.height = MAX_HEIGHT;
         }
 
         switch(alignment) {
@@ -99,6 +120,25 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
             glyph_lines.wrap(available_width);
             info_box.width = glyph_lines.width();
             info_box.height = glyph_lines.height();
+
+            if (info_box.height > MAX_HEIGHT)
+            {
+                glyph_lines.wrap(available_width - scrollbar_space);
+                info_box.width = glyph_lines.width() + scrollbar_space;
+                info_box.height = glyph_lines.height();
+            }
+        }
+
+        if (info_box.height > MAX_HEIGHT)
+        {
+            if (direction != PlacementDirection::LEFT_WRAPPED)
+            {
+                float wrap_width = info_box.width - scrollbar_space;
+                glyph_lines.wrap(wrap_width);
+                info_box.width = glyph_lines.width() + scrollbar_space;
+                info_box.height = glyph_lines.height();
+            }
+            info_box.height = MAX_HEIGHT;
         }
 
         info_box.x = anchor.x - info_box.width - SPACING_MEDIUM * 2.0f;
@@ -133,11 +173,19 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
     }
     case PlacementDirection::ABOVE: {
         info_box.x = anchor.x;
-        info_box.y = anchor.y - info_box.height - SPACING_MEDIUM * 2.0f;
 
         glyph_lines.wrap(layout_width);
         info_box.width = glyph_lines.width();
         info_box.height = glyph_lines.height();
+
+        if (info_box.height > MAX_HEIGHT)
+        {
+            glyph_lines.wrap(layout_width - scrollbar_space);
+            info_box.width = glyph_lines.width() + scrollbar_space;
+            info_box.height = MAX_HEIGHT;
+        }
+
+        info_box.y = anchor.y - info_box.height - SPACING_MEDIUM * 2.0f;
 
         if (info_box.y < 0)
         {
@@ -175,6 +223,13 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
         info_box.width = glyph_lines.width();
         info_box.height = glyph_lines.height();
 
+        if (info_box.height > MAX_HEIGHT)
+        {
+            glyph_lines.wrap(layout_width - scrollbar_space);
+            info_box.width = glyph_lines.width() + scrollbar_space;
+            info_box.height = MAX_HEIGHT;
+        }
+
         if (info_box.y + info_box.height + SPACING_MEDIUM * 2.0f > layout_height)
         {
             return std::nullopt;
@@ -204,6 +259,14 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
         return Placement{glyph_lines.toLines(), info_box};
     }
     case PlacementDirection::CENTER: {
+        if (info_box.height > MAX_HEIGHT)
+        {
+            float wrap_width = info_box.width - scrollbar_space;
+            glyph_lines.wrap(wrap_width);
+            info_box.width = glyph_lines.width() + scrollbar_space;
+            info_box.height = MAX_HEIGHT;
+        }
+
         info_box.x = anchor.x + (anchor.width - info_box.width) / 2.0f;
         info_box.y = anchor.y + (anchor.height - info_box.height) / 2.0f;
 
@@ -211,7 +274,7 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
             return std::nullopt;
         }
 
-        return Placement{content, info_box};
+        return Placement{glyph_lines.toLines(), info_box};
     }
     case PlacementDirection::FULL: {
         info_box.x = 0;
@@ -360,7 +423,45 @@ void InfoBoxView::render(const KakouneClient *kakoune_client, domain::FontManage
 
     }
 
-    m_renderer->renderLines(ui_options.font, font_manager, placement.content, kakoune_client->state.info_box->default_face, layout.current().x, layout.current().y);
+    float line_height = ui_options.font->getLineHeight();
+    int total_lines = placement.content.size();
+    int visible_lines = static_cast<int>(placement.bounds.height / line_height);
+    bool needs_scroll = total_lines > visible_lines;
+
+    int max_scroll = std::max(0, total_lines - visible_lines);
+    m_scroll_offset = std::max(0.0f, std::min(static_cast<float>(max_scroll), m_scroll_offset));
+
+    auto content_layout = layout.copy();
+    if (needs_scroll)
+    {
+        content_layout.padRight(SPACING_MEDIUM + m_scroll_bar->width());
+    }
+
+    int start_line = static_cast<int>(m_scroll_offset);
+    int end_line = std::min(start_line + visible_lines, total_lines);
+
+    float y_pos = content_layout.current().y;
+    for (int i = start_line; i < end_line; i++)
+    {
+        m_renderer->renderLine(ui_options.font, font_manager, placement.content.at(i),
+                             kakoune_client->state.info_box->default_face,
+                             content_layout.current().x, y_pos);
+        y_pos += line_height;
+    }
+
+    if (needs_scroll)
+    {
+        int max_scroll = total_lines - visible_lines;
+        m_scroll_bar->setValue(m_scroll_offset, max_scroll, visible_lines);
+        m_scroll_bar->render(m_renderer,
+                           kakoune_client->state.info_box->default_face.getFg(kakoune_client->state.default_face),
+                           layout);
+    }
+}
+
+void InfoBoxView::onMouseScroll(int scroll_amount)
+{
+    m_scroll_offset += scroll_amount;
 }
 
 float InfoBoxView::x() const {

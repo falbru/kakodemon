@@ -16,6 +16,8 @@ class InfoBoxController
     void update(const UIOptions &ui_options);
     void render(const UIOptions &ui_options);
 
+    void onMouseScroll(int scroll_amount);
+
     float x() const;
     float y() const;
     float width() const;

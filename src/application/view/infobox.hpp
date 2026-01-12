@@ -4,8 +4,10 @@
 #include "application/model/kakouneclient.hpp"
 #include "application/model/uioptions.hpp"
 #include "application/view/kakounecontentview.hpp"
+#include "application/view/widgets/scrollbar.hpp"
 #include "domain/geometry.hpp"
 #include "domain/lines.hpp"
+#include <memory>
 
 enum class PlacementDirection
 {
@@ -51,6 +53,8 @@ class InfoBoxView
     void render(const KakouneClient *kakoune_client, domain::FontManager *font_manager, const UIOptions &ui_options,
                 float width, float height);
 
+    void onMouseScroll(int scroll_amount);
+
     float x() const;
     float y() const;
     float width() const;
@@ -59,6 +63,7 @@ class InfoBoxView
   private:
     const float MIN_WIDTH = 150.0f;
     const float MAX_WIDTH = 1000.0f;
+    const float MAX_HEIGHT = 600.0f;
     domain::Renderer *m_renderer;
     KakouneContentView *m_kakoune_content_view;
     MenuController *m_menu_controller;
@@ -67,6 +72,8 @@ class InfoBoxView
     float m_y = 0.0f;
     float m_width = 0.0f;
     float m_height = 0.0f;
+    float m_scroll_offset = 0.0f;
+    std::unique_ptr<ScrollBar> m_scroll_bar;
 };
 
 #endif // VIEW_INFOBOX_HPP_INCLUDED
