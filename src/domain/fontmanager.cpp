@@ -40,8 +40,16 @@ Font *FontManager::getOrCreateFont(const FontMatch &match)
 
 Font *FontManager::getFontFromName(const std::string &pattern)
 {
+    auto it = m_name_cache.find(pattern);
+    if (it != m_name_cache.end())
+    {
+        return it->second;
+    }
+
     auto match = m_resolver->resolve(pattern);
-    return getOrCreateFont(match);
+    Font *font = getOrCreateFont(match);
+    m_name_cache[pattern] = font;
+    return font;
 }
 
 Font *FontManager::getFontForCodepoint(Codepoint c, Font *primary_font)

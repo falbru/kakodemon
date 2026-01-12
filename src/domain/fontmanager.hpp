@@ -54,6 +54,7 @@ class FontManager
     std::map<Codepoint, std::map<int, Font *>> m_codepoint_cache;
     std::map<Font *, FontMatch> m_font_to_match;
     std::map<Font *, std::map<FontStyle, Font *>> m_style_variant_cache;
+    std::map<std::string, Font *> m_name_cache;
 };
 
 } // namespace domain
