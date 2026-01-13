@@ -67,6 +67,8 @@ domain::FontMatch FontconfigResolver::resolve(const std::string& pattern)
         return domain::FontMatch{"", 0};
     }
 
+    FcPatternAddInteger(pat, FC_SPACING, FC_MONO);
+
     FcConfigSubstitute(config, pat, FcMatchPattern);
     FcDefaultSubstitute(pat);
 

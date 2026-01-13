@@ -98,7 +98,7 @@ std::optional<domain::KakouneState> JsonRpcKakouneInterface::getNextKakouneState
 
     FrameState frame_state = frame_state_opt.value();
 
-    if (frame_state.ui_options.has_value()) mergeUIOptions(m_ui_options, frame_state.ui_options.value());
+    if (frame_state.ui_options.has_value()) m_ui_options = frame_state.ui_options.value();
 
     return convertFrameStateToKakouneState(frame_state);
 }
@@ -276,7 +276,7 @@ std::optional<std::pair<domain::KakouneState, domain::FrameEvents>> JsonRpcKakou
     FrameState frame_state = result->first;
     FrameEvents adapter_events = result->second;
 
-    if (frame_state.ui_options.has_value()) mergeUIOptions(m_ui_options, frame_state.ui_options.value());
+    if (frame_state.ui_options.has_value()) m_ui_options = frame_state.ui_options.value();
 
     domain::KakouneState kakoune_state = convertFrameStateToKakouneState(frame_state);
 
@@ -348,96 +348,6 @@ std::string JsonRpcKakouneInterface::getMouseButtonString(domain::MouseButton bu
             spdlog::warn("Can't convert MouseButton {} to kakoune button", (int)button);
             return "right";
         }
-    }
-}
-
-void JsonRpcKakouneInterface::mergeUIOptions(UIOptions& original, UIOptions updated) {
-    if (updated.font.has_value()) {
-        original.font = updated.font.value();
-    }
-
-    if (updated.font_menu.has_value()) {
-        original.font_menu = updated.font_menu.value();
-    }
-
-    if (updated.font_infobox.has_value()) {
-        original.font_infobox = updated.font_infobox.value();
-    }
-
-    if (updated.font_statusbar.has_value()) {
-        original.font_statusbar = updated.font_statusbar.value();
-    }
-
-    if (updated.font_content.has_value()) {
-        original.font_content = updated.font_content.value();
-    }
-
-    if (updated.color_border.has_value()) {
-        original.color_border = updated.color_border.value();
-    }
-
-    if (updated.color_black.has_value()) {
-        original.color_black = updated.color_black.value();
-    }
-
-    if (updated.color_red.has_value()) {
-        original.color_red = updated.color_red.value();
-    }
-
-    if (updated.color_green.has_value()) {
-        original.color_green = updated.color_green.value();
-    }
-
-    if (updated.color_yellow.has_value()) {
-        original.color_yellow = updated.color_yellow.value();
-    }
-
-    if (updated.color_blue.has_value()) {
-        original.color_blue = updated.color_blue.value();
-    }
-
-    if (updated.color_magenta.has_value()) {
-        original.color_magenta = updated.color_magenta.value();
-    }
-
-    if (updated.color_cyan.has_value()) {
-        original.color_cyan = updated.color_cyan.value();
-    }
-
-    if (updated.color_white.has_value()) {
-        original.color_white = updated.color_white.value();
-    }
-
-    if (updated.color_bright_black.has_value()) {
-        original.color_bright_black = updated.color_bright_black.value();
-    }
-
-    if (updated.color_bright_red.has_value()) {
-        original.color_bright_red = updated.color_bright_red.value();
-    }
-
-    if (updated.color_bright_green.has_value()) {
-        original.color_bright_green = updated.color_bright_green.value();
-    }
-
-    if (updated.color_bright_yellow.has_value()) {
-        original.color_bright_yellow = updated.color_bright_yellow.value();
-    }
-
-    if (updated.color_bright_blue.has_value()) {
-        original.color_bright_blue = updated.color_bright_blue.value();
-    }
-
-    if (updated.color_bright_magenta.has_value()) {
-        original.color_bright_magenta = updated.color_bright_magenta.value();
-    }
-
-    if (updated.color_bright_cyan.has_value()) {
-        original.color_bright_cyan = updated.color_bright_cyan.value();
-    }
-
-    if (updated.color_bright_white.has_value()) {
-        original.color_bright_white = updated.color_bright_white.value();
     }
 }
 

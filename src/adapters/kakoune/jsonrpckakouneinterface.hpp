@@ -40,8 +40,6 @@ class JsonRpcKakouneInterface : public domain::KakouneInterface
 
     std::string getMouseButtonString(domain::MouseButton button);
     domain::KakouneState convertFrameStateToKakouneState(const FrameState &frame_state);
-
-    void mergeUIOptions(UIOptions &original, UIOptions updated);
 };
 
 } // namespace kakoune
