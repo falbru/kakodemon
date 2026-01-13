@@ -44,7 +44,7 @@ std::optional<domain::RasterizedGlyph> FreeTypeFontEngine::rasterizeGlyph(domain
 
     FT_UInt glyph_index = FT_Get_Char_Index(m_face, c);
     if (glyph_index == 0) {
-        spdlog::warn("FreeType: Glyph does not exist for codepoint {} (U+{:04X})", c, c);
+        spdlog::debug("FreeType: Glyph does not exist for codepoint {} (U+{:04X})", c, c);
         return std::nullopt;
     }
 
@@ -57,13 +57,13 @@ std::optional<domain::RasterizedGlyph> FreeTypeFontEngine::rasterizeGlyph(domain
     }
     if (FT_Load_Glyph(m_face, glyph_index, load_flags))
     {
-        spdlog::warn("FreeType: Failed to load glyph for codepoint {}", c);
+        spdlog::debug("FreeType: Failed to load glyph for codepoint {}", c);
         return std::nullopt;
     }
 
     if (FT_Render_Glyph(m_face->glyph, FT_RENDER_MODE_NORMAL))
     {
-        spdlog::warn("FreeType: Failed to rasterize glyph for codepoint {}", c);
+        spdlog::debug("FreeType: Failed to rasterize glyph for codepoint {}", c);
         return std::nullopt;
     }
 
