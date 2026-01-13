@@ -7,7 +7,7 @@ ScrolledMenuItems::ScrolledMenuItems(int max_visible_items) : m_max_visible_item
 }
 
 void ScrolledMenuItems::render(domain::Renderer* renderer, const RenderContext &render_context, const domain::MenuItems &menu_items, const domain::RGBAColor &scrollbar_color, LayoutManager &layout) {
-    domain::Font* font = render_context.ui_options.font;
+    domain::Font* font = render_context.ui_options.font_menu;
     auto items_layout = layout.copy();
     if (menu_items.items.size() > m_max_visible_items) {
         items_layout.padRight(SPACING_MEDIUM + m_scroll_bar->width());

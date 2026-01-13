@@ -15,7 +15,7 @@ void SearchMenuView::init(domain::Renderer *renderer) {
 }
 
 void SearchMenuView::render(const RenderContext &render_context, const domain::Menu &menu, int cursor_column) {
-    domain::Font* font = render_context.ui_options.font;
+    domain::Font* font = render_context.ui_options.font_menu;
 
     m_input->setPrompt(menu.getInput().getPrompt());
     m_input->setContent(menu.getInput().getContent());

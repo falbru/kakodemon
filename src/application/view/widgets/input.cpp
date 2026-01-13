@@ -9,7 +9,7 @@ void Input::setPrompt(const domain::Line& prompt) { m_prompt = prompt; }
 void Input::setContent(const domain::Line& content) { m_content = content; }
 
 void Input::render(domain::Renderer *renderer, const RenderContext &render_context, const domain::StatusLine &input, const domain::Face &face, int cursor_column, LayoutManager &layout) {
-  domain::Font* font = render_context.ui_options.font;
+  domain::Font* font = render_context.ui_options.font_menu;
   auto input_layout = layout.sliceTop(height(font));
 
   renderer->renderRect(face.getBg(render_context.default_face, render_context.ui_options.color_overrides),

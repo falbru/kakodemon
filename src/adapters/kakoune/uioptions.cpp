@@ -6,6 +6,18 @@ void to_json(nlohmann::json &j, const UIOptions &ui_options) {
     if (ui_options.font.has_value()) {
         j["kakodemon_set_font"] = ui_options.font.value();
     }
+    if (ui_options.font_menu.has_value()) {
+        j["kakodemon_set_font_menu"] = ui_options.font_menu.value();
+    }
+    if (ui_options.font_infobox.has_value()) {
+        j["kakodemon_set_font_infobox"] = ui_options.font_infobox.value();
+    }
+    if (ui_options.font_statusbar.has_value()) {
+        j["kakodemon_set_font_statusbar"] = ui_options.font_statusbar.value();
+    }
+    if (ui_options.font_content.has_value()) {
+        j["kakodemon_set_font_content"] = ui_options.font_content.value();
+    }
     if (ui_options.color_border.has_value()) {
         j["kakodemon_set_color_border"] = ui_options.color_border->color_string;
     }
@@ -62,6 +74,18 @@ void to_json(nlohmann::json &j, const UIOptions &ui_options) {
 void from_json(const nlohmann::json &j, UIOptions &ui_options) {
     if (j.contains("kakodemon_set_font")) {
         ui_options.font = j["kakodemon_set_font"];
+    }
+    if (j.contains("kakodemon_set_font_menu")) {
+        ui_options.font_menu = j["kakodemon_set_font_menu"];
+    }
+    if (j.contains("kakodemon_set_font_infobox")) {
+        ui_options.font_infobox = j["kakodemon_set_font_infobox"];
+    }
+    if (j.contains("kakodemon_set_font_statusbar")) {
+        ui_options.font_statusbar = j["kakodemon_set_font_statusbar"];
+    }
+    if (j.contains("kakodemon_set_font_content")) {
+        ui_options.font_content = j["kakodemon_set_font_content"];
     }
     if (j.contains("kakodemon_set_color_border")) {
         ui_options.color_border = Color{j["kakodemon_set_color_border"]};

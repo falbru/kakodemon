@@ -82,6 +82,10 @@ void Application::init(const CliConfig &config)
 
     m_ui_options->font = m_font_manager->getFontFromName("monospace 14");
     loadBasicGlyphs(m_ui_options->font);
+    m_ui_options->font_menu = m_ui_options->font;
+    m_ui_options->font_infobox = m_ui_options->font;
+    m_ui_options->font_statusbar = m_ui_options->font;
+    m_ui_options->font_content = m_ui_options->font;
 }
 
 void Application::updateControllers()

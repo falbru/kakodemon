@@ -11,6 +11,10 @@ namespace domain
 struct UIOptions
 {
     Font *font = nullptr;
+    Font *font_menu = nullptr;
+    Font *font_infobox = nullptr;
+    Font *font_statusbar = nullptr;
+    Font *font_content = nullptr;
     OptionalColor color_border;
     std::unordered_map<FixedColor, RGBAColor> color_overrides;
 };

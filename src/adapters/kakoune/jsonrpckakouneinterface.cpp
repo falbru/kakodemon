@@ -111,6 +111,34 @@ domain::UIOptions JsonRpcKakouneInterface::getUIOptions(domain::FontManager* fon
         domain::loadBasicGlyphs(ui_options.font); // TODO check if the font is new
     }
 
+    if (m_ui_options.font_menu.has_value()) {
+        ui_options.font_menu = font_manager->getFontFromName(m_ui_options.font_menu.value());
+        domain::loadBasicGlyphs(ui_options.font_menu);
+    } else if (ui_options.font) {
+        ui_options.font_menu = ui_options.font;
+    }
+
+    if (m_ui_options.font_infobox.has_value()) {
+        ui_options.font_infobox = font_manager->getFontFromName(m_ui_options.font_infobox.value());
+        domain::loadBasicGlyphs(ui_options.font_infobox);
+    } else if (ui_options.font) {
+        ui_options.font_infobox = ui_options.font;
+    }
+
+    if (m_ui_options.font_statusbar.has_value()) {
+        ui_options.font_statusbar = font_manager->getFontFromName(m_ui_options.font_statusbar.value());
+        domain::loadBasicGlyphs(ui_options.font_statusbar);
+    } else if (ui_options.font) {
+        ui_options.font_statusbar = ui_options.font;
+    }
+
+    if (m_ui_options.font_content.has_value()) {
+        ui_options.font_content = font_manager->getFontFromName(m_ui_options.font_content.value());
+        domain::loadBasicGlyphs(ui_options.font_content);
+    } else if (ui_options.font) {
+        ui_options.font_content = ui_options.font;
+    }
+
     if (m_ui_options.color_border.has_value()) {
         ui_options.color_border = toDomain(m_ui_options.color_border.value());
     }
@@ -326,6 +354,22 @@ std::string JsonRpcKakouneInterface::getMouseButtonString(domain::MouseButton bu
 void JsonRpcKakouneInterface::mergeUIOptions(UIOptions& original, UIOptions updated) {
     if (updated.font.has_value()) {
         original.font = updated.font.value();
+    }
+
+    if (updated.font_menu.has_value()) {
+        original.font_menu = updated.font_menu.value();
+    }
+
+    if (updated.font_infobox.has_value()) {
+        original.font_infobox = updated.font_infobox.value();
+    }
+
+    if (updated.font_statusbar.has_value()) {
+        original.font_statusbar = updated.font_statusbar.value();
+    }
+
+    if (updated.font_content.has_value()) {
+        original.font_content = updated.font_content.value();
     }
 
     if (updated.color_border.has_value()) {

@@ -59,14 +59,14 @@ void EditorController::render(const domain::UIOptions& ui_options)
 
     m_kakoune_content_view->render(render_context, m_kakoune_client->state.content, m_kakoune_client->state.default_face, 0.0f, 0.0f);
     m_kakoune_content_view->setWidth(m_width);
-    m_content_height = m_height - m_status_bar_view->height(ui_options.font);
+    m_content_height = m_height - m_status_bar_view->height(ui_options.font_statusbar);
     m_kakoune_content_view->setHeight(m_content_height);
     m_status_bar_view->render(render_context, m_kakoune_client->state.mode_line);
 }
 
 void EditorController::onWindowResize(int width, int height, const domain::UIOptions& ui_options) {
-    int rows = (height - m_status_bar_view->height(ui_options.font)) / m_kakoune_content_view->getCellHeight(ui_options.font);
-    int columns = width / m_kakoune_content_view->getCellWidth(ui_options.font);
+    int rows = (height - m_status_bar_view->height(ui_options.font_statusbar)) / m_kakoune_content_view->getCellHeight(ui_options.font_content);
+    int columns = width / m_kakoune_content_view->getCellWidth(ui_options.font_content);
 
     if (rows != m_rows || columns != m_columns) {
         m_kakoune_client->interface->resize(rows, columns);

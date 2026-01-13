@@ -36,10 +36,10 @@ void InlineMenuView::render(const RenderContext &render_context, const domain::M
 {
     if (!menu.hasItems()) return;
 
-    domain::Font* font = render_context.ui_options.font;
+    domain::Font* font = render_context.ui_options.font_menu;
     auto anchor = menu.getItems().anchor;
 
-    auto menu_position = m_kakoune_content_view->coordToPixels(font, anchor);
+    auto menu_position = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, anchor);
 
     auto menu_item_width = 0.0f;
     for (const auto& item : menu.getItems().items) {

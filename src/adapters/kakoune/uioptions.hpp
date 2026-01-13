@@ -12,6 +12,10 @@ namespace kakoune
 struct UIOptions
 {
     std::optional<std::string> font;
+    std::optional<std::string> font_menu;
+    std::optional<std::string> font_infobox;
+    std::optional<std::string> font_statusbar;
+    std::optional<std::string> font_content;
     std::optional<Color> color_border;
     std::optional<Color> color_black;
     std::optional<Color> color_red;

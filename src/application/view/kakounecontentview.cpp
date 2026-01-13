@@ -12,7 +12,7 @@ void KakouneContentView::init(domain::Renderer* renderer)
 
 void KakouneContentView::render(const RenderContext& render_context, const domain::Lines &lines, const domain::Face& default_face, float x, float y)
 {
-    m_renderer->renderLines(render_context.textConfig(render_context.ui_options.font), lines, default_face, x, y);
+    m_renderer->renderLines(render_context.textConfig(render_context.ui_options.font_content), lines, default_face, x, y);
 }
 
 float KakouneContentView::getCellWidth(domain::Font* font) const {

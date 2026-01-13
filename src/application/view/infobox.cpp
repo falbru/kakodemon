@@ -334,7 +334,7 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
 
 void InfoBoxView::render(const RenderContext &render_context, const domain::InfoBox &info_box, const domain::CursorPosition &cursor_position)
 {
-    domain::Font* font = render_context.ui_options.font;
+    domain::Font* font = render_context.ui_options.font_infobox;
     domain::Rectangle anchor;
     PlacementDirection direction = PlacementDirection::BELOW;
     CrossAxisAlignment alignment = CrossAxisAlignment::START;
