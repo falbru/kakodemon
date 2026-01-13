@@ -13,36 +13,44 @@ namespace domain
 
 class FontManager;
 
+struct TextRenderConfig
+{
+    domain::Font *font;
+    domain::FontManager *font_manager;
+    const domain::Face &default_face;
+    const std::unordered_map<domain::FixedColor, domain::RGBAColor> &color_overrides;
+};
+
+struct CornerRadius
+{
+    float top_left;
+    float top_right;
+    float bottom_right;
+    float bottom_left;
+
+    CornerRadius(float radius = 0.0f);
+    CornerRadius(float top_left, float top_right, float bottom_right, float bottom_left);
+};
+
 class Renderer
 {
   public:
-    virtual void init(int width, int height, FontManager *font_manager) = 0;
+    virtual void init(int width, int height) = 0;
     virtual void onWindowResize(int width, int height) = 0;
     virtual void addBounds(float x, float y, float width, float height) = 0;
     virtual void popBounds() = 0;
 
     virtual void renderRect(const RGBAColor color, float x, float y, float width, float height) const = 0;
     virtual void renderRectWithShadow(const RGBAColor color, float x, float y, float width, float height,
-                                      float shadowRadius) const = 0;
+                                      float shadow_radius) const = 0;
     virtual void renderRoundedRect(const RGBAColor color, float x, float y, float width, float height,
-                                   float corner_radius) const = 0;
-    virtual void renderRoundedRect(const RGBAColor color, float x, float y, float width, float height,
-                                   float top_left_radius, float top_right_radius, float bottom_right_radius,
-                                   float bottom_left_radius) const = 0;
+                                   CornerRadius corner_radius) const = 0;
     virtual void renderRoundedRectWithShadow(const RGBAColor color, float x, float y, float width, float height,
-                                             float corner_radius, float shadowRadius) const = 0;
-    virtual void renderRoundedRectWithShadow(const RGBAColor color, float x, float y, float width, float height,
-                                             float top_left_radius, float top_right_radius, float bottom_right_radius,
-                                             float bottom_left_radius, float shadowRadius) const = 0;
-    virtual void renderLine(Font *font, domain::FontManager *font_manager, const Line &line, const Face &default_face,
-                            float x, float y,
-                            const std::unordered_map<FixedColor, RGBAColor> &color_overrides) const = 0;
-    virtual void renderLine(Font *font, domain::FontManager *font_manager, const Line &line, const Face &default_face,
-                            float x, float y, const Alignment &alignment,
-                            const std::unordered_map<FixedColor, RGBAColor> &color_overrides) const = 0;
-    virtual void renderLines(Font *font, domain::FontManager *font_manager, const Lines &lines,
-                             const domain::Face &default_face, float x, float y,
-                             const std::unordered_map<FixedColor, RGBAColor> &color_overrides) const = 0;
+                                             CornerRadius corner_radius, float shadow_radius) const = 0;
+    virtual void renderLine(const TextRenderConfig &config, const Line &line, const Face &default_face, float x,
+                            float y, const Alignment &alignment = Alignment()) const = 0;
+    virtual void renderLines(const TextRenderConfig &config, const Lines &lines, const domain::Face &default_face,
+                             float x, float y) const = 0;
 };
 
 } // namespace domain

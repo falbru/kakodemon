@@ -1,11 +1,12 @@
 #ifndef VIEW_WIDGETS_INPUT_HPP_INCLUDED
 #define VIEW_WIDGETS_INPUT_HPP_INCLUDED
 
-#include "application/model/kakouneclient.hpp"
 #include "application/view/layoutmanager.hpp"
+#include "application/view/rendercontext.hpp"
 #include "application/view/styling.hpp"
+#include "domain/face.hpp"
 #include "domain/ports/renderer.hpp"
-#include "domain/uioptions.hpp"
+#include "domain/statusline.hpp"
 
 class Input
 {
@@ -15,8 +16,8 @@ class Input
     void setPrompt(const domain::Line &prompt);
     void setContent(const domain::Line &content);
 
-    void render(domain::Renderer *renderer, const domain::UIOptions &ui_options, domain::FontManager *font_manager,
-                const KakouneClient &kakoune_client, LayoutManager &layout);
+    void render(domain::Renderer *renderer, const RenderContext &render_context, const domain::StatusLine &input,
+                const domain::Face &face, int cursor_column, LayoutManager &layout);
 
     float height(domain::Font *font) const;
 

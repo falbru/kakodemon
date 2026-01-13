@@ -54,6 +54,7 @@ domain::KakouneState JsonRpcKakouneInterface::convertFrameStateToKakouneState(co
 
         menu = domain::Menu(
             status_line.value(),
+            toDomain(frame_state.draw_status.default_face),
             domain::MenuItems(
                 toDomain(frame_state.menu->items),
                 toDomain(frame_state.menu->anchor),
@@ -64,7 +65,7 @@ domain::KakouneState JsonRpcKakouneInterface::convertFrameStateToKakouneState(co
             toDomain(frame_state.menu->style)
         );
     } else if (status_line_has_content) {
-        menu = domain::Menu(status_line.value(), domain::MenuStyle::PROMPT);
+        menu = domain::Menu(status_line.value(), toDomain(frame_state.draw_status.default_face), domain::MenuStyle::PROMPT);
     }
 
     if (!status_line_has_content) {

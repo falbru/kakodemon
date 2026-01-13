@@ -1,5 +1,7 @@
 #include "promptmenu.hpp"
+#include "application/view/rendercontext.hpp"
 #include "domain/color.hpp"
+#include "domain/ports/renderer.hpp"
 #include "domain/uioptions.hpp"
 #include "styling.hpp"
 #include "widgets/scrolledmenuitems.hpp"
@@ -17,51 +19,49 @@ void PromptMenuView::init(domain::Renderer* renderer,
     m_input = std::make_unique<Input>();
 }
 
-void PromptMenuView::render(domain::UIOptions ui_options, domain::FontManager* font_manager, const KakouneClient &kakoune_client, float width, float height)
+void PromptMenuView::render(const RenderContext& render_context, const domain::Menu &menu, int cursor_column)
 {
-    if (!kakoune_client.state.menu.has_value())
-        return;
+    domain::Font* font = render_context.ui_options.font;
 
-    m_input->setPrompt(kakoune_client.state.menu->getInput().getPrompt());
-    m_input->setContent(kakoune_client.state.menu->getInput().getContent());
+    m_input->setPrompt(menu.getInput().getPrompt());
+    m_input->setContent(menu.getInput().getContent());
 
-    m_x = (width - WIDTH) / 2;
-    m_height = 2 * BORDER_THICKNESS + 2 * SPACING_MEDIUM + m_input->height(ui_options.font);
+    m_x = (render_context.screen_width - WIDTH) / 2;
+    m_height = 2 * BORDER_THICKNESS + 2 * SPACING_MEDIUM + m_input->height(font);
 
-    float items_size = kakoune_client.state.menu->hasItems() ?
-        std::min(MAX_VISIBLE_ITEMS, (int)kakoune_client.state.menu->getItems().items.size()) : 0;
+    float items_size = menu.hasItems() ? std::min(MAX_VISIBLE_ITEMS, (int)menu.getItems().items.size()) : 0;
     if (items_size > 0)
     {
-        m_height += BORDER_THICKNESS + ui_options.font->getLineHeight() * items_size;
+        m_height += BORDER_THICKNESS + font->getLineHeight() * items_size;
     }
 
     LayoutManager layout(m_x, Y, WIDTH, m_height);
 
     m_renderer->renderRoundedRectWithShadow(
-        getRGBAColor(ui_options.color_border, default_border_color), layout.current().x,
-        layout.current().y, layout.current().width, layout.current().height, CORNER_RADIUS, SHADOW_LENGTH);
+        getRGBAColor(render_context.ui_options.color_border, default_border_color), layout.current().x,
+        layout.current().y, layout.current().width, layout.current().height, domain::CornerRadius(CORNER_RADIUS), SHADOW_LENGTH);
 
     layout.pad(BORDER_THICKNESS);
 
     m_renderer->renderRoundedRect(
-        kakoune_client.state.mode_line.getDefaultFace().getBg(kakoune_client.state.default_face, ui_options.color_overrides), layout.current().x,
-        layout.current().y, layout.current().width, SPACING_MEDIUM + m_input->height(ui_options.font) + SPACING_MEDIUM, CORNER_RADIUS, CORNER_RADIUS, items_size > 0 ? 0.0f : CORNER_RADIUS, items_size > 0 ? 0.0f : CORNER_RADIUS);
+        menu.getInputFace().getBg(render_context.default_face, render_context.ui_options.color_overrides), layout.current().x,
+        layout.current().y, layout.current().width, SPACING_MEDIUM + m_input->height(font) + SPACING_MEDIUM, domain::CornerRadius(CORNER_RADIUS, CORNER_RADIUS, items_size > 0 ? 0.0f : CORNER_RADIUS, items_size > 0 ? 0.0f : CORNER_RADIUS));
 
     layout.pad(SPACING_MEDIUM);
 
-    m_input->render(m_renderer, ui_options, font_manager, kakoune_client, layout);
+    m_input->render(m_renderer, render_context, menu.getInput(), menu.getInputFace(), cursor_column, layout);
 
-    if (kakoune_client.state.menu->hasItems())
+    if (menu.hasItems())
     {
-        m_renderer->renderRect(getRGBAColor(ui_options.color_border, default_border_color), layout.current().x - SPACING_MEDIUM, layout.current().y, layout.current().width + SPACING_MEDIUM * 2, 1);
+        m_renderer->renderRect(getRGBAColor(render_context.ui_options.color_border, default_border_color), layout.current().x - SPACING_MEDIUM, layout.current().y, layout.current().width + SPACING_MEDIUM * 2, 1);
 
         layout.gapY(BORDER_THICKNESS);
 
         m_renderer->renderRoundedRect(
-            kakoune_client.state.menu->getItems().face.getBg(kakoune_client.state.default_face, ui_options.color_overrides), layout.current().x - SPACING_MEDIUM,
-            layout.current().y, layout.current().width + SPACING_MEDIUM*2, layout.current().height + SPACING_MEDIUM, 0.0f, 0.0f, CORNER_RADIUS, CORNER_RADIUS);
+            menu.getItems().face.getBg(render_context.default_face, render_context.ui_options.color_overrides), layout.current().x - SPACING_MEDIUM,
+            layout.current().y, layout.current().width + SPACING_MEDIUM*2, layout.current().height + SPACING_MEDIUM, domain::CornerRadius(0.0f, 0.0f, CORNER_RADIUS, CORNER_RADIUS));
 
-        m_scrolled_menu_items->render(m_renderer, ui_options, font_manager, kakoune_client, layout);
+        m_scrolled_menu_items->render(m_renderer, render_context, menu.getItems(), menu.getInputFace().getFg(render_context.default_face, render_context.ui_options.color_overrides), layout);
     }
 }
 
@@ -97,8 +97,8 @@ float PromptMenuView::scrolledItemsHeight() const {
     return m_scrolled_menu_items->height();
 }
 
-domain::MouseMoveResult PromptMenuView::onMouseMove(float x, float y, const KakouneClient &kakoune_client) {
-    if (kakoune_client.state.menu.has_value() && kakoune_client.state.menu->hasItems()) {
+domain::MouseMoveResult PromptMenuView::onMouseMove(float x, float y, const domain::Menu& menu) {
+    if (menu.hasItems()) {
         float items_x = m_scrolled_menu_items->x();
         float items_y = m_scrolled_menu_items->y();
         float items_width = m_scrolled_menu_items->width();
@@ -116,14 +116,15 @@ domain::MouseMoveResult PromptMenuView::onMouseMove(float x, float y, const Kako
     return domain::MouseMoveResult{std::nullopt};
 }
 
-std::optional<int> PromptMenuView::findItemAtPosition(float x, float y, domain::Font *font, const KakouneClient &kakoune_client) {
-    return m_scrolled_menu_items->findItemAtPosition(x, y, font, kakoune_client);
+std::optional<int> PromptMenuView::findItemAtPosition(float x, float y, const domain::Menu &menu) {
+    if (!menu.hasItems()) return std::nullopt;
+    return m_scrolled_menu_items->findItemAtPosition(x, y, menu.getItems());
 }
 
-void PromptMenuView::onMouseScroll(int scroll_amount, const KakouneClient &kakoune_client) {
-    if (!kakoune_client.state.menu.has_value() || !kakoune_client.state.menu->hasItems()) return;
+void PromptMenuView::onMouseScroll(int scroll_amount, const domain::Menu &menu) {
+    if (!menu.hasItems()) return;
 
-    int total_items = kakoune_client.state.menu->getItems().items.size();
+    int total_items = menu.getItems().items.size();
     m_scrolled_menu_items->scroll(scroll_amount, total_items);
 }
 

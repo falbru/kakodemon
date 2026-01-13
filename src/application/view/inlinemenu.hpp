@@ -1,11 +1,11 @@
 #ifndef VIEW_INLINEMENU_HPP_INCLUDED
 #define VIEW_INLINEMENU_HPP_INCLUDED
 
-#include "application/model/kakouneclient.hpp"
 #include "application/view/kakounecontentview.hpp"
+#include "application/view/rendercontext.hpp"
 #include "application/view/widgets/scrolledmenuitems.hpp"
+#include "domain/menu.hpp"
 #include "domain/mouse.hpp"
-#include "domain/uioptions.hpp"
 #include <memory>
 
 class InlineMenuView
@@ -15,12 +15,11 @@ class InlineMenuView
 
     void init(domain::Renderer *renderer, KakouneContentView *kakoune_content_view);
 
-    void render(const domain::UIOptions &ui_options, domain::FontManager *font_manager,
-                const KakouneClient &kakoune_client, float width, float height);
+    void render(const RenderContext &render_context, const domain::Menu &menu);
 
-    domain::MouseMoveResult onMouseMove(float x, float y, const KakouneClient &kakoune_client);
-    std::optional<int> findItemAtPosition(float x, float y, domain::Font *font, const KakouneClient &kakoune_client);
-    void onMouseScroll(int scroll_amount, const KakouneClient &kakoune_client);
+    domain::MouseMoveResult onMouseMove(float x, float y, const domain::Menu &menu);
+    std::optional<int> findItemAtPosition(float x, float y, const domain::Menu &menu);
+    void onMouseScroll(int scroll_amount, const domain::Menu &menu);
     void ensureItemVisible(int index);
 
     float x() const;

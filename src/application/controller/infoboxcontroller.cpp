@@ -1,4 +1,5 @@
 #include "infoboxcontroller.hpp"
+#include "application/view/rendercontext.hpp"
 #include "domain/uioptions.hpp"
 
 InfoBoxController::InfoBoxController() {
@@ -19,7 +20,15 @@ void InfoBoxController::update(const domain::UIOptions& ui_options) {
 void InfoBoxController::render(const domain::UIOptions& ui_options) {
     if (!m_kakoune_client->state.info_box.has_value() || (m_kakoune_client->state.info_box->title.size() == 0 && m_kakoune_client->state.info_box->content.size() == 0)) return;
 
-    m_info_box_view->render(m_kakoune_client, m_font_manager, ui_options, m_editor_controller->width(), m_editor_controller->height());
+    RenderContext render_context = {
+        m_font_manager,
+        m_kakoune_client->state.default_face,
+        ui_options,
+        static_cast<float>(m_editor_controller->width()),
+        static_cast<float>(m_editor_controller->height())
+    };
+
+    m_info_box_view->render(render_context, *m_kakoune_client->state.info_box, m_kakoune_client->state.cursor_position);
 }
 
 void InfoBoxController::onMouseScroll(int scroll_amount)

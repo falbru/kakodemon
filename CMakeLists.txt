@@ -60,6 +60,7 @@ set(SRC
     src/application/controller/mousecontroller.cpp
     src/application/model/kakouneclient.cpp
     src/application/view/glyphsequence.cpp
+    src/application/view/rendercontext.cpp
     src/application/view/infobox.cpp
     src/application/view/inlinemenu.cpp
     src/application/view/kakounecontentview.cpp
@@ -86,6 +87,7 @@ set(SRC
     src/domain/modeline.cpp
     src/domain/ports/font.cpp
     src/domain/ports/kakouneinterface.cpp
+    src/domain/ports/renderer.cpp
     src/domain/statusline.cpp
     src/domain/utf8string.cpp
     src/main.cpp

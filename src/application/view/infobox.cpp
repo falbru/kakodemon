@@ -332,17 +332,18 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
     return std::nullopt;
 }
 
-void InfoBoxView::render(const KakouneClient *kakoune_client, domain::FontManager* font_manager, const domain::UIOptions& ui_options, float width, float height)
+void InfoBoxView::render(const RenderContext &render_context, const domain::InfoBox &info_box, const domain::CursorPosition &cursor_position)
 {
+    domain::Font* font = render_context.ui_options.font;
     domain::Rectangle anchor;
     PlacementDirection direction = PlacementDirection::BELOW;
     CrossAxisAlignment alignment = CrossAxisAlignment::START;
     std::vector<PlacementDirection> fallback_directions;
 
-    switch (kakoune_client->state.info_box->style)
+    switch (info_box.style)
     {
     case domain::InfoStyle::PROMPT:
-        if (kakoune_client->state.menu.has_value())
+        if (m_menu_controller->height() > 0)
         {
             anchor = {m_menu_controller->x(), m_menu_controller->y(), m_menu_controller->width(),
                       m_menu_controller->height()};
@@ -360,9 +361,9 @@ void InfoBoxView::render(const KakouneClient *kakoune_client, domain::FontManage
         break;
 
     case domain::InfoStyle::INLINE: {
-        auto pos = m_kakoune_content_view->coordToPixels(ui_options.font, kakoune_client->state.info_box->anchor);
-        anchor = {pos.first, pos.second, m_kakoune_content_view->getCellWidth(ui_options.font),
-                  m_kakoune_content_view->getCellHeight(ui_options.font)};
+        auto pos = m_kakoune_content_view->coordToPixels(font, info_box.anchor);
+        anchor = {pos.first, pos.second, m_kakoune_content_view->getCellWidth(font),
+                  m_kakoune_content_view->getCellHeight(font)};
         direction = PlacementDirection::BELOW;
         alignment = CrossAxisAlignment::START;
         fallback_directions = {PlacementDirection::ABOVE, PlacementDirection::RIGHT_WRAPPED,
@@ -371,9 +372,9 @@ void InfoBoxView::render(const KakouneClient *kakoune_client, domain::FontManage
     break;
 
     case domain::InfoStyle::INLINE_ABOVE: {
-        auto pos = m_kakoune_content_view->coordToPixels(ui_options.font, kakoune_client->state.info_box->anchor);
-        anchor = {pos.first, pos.second, m_kakoune_content_view->getCellWidth(ui_options.font),
-                  m_kakoune_content_view->getCellHeight(ui_options.font)};
+        auto pos = m_kakoune_content_view->coordToPixels(font, info_box.anchor);
+        anchor = {pos.first, pos.second, m_kakoune_content_view->getCellWidth(font),
+                  m_kakoune_content_view->getCellHeight(font)};
         direction = PlacementDirection::ABOVE;
         alignment = CrossAxisAlignment::START;
         fallback_directions = {PlacementDirection::BELOW, PlacementDirection::RIGHT_WRAPPED,
@@ -382,8 +383,8 @@ void InfoBoxView::render(const KakouneClient *kakoune_client, domain::FontManage
     break;
 
     case domain::InfoStyle::INLINE_BELOW: {
-        auto pos = m_kakoune_content_view->coordToPixels(ui_options.font, kakoune_client->state.info_box->anchor);
-        anchor = {pos.first, pos.second, 0, m_kakoune_content_view->getCellHeight(ui_options.font)};
+        auto pos = m_kakoune_content_view->coordToPixels(font, info_box.anchor);
+        anchor = {pos.first, pos.second, 0, m_kakoune_content_view->getCellHeight(font)};
         direction = PlacementDirection::BELOW;
         alignment = CrossAxisAlignment::START;
         fallback_directions = {PlacementDirection::ABOVE, PlacementDirection::RIGHT_WRAPPED,
@@ -401,7 +402,7 @@ void InfoBoxView::render(const KakouneClient *kakoune_client, domain::FontManage
         break;
 
     case domain::InfoStyle::MODAL:
-        anchor = {0, 0, width, height};
+        anchor = {0, 0, render_context.screen_width, render_context.screen_height};
         direction = PlacementDirection::CENTER;
         alignment = CrossAxisAlignment::CENTER;
         fallback_directions = {PlacementDirection::FULL};
@@ -420,7 +421,7 @@ void InfoBoxView::render(const KakouneClient *kakoune_client, domain::FontManage
     Placement placement;
     for (const auto& dir : fallback_directions)
     {
-        auto current_placement = tryPlaceInfoBox(dir, alignment, kakoune_client->state.info_box->content, kakoune_client->state.info_box->title, anchor, width, height, ui_options.font, font_manager, menu_rectangle, kakoune_client->state.cursor_position);
+        auto current_placement = tryPlaceInfoBox(dir, alignment, info_box.content, info_box.title, anchor, render_context.screen_width, render_context.screen_height, font, render_context.font_manager, menu_rectangle, cursor_position);
         if (current_placement.has_value()) {
             placement = current_placement.value();
             break;
@@ -429,8 +430,8 @@ void InfoBoxView::render(const KakouneClient *kakoune_client, domain::FontManage
 
     float infobox_height = placement.bounds.height + SPACING_MEDIUM * 2.0f + BORDER_THICKNESS * 2.0f;
 
-    float title_height = ui_options.font->getLineHeight() + BORDER_THICKNESS + SPACING_SMALL + SPACING_MEDIUM;
-    if (kakoune_client->state.info_box->title.size() > 0) {
+    float title_height = font->getLineHeight() + BORDER_THICKNESS + SPACING_SMALL + SPACING_MEDIUM;
+    if (info_box.title.size() > 0) {
         infobox_height += title_height;
     }
 
@@ -447,15 +448,15 @@ void InfoBoxView::render(const KakouneClient *kakoune_client, domain::FontManage
 
     layout.pad(BORDER_THICKNESS);
 
-    m_renderer->renderRect(kakoune_client->state.info_box->default_face.getBg(kakoune_client->state.default_face, ui_options.color_overrides),
+    m_renderer->renderRect(info_box.default_face.getBg(render_context.default_face, render_context.ui_options.color_overrides),
                            layout.current().x, layout.current().y, layout.current().width, layout.current().height);
 
     layout.pad(SPACING_MEDIUM);
 
-    if (kakoune_client->state.info_box->title.size() > 0) {
-        m_renderer->renderLine(ui_options.font, font_manager, kakoune_client->state.info_box->title, kakoune_client->state.info_box->default_face, layout.current().x, layout.current().y, ui_options.color_overrides);
+    if (info_box.title.size() > 0) {
+        m_renderer->renderLine(render_context.textConfig(font), info_box.title, info_box.default_face, layout.current().x, layout.current().y);
 
-        layout.gapY(ui_options.font->getLineHeight());
+        layout.gapY(font->getLineHeight());
 
         layout.gapY(SPACING_SMALL);
 
@@ -467,7 +468,7 @@ void InfoBoxView::render(const KakouneClient *kakoune_client, domain::FontManage
 
     }
 
-    float line_height = ui_options.font->getLineHeight();
+    float line_height = font->getLineHeight();
     int total_lines = placement.content.size();
     int visible_lines = static_cast<int>(placement.bounds.height / line_height);
     bool needs_scroll = total_lines > visible_lines;
@@ -487,9 +488,9 @@ void InfoBoxView::render(const KakouneClient *kakoune_client, domain::FontManage
     float y_pos = content_layout.current().y;
     for (int i = start_line; i < end_line; i++)
     {
-        m_renderer->renderLine(ui_options.font, font_manager, placement.content.at(i),
-                             kakoune_client->state.info_box->default_face,
-                             content_layout.current().x, y_pos, ui_options.color_overrides);
+        m_renderer->renderLine(render_context.textConfig(font), placement.content.at(i),
+                             info_box.default_face,
+                             content_layout.current().x, y_pos);
         y_pos += line_height;
     }
 
@@ -498,7 +499,7 @@ void InfoBoxView::render(const KakouneClient *kakoune_client, domain::FontManage
         int max_scroll = total_lines - visible_lines;
         m_scroll_bar->setValue(m_scroll_offset, max_scroll, visible_lines);
         m_scroll_bar->render(m_renderer,
-                           kakoune_client->state.info_box->default_face.getFg(kakoune_client->state.default_face, ui_options.color_overrides),
+                           info_box.default_face.getFg(render_context.default_face, render_context.ui_options.color_overrides),
                            layout);
     }
 }

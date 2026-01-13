@@ -98,7 +98,7 @@ void opengl::GLFWApplication::init(const CliConfig& config) {
         font_factory
     );
 
-    m_renderer->init(framebuffer_width, framebuffer_height, m_font_manager.get());
+    m_renderer->init(framebuffer_width, framebuffer_height);
 
     Application::init(config);
 

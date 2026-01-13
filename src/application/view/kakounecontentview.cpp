@@ -1,4 +1,5 @@
 #include "kakounecontentview.hpp"
+#include "application/view/rendercontext.hpp"
 
 KakouneContentView::KakouneContentView()
 {
@@ -9,9 +10,9 @@ void KakouneContentView::init(domain::Renderer* renderer)
     m_renderer = renderer;
 }
 
-void KakouneContentView::render(const domain::UIOptions &ui_options, domain::FontManager* font_manager, const domain::Lines &lines, const domain::Face& default_face, float x, float y)
+void KakouneContentView::render(const RenderContext& render_context, const domain::Lines &lines, const domain::Face& default_face, float x, float y)
 {
-    m_renderer->renderLines(ui_options.font, font_manager, lines, default_face, x, y, ui_options.color_overrides);
+    m_renderer->renderLines(render_context.textConfig(render_context.ui_options.font), lines, default_face, x, y);
 }
 
 float KakouneContentView::getCellWidth(domain::Font* font) const {

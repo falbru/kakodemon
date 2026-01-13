@@ -7,6 +7,7 @@
 #include "domain/glyphlinesbuilder.hpp"
 #include "domain/line.hpp"
 #include "domain/ports/fontengine.hpp"
+#include "domain/ports/renderer.hpp"
 #include "domain/utf8string.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "opengl.hpp"
@@ -14,7 +15,7 @@
 opengl::Renderer::Renderer() {
 }
 
-void opengl::Renderer::init(int width, int height, domain::FontManager *font_manager) {
+void opengl::Renderer::init(int width, int height) {
     m_shader_program = std::make_unique<ShaderProgram>();
     m_shader_program->compile();
 
@@ -69,21 +70,12 @@ void opengl::Renderer::popBounds() {
     }
 }
 
-void opengl::Renderer::renderLine(domain::Font* font, domain::FontManager* font_manager, const domain::Line &line, const domain::Face &default_face, float x,
-                     float y, const std::unordered_map<domain::FixedColor, domain::RGBAColor> &color_overrides) const {
-    renderLine(font, font_manager, line, default_face, x, y, domain::Alignment(), color_overrides);
-}
-
-void opengl::Renderer::renderLine(domain::Font* font, domain::FontManager* font_manager, const domain::Line &line, const domain::Face &default_face, float x, float y, const domain::Alignment& alignment, const std::unordered_map<domain::FixedColor, domain::RGBAColor> &color_overrides) const
+void opengl::Renderer::renderLine(const domain::TextRenderConfig& config, const domain::Line &line, const domain::Face &default_face, float x, float y, const domain::Alignment &alignment) const
 {
-    opengl::Font* opengl_font = dynamic_cast<opengl::Font*>(font);
-
-    if (!opengl_font) return;
-
     m_shader_program->use();
     glBindVertexArray(m_text_vao);
 
-    _renderLine(opengl_font, font_manager, line, default_face, x, y, alignment, RenderPass::Both, color_overrides);
+    _renderLine(config, line, default_face, x, y, alignment, RenderPass::Both);
 
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -108,37 +100,27 @@ void opengl::Renderer::renderRectWithShadow(const domain::RGBAColor color, float
     glBindVertexArray(0);
 }
 
-void opengl::Renderer::renderRoundedRect(const domain::RGBAColor color, float x, float y, float width, float height, float corner_radius) const
-{
-    renderRoundedRect(color, x, y, width, height, corner_radius, corner_radius, corner_radius, corner_radius);
-}
-
-void opengl::Renderer::renderRoundedRect(const domain::RGBAColor color, float x, float y, float width, float height, float top_left_radius, float top_right_radius, float bottom_right_radius, float bottom_left_radius) const
+void opengl::Renderer::renderRoundedRect(const domain::RGBAColor color, float x, float y, float width, float height, domain::CornerRadius corner_radius) const
 {
     m_shader_program->use();
 
-    _renderRoundedRect(color, x, y, width, height, top_left_radius, top_right_radius, bottom_right_radius, bottom_left_radius);
+    _renderRoundedRect(color, x, y, width, height, corner_radius);
 
     glBindVertexArray(0);
 }
 
-void opengl::Renderer::renderRoundedRectWithShadow(const domain::RGBAColor color, float x, float y, float width, float height, float corner_radius, float shadowRadius) const
-{
-    renderRoundedRectWithShadow(color, x, y, width, height, corner_radius, corner_radius, corner_radius, corner_radius, shadowRadius);
-}
-
-void opengl::Renderer::renderRoundedRectWithShadow(const domain::RGBAColor color, float x, float y, float width, float height, float top_left_radius, float top_right_radius, float bottom_right_radius, float bottom_left_radius, float shadowRadius) const
+void opengl::Renderer::renderRoundedRectWithShadow(const domain::RGBAColor color, float x, float y, float width, float height, domain::CornerRadius corner_radius, float shadow_radius) const
 {
     m_shader_program->use();
 
-    _renderRoundedRectWithShadow(color, x, y, width, height, top_left_radius, top_right_radius, bottom_right_radius, bottom_left_radius, shadowRadius);
-    _renderRoundedRect(color, x, y, width, height, top_left_radius, top_right_radius, bottom_right_radius, bottom_left_radius);
+    _renderRoundedRectWithShadow(color, x, y, width, height, corner_radius, shadow_radius);
+    _renderRoundedRect(color, x, y, width, height, corner_radius);
 
     glBindVertexArray(0);
 }
 
-void opengl::Renderer::renderLines(domain::Font* font, domain::FontManager* font_manager, const domain::Lines& lines, const domain::Face& default_face, float x, float y, const std::unordered_map<domain::FixedColor, domain::RGBAColor> &color_overrides) const {
-    opengl::Font* opengl_font = dynamic_cast<opengl::Font*>(font);
+void opengl::Renderer::renderLines(const domain::TextRenderConfig& config, const domain::Lines &lines, const domain::Face &default_face, float x, float y) const {
+    opengl::Font* opengl_font = dynamic_cast<opengl::Font*>(config.font);
 
     if (!opengl_font) return;
 
@@ -147,28 +129,29 @@ void opengl::Renderer::renderLines(domain::Font* font, domain::FontManager* font
     float y_it = y;
     for (const auto& line : lines.getLines())
     {
-        _renderLine(opengl_font, font_manager, line, default_face, x, y_it, domain::Alignment(), RenderPass::BackgroundOnly, color_overrides);
-        y_it += font->getLineHeight();
+        _renderLine(config, line, default_face, x, y_it, domain::Alignment(), RenderPass::BackgroundOnly);
+        y_it += config.font->getLineHeight();
     }
 
     glBindVertexArray(m_text_vao);
     y_it = y;
     for (const auto& line : lines.getLines())
     {
-        _renderLine(opengl_font, font_manager, line, default_face, x, y_it, domain::Alignment(), RenderPass::TextOnly, color_overrides);
-        y_it += font->getLineHeight();
+        _renderLine(config, line, default_face, x, y_it, domain::Alignment(), RenderPass::TextOnly);
+        y_it += config.font->getLineHeight();
     }
 
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font_manager, const domain::Line& line, const domain::Face& default_face, float x, float y, const domain::Alignment& alignment, RenderPass pass, const std::unordered_map<domain::FixedColor, domain::RGBAColor> &color_overrides) const {
+void opengl::Renderer::_renderLine(const domain::TextRenderConfig& config, const domain::Line &line, const domain::Face &default_face, float x, float y, const domain::Alignment &alignment, RenderPass pass) const {
+    opengl::Font* font = dynamic_cast<opengl::Font*>(config.font);
 
     float start_x = x;
     float start_y = y + font->getLineHeight();
 
-    auto glyph_line = domain::GlyphLinesBuilder::build(line, font, font_manager);
+    auto glyph_line = domain::GlyphLinesBuilder::build(line, font, config.font_manager);
 
     if (alignment.h == domain::Alignment::HorizontalAlignment::Right) {
         start_x -= glyph_line.width();
@@ -192,7 +175,7 @@ void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font
             float width = atom.width();
 
             // Background color
-            _renderRect(atom.getFace().getBg(default_face, color_overrides), x_it, y_it - height, width, height);
+            _renderRect(atom.getFace().getBg(default_face, config.color_overrides), x_it, y_it - height, width, height);
 
             x_it += width;
         }
@@ -204,7 +187,7 @@ void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font
         float y_it = start_y + font->getDescender();
         for (const auto& atom : glyph_line.getGlyphAtoms())
         {
-            domain::RGBAColor color = atom.getFace().getFg(default_face, color_overrides);
+            domain::RGBAColor color = atom.getFace().getFg(default_face, config.color_overrides);
             m_shader_program->setVector4f("textColor", color.r, color.g, color.b, color.a);
 
             float atom_x = x_it;
@@ -214,7 +197,7 @@ void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font
                 opengl::Font* run_font = dynamic_cast<opengl::Font*>(run.font);
                 for (const auto& glyph : run.glyphs)
                 {
-                    if (domain::isControlCharacter(glyph.codepoint)) continue; // TODO clean way of stripping the last newline?
+                    if (domain::isControlCharacter(glyph.codepoint)) continue;
 
                     if (run_font->getGlyph(glyph.codepoint).format == domain::PixelFormat::GRAYSCALE) {
                         m_shader_program->setRenderType(RenderType::Text);
@@ -243,7 +226,7 @@ void opengl::Renderer::_renderLine(opengl::Font* font, domain::FontManager* font
             }
 
             if (atom.getFace().hasAttribute(domain::Attribute::Underline) && font->getUnderlineThickness() > 0) {
-                _renderRect(atom.getFace().getFg(default_face, color_overrides), atom_x, y_it + font->getUnderlineOffset(), x_it - atom_x, font->getUnderlineThickness());
+                _renderRect(atom.getFace().getFg(default_face, config.color_overrides), atom_x, y_it + font->getUnderlineOffset(), x_it - atom_x, font->getUnderlineThickness());
             }
         }
     }
@@ -276,7 +259,7 @@ void opengl::Renderer::_renderRect(const domain::RGBAColor color, float x, float
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void opengl::Renderer::_renderRoundedRect(const domain::RGBAColor color, float x, float y, float width, float height, float top_left_radius, float top_right_radius, float bottom_right_radius, float bottom_left_radius) const {
+void opengl::Renderer::_renderRoundedRect(const domain::RGBAColor color, float x, float y, float width, float height, domain::CornerRadius corner_radius) const {
     float vertices[6][2] = {
         {x, y}, {x, y + height},     {x + width, y + height},
         {x, y}, {x + width, y + height}, {x + width, y}};
@@ -284,22 +267,22 @@ void opengl::Renderer::_renderRoundedRect(const domain::RGBAColor color, float x
     glBindVertexArray(m_rect_vao);
     m_shader_program->setVector4f("rectColor", color.r, color.g, color.b, 1.0f);
     m_shader_program->setRenderType(RenderType::RoundedRectangle);
-    m_shader_program->setVector4f("cornerRadii", bottom_left_radius, bottom_right_radius, top_right_radius, top_left_radius);
+    m_shader_program->setVector4f("cornerRadii", corner_radius.bottom_left, corner_radius.bottom_right, corner_radius.top_right, corner_radius.top_left);
     m_shader_program->setVector4f("rectBounds", x, (float)m_screen_height - y - height, width, height);
     glBindBuffer(GL_ARRAY_BUFFER, m_rect_vbo);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void opengl::Renderer::_renderRoundedRectWithShadow(const domain::RGBAColor color, float x, float y, float width, float height, float top_left_radius, float top_right_radius, float bottom_right_radius, float bottom_left_radius, float shadowRadius) const {
+void opengl::Renderer::_renderRoundedRectWithShadow(const domain::RGBAColor color, float x, float y, float width, float height, domain::CornerRadius corner_radius, float shadow_radius) const {
     float vertices[6][2] = {
-        {x - shadowRadius, y - shadowRadius}, {x - shadowRadius, y + height + shadowRadius},     {x + width + shadowRadius, y + height + shadowRadius},
-        {x - shadowRadius, y - shadowRadius}, {x + width + shadowRadius, y + height + shadowRadius}, {x + width + shadowRadius, y - shadowRadius}};
+        {x - shadow_radius, y - shadow_radius}, {x - shadow_radius, y + height + shadow_radius},     {x + width + shadow_radius, y + height + shadow_radius},
+        {x - shadow_radius, y - shadow_radius}, {x + width + shadow_radius, y + height + shadow_radius}, {x + width + shadow_radius, y - shadow_radius}};
 
     glBindVertexArray(m_rect_vao);
     m_shader_program->setRenderType(RenderType::RoundedShadow);
-    m_shader_program->setFloat("shadowRadius", shadowRadius);
-    m_shader_program->setVector4f("cornerRadii", bottom_left_radius, bottom_right_radius, top_right_radius, top_left_radius);
+    m_shader_program->setFloat("shadowRadius", shadow_radius);
+    m_shader_program->setVector4f("cornerRadii", corner_radius.bottom_left, corner_radius.bottom_right, corner_radius.top_right, corner_radius.top_left);
     m_shader_program->setVector4f("rectBounds", x, (float)m_screen_height - y - height, width, height);
     glBindBuffer(GL_ARRAY_BUFFER, m_rect_vbo);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);

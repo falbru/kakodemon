@@ -1,13 +1,12 @@
 #ifndef VIEW_SEARCHMENU_HPP_INCLUDED
 #define VIEW_SEARCHMENU_HPP_INCLUDED
 
-#include "application/model/kakouneclient.hpp"
-#include "application/view/kakounecontentview.hpp"
+#include "application/view/rendercontext.hpp"
 #include "application/view/widgets/input.hpp"
 #include "application/view/widgets/scrolledmenuitems.hpp"
+#include "domain/menu.hpp"
 #include "domain/mouse.hpp"
 #include "domain/ports/renderer.hpp"
-#include "domain/uioptions.hpp"
 
 class SearchMenuView
 {
@@ -16,12 +15,11 @@ class SearchMenuView
 
     void init(domain::Renderer *renderer);
 
-    void render(const domain::UIOptions &ui_options, domain::FontManager *font_manager,
-                const KakouneClient &kakoune_client, float width, float height);
+    void render(const RenderContext &render_context, const domain::Menu &menu, int cursor_column);
 
-    domain::MouseMoveResult onMouseMove(float x, float y, const KakouneClient &kakoune_client);
-    std::optional<int> findItemAtPosition(float x, float y, domain::Font *font, const KakouneClient &kakoune_client);
-    void onMouseScroll(int scroll_amount, const KakouneClient &kakoune_client);
+    domain::MouseMoveResult onMouseMove(float x, float y, const domain::Menu &menu);
+    std::optional<int> findItemAtPosition(float x, float y, const domain::Menu &menu);
+    void onMouseScroll(int scroll_amount, const domain::Menu &menu);
     void ensureItemVisible(int index);
 
     float x() const;
@@ -43,7 +41,6 @@ class SearchMenuView
     float m_x;
     float m_height;
 
-    KakouneContentView *m_kakoune_content_view;
     domain::Renderer *m_renderer;
 
     std::unique_ptr<Input> m_input;

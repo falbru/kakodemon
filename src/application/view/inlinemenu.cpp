@@ -32,28 +32,29 @@ float InlineMenuView::height() const {
     return m_height;
 }
 
-void InlineMenuView::render(const domain::UIOptions &ui_options, domain::FontManager* font_manager, const KakouneClient &kakoune_client, float width, float height)
+void InlineMenuView::render(const RenderContext &render_context, const domain::Menu &menu)
 {
-    if (!kakoune_client.state.menu.has_value() || !kakoune_client.state.menu->hasItems()) return;
+    if (!menu.hasItems()) return;
 
-    auto anchor = kakoune_client.state.menu->getItems().anchor;
+    domain::Font* font = render_context.ui_options.font;
+    auto anchor = menu.getItems().anchor;
 
-    auto menu_position = m_kakoune_content_view->coordToPixels(ui_options.font, anchor);
+    auto menu_position = m_kakoune_content_view->coordToPixels(font, anchor);
 
-    auto menu_item_width = domain::GlyphLinesBuilder::build(kakoune_client.state.menu->getItems().items.at(0), ui_options.font, font_manager).width(); // For the menu, all lines will have the same length
+    auto menu_item_width = domain::GlyphLinesBuilder::build(menu.getItems().items.at(0), font, render_context.font_manager).width();
 
-    m_width = std::min(menu_item_width, std::min(MAX_MENU_WIDTH, width));
-    float items_size = std::min(MAX_VISIBLE_ITEMS, (int)kakoune_client.state.menu->getItems().items.size());
-    m_height = ui_options.font->getLineHeight() * items_size + BORDER_THICKNESS * 2.0f;
+    m_width = std::min(menu_item_width, std::min(MAX_MENU_WIDTH, render_context.screen_width));
+    float items_size = std::min(MAX_VISIBLE_ITEMS, (int)menu.getItems().items.size());
+    m_height = font->getLineHeight() * items_size + BORDER_THICKNESS * 2.0f;
 
     m_x = menu_position.first;
-    if (m_x + m_width > width)
+    if (m_x + m_width > render_context.screen_width)
     {
-        m_x = width - m_width;
+        m_x = render_context.screen_width - m_width;
     }
 
-    m_y = menu_position.second + SPACING_SMALL + ui_options.font->getLineHeight();
-    if (m_y + m_height > height)
+    m_y = menu_position.second + SPACING_SMALL + font->getLineHeight();
+    if (m_y + m_height > render_context.screen_height)
     {
         m_y = menu_position.second - SPACING_SMALL - m_height;
     }
@@ -65,12 +66,12 @@ void InlineMenuView::render(const domain::UIOptions &ui_options, domain::FontMan
 
     layout.pad(BORDER_THICKNESS);
 
-    m_renderer->renderRect(kakoune_client.state.menu->getItems().face.getBg(kakoune_client.state.default_face, ui_options.color_overrides),
+    m_renderer->renderRect(menu.getItems().face.getBg(render_context.default_face, render_context.ui_options.color_overrides),
                            layout.current().x, layout.current().y, layout.current().width, layout.current().height);
 
     layout.pad(0, SPACING_MEDIUM);
 
-    m_scrolled_menu_items->render(m_renderer, ui_options, font_manager, kakoune_client, layout);
+    m_scrolled_menu_items->render(m_renderer, render_context, menu.getItems(), menu.getItems().face.getFg(render_context.default_face, render_context.ui_options.color_overrides), layout);
 }
 
 float InlineMenuView::scrolledItemsX() const {
@@ -89,8 +90,8 @@ float InlineMenuView::scrolledItemsHeight() const {
     return m_scrolled_menu_items->height();
 }
 
-domain::MouseMoveResult InlineMenuView::onMouseMove(float x, float y, const KakouneClient &kakoune_client) {
-    if (kakoune_client.state.menu.has_value() && kakoune_client.state.menu->hasItems()) {
+domain::MouseMoveResult InlineMenuView::onMouseMove(float x, float y, const domain::Menu &menu) {
+    if (menu.hasItems()) {
         float items_x = m_scrolled_menu_items->x();
         float items_y = m_scrolled_menu_items->y();
         float items_width = m_scrolled_menu_items->width();
@@ -108,14 +109,15 @@ domain::MouseMoveResult InlineMenuView::onMouseMove(float x, float y, const Kako
     return domain::MouseMoveResult{std::nullopt};
 }
 
-std::optional<int> InlineMenuView::findItemAtPosition(float x, float y, domain::Font *font, const KakouneClient &kakoune_client) {
-    return m_scrolled_menu_items->findItemAtPosition(x, y, font, kakoune_client);
+std::optional<int> InlineMenuView::findItemAtPosition(float x, float y, const domain::Menu &menu) {
+    if (!menu.hasItems()) return std::nullopt;
+    return m_scrolled_menu_items->findItemAtPosition(x, y, menu.getItems());
 }
 
-void InlineMenuView::onMouseScroll(int scroll_amount, const KakouneClient &kakoune_client) {
-    if (!kakoune_client.state.menu.has_value() || !kakoune_client.state.menu->hasItems()) return;
+void InlineMenuView::onMouseScroll(int scroll_amount, const domain::Menu &menu) {
+    if (!menu.hasItems()) return;
 
-    int total_items = kakoune_client.state.menu->getItems().items.size();
+    int total_items = menu.getItems().items.size();
     m_scrolled_menu_items->scroll(scroll_amount, total_items);
 }
 

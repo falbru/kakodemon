@@ -1,12 +1,13 @@
 #ifndef VIEW_INFOBOX_HPP_INCLUDED
 #define VIEW_INFOBOX_HPP_INCLUDED
 #include "application/controller/menucontroller.hpp"
-#include "application/model/kakouneclient.hpp"
 #include "application/view/kakounecontentview.hpp"
+#include "application/view/rendercontext.hpp"
 #include "application/view/widgets/scrollbar.hpp"
+#include "domain/editor.hpp"
 #include "domain/geometry.hpp"
+#include "domain/infobox.hpp"
 #include "domain/lines.hpp"
-#include "domain/uioptions.hpp"
 #include <memory>
 
 enum class PlacementDirection
@@ -51,8 +52,8 @@ class InfoBoxView
                                              const domain::Rectangle &menu_rectangle,
                                              const domain::CursorPosition &cursor_position);
 
-    void render(const KakouneClient *kakoune_client, domain::FontManager *font_manager,
-                const domain::UIOptions &ui_options, float width, float height);
+    void render(const RenderContext &render_context, const domain::InfoBox &info_box,
+                const domain::CursorPosition &cursor_position);
 
     void onMouseScroll(int scroll_amount);
 

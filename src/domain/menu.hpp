@@ -2,6 +2,7 @@
 #define DOMAIN_MENU_HPP_INCLUDED
 
 #include "domain/coord.hpp"
+#include "domain/face.hpp"
 #include "domain/line.hpp"
 #include "domain/lines.hpp"
 #include "domain/statusline.hpp"
@@ -36,16 +37,18 @@ class Menu
 
 {
   public:
-    Menu(StatusLine input, MenuItems items, MenuStyle style);
-    Menu(StatusLine input, MenuStyle style);
+    Menu(StatusLine input, Face input_face, MenuItems items, MenuStyle style);
+    Menu(StatusLine input, Face input_face, MenuStyle style);
 
     const StatusLine &getInput() const;
+    const Face &getInputFace() const;
     bool hasItems() const;
     const MenuItems &getItems() const;
     MenuStyle getStyle() const;
 
   private:
     StatusLine m_input;
+    Face m_input_face;
     std::optional<MenuItems> m_items;
     MenuStyle m_style;
 };
