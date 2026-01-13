@@ -28,7 +28,7 @@ void InfoBoxView::init(domain::Renderer* renderer, MenuController* menu_controll
 
 std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection direction, CrossAxisAlignment alignment,
                                                       const domain::Lines &content, const domain::Line &title,
-                                                      const domain::Rectangle &anchor, float layout_width, float layout_height, domain::Font* font, domain::FontManager* font_manager, const domain::Rectangle& menu_rectangle, const domain::CursorPosition &cursor_position)
+                                                      const domain::Rectangle &anchor, float layout_width, float layout_height, domain::Font* font, domain::FontManager* font_manager, const domain::Rectangle& menu_rectangle, const domain::CursorPosition &cursor_position, domain::Font* font_content)
 {
     domain::GlyphLines glyph_lines = domain::GlyphLinesBuilder::build(content, font, font_manager);
 
@@ -45,11 +45,11 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
 
     if (std::holds_alternative<domain::BufferContentPosition>(cursor_position)) {
         auto buffer_pos = std::get<domain::BufferContentPosition>(cursor_position);
-        auto cursor_pixel_pos = m_kakoune_content_view->coordToPixels(font, buffer_pos.coord);
+        auto cursor_pixel_pos = m_kakoune_content_view->coordToPixels(font_content, buffer_pos.coord);
         cursor_rect.x = cursor_pixel_pos.first;
         cursor_rect.y = cursor_pixel_pos.second;
-        cursor_rect.width = m_kakoune_content_view->getCellWidth(font);
-        cursor_rect.height = m_kakoune_content_view->getCellHeight(font);
+        cursor_rect.width = m_kakoune_content_view->getCellWidth(font_content);
+        cursor_rect.height = m_kakoune_content_view->getCellHeight(font_content);
         has_cursor = true;
     }
 
@@ -361,9 +361,9 @@ void InfoBoxView::render(const RenderContext &render_context, const domain::Info
         break;
 
     case domain::InfoStyle::INLINE: {
-        auto pos = m_kakoune_content_view->coordToPixels(font, info_box.anchor);
-        anchor = {pos.first, pos.second, m_kakoune_content_view->getCellWidth(font),
-                  m_kakoune_content_view->getCellHeight(font)};
+        auto pos = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, info_box.anchor);
+        anchor = {pos.first, pos.second, m_kakoune_content_view->getCellWidth(render_context.ui_options.font_content),
+                  m_kakoune_content_view->getCellHeight(render_context.ui_options.font_content)};
         direction = PlacementDirection::BELOW;
         alignment = CrossAxisAlignment::START;
         fallback_directions = {PlacementDirection::ABOVE, PlacementDirection::RIGHT_WRAPPED,
@@ -372,9 +372,9 @@ void InfoBoxView::render(const RenderContext &render_context, const domain::Info
     break;
 
     case domain::InfoStyle::INLINE_ABOVE: {
-        auto pos = m_kakoune_content_view->coordToPixels(font, info_box.anchor);
-        anchor = {pos.first, pos.second, m_kakoune_content_view->getCellWidth(font),
-                  m_kakoune_content_view->getCellHeight(font)};
+        auto pos = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, info_box.anchor);
+        anchor = {pos.first, pos.second, m_kakoune_content_view->getCellWidth(render_context.ui_options.font_content),
+                  m_kakoune_content_view->getCellHeight(render_context.ui_options.font_content)};
         direction = PlacementDirection::ABOVE;
         alignment = CrossAxisAlignment::START;
         fallback_directions = {PlacementDirection::BELOW, PlacementDirection::RIGHT_WRAPPED,
@@ -383,8 +383,8 @@ void InfoBoxView::render(const RenderContext &render_context, const domain::Info
     break;
 
     case domain::InfoStyle::INLINE_BELOW: {
-        auto pos = m_kakoune_content_view->coordToPixels(font, info_box.anchor);
-        anchor = {pos.first, pos.second, 0, m_kakoune_content_view->getCellHeight(font)};
+        auto pos = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, info_box.anchor);
+        anchor = {pos.first, pos.second, 0, m_kakoune_content_view->getCellHeight(render_context.ui_options.font_content)};
         direction = PlacementDirection::BELOW;
         alignment = CrossAxisAlignment::START;
         fallback_directions = {PlacementDirection::ABOVE, PlacementDirection::RIGHT_WRAPPED,
@@ -421,7 +421,7 @@ void InfoBoxView::render(const RenderContext &render_context, const domain::Info
     Placement placement;
     for (const auto& dir : fallback_directions)
     {
-        auto current_placement = tryPlaceInfoBox(dir, alignment, info_box.content, info_box.title, anchor, render_context.screen_width, render_context.screen_height, font, render_context.font_manager, menu_rectangle, cursor_position);
+        auto current_placement = tryPlaceInfoBox(dir, alignment, info_box.content, info_box.title, anchor, render_context.screen_width, render_context.screen_height, font, render_context.font_manager, menu_rectangle, cursor_position, render_context.ui_options.font_content);
         if (current_placement.has_value()) {
             placement = current_placement.value();
             break;

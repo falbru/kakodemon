@@ -50,7 +50,7 @@ class InfoBoxView
                                              const domain::Rectangle &anchor, float layout_width, float layout_height,
                                              domain::Font *font, domain::FontManager *font_manager,
                                              const domain::Rectangle &menu_rectangle,
-                                             const domain::CursorPosition &cursor_position);
+                                             const domain::CursorPosition &cursor_position, domain::Font *font_content);
 
     void render(const RenderContext &render_context, const domain::InfoBox &info_box,
                 const domain::CursorPosition &cursor_position);

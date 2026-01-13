@@ -41,7 +41,14 @@ bool EditorController::update(domain::UIOptions& ui_options)
             m_menu_controller->ensureItemVisible(m_kakoune_client->state.menu->getItems().selected_index);
         }
 
-        ui_options = m_kakoune_client->interface->getUIOptions(m_font_manager);
+        domain::UIOptions new_ui_options = m_kakoune_client->interface->getUIOptions(m_font_manager);
+        bool fonts_changed = new_ui_options.font_content != ui_options.font_content ||
+                             new_ui_options.font_statusbar != ui_options.font_statusbar;
+        ui_options = new_ui_options;
+
+        if (fonts_changed && m_width > 0 && m_height > 0) {
+            onWindowResize(m_width, m_height, ui_options);
+        }
     }
 
     return state_updated;
@@ -59,7 +66,7 @@ void EditorController::render(const domain::UIOptions& ui_options)
 
     m_kakoune_content_view->render(render_context, m_kakoune_client->state.content, m_kakoune_client->state.default_face, 0.0f, 0.0f);
     m_kakoune_content_view->setWidth(m_width);
-    m_content_height = m_height - m_status_bar_view->height(ui_options.font_statusbar);
+    m_content_height = m_rows * m_kakoune_content_view->getCellHeight(ui_options.font_content);
     m_kakoune_content_view->setHeight(m_content_height);
     m_status_bar_view->render(render_context, m_kakoune_client->state.mode_line);
 }
@@ -96,8 +103,8 @@ domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const do
     }
 
     if (is_any_mouse_button_pressed) {
-        int column = x / ui_options->font->getGlyphMetrics(97).advance;
-        int line = y / ui_options->font->getLineHeight();
+        int column = x / ui_options->font_content->getGlyphMetrics(97).advance;
+        int line = y / ui_options->font_content->getLineHeight();
 
         m_kakoune_client->interface->moveMouse(line, column);
     }
@@ -106,8 +113,8 @@ domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const do
 }
 
 void EditorController::onMouseButton(domain::MouseButtonEvent event, const domain::UIOptions* ui_options, bool obscured) {
-    int column = event.x / ui_options->font->getGlyphMetrics(97).advance;
-    int line = event.y / ui_options->font->getLineHeight();
+    int column = event.x / ui_options->font_content->getGlyphMetrics(97).advance;
+    int line = event.y / ui_options->font_content->getLineHeight();
 
     if (!obscured && event.action == domain::MouseButtonAction::PRESS) {
         m_kakoune_client->interface->pressMouseButton(event.button, line, column);
@@ -131,8 +138,8 @@ int EditorController::height() const {
 }
 
 void EditorController::onMouseScroll(int amount, float x, float y, const domain::UIOptions* ui_options) {
-    int column = x / ui_options->font->getGlyphMetrics(97).advance;
-    int line = y / ui_options->font->getLineHeight();
+    int column = x / ui_options->font_content->getGlyphMetrics(97).advance;
+    int line = y / ui_options->font_content->getLineHeight();
 
     m_kakoune_client->interface->scroll(amount, line, column);
 }
