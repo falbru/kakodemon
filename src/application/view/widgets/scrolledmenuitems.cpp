@@ -9,7 +9,9 @@ ScrolledMenuItems::ScrolledMenuItems(int max_visible_items) : m_max_visible_item
 void ScrolledMenuItems::render(domain::Renderer* renderer, const RenderContext &render_context, const domain::MenuItems &menu_items, const domain::RGBAColor &scrollbar_color, LayoutManager &layout) {
     domain::Font* font = render_context.ui_options.font;
     auto items_layout = layout.copy();
-    items_layout.padRight(SPACING_MEDIUM + m_scroll_bar->width());
+    if (menu_items.items.size() > m_max_visible_items) {
+        items_layout.padRight(SPACING_MEDIUM + m_scroll_bar->width());
+    }
 
     m_x = items_layout.current().x;
     m_y = items_layout.current().y;
@@ -111,4 +113,11 @@ void ScrolledMenuItems::ensureItemVisible(int index) {
     {
         m_scroll_offset = std::max(0, index - m_max_visible_items + 1);
     }
+}
+
+float ScrolledMenuItems::getRightPadding(int total_items) const {
+    if (total_items > m_max_visible_items) {
+        return SPACING_MEDIUM + m_scroll_bar->width();
+    }
+    return 0.0f;
 }

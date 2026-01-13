@@ -4,7 +4,6 @@
 #include "application/view/layoutmanager.hpp"
 #include "application/view/rendercontext.hpp"
 #include "application/view/widgets/scrollbar.hpp"
-#include "domain/face.hpp"
 #include "domain/menu.hpp"
 #include "domain/ports/renderer.hpp"
 #include <memory>
@@ -26,6 +25,8 @@ class ScrolledMenuItems
 
     void scroll(int amount, int total_items);
     void ensureItemVisible(int index);
+
+    float getRightPadding(int total_items) const;
 
   private:
     float m_scroll_offset = 0;

@@ -17,6 +17,9 @@ class Lines
     const std::vector<Line> &getLines() const;
     unsigned int size() const;
 
+    std::vector<Line>::const_iterator begin() const;
+    std::vector<Line>::const_iterator end() const;
+
   private:
     std::vector<Line> m_lines;
 };

@@ -22,4 +22,12 @@ const std::vector<Line>& Lines::getLines() const {
 unsigned int Lines::size() const {
     return m_lines.size();
 }
+
+std::vector<Line>::const_iterator Lines::begin() const {
+    return m_lines.begin();
+}
+
+std::vector<Line>::const_iterator Lines::end() const {
+    return m_lines.end();
+}
 }

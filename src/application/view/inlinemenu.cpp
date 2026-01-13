@@ -41,9 +41,12 @@ void InlineMenuView::render(const RenderContext &render_context, const domain::M
 
     auto menu_position = m_kakoune_content_view->coordToPixels(font, anchor);
 
-    auto menu_item_width = domain::GlyphLinesBuilder::build(menu.getItems().items.at(0), font, render_context.font_manager).width();
-
-    m_width = std::min(menu_item_width, std::min(MAX_MENU_WIDTH, render_context.screen_width));
+    auto menu_item_width = 0.0f;
+    for (const auto& item : menu.getItems().items) {
+        auto item_width = domain::GlyphLinesBuilder::build(item, font, render_context.font_manager).width();
+        menu_item_width = std::max(menu_item_width, item_width);
+    }
+    m_width = std::min(menu_item_width + BORDER_THICKNESS * 2.0f + SPACING_MEDIUM * 2.0f + m_scrolled_menu_items->getRightPadding(menu.getItems().items.size()), std::min(MAX_MENU_WIDTH, render_context.screen_width));
     float items_size = std::min(MAX_VISIBLE_ITEMS, (int)menu.getItems().items.size());
     m_height = font->getLineHeight() * items_size + BORDER_THICKNESS * 2.0f;
 
