@@ -2,6 +2,8 @@
 
 Kakodemon is an OpenGL-based GUI for Kakoune written in C++
 
+<img width="1920" height="1131" alt="Screenshot From 2026-01-13" src="https://github.com/user-attachments/assets/8fb194ef-3f7e-4cf0-be51-002af1493bcd" />
+
 ## Install from source
 
 1. Install the necessary build dependencies
