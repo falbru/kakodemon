@@ -42,7 +42,7 @@ void ScrolledMenuItems::render(domain::Renderer* renderer, const RenderContext &
             renderer->renderRect(
                 menu_items.selected_face.getBg(render_context.default_face, render_context.ui_options.color_overrides),
                 items_layout.current().x - SPACING_MEDIUM, items_layout.current().y,
-                items_layout.current().width + SPACING_MEDIUM * 3 + m_scroll_bar->width(), font->getLineHeight());
+                items_layout.current().width + SPACING_MEDIUM * 2 + getRightPadding(menu_items.items.size()), font->getLineHeight());
         }
         domain::Face item_face = i == selected_index ? menu_items.selected_face : menu_items.face;
 
