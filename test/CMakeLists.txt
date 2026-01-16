@@ -7,6 +7,7 @@ add_executable(tests
     unit/test_utf8string.cpp
     unit/test_cliparser.cpp
     unit/test_line.cpp
+    unit/test_color.cpp
     integration/test_fontconfigresolver.cpp
     integration/test_localsession.cpp
     integration/test_kakouneclientprocess.cpp

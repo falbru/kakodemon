@@ -71,7 +71,7 @@ domain::OptionalColor kakoune::toDomain(Color c)
 
         for (char c : hex_color) {
             if (!IsValidHexChar(c)) {
-                throw std::runtime_error("Invalid hex characters in rgb: format: " + color_string);
+                throw ColorConversionException(color_string);
             }
         }
 
@@ -92,7 +92,7 @@ domain::OptionalColor kakoune::toDomain(Color c)
 
         for (char c : hex_color) {
             if (!IsValidHexChar(c)) {
-                throw std::runtime_error("Invalid hex characters in rgba: format: " + color_string);
+                throw ColorConversionException(color_string);
             }
         }
 
@@ -109,5 +109,5 @@ domain::OptionalColor kakoune::toDomain(Color c)
         return domain::RGBAColor{red, green, blue, alpha};
     }
 
-    throw std::runtime_error("Unable to convert color: " + color_string);
+    throw ColorConversionException(color_string);
 }

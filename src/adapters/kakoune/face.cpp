@@ -1,4 +1,5 @@
 #include "face.hpp"
+#include <spdlog/spdlog.h>
 
 void kakoune::to_json(nlohmann::json &j, const Attribute &a)
 {
@@ -72,5 +73,22 @@ domain::Face kakoune::toDomain(kakoune::Face face) {
     for (const auto& attr : face.attributes) {
         attributes.push_back(::toDomain(attr));
     }
-    return domain::Face(toDomain(face.bg), toDomain(face.fg), std::move(attributes));
+
+    domain::OptionalColor bg;
+    try {
+        bg = toDomain(face.bg);
+    } catch (const ColorConversionException& e) {
+        spdlog::warn("{}", e.what());
+        bg = domain::DefaultColor();
+    }
+
+    domain::OptionalColor fg;
+    try {
+        fg = toDomain(face.fg);
+    } catch (const ColorConversionException& e) {
+        spdlog::warn("{}", e.what());
+        fg = domain::DefaultColor();
+    }
+
+    return domain::Face(bg, fg, std::move(attributes));
 }

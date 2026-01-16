@@ -15,6 +15,27 @@
 
 namespace kakoune {
 
+namespace {
+
+void applyColorOverride(
+    std::unordered_map<domain::FixedColor, domain::RGBAColor>& overrides,
+    domain::FixedColor fixed_color,
+    const Color& color)
+{
+    try {
+        auto converted = toDomain(color);
+        if (std::holds_alternative<domain::RGBAColor>(converted)) {
+            overrides[fixed_color] = std::get<domain::RGBAColor>(converted);
+        } else if (std::holds_alternative<domain::DefaultColor>(converted)) {
+            overrides[fixed_color] = domain::getRGBAColor(fixed_color);
+        }
+    } catch (const ColorConversionException& e) {
+        overrides[fixed_color] = domain::getRGBAColor(fixed_color);
+    }
+}
+
+}
+
 JsonRpcKakouneInterface::JsonRpcKakouneInterface(const domain::KakouneSession& session, std::optional<std::string> startup_command, const std::vector<std::string>& file_arguments) : domain::KakouneInterface(session) {
     m_process = std::make_unique<KakouneClientProcess>(session.getSessionId());
     m_process->start(startup_command, file_arguments);
@@ -140,120 +161,45 @@ domain::UIOptions JsonRpcKakouneInterface::getUIOptions(domain::FontManager* fon
     }
 
     if (m_ui_options.color_border.has_value()) {
-        ui_options.color_border = toDomain(m_ui_options.color_border.value());
-    }
-
-    if (m_ui_options.color_black.has_value()) {
-        auto color = toDomain(m_ui_options.color_black.value());
-        if (std::holds_alternative<domain::RGBAColor>(color)) {
-            ui_options.color_overrides[domain::FixedColor::Black] = std::get<domain::RGBAColor>(color);
+        try {
+            ui_options.color_border = toDomain(m_ui_options.color_border.value());
+        } catch (const ColorConversionException& e) {
+            spdlog::warn("{}", e.what());
         }
     }
 
-    if (m_ui_options.color_red.has_value()) {
-        auto color = toDomain(m_ui_options.color_red.value());
-        if (std::holds_alternative<domain::RGBAColor>(color)) {
-            ui_options.color_overrides[domain::FixedColor::Red] = std::get<domain::RGBAColor>(color);
-        }
-    }
-
-    if (m_ui_options.color_green.has_value()) {
-        auto color = toDomain(m_ui_options.color_green.value());
-        if (std::holds_alternative<domain::RGBAColor>(color)) {
-            ui_options.color_overrides[domain::FixedColor::Green] = std::get<domain::RGBAColor>(color);
-        }
-    }
-
-    if (m_ui_options.color_yellow.has_value()) {
-        auto color = toDomain(m_ui_options.color_yellow.value());
-        if (std::holds_alternative<domain::RGBAColor>(color)) {
-            ui_options.color_overrides[domain::FixedColor::Yellow] = std::get<domain::RGBAColor>(color);
-        }
-    }
-
-    if (m_ui_options.color_blue.has_value()) {
-        auto color = toDomain(m_ui_options.color_blue.value());
-        if (std::holds_alternative<domain::RGBAColor>(color)) {
-            ui_options.color_overrides[domain::FixedColor::Blue] = std::get<domain::RGBAColor>(color);
-        }
-    }
-
-    if (m_ui_options.color_magenta.has_value()) {
-        auto color = toDomain(m_ui_options.color_magenta.value());
-        if (std::holds_alternative<domain::RGBAColor>(color)) {
-            ui_options.color_overrides[domain::FixedColor::Magenta] = std::get<domain::RGBAColor>(color);
-        }
-    }
-
-    if (m_ui_options.color_cyan.has_value()) {
-        auto color = toDomain(m_ui_options.color_cyan.value());
-        if (std::holds_alternative<domain::RGBAColor>(color)) {
-            ui_options.color_overrides[domain::FixedColor::Cyan] = std::get<domain::RGBAColor>(color);
-        }
-    }
-
-    if (m_ui_options.color_white.has_value()) {
-        auto color = toDomain(m_ui_options.color_white.value());
-        if (std::holds_alternative<domain::RGBAColor>(color)) {
-            ui_options.color_overrides[domain::FixedColor::White] = std::get<domain::RGBAColor>(color);
-        }
-    }
-
-    if (m_ui_options.color_bright_black.has_value()) {
-        auto color = toDomain(m_ui_options.color_bright_black.value());
-        if (std::holds_alternative<domain::RGBAColor>(color)) {
-            ui_options.color_overrides[domain::FixedColor::BrightBlack] = std::get<domain::RGBAColor>(color);
-        }
-    }
-
-    if (m_ui_options.color_bright_red.has_value()) {
-        auto color = toDomain(m_ui_options.color_bright_red.value());
-        if (std::holds_alternative<domain::RGBAColor>(color)) {
-            ui_options.color_overrides[domain::FixedColor::BrightRed] = std::get<domain::RGBAColor>(color);
-        }
-    }
-
-    if (m_ui_options.color_bright_green.has_value()) {
-        auto color = toDomain(m_ui_options.color_bright_green.value());
-        if (std::holds_alternative<domain::RGBAColor>(color)) {
-            ui_options.color_overrides[domain::FixedColor::BrightGreen] = std::get<domain::RGBAColor>(color);
-        }
-    }
-
-    if (m_ui_options.color_bright_yellow.has_value()) {
-        auto color = toDomain(m_ui_options.color_bright_yellow.value());
-        if (std::holds_alternative<domain::RGBAColor>(color)) {
-            ui_options.color_overrides[domain::FixedColor::BrightYellow] = std::get<domain::RGBAColor>(color);
-        }
-    }
-
-    if (m_ui_options.color_bright_blue.has_value()) {
-        auto color = toDomain(m_ui_options.color_bright_blue.value());
-        if (std::holds_alternative<domain::RGBAColor>(color)) {
-            ui_options.color_overrides[domain::FixedColor::BrightBlue] = std::get<domain::RGBAColor>(color);
-        }
-    }
-
-    if (m_ui_options.color_bright_magenta.has_value()) {
-        auto color = toDomain(m_ui_options.color_bright_magenta.value());
-        if (std::holds_alternative<domain::RGBAColor>(color)) {
-            ui_options.color_overrides[domain::FixedColor::BrightMagenta] = std::get<domain::RGBAColor>(color);
-        }
-    }
-
-    if (m_ui_options.color_bright_cyan.has_value()) {
-        auto color = toDomain(m_ui_options.color_bright_cyan.value());
-        if (std::holds_alternative<domain::RGBAColor>(color)) {
-            ui_options.color_overrides[domain::FixedColor::BrightCyan] = std::get<domain::RGBAColor>(color);
-        }
-    }
-
-    if (m_ui_options.color_bright_white.has_value()) {
-        auto color = toDomain(m_ui_options.color_bright_white.value());
-        if (std::holds_alternative<domain::RGBAColor>(color)) {
-            ui_options.color_overrides[domain::FixedColor::BrightWhite] = std::get<domain::RGBAColor>(color);
-        }
-    }
+    if (m_ui_options.color_black.has_value())
+        applyColorOverride(ui_options.color_overrides, domain::FixedColor::Black, m_ui_options.color_black.value());
+    if (m_ui_options.color_red.has_value())
+        applyColorOverride(ui_options.color_overrides, domain::FixedColor::Red, m_ui_options.color_red.value());
+    if (m_ui_options.color_green.has_value())
+        applyColorOverride(ui_options.color_overrides, domain::FixedColor::Green, m_ui_options.color_green.value());
+    if (m_ui_options.color_yellow.has_value())
+        applyColorOverride(ui_options.color_overrides, domain::FixedColor::Yellow, m_ui_options.color_yellow.value());
+    if (m_ui_options.color_blue.has_value())
+        applyColorOverride(ui_options.color_overrides, domain::FixedColor::Blue, m_ui_options.color_blue.value());
+    if (m_ui_options.color_magenta.has_value())
+        applyColorOverride(ui_options.color_overrides, domain::FixedColor::Magenta, m_ui_options.color_magenta.value());
+    if (m_ui_options.color_cyan.has_value())
+        applyColorOverride(ui_options.color_overrides, domain::FixedColor::Cyan, m_ui_options.color_cyan.value());
+    if (m_ui_options.color_white.has_value())
+        applyColorOverride(ui_options.color_overrides, domain::FixedColor::White, m_ui_options.color_white.value());
+    if (m_ui_options.color_bright_black.has_value())
+        applyColorOverride(ui_options.color_overrides, domain::FixedColor::BrightBlack, m_ui_options.color_bright_black.value());
+    if (m_ui_options.color_bright_red.has_value())
+        applyColorOverride(ui_options.color_overrides, domain::FixedColor::BrightRed, m_ui_options.color_bright_red.value());
+    if (m_ui_options.color_bright_green.has_value())
+        applyColorOverride(ui_options.color_overrides, domain::FixedColor::BrightGreen, m_ui_options.color_bright_green.value());
+    if (m_ui_options.color_bright_yellow.has_value())
+        applyColorOverride(ui_options.color_overrides, domain::FixedColor::BrightYellow, m_ui_options.color_bright_yellow.value());
+    if (m_ui_options.color_bright_blue.has_value())
+        applyColorOverride(ui_options.color_overrides, domain::FixedColor::BrightBlue, m_ui_options.color_bright_blue.value());
+    if (m_ui_options.color_bright_magenta.has_value())
+        applyColorOverride(ui_options.color_overrides, domain::FixedColor::BrightMagenta, m_ui_options.color_bright_magenta.value());
+    if (m_ui_options.color_bright_cyan.has_value())
+        applyColorOverride(ui_options.color_overrides, domain::FixedColor::BrightCyan, m_ui_options.color_bright_cyan.value());
+    if (m_ui_options.color_bright_white.has_value())
+        applyColorOverride(ui_options.color_overrides, domain::FixedColor::BrightWhite, m_ui_options.color_bright_white.value());
 
     return ui_options;
 }
