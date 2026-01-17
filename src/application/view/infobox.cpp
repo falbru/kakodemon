@@ -19,11 +19,12 @@ InfoBoxView::InfoBoxView()
 }
 
 void InfoBoxView::init(domain::Renderer* renderer, MenuController* menu_controller,
-                       KakouneContentView* kakoune_content_view)
+                       KakouneContentView* kakoune_content_view, StatusBarView* status_bar_view)
 {
     m_renderer = renderer;
     m_menu_controller = menu_controller;
     m_kakoune_content_view = kakoune_content_view;
+    m_status_bar_view = status_bar_view;
 }
 
 std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection direction, CrossAxisAlignment alignment,
@@ -357,7 +358,8 @@ void InfoBoxView::render(const RenderContext &render_context, const domain::Info
         }
         else
         {
-            anchor = {0, m_kakoune_content_view->height(), m_kakoune_content_view->width(), 0};
+            float statusbar_height = m_status_bar_view->height(render_context.ui_options.font_statusbar);
+            anchor = {0, render_context.screen_height - statusbar_height, render_context.screen_width, 0};
             direction = PlacementDirection::ABOVE;
             alignment = CrossAxisAlignment::END;
             fallback_directions = {PlacementDirection::FULL};

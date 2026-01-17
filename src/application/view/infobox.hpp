@@ -3,6 +3,7 @@
 #include "application/controller/menucontroller.hpp"
 #include "application/view/kakounecontentview.hpp"
 #include "application/view/rendercontext.hpp"
+#include "application/view/statusbar.hpp"
 #include "application/view/widgets/scrollbar.hpp"
 #include "domain/editor.hpp"
 #include "domain/geometry.hpp"
@@ -39,7 +40,8 @@ class InfoBoxView
 {
   public:
     InfoBoxView();
-    void init(domain::Renderer *renderer, MenuController *menu_controller, KakouneContentView *kakoune_content_view);
+    void init(domain::Renderer *renderer, MenuController *menu_controller, KakouneContentView *kakoune_content_view,
+              StatusBarView *status_bar_view);
 
     std::pair<float, float> calculateInfoBoxPosition(const domain::Rectangle &anchor, float info_box_width,
                                                      float info_box_height, float viewport_width, float viewport_height,
@@ -69,6 +71,7 @@ class InfoBoxView
     domain::Renderer *m_renderer;
     KakouneContentView *m_kakoune_content_view;
     MenuController *m_menu_controller;
+    StatusBarView *m_status_bar_view;
 
     float m_x = 0.0f;
     float m_y = 0.0f;
