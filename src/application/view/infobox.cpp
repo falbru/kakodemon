@@ -326,6 +326,10 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
         info_box.width = layout_width;
         info_box.height = layout_height;
 
+        if (info_box.intersects(menu_rectangle)) {
+            return std::nullopt;
+        }
+
         return Placement{content, info_box};
     }
     }
