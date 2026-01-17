@@ -80,7 +80,7 @@ void LocalSession::start()
     if (pid == 0)
     {
         std::string init_command = "nop %sh{ echo > '" + m_fifo_path + "'}";
-        execlp("/usr/local/bin/kak", "kak", "-d", "-s", m_session_id.c_str(), "-E", init_command.c_str(), nullptr);
+        execlp("/usr/local/bin/kak", "kak", "-d", "-s", m_session_id.c_str(), "-ui", "json", "-E", init_command.c_str(), nullptr);
         perror("execlp");
         _exit(1);
     }
