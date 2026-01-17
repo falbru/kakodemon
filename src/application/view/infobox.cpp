@@ -449,7 +449,7 @@ void InfoBoxView::render(const RenderContext &render_context, const domain::Info
     m_width = layout.current().width;
     m_height = layout.current().height;
 
-    m_renderer->renderRect(domain::RGBAColor{0.5, 0.5, 0.5, 1},
+    m_renderer->renderRect(getRGBAColor(render_context.ui_options.color_border, default_border_color),
                            layout.current().x, layout.current().y, layout.current().width, layout.current().height);
 
     layout.pad(BORDER_THICKNESS);
@@ -466,7 +466,7 @@ void InfoBoxView::render(const RenderContext &render_context, const domain::Info
 
         layout.gapY(SPACING_SMALL);
 
-        m_renderer->renderRect(domain::RGBAColor{0.5, 0.5, 0.5, 1}, layout.current().x, layout.current().y, layout.current().width, 1);
+        m_renderer->renderRect(getRGBAColor(render_context.ui_options.color_border, default_border_color), layout.current().x, layout.current().y, layout.current().width, 1);
 
         layout.gapY(BORDER_THICKNESS);
 

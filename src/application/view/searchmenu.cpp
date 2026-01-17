@@ -32,7 +32,7 @@ void SearchMenuView::render(const RenderContext &render_context, const domain::M
     LayoutManager layout(m_x, 0, WIDTH, m_height);
 
     m_renderer->renderRoundedRectWithShadow(
-        domain::RGBAColor{0.5, 0.5, 0.5, 1.0}, layout.current().x,
+        getRGBAColor(render_context.ui_options.color_border, default_border_color), layout.current().x,
         layout.current().y, layout.current().width, layout.current().height, domain::CornerRadius(0, 0, CORNER_RADIUS, CORNER_RADIUS), SHADOW_LENGTH);
 
     layout.padLeft(BORDER_THICKNESS);
@@ -55,7 +55,7 @@ void SearchMenuView::render(const RenderContext &render_context, const domain::M
 
     if (menu.hasItems())
     {
-        m_renderer->renderRect(domain::RGBAColor{0.5, 0.5, 0.5, 1.0}, layout.current().x - SPACING_MEDIUM, layout.current().y, layout.current().width + SPACING_MEDIUM * 2, 1);
+        m_renderer->renderRect(getRGBAColor(render_context.ui_options.color_border, default_border_color), layout.current().x - SPACING_MEDIUM, layout.current().y, layout.current().width + SPACING_MEDIUM * 2, 1);
 
         layout.gapY(BORDER_THICKNESS);
 

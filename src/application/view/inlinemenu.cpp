@@ -64,7 +64,7 @@ void InlineMenuView::render(const RenderContext &render_context, const domain::M
 
     LayoutManager layout(m_x, m_y, m_width, m_height);
 
-    m_renderer->renderRect(domain::RGBAColor{0.5, 0.5, 0.5, 1},
+    m_renderer->renderRect(getRGBAColor(render_context.ui_options.color_border, default_border_color),
                            layout.current().x, layout.current().y, layout.current().width, layout.current().height);
 
     layout.pad(BORDER_THICKNESS);
