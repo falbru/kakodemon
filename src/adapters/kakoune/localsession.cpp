@@ -42,7 +42,7 @@ LocalSession::~LocalSession()
             dup2(pipefd[0], STDIN_FILENO);
             close(pipefd[0]);
 
-            execlp("/usr/local/bin/kak", "kak", "-p", m_session_id.c_str(), nullptr);
+            execlp("kak", "kak", "-p", m_session_id.c_str(), nullptr);
             perror("execlp");
             _exit(1);
         }
@@ -80,7 +80,7 @@ void LocalSession::start()
     if (pid == 0)
     {
         std::string init_command = "nop %sh{ echo > '" + m_fifo_path + "'}";
-        execlp("/usr/local/bin/kak", "kak", "-d", "-s", m_session_id.c_str(), "-ui", "json", "-E", init_command.c_str(), nullptr);
+        execlp("kak", "kak", "-d", "-s", m_session_id.c_str(), "-ui", "json", "-E", init_command.c_str(), nullptr);
         perror("execlp");
         _exit(1);
     }

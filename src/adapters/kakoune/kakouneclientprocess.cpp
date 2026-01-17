@@ -88,7 +88,7 @@ void KakouneClientProcess::start(std::optional<std::string> startup_command, con
 
         args.push_back(nullptr);
 
-        execv("/usr/local/bin/kak", const_cast<char* const*>(args.data()));
+        execvp("kak", const_cast<char* const*>(args.data()));
 
         perror("execv");
         _exit(1);
