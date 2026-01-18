@@ -24,6 +24,11 @@ jobs:
         tar -xf kakoune-8157d89a.tar.xz
         sudo cp kak /usr/local/bin/
 
+    - name: Copy Kakoune configuration
+      run: |
+        mkdir -p ~/.config/kak/autoload
+        cp -r rc/* ~/.config/kak/autoload/
+
     - name: Configure CMake
       run: |
         cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_TESTS=ON
