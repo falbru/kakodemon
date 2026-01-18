@@ -18,6 +18,7 @@ class GLFWApplication : public Application
     void run() override;
 
     void setCursor(domain::Cursor cursor) override;
+    void setWindowTitle(const std::string &title) override;
     void wakeEventLoop() override;
 
   private:

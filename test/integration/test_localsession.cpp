@@ -40,7 +40,7 @@ TEST_CASE("KakouneClient can connect immediately after LocalSession starts", "[i
         auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*remote_session, std::nullopt);
 
         REQUIRE_NOTHROW([&]() {
-            auto client = std::make_unique<KakouneClient>(std::move(remote_session), std::move(interface));
+            auto client = std::make_unique<KakouneClient>(remote_session.get(), std::move(interface));
         }());
     }
 }

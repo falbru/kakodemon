@@ -50,9 +50,11 @@ set(SRC
     src/adapters/opengl/font.cpp
     src/adapters/opengl/renderer.cpp
     src/adapters/opengl/shaderprogram.cpp
+    src/adapters/namedpipe/namedpipecommandinterface.cpp
     src/application/application.cpp
     src/application/applicationbuilder.cpp
     src/application/cliparser.cpp
+    src/application/controller/commandcontroller.cpp
     src/application/controller/editorcontroller.cpp
     src/application/controller/infoboxcontroller.cpp
     src/application/controller/inputcontroller.cpp

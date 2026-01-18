@@ -10,6 +10,7 @@ class RemoteSession : public domain::KakouneSession
     explicit RemoteSession(const std::string &session_id);
 
     std::string getSessionId() const override;
+    void setSessionId(const std::string &session_id) override;
 
   private:
     std::string m_session_id;

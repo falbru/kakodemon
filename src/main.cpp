@@ -1,6 +1,7 @@
 #include "application/application.hpp"
 #include "application/applicationbuilder.hpp"
 #include "application/cliparser.hpp"
+#include "adapters/namedpipe/namedpipecommandinterface.hpp"
 #include "config.hpp"
 #include <iostream>
 #include <memory>
@@ -12,6 +13,7 @@ void print_help(const char* program_name)
               << "  -c <session>      Connect to remote Kakoune session\n"
               << "  -s <session>      Set session name\n"
               << "  -e <command>      Execute command on client initialisation\n"
+              << "  -p <command>      Send command to a running instance (uses KAKOD_ID env)\n"
               << "  --version         Print version and exit\n"
               << "  --help            Print this help message and exit\n\n"
               << "File arguments:\n"
@@ -37,6 +39,18 @@ int main(int argc, char* argv[])
         case ParseResult::ShowHelp:
             print_help(argv[0]);
             return 0;
+        case ParseResult::SendCommand:
+        {
+            NamedPipeCommandInterface interface(parsed_args.command_request.pipe_id, PipeMode::Send);
+            Command cmd;
+            cmd.name = parsed_args.command_request.command;
+            cmd.args = parsed_args.command_request.args;
+            if (!interface.sendCommand(cmd)) {
+                std::cerr << "Error: Failed to send command\n";
+                return 1;
+            }
+            return 0;
+        }
         case ParseResult::Error:
             std::cerr << parsed_args.error_message << "\n";
             return 1;

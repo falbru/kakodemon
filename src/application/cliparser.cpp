@@ -1,4 +1,5 @@
 #include "cliparser.hpp"
+#include <cstdlib>
 #include <getopt.h>
 #include <random>
 #include <sstream>
@@ -22,6 +23,7 @@ ParsedCliArgs parseCliArgs(int argc, char* argv[])
 
     bool remote_session_set = false;
     bool local_session_set = false;
+    bool send_command = false;
 
     static struct option long_options[] = {
         {"version", no_argument, 0, 'v'},
@@ -33,7 +35,7 @@ ParsedCliArgs parseCliArgs(int argc, char* argv[])
 
     int opt;
     int option_index = 0;
-    while ((opt = getopt_long(argc, argv, "c:s:e:", long_options, &option_index)) != -1)
+    while ((opt = getopt_long(argc, argv, "c:s:e:p", long_options, &option_index)) != -1)
     {
         switch (opt)
         {
@@ -49,6 +51,9 @@ ParsedCliArgs parseCliArgs(int argc, char* argv[])
             case 'e':
                 result.config.startup_command = optarg;
                 break;
+            case 'p':
+                send_command = true;
+                break;
             case 'v':
                 result.result = ParseResult::ShowVersion;
                 return result;
@@ -60,6 +65,34 @@ ParsedCliArgs parseCliArgs(int argc, char* argv[])
                 result.error_message = "Invalid option";
                 return result;
         }
+    }
+
+    if (send_command)
+    {
+        const char* id_env = std::getenv("KAKOD_ID");
+        if (!id_env)
+        {
+            result.result = ParseResult::Error;
+            result.error_message = "Error: KAKOD_ID environment variable not set";
+            return result;
+        }
+        result.command_request.pipe_id = id_env;
+
+        if (optind >= argc)
+        {
+            result.result = ParseResult::Error;
+            result.error_message = "Error: -p requires a command";
+            return result;
+        }
+
+        result.command_request.command = argv[optind++];
+        for (int i = optind; i < argc; i++)
+        {
+            result.command_request.args.push_back(argv[i]);
+        }
+
+        result.result = ParseResult::SendCommand;
+        return result;
     }
 
     if (remote_session_set && local_session_set)

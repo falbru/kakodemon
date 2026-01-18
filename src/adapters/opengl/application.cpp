@@ -263,6 +263,10 @@ void opengl::GLFWApplication::setCursor(domain::Cursor cursor) {
     }
 }
 
+void opengl::GLFWApplication::setWindowTitle(const std::string& title) {
+    glfwSetWindowTitle(m_window, title.c_str());
+}
+
 void opengl::GLFWApplication::wakeEventLoop() {
     glfwPostEmptyEvent();
 }

@@ -119,3 +119,8 @@ std::string LocalSession::getSessionId() const
 {
     return m_session_id;
 }
+
+void LocalSession::setSessionId(const std::string& session_id)
+{
+    m_session_id = session_id;
+}

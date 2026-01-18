@@ -6,6 +6,7 @@
 
 #include "adapters/opengl/opengl.hpp"
 #include "application/cliconfig.hpp"
+#include "application/controller/commandcontroller.hpp"
 #include "application/controller/editorcontroller.hpp"
 #include "application/controller/infoboxcontroller.hpp"
 #include "application/controller/inputcontroller.hpp"
@@ -21,9 +22,10 @@
 #include "domain/fontmanager.hpp"
 #include "domain/keys.hpp"
 #include "domain/mouse.hpp"
-#include "domain/ports/font.hpp"
+#include "domain/ports/commandinterface.hpp"
 #include "domain/ports/fontengine.hpp"
 #include "domain/ports/fontresolver.hpp"
+#include "domain/ports/kakounesession.hpp"
 #include "domain/ports/renderer.hpp"
 #include "domain/uioptions.hpp"
 
@@ -42,6 +44,7 @@ class Application
 
     void setClearColor(domain::RGBAColor color);
     virtual void setCursor(domain::Cursor cursor);
+    virtual void setWindowTitle(const std::string &title) = 0;
 
     void onWindowResize(int width, int height);
     void onKeyInput(domain::KeyEvent event);
@@ -74,9 +77,15 @@ class Application
 
     bool m_needs_render = true;
 
+    std::string m_kakodemon_id;
+
+    std::unique_ptr<CommandInterface> m_command_interface;
+
+    std::unique_ptr<domain::KakouneSession> m_kakoune_session;
     std::unique_ptr<KakouneClient> m_kakoune_client;
     std::unique_ptr<domain::UIOptions> m_ui_options;
 
+    std::unique_ptr<CommandController> m_command_controller;
     std::unique_ptr<EditorController> m_editor_controller;
     std::unique_ptr<InputController> m_input_controller;
     std::unique_ptr<MouseController> m_mouse_controller;

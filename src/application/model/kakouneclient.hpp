@@ -8,10 +8,10 @@
 class KakouneClient
 {
   public:
-    KakouneClient(std::unique_ptr<domain::KakouneSession> session, std::unique_ptr<domain::KakouneInterface> interface);
+    KakouneClient(domain::KakouneSession *session, std::unique_ptr<domain::KakouneInterface> interface);
 
     domain::KakouneState state;
-    std::unique_ptr<domain::KakouneSession> session;
+    domain::KakouneSession *session;
     std::unique_ptr<domain::KakouneInterface> interface;
 };
 

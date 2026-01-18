@@ -1,6 +1,8 @@
 #include "application.hpp"
 #include "adapters/kakoune/localsession.hpp"
+#include "adapters/namedpipe/namedpipecommandinterface.hpp"
 #include "application/cliconfig.hpp"
+#include "application/controller/commandcontroller.hpp"
 #include "application/controller/infoboxcontroller.hpp"
 #include "application/controller/menucontroller.hpp"
 #include "application/controller/mousecontroller.hpp"
@@ -18,7 +20,27 @@
 #include "adapters/kakoune/jsonrpckakouneinterface.hpp"
 #include "adapters/kakoune/remotesession.hpp"
 #include "domain/mouse.hpp"
+#include <cstdlib>
 #include <memory>
+#include <random>
+
+namespace {
+
+std::string generateId(size_t length = 8) {
+    static const char charset[] = "abcdefghijklmnopqrstuvwxyz0123456789";
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dist(0, sizeof(charset) - 2);
+
+    std::string id;
+    id.reserve(length);
+    for (size_t i = 0; i < length; ++i) {
+        id += charset[dist(gen)];
+    }
+    return id;
+}
+
+}
 
 Application::Application()
 {
@@ -38,22 +60,28 @@ void Application::setFontDependencies(
 
 void Application::init(const CliConfig &config)
 {
-    std::unique_ptr<domain::KakouneSession> session;
+    m_kakodemon_id = generateId();
+    setenv("KAKOD_ID", m_kakodemon_id.c_str(), 1);
+
+    m_command_interface = std::make_unique<NamedPipeCommandInterface>(m_kakodemon_id, PipeMode::Receive);
+    m_command_interface->setWakeEventLoopCallback([this]() { wakeEventLoop(); });
+    m_command_interface->init();
 
     if (config.session_type == SessionType::Remote)
     {
-        session = std::make_unique<RemoteSession>(config.session_id);
+        m_kakoune_session = std::make_unique<RemoteSession>(config.session_id);
     }else {
         auto local_session = std::make_unique<LocalSession>(config.session_id);
         local_session->start();
-        session = std::move(local_session);
+        m_kakoune_session = std::move(local_session);
     }
 
-    auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*session, config.startup_command, config.file_arguments);
+    auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*m_kakoune_session, config.startup_command, config.file_arguments);
     interface->setWakeEventLoopCallback([this]() { wakeEventLoop(); });
-    m_kakoune_client = std::make_unique<KakouneClient>(std::move(session), std::move(interface));
+    m_kakoune_client = std::make_unique<KakouneClient>(m_kakoune_session.get(), std::move(interface));
     m_ui_options = std::make_unique<domain::UIOptions>();
 
+    m_command_controller = std::make_unique<CommandController>();
     m_editor_controller = std::make_unique<EditorController>();
     m_input_controller = std::make_unique<InputController>();
     m_mouse_controller = std::make_unique<MouseController>();
@@ -74,6 +102,7 @@ void Application::init(const CliConfig &config)
     m_search_menu->init(m_renderer.get());
     m_info_box->init(m_renderer.get(), m_menu_controller.get(), m_kakoune_content_view.get(), m_status_bar.get());
 
+    m_command_controller->init(m_command_interface.get(), m_kakoune_session.get(), [this](const std::string &title) { setWindowTitle(title); });
     m_input_controller->init(m_kakoune_client.get());
     m_menu_controller->init(m_kakoune_client.get(), m_editor_controller.get(), m_font_manager.get(), m_prompt_menu.get(), m_inline_menu.get(), m_search_menu.get(), [this]() { markDirty(); });
     m_editor_controller->init(m_kakoune_client.get(), m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager.get(), [&](domain::RGBAColor color) { setClearColor(color); }, m_menu_controller.get());
@@ -90,6 +119,7 @@ void Application::init(const CliConfig &config)
 
 void Application::updateControllers()
 {
+    m_command_controller->update();
     m_input_controller->update();
     bool state_updated = m_editor_controller->update(*m_ui_options.get());
     if (state_updated) {
