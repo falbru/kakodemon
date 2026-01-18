@@ -53,6 +53,7 @@ set(SRC
     src/adapters/namedpipe/namedpipecommandinterface.cpp
     src/application/application.cpp
     src/application/applicationbuilder.cpp
+    src/application/applicationconfig.cpp
     src/application/cliparser.cpp
     src/application/controller/commandcontroller.cpp
     src/application/controller/editorcontroller.cpp

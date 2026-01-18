@@ -14,7 +14,7 @@ class GLFWApplication : public Application
     GLFWApplication();
     ~GLFWApplication();
 
-    void init(const CliConfig &config) override;
+    void init(const CliConfig &cli_config, ApplicationConfig &app_config) override;
     void run() override;
 
     void setCursor(domain::Cursor cursor) override;

@@ -58,8 +58,9 @@ void Application::setFontDependencies(
     m_font_engine_factory = engine_factory;
 }
 
-void Application::init(const CliConfig &config)
+void Application::init(const CliConfig &cli_config, ApplicationConfig &app_config)
 {
+    m_app_config = &app_config;
     m_kakodemon_id = generateId();
     setenv("KAKOD_ID", m_kakodemon_id.c_str(), 1);
 
@@ -67,16 +68,16 @@ void Application::init(const CliConfig &config)
     m_command_interface->setWakeEventLoopCallback([this]() { wakeEventLoop(); });
     m_command_interface->init();
 
-    if (config.session_type == SessionType::Remote)
+    if (cli_config.session_type == SessionType::Remote)
     {
-        m_kakoune_session = std::make_unique<RemoteSession>(config.session_id);
+        m_kakoune_session = std::make_unique<RemoteSession>(cli_config.session_id);
     }else {
-        auto local_session = std::make_unique<LocalSession>(config.session_id);
+        auto local_session = std::make_unique<LocalSession>(cli_config.session_id);
         local_session->start();
         m_kakoune_session = std::move(local_session);
     }
 
-    auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*m_kakoune_session, config.startup_command, config.file_arguments);
+    auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*m_kakoune_session, cli_config.startup_command, cli_config.file_arguments);
     interface->setWakeEventLoopCallback([this]() { wakeEventLoop(); });
     m_kakoune_client = std::make_unique<KakouneClient>(m_kakoune_session.get(), std::move(interface));
     m_ui_options = std::make_unique<domain::UIOptions>();

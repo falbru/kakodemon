@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "adapters/opengl/opengl.hpp"
+#include "application/applicationconfig.hpp"
 #include "application/cliconfig.hpp"
 #include "application/controller/commandcontroller.hpp"
 #include "application/controller/editorcontroller.hpp"
@@ -39,7 +40,7 @@ class Application
 
     void setFontDependencies(std::unique_ptr<domain::FontResolver> resolver, FontEngineFactory engine_factory);
 
-    virtual void init(const CliConfig &config);
+    virtual void init(const CliConfig &cli_config, ApplicationConfig &app_config);
     virtual void run() = 0;
 
     void setClearColor(domain::RGBAColor color);
@@ -78,6 +79,7 @@ class Application
     bool m_needs_render = true;
 
     std::string m_kakodemon_id;
+    ApplicationConfig *m_app_config;
 
     std::unique_ptr<CommandInterface> m_command_interface;
 

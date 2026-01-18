@@ -1,5 +1,6 @@
 #include "application/application.hpp"
 #include "application/applicationbuilder.hpp"
+#include "application/applicationconfig.hpp"
 #include "application/cliparser.hpp"
 #include "adapters/namedpipe/namedpipecommandinterface.hpp"
 #include "config.hpp"
@@ -58,6 +59,8 @@ int main(int argc, char* argv[])
             break;
     }
 
+    ApplicationConfig app_config = loadApplicationConfig();
+
     ApplicationBuilder builder;
     std::unique_ptr<Application> app = builder
         .withPlatform(PlatformType::OPENGL_GLFW)
@@ -65,7 +68,7 @@ int main(int argc, char* argv[])
         .withFontEngine(FontEngineType::FREETYPE)
         .build();
 
-    app->init(parsed_args.config);
+    app->init(parsed_args.config, app_config);
     app->run();
     return 0;
 }

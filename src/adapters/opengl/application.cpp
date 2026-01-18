@@ -18,7 +18,7 @@ opengl::GLFWApplication::~GLFWApplication() {
     glfwTerminate();
 }
 
-void opengl::GLFWApplication::init(const CliConfig& config) {
+void opengl::GLFWApplication::init(const CliConfig& cli_config, ApplicationConfig& app_config) {
     if (!glfwInit()) {
         return;
     }
@@ -26,6 +26,9 @@ void opengl::GLFWApplication::init(const CliConfig& config) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    if (app_config.maximized) {
+        glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+    }
 
     glfwWindowHintString(GLFW_WAYLAND_APP_ID, "kakodemon");
     glfwWindowHintString(GLFW_X11_CLASS_NAME, "Kakodemon");
@@ -80,6 +83,12 @@ void opengl::GLFWApplication::init(const CliConfig& config) {
         app->onMouseScroll(yoffset);
     });
 
+    glfwSetWindowMaximizeCallback(m_window, [](GLFWwindow* window, int maximized) {
+        GLFWApplication* app = static_cast<GLFWApplication*>(glfwGetWindowUserPointer(window));
+        app->m_app_config->maximized = maximized == GLFW_TRUE;
+        saveApplicationConfig(*app->m_app_config);
+    });
+
     int framebuffer_width, framebuffer_height;
     glfwGetFramebufferSize(m_window, &framebuffer_width, &framebuffer_height);
 
@@ -100,7 +109,7 @@ void opengl::GLFWApplication::init(const CliConfig& config) {
 
     m_renderer->init(framebuffer_width, framebuffer_height);
 
-    Application::init(config);
+    Application::init(cli_config, app_config);
 
     onWindowResize(framebuffer_width, framebuffer_height);
 }
