@@ -57,8 +57,8 @@ Kakodemon is configured by setting the option `ui_options` in Kakoune. The follo
 
 ```kak
 set-option global ui_options \
+    'kakodemon_set_font=JetBrains Mono 10' \
     'kakodemon_set_font_content=JetBrains Mono 14' \
-    'kakodemon_set_font_menu=JetBrains Mono 10' \
     'kakodemon_set_color_red=rgb:FF5555' \
     'kakodemon_set_color_green=rgb:50FA7B' \
     'kakodemon_set_color_border=rgb:44475A'
