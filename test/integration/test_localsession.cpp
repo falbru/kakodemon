@@ -100,3 +100,39 @@ TEST_CASE("RemoteSession connects to existing session", "[integration][remoteses
         auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*remote_session, std::nullopt);
     }());
 }
+
+TEST_CASE("LocalSession destructor kills renamed session", "[integration][localsession]") {
+    std::string original_session_id = "test_rename_session_" + std::to_string(getpid());
+    std::string new_session_id = "test_renamed_session_" + std::to_string(getpid());
+
+    {
+        auto session = std::make_unique<LocalSession>(original_session_id);
+        session->start();
+
+        std::string cmd = "kak -l | grep " + original_session_id;
+        int result = system(cmd.c_str());
+        REQUIRE(WEXITSTATUS(result) == 0);
+
+        std::string rename_cmd = "echo 'rename-session " + new_session_id + "' | kak -p " + original_session_id;
+        system(rename_cmd.c_str());
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+        std::string verify_new_cmd = "kak -l | grep " + new_session_id;
+        result = system(verify_new_cmd.c_str());
+        REQUIRE(WEXITSTATUS(result) == 0);
+
+        std::string verify_old_cmd = "kak -l | grep " + original_session_id;
+        result = system(verify_old_cmd.c_str());
+        REQUIRE(WEXITSTATUS(result) != 0);
+
+        session->setSessionId(new_session_id);
+        REQUIRE(session->getSessionId() == new_session_id);
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    std::string cmd = "kak -l | grep " + new_session_id;
+    int result = system(cmd.c_str());
+    REQUIRE(WEXITSTATUS(result) != 0);
+}
