@@ -11,6 +11,7 @@ add_executable(tests
     integration/test_fontconfigresolver.cpp
     integration/test_localsession.cpp
     integration/test_kakouneclientprocess.cpp
+    integration/test_namedpipecommandinterface.cpp
     ${CMAKE_SOURCE_DIR}/src/application/cliparser.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/fontconfig/fontconfigresolver.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/atom.cpp
@@ -24,6 +25,7 @@ add_executable(tests
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/line.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/menustyle.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/localsession.cpp
+    ${CMAKE_SOURCE_DIR}/src/adapters/namedpipe/namedpipecommandinterface.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/remotesession.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/uioptions.cpp
     ${CMAKE_SOURCE_DIR}/src/application/model/kakouneclient.cpp
