@@ -1,6 +1,4 @@
 #include "application/controller/menucontroller.hpp"
-#include "application/model/kakouneclient.hpp"
-#include "domain/alignment.hpp"
 #include "domain/color.hpp"
 #include "domain/geometry.hpp"
 #include "domain/glyphlinesbuilder.hpp"
@@ -424,15 +422,20 @@ void InfoBoxView::render(const RenderContext &render_context, const domain::Info
         m_menu_controller->height(),
     };
 
-    Placement placement;
+    std::optional<Placement> placement_opt;
     for (const auto& dir : fallback_directions)
     {
         auto current_placement = tryPlaceInfoBox(dir, alignment, info_box.content, info_box.title, anchor, render_context.screen_width, render_context.screen_height, font, render_context.font_manager, menu_rectangle, cursor_position, render_context.ui_options.font_content);
         if (current_placement.has_value()) {
-            placement = current_placement.value();
+            placement_opt = current_placement.value();
             break;
         }
     }
+
+    if (!placement_opt.has_value()) {
+        return;
+    }
+    auto placement = placement_opt.value();
 
     float infobox_height = placement.bounds.height + SPACING_MEDIUM * 2.0f + BORDER_THICKNESS * 2.0f;
 
