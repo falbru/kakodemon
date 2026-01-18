@@ -130,33 +130,36 @@ domain::UIOptions JsonRpcKakouneInterface::getUIOptions(domain::FontManager* fon
     if (m_ui_options.font.has_value()) {
         ui_options.font = font_manager->getFontFromName(m_ui_options.font.value());
         domain::loadBasicGlyphs(ui_options.font); // TODO check if the font is new
+    }else {
+        ui_options.font = font_manager->getDefaultFont(14);
+        domain::loadBasicGlyphs(ui_options.font);
     }
 
     if (m_ui_options.font_menu.has_value()) {
         ui_options.font_menu = font_manager->getFontFromName(m_ui_options.font_menu.value());
         domain::loadBasicGlyphs(ui_options.font_menu);
-    } else if (ui_options.font) {
+    } else {
         ui_options.font_menu = ui_options.font;
     }
 
     if (m_ui_options.font_infobox.has_value()) {
         ui_options.font_infobox = font_manager->getFontFromName(m_ui_options.font_infobox.value());
         domain::loadBasicGlyphs(ui_options.font_infobox);
-    } else if (ui_options.font) {
+    } else {
         ui_options.font_infobox = ui_options.font;
     }
 
     if (m_ui_options.font_statusbar.has_value()) {
         ui_options.font_statusbar = font_manager->getFontFromName(m_ui_options.font_statusbar.value());
         domain::loadBasicGlyphs(ui_options.font_statusbar);
-    } else if (ui_options.font) {
+    } else {
         ui_options.font_statusbar = ui_options.font;
     }
 
     if (m_ui_options.font_content.has_value()) {
         ui_options.font_content = font_manager->getFontFromName(m_ui_options.font_content.value());
         domain::loadBasicGlyphs(ui_options.font_content);
-    } else if (ui_options.font) {
+    } else {
         ui_options.font_content = ui_options.font;
     }
 

@@ -30,6 +30,7 @@ class FontManager
     FontManager(std::unique_ptr<FontResolver> resolver, FontEngineFactory engine_factory, FontFactory font_factory);
 
     Font *getFontFromName(const std::string &pattern);
+    Font *getDefaultFont(int size);
     Font *getFontForCodepoint(Codepoint c, Font *primary_font);
     Font *getFontStyleVariant(Font *base_font, FontStyle style);
 
@@ -55,6 +56,7 @@ class FontManager
     std::map<Font *, FontMatch> m_font_to_match;
     std::map<Font *, std::map<FontStyle, Font *>> m_style_variant_cache;
     std::map<std::string, Font *> m_name_cache;
+    std::map<int, Font *> m_default_font_cache;
 };
 
 } // namespace domain

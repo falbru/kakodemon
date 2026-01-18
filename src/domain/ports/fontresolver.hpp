@@ -29,6 +29,7 @@ class FontResolver
     virtual ~FontResolver() = default;
 
     virtual FontMatch resolve(const std::string &pattern) = 0;
+    virtual FontMatch resolveDefault(int size) = 0;
     virtual std::optional<FontMatch> resolveForCodepoint(Codepoint codepoint) = 0;
     virtual std::optional<FontMatch> resolveStyleVariant(const FontMatch &base_font, FontStyle style) = 0;
 };

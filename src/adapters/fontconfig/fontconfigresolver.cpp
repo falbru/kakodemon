@@ -19,6 +19,58 @@ FontconfigResolver::~FontconfigResolver()
     FcFini();
 }
 
+domain::FontMatch FontconfigResolver::resolveDefault(int size)
+{
+    FcConfig *config = FcConfigGetCurrent();
+
+    FcPattern *pat = FcPatternCreate();
+    if (!pat)
+    {
+        spdlog::error("Failed to create font pattern for default font");
+        return domain::FontMatch{"", 0, 0};
+    }
+
+    FcPatternAddString(pat, FC_FAMILY, reinterpret_cast<const FcChar8*>("monospace"));
+    FcPatternAddDouble(pat, FC_SIZE, static_cast<double>(size));
+    FcPatternAddInteger(pat, FC_SPACING, FC_MONO);
+
+    FcConfigSubstitute(config, pat, FcMatchPattern);
+    FcDefaultSubstitute(pat);
+
+    FcResult result;
+    FcPattern *font = FcFontMatch(config, pat, &result);
+
+    domain::FontMatch match{"", 0, 0};
+
+    if (font && result == FcResultMatch)
+    {
+        FcChar8 *file = nullptr;
+        if (FcPatternGetString(font, FC_FILE, 0, &file) == FcResultMatch)
+        {
+            match.path = reinterpret_cast<char*>(file);
+            spdlog::debug("Resolved default font to: {}", match.path);
+        }
+
+        match.size = size;
+
+        int face_index = 0;
+        if (FcPatternGetInteger(font, FC_INDEX, 0, &face_index) == FcResultMatch)
+        {
+            match.face_index = face_index;
+        }
+
+        FcPatternDestroy(font);
+    }
+    else
+    {
+        spdlog::warn("Failed to match default font pattern");
+    }
+
+    FcPatternDestroy(pat);
+
+    return match;
+}
+
 domain::FontMatch FontconfigResolver::resolve(const std::string& pattern)
 {
     FcConfig *config = FcConfigGetCurrent();

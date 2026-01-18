@@ -52,6 +52,20 @@ Font *FontManager::getFontFromName(const std::string &pattern)
     return font;
 }
 
+Font *FontManager::getDefaultFont(int size)
+{
+    auto it = m_default_font_cache.find(size);
+    if (it != m_default_font_cache.end())
+    {
+        return it->second;
+    }
+
+    auto match = m_resolver->resolveDefault(size);
+    Font *font = getOrCreateFont(match);
+    m_default_font_cache[size] = font;
+    return font;
+}
+
 Font *FontManager::getFontForCodepoint(Codepoint c, Font *primary_font)
 {
     int primary_size = primary_font->getSize();
