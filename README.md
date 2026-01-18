@@ -15,13 +15,13 @@ sudo apt install -y git build-essential cmake libwayland-dev libxkbcommon-dev xo
 2. Clone the repository
 
 ```sh
-git clone https://github.com/falbru/kakodemon
+git clone https://github.com/falbru/kakodemon ~/.config/kak/autoload/
 ```
 
 3. Build and install the project
 
 ```sh
-cd kakodemon
+cd ~/.config/kak/autoload/kakodemon
 mkdir build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
