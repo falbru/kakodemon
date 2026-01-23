@@ -15,10 +15,17 @@ NamedPipeCommandInterface::NamedPipeCommandInterface(const std::string& pipe_id,
 
 NamedPipeCommandInterface::~NamedPipeCommandInterface() {
     m_running.store(false);
-    if (m_read_thread.joinable()) {
-        m_read_thread.join();
-    }
     if (m_mode == PipeMode::Receive || m_mode == PipeMode::Both) {
+        int fd = open(m_pipe_path.c_str(), O_WRONLY);
+        if (fd != -1) {
+            ssize_t written = write(fd, "a", 1);
+            close(fd);
+        }
+
+        if (m_read_thread.joinable()) {
+            m_read_thread.join();
+        }
+
         unlink(m_pipe_path.c_str());
     }
 }
@@ -47,78 +54,67 @@ void NamedPipeCommandInterface::readLoop() {
         return;
     }
 
-    int fd = open(m_pipe_path.c_str(), O_RDONLY | O_NONBLOCK);
+    int fd = open(m_pipe_path.c_str(), O_RDONLY);
     if (fd == -1) {
         spdlog::error("Failed to open named pipe for reading: {}", strerror(errno));
         return;
     }
 
     while (m_running.load()) {
-        struct pollfd pfd;
-        pfd.fd = fd;
-        pfd.events = POLLIN;
+        std::string buffer;
+        char chunk[256];
+        ssize_t bytes_read;
 
-        int ret = poll(&pfd, 1, 1000);
+        while ((bytes_read = read(fd, chunk, sizeof(chunk) - 1)) > 0) {
+            chunk[bytes_read] = '\0';
+            buffer += chunk;
 
-        if (ret == -1) {
-            if (errno == EINTR) {
-                continue;
+            if (strchr(chunk, '\n') != nullptr) {
+                break;
             }
-            spdlog::error("poll() failed: {}", strerror(errno));
+        }
+
+        if (bytes_read == 0) {
+            close(fd);
+            fd = open(m_pipe_path.c_str(), O_RDONLY);
+            if (fd == -1) {
+                spdlog::error("Failed to open named pipe for reading: {}", strerror(errno));
+                return;
+            }
+        }
+
+        if (bytes_read == -1 && errno != EAGAIN && errno != EWOULDBLOCK) {
+            spdlog::error("read() failed: {}", strerror(errno));
             break;
         }
 
-        if (ret == 0) {
+        if (buffer.empty()) {
             continue;
         }
 
-        if (pfd.revents & POLLIN) {
-            std::string buffer;
-            char chunk[256];
-            ssize_t bytes_read;
-
-            while ((bytes_read = read(fd, chunk, sizeof(chunk) - 1)) > 0) {
-                chunk[bytes_read] = '\0';
-                buffer += chunk;
-            }
-
-            if (bytes_read == -1 && errno != EAGAIN && errno != EWOULDBLOCK) {
-                spdlog::error("read() failed: {}", strerror(errno));
-                break;
-            }
-
-            if (buffer.empty()) {
+        std::istringstream stream(buffer);
+        std::string line;
+        while (std::getline(stream, line)) {
+            if (line.empty()) {
                 continue;
             }
-
-            std::istringstream stream(buffer);
-            std::string line;
-            while (std::getline(stream, line)) {
-                if (line.empty()) {
-                    continue;
+            try {
+                nlohmann::json json = nlohmann::json::parse(line);
+                Command cmd;
+                cmd.name = json.at("command").get<std::string>();
+                if (json.contains("args")) {
+                    cmd.args = json.at("args").get<std::vector<std::string>>();
                 }
-                try {
-                    nlohmann::json json = nlohmann::json::parse(line);
-                    Command cmd;
-                    cmd.name = json.at("command").get<std::string>();
-                    if (json.contains("args")) {
-                        cmd.args = json.at("args").get<std::vector<std::string>>();
-                    }
-                    {
-                        std::lock_guard<std::mutex> lock(m_commands_mutex);
-                        m_pending_commands.push_back(std::move(cmd));
-                    }
-                    if (m_wake_event_loop_callback) {
-                        m_wake_event_loop_callback();
-                    }
-                } catch (const nlohmann::json::exception& e) {
-                    spdlog::warn("Failed to parse command JSON: {}", e.what());
+                {
+                    std::lock_guard<std::mutex> lock(m_commands_mutex);
+                    m_pending_commands.push_back(std::move(cmd));
                 }
+                if (m_wake_event_loop_callback) {
+                    m_wake_event_loop_callback();
+                }
+            } catch (const nlohmann::json::exception& e) {
+                spdlog::warn("Failed to parse command JSON: {}", e.what());
             }
-        }
-
-        if (pfd.revents & (POLLHUP | POLLERR)) {
-            continue;
         }
     }
 

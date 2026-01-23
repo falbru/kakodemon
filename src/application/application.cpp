@@ -8,7 +8,6 @@
 #include "application/controller/mousecontroller.hpp"
 #include "application/view/searchmenu.hpp"
 #include "domain/color.hpp"
-#include "domain/ports/kakounesession.hpp"
 #include "domain/keys.hpp"
 #include "application/controller/editorcontroller.hpp"
 #include "application/controller/inputcontroller.hpp"
