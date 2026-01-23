@@ -31,14 +31,6 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
 {
     domain::GlyphLines glyph_lines = domain::GlyphLinesBuilder::build(content, font, font_manager);
 
-    float title_height = 0.0f;
-    float title_width = 0.0f;
-    if (title.size() > 0) {
-        title_height = font->getLineHeight() + BORDER_THICKNESS + SPACING_SMALL + SPACING_MEDIUM;
-        domain::GlyphLine title_glyph_line = domain::GlyphLinesBuilder::build(title, font, font_manager);
-        title_width = title_glyph_line.width();
-    }
-
     domain::Rectangle cursor_rect;
     bool has_cursor = false;
 
@@ -52,11 +44,17 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
         has_cursor = true;
     }
 
-    domain::Rectangle info_box;
+    float title_height = 0.0f;
+    float title_width = 0.0f;
+    if (title.size() > 0) {
+        title_height = font->getLineHeight() + BORDER_THICKNESS + SPACING_SMALL + SPACING_MEDIUM;
+        domain::GlyphLine title_glyph_line = domain::GlyphLinesBuilder::build(title, font, font_manager);
+        title_width = title_glyph_line.width();
+    }
 
+    domain::Rectangle info_box;
     info_box.width = std::max(glyph_lines.width(), title_width);
     info_box.height = glyph_lines.height();
-
     if (info_box.width > MAX_WIDTH - SPACING_MEDIUM * 2.0f)
     {
         glyph_lines.wrap(MAX_WIDTH - SPACING_MEDIUM * 2.0f);
@@ -70,7 +68,7 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
     {
     case PlacementDirection::RIGHT:
     case PlacementDirection::RIGHT_WRAPPED: {
-        info_box.x = anchor.x + anchor.width;
+        info_box.x = anchor.x + anchor.width + SPACING_MEDIUM;
 
         if (direction == PlacementDirection::RIGHT_WRAPPED)
         {
@@ -138,7 +136,7 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
     case PlacementDirection::LEFT_WRAPPED: {
         if (direction == PlacementDirection::LEFT_WRAPPED)
         {
-            float available_width = anchor.x - SPACING_MEDIUM * 2.0f;
+            float available_width = anchor.x - SPACING_MEDIUM * 3.0f;
             if (available_width < MIN_WIDTH)
                 return std::nullopt;
 
@@ -166,7 +164,7 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
             info_box.height = MAX_HEIGHT;
         }
 
-        info_box.x = anchor.x - info_box.width - SPACING_MEDIUM * 2.0f;
+        info_box.x = anchor.x - info_box.width - SPACING_MEDIUM * 3.0f;
 
         if (info_box.x < 0)
         {
@@ -215,7 +213,7 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
         }
 
         float total_height = info_box.height + SPACING_MEDIUM * 2.0f + BORDER_THICKNESS * 2.0f + title_height;
-        info_box.y = anchor.y - total_height;
+        info_box.y = anchor.y - total_height - SPACING_MEDIUM;
 
         if (info_box.y < 0)
         {
@@ -251,7 +249,7 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
     }
     case PlacementDirection::BELOW: {
         info_box.x = anchor.x;
-        info_box.y = anchor.y + anchor.height;
+        info_box.y = anchor.y + anchor.height + SPACING_MEDIUM;
 
         glyph_lines.wrap(layout_width);
         info_box.width = std::max(glyph_lines.width(), title_width);
@@ -413,8 +411,6 @@ void InfoBoxView::render(const RenderContext &render_context, const domain::Info
         break;
     }
 
-    fallback_directions.insert(fallback_directions.begin(), direction);
-
     domain::Rectangle menu_rectangle = {
         m_menu_controller->x(),
         m_menu_controller->y(),
@@ -423,7 +419,12 @@ void InfoBoxView::render(const RenderContext &render_context, const domain::Info
     };
 
     std::optional<Placement> placement_opt;
-    for (const auto& dir : fallback_directions)
+
+    std::vector<PlacementDirection> directions;
+    directions.reserve(fallback_directions.size() + 1);
+    directions.insert(directions.begin(), direction);
+    directions.insert(directions.begin() + 1, fallback_directions.begin(), fallback_directions.end());
+    for (const auto& dir : directions)
     {
         auto current_placement = tryPlaceInfoBox(dir, alignment, info_box.content, info_box.title, anchor, render_context.screen_width, render_context.screen_height, font, render_context.font_manager, menu_rectangle, cursor_position, render_context.ui_options.font_content);
         if (current_placement.has_value()) {
