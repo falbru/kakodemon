@@ -11,6 +11,7 @@
 #include "domain/utf8string.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "opengl.hpp"
+#include "spdlog/spdlog.h"
 
 opengl::Renderer::Renderer() {
 }
@@ -252,7 +253,7 @@ void opengl::Renderer::_renderRect(const domain::RGBAColor color, float x, float
         {x, y}, {x + width, y + height}, {x + width, y}};
 
     glBindVertexArray(m_rect_vao);
-    m_shader_program->setVector4f("rectColor", color.r, color.g, color.b, 1.0f);
+    m_shader_program->setVector4f("rectColor", color.r, color.g, color.b, color.a);
     m_shader_program->setRenderType(RenderType::Rectangle);
     glBindBuffer(GL_ARRAY_BUFFER, m_rect_vbo);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
