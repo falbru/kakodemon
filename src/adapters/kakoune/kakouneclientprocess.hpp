@@ -2,6 +2,7 @@
 #define KAKOUNECLIENTPROCESS_HPP_INCLUDED
 
 #include <sys/poll.h>
+#include <sys/types.h>
 
 #include <string>
 #include <variant>
@@ -171,10 +172,13 @@ class KakouneClientProcess
 
     void sendRequest(const OutgoingRequest &request);
 
+    bool isClientRunning();
+
   private:
     std::optional<IncomingRequest> parseRequest(std::string request);
 
     std::string m_session_name;
+    pid_t m_child_pid = -1;
 
     int m_stdout_pipefd[2];
     int m_stdin_pipefd[2];
@@ -184,6 +188,8 @@ class KakouneClientProcess
 
     std::function<void(const IncomingRequest &)> m_request_callback;
     std::string m_request_remainder;
+
+    bool m_client_exited = false;
 };
 
 #endif

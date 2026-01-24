@@ -95,6 +95,7 @@ void KakouneClientProcess::start(std::optional<std::string> startup_command, con
     }
     else
     {
+        m_child_pid = pid;
         close(m_stdout_pipefd[1]);
         close(m_stdin_pipefd[0]);
         m_pollfd.fd = m_stdout_pipefd[0];
@@ -105,6 +106,24 @@ void KakouneClientProcess::start(std::optional<std::string> startup_command, con
 void KakouneClientProcess::setRequestCallback(std::function<void(const IncomingRequest &)> callback)
 {
     m_request_callback = callback;
+}
+
+bool KakouneClientProcess::isClientRunning()
+{
+    if (m_client_exited || m_child_pid <= 0)
+    {
+        return false;
+    }
+
+    int status;
+    pid_t result = waitpid(m_child_pid, &status, WNOHANG);
+    if (result == m_child_pid)
+    {
+        m_client_exited = true;
+        return false;
+    }
+
+    return true;
 }
 
 void KakouneClientProcess::pollForRequests()

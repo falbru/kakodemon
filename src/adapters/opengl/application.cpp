@@ -116,7 +116,7 @@ void opengl::GLFWApplication::init(const CliConfig& cli_config, ApplicationConfi
 void opengl::GLFWApplication::run() {
     glfwSwapBuffers(m_window); // Updates the backbuffer size
 
-    while (!glfwWindowShouldClose(m_window))
+    while (!glfwWindowShouldClose(m_window) && m_kakoune_client->interface->isClientRunning())
     {
         glfwWaitEvents();
 

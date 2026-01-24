@@ -33,6 +33,8 @@ class JsonRpcKakouneInterface : public domain::KakouneInterface
     void releaseMouseButton(domain::MouseButton button, int line, int column) override;
     void selectMenuItem(int index) override;
 
+    bool isClientRunning() override;
+
   private:
     std::unique_ptr<KakouneClientProcess> m_process;
     std::unique_ptr<KakouneFrameStateManager> m_frame_state_manager;
