@@ -68,7 +68,7 @@ void EditorController::render(const domain::UIOptions& ui_options)
     m_kakoune_content_view->setWidth(m_width);
     m_content_height = m_rows * m_kakoune_content_view->getCellHeight(ui_options.font_content);
     m_kakoune_content_view->setHeight(m_content_height);
-    m_status_bar_view->render(render_context, m_kakoune_client->state.mode_line);
+    m_status_bar_view->render(render_context, m_kakoune_client->state.mode_line, m_kakoune_client->state.cursor_position);
 }
 
 void EditorController::onWindowResize(int width, int height, const domain::UIOptions& ui_options) {

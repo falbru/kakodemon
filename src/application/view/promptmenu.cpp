@@ -23,11 +23,8 @@ void PromptMenuView::render(const RenderContext& render_context, const domain::M
 {
     domain::Font* font = render_context.ui_options.font_menu;
 
-    m_input->setPrompt(menu.getInput().getPrompt());
-    m_input->setContent(menu.getInput().getContent());
-
     m_x = (render_context.screen_width - WIDTH) / 2;
-    m_height = 2 * BORDER_THICKNESS + 2 * SPACING_MEDIUM + m_input->height(font);
+    m_height = 2 * BORDER_THICKNESS + 4 * SPACING_MEDIUM + m_input->height(font);
 
     float items_size = menu.hasItems() ? std::min(MAX_VISIBLE_ITEMS, (int)menu.getItems().items.size()) : 0;
     if (items_size > 0)
@@ -45,11 +42,13 @@ void PromptMenuView::render(const RenderContext& render_context, const domain::M
 
     m_renderer->renderRoundedRect(
         menu.getInputFace().getBg(render_context.default_face, render_context.ui_options.color_overrides), layout.current().x,
-        layout.current().y, layout.current().width, SPACING_MEDIUM + m_input->height(font) + SPACING_MEDIUM, domain::CornerRadius(CORNER_RADIUS, CORNER_RADIUS, items_size > 0 ? 0.0f : CORNER_RADIUS, items_size > 0 ? 0.0f : CORNER_RADIUS));
+        layout.current().y, layout.current().width, 4 * SPACING_MEDIUM + m_input->height(font), domain::CornerRadius(CORNER_RADIUS, CORNER_RADIUS, items_size > 0 ? 0.0f : CORNER_RADIUS, items_size > 0 ? 0.0f : CORNER_RADIUS));
 
     layout.pad(SPACING_MEDIUM);
 
-    m_input->render(m_renderer, render_context, menu.getInput(), menu.getInputFace(), cursor_column, layout);
+    LayoutManager input_layout = layout.sliceTop(SPACING_MEDIUM * 2 + m_input->height(font));
+    input_layout.pad(SPACING_MEDIUM, 0);
+    m_input->render(m_renderer, render_context, font, menu.getInput(), menu.getInputFace(), cursor_column, input_layout);
 
     if (menu.hasItems())
     {

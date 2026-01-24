@@ -4,21 +4,8 @@
 
 Input::Input() {}
 
-void Input::setPrompt(const domain::Line& prompt) { m_prompt = prompt; }
-
-void Input::setContent(const domain::Line& content) { m_content = content; }
-
-void Input::render(domain::Renderer *renderer, const RenderContext &render_context, const domain::StatusLine &input, const domain::Face &face, int cursor_column, LayoutManager &layout) {
-  domain::Font* font = render_context.ui_options.font_menu;
+void Input::render(domain::Renderer *renderer, const RenderContext &render_context, domain::Font* font, const domain::StatusLine &input, const domain::Face &face, int cursor_column, LayoutManager &layout) {
   auto input_layout = layout.sliceTop(height(font));
-
-  renderer->renderRect(face.getBg(render_context.default_face, render_context.ui_options.color_overrides),
-                       input_layout.current().x,
-                       input_layout.current().y,
-                       input_layout.current().width,
-                       input_layout.current().height);
-
-  input_layout.pad(PADDING);
 
   if (input.getPrompt().size() > 0) {
       auto prompt_layout = input_layout.sliceLeft(domain::GlyphLinesBuilder::build(input.getPrompt(), font, render_context.font_manager).width());
@@ -55,5 +42,5 @@ void Input::render(domain::Renderer *renderer, const RenderContext &render_conte
 }
 
 float Input::height(domain::Font* font) const {
-  return PADDING * 2 + font->getLineHeight();
+  return font->getLineHeight();
 }

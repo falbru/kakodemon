@@ -1,4 +1,5 @@
 #include "application/view/searchmenu.hpp"
+#include "application/view/layoutmanager.hpp"
 #include "application/view/styling.hpp"
 #include "application/view/widgets/input.hpp"
 #include "application/view/widgets/scrolledmenuitems.hpp"
@@ -17,11 +18,8 @@ void SearchMenuView::init(domain::Renderer *renderer) {
 void SearchMenuView::render(const RenderContext &render_context, const domain::Menu &menu, int cursor_column) {
     domain::Font* font = render_context.ui_options.font_menu;
 
-    m_input->setPrompt(menu.getInput().getPrompt());
-    m_input->setContent(menu.getInput().getContent());
-
     m_x = render_context.screen_width - WIDTH;
-    m_height = BORDER_THICKNESS + 2 * SPACING_MEDIUM + m_input->height(font);
+    m_height = BORDER_THICKNESS + 4 * SPACING_MEDIUM + m_input->height(font);
 
     float items_size = menu.hasItems() ? std::min(MAX_VISIBLE_ITEMS, (int)menu.getItems().items.size()) : 0;
     if (items_size > 0)
@@ -42,16 +40,18 @@ void SearchMenuView::render(const RenderContext &render_context, const domain::M
     if (items_size > 0) {
         m_renderer->renderRect(
             menu.getInputFace().getBg(render_context.default_face, render_context.ui_options.color_overrides), layout.current().x,
-            layout.current().y, layout.current().width, SPACING_MEDIUM + m_input->height(font));
+            layout.current().y, layout.current().width, 3 * SPACING_MEDIUM + m_input->height(font));
     } else {
         m_renderer->renderRoundedRect(
             menu.getInputFace().getBg(render_context.default_face, render_context.ui_options.color_overrides), layout.current().x,
-            layout.current().y, layout.current().width, SPACING_MEDIUM + m_input->height(font) + SPACING_MEDIUM, domain::CornerRadius(0, 0, CORNER_RADIUS, CORNER_RADIUS));
+            layout.current().y, layout.current().width, 4 * SPACING_MEDIUM + m_input->height(font), domain::CornerRadius(0, 0, CORNER_RADIUS, CORNER_RADIUS));
     }
 
     layout.pad(SPACING_MEDIUM);
 
-    m_input->render(m_renderer, render_context, menu.getInput(), menu.getInputFace(), cursor_column, layout);
+    LayoutManager input_layout = layout.sliceTop(SPACING_MEDIUM * 2 + m_input->height(font));
+    input_layout.pad(SPACING_MEDIUM, 0);
+    m_input->render(m_renderer, render_context, font, menu.getInput(), menu.getInputFace(), cursor_column, input_layout);
 
     if (menu.hasItems())
     {

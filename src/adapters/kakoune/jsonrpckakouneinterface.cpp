@@ -67,7 +67,7 @@ domain::KakouneState JsonRpcKakouneInterface::convertFrameStateToKakouneState(co
 
     std::optional<domain::StatusLine> status_line = domain::StatusLine(toDomain(frame_state.draw_status.status_line_prompt), toDomain(frame_state.draw_status.status_line_content));
 
-    bool status_line_has_content = !(status_line->getPrompt().size() == 0 && status_line->getContent().size() == 0);
+    bool status_line_has_prompt = status_line->getPrompt().size() > 0;
 
     std::optional<domain::Menu> menu;
     if (frame_state.menu.has_value()) {
@@ -85,12 +85,8 @@ domain::KakouneState JsonRpcKakouneInterface::convertFrameStateToKakouneState(co
             ),
             toDomain(frame_state.menu->style)
         );
-    } else if (status_line_has_content) {
+    } else if (status_line_has_prompt) {
         menu = domain::Menu(status_line.value(), toDomain(frame_state.draw_status.default_face), domain::MenuStyle::PROMPT);
-    }
-
-    if (!status_line_has_content) {
-        status_line = std::nullopt;
     }
 
     domain::CursorPosition cursor_position;
@@ -103,7 +99,7 @@ domain::KakouneState JsonRpcKakouneInterface::convertFrameStateToKakouneState(co
     return domain::KakouneState{
         .content = toDomain(frame_state.draw.lines),
         .cursor_position = cursor_position,
-        .mode_line = domain::ModeLine(menu.has_value() ? std::nullopt : status_line, toDomain(frame_state.draw_status.mode_line), toDomain(frame_state.draw_status.default_face)),
+        .mode_line = domain::ModeLine((menu.has_value() || status_line->getContent().size() == 0) ? std::nullopt : status_line, toDomain(frame_state.draw_status.mode_line), toDomain(frame_state.draw_status.default_face)),
         .info_box = info_box,
         .menu = menu,
         .default_face = toDomain(frame_state.draw.default_face),
