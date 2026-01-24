@@ -20,6 +20,7 @@ ParsedCliArgs parseCliArgs(int argc, char* argv[])
 {
     ParsedCliArgs result;
     result.result = ParseResult::Success;
+    result.config.no_config = false;
 
     bool remote_session_set = false;
     bool local_session_set = false;
@@ -35,7 +36,7 @@ ParsedCliArgs parseCliArgs(int argc, char* argv[])
 
     int opt;
     int option_index = 0;
-    while ((opt = getopt_long(argc, argv, "c:s:e:p", long_options, &option_index)) != -1)
+    while ((opt = getopt_long(argc, argv, "c:s:e:p:n", long_options, &option_index)) != -1)
     {
         switch (opt)
         {
@@ -53,6 +54,9 @@ ParsedCliArgs parseCliArgs(int argc, char* argv[])
                 break;
             case 'p':
                 send_command = true;
+                break;
+            case 'n':
+                result.config.no_config = true;
                 break;
             case 'v':
                 result.result = ParseResult::ShowVersion;
@@ -99,6 +103,13 @@ ParsedCliArgs parseCliArgs(int argc, char* argv[])
     {
         result.result = ParseResult::Error;
         result.error_message = "Error: -c and -s options are not compatible";
+        return result;
+    }
+
+    if (remote_session_set && result.config.no_config)
+    {
+        result.result = ParseResult::Error;
+        result.error_message = "Error: -c and -n options are not compatible";
         return result;
     }
 

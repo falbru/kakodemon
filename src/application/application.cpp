@@ -72,7 +72,7 @@ void Application::init(const CliConfig &cli_config, ApplicationConfig &app_confi
         m_kakoune_session = std::make_unique<RemoteSession>(cli_config.session_id);
     }else {
         auto local_session = std::make_unique<LocalSession>(cli_config.session_id);
-        local_session->start(cli_config.file_arguments);
+        local_session->start(cli_config.file_arguments, cli_config.no_config);
         m_kakoune_session = std::move(local_session);
     }
 

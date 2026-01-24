@@ -88,6 +88,24 @@ TEST_CASE("CLI Parser - Startup command with remote session", "[cliparser]")
     REQUIRE(result.config.startup_command.value() == "buffer next");
 }
 
+TEST_CASE("CLI Parser - No config flag", "[cliparser]")
+{
+    ArgvHelper args({"kakod", "-n"});
+    ParsedCliArgs result = parseCliArgs(args.argc(), args.argv());
+
+    REQUIRE(result.result == ParseResult::Success);
+    REQUIRE(result.config.no_config == true);
+}
+
+TEST_CASE("CLI Parser - Defaults to load config", "[cliparser]")
+{
+    ArgvHelper args({"kakod"});
+    ParsedCliArgs result = parseCliArgs(args.argc(), args.argv());
+
+    REQUIRE(result.result == ParseResult::Success);
+    REQUIRE(result.config.no_config == false);
+}
+
 TEST_CASE("CLI Parser - Version flag", "[cliparser]")
 {
     ArgvHelper args({"kakod", "--version"});
@@ -107,6 +125,15 @@ TEST_CASE("CLI Parser - Help flag", "[cliparser]")
 TEST_CASE("CLI Parser - Conflicting -c and -s flags", "[cliparser]")
 {
     ArgvHelper args({"kakod", "-c", "remote", "-s", "local"});
+    ParsedCliArgs result = parseCliArgs(args.argc(), args.argv());
+
+    REQUIRE(result.result == ParseResult::Error);
+    REQUIRE(result.error_message.find("not compatible") != std::string::npos);
+}
+
+TEST_CASE("CLI Parser - Conflicting -c and -n flags", "[cliparser]")
+{
+    ArgvHelper args({"kakod", "-c", "remote", "-n"});
     ParsedCliArgs result = parseCliArgs(args.argc(), args.argv());
 
     REQUIRE(result.result == ParseResult::Error);

@@ -15,6 +15,7 @@ void print_help(const char* program_name)
               << "  -s <session>      Set session name\n"
               << "  -e <command>      Execute command on client initialisation\n"
               << "  -p <command>      Send command to a running instance (uses KAKOD_ID env)\n"
+              << "  -n                Do not source kakrc files on startup\n"
               << "  --version         Print version and exit\n"
               << "  --help            Print this help message and exit\n\n"
               << "File arguments:\n"

@@ -16,4 +16,5 @@ struct CliConfig
     std::string session_id;
     std::optional<std::string> startup_command = std::nullopt;
     std::vector<std::string> file_arguments;
+    bool no_config;
 };

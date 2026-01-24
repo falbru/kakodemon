@@ -59,7 +59,7 @@ LocalSession::~LocalSession()
     }
 }
 
-void LocalSession::start(const std::vector<std::string>& file_arguments)
+void LocalSession::start(const std::vector<std::string>& file_arguments, bool no_config)
 {
     m_fifo_path = "/tmp/kakodemon_" + m_session_id + "_" + std::to_string(getpid()) + ".fifo";
 
@@ -89,6 +89,10 @@ void LocalSession::start(const std::vector<std::string>& file_arguments)
         args.push_back("json");
         args.push_back("-E");
         args.push_back(init_command.c_str());
+
+        if (no_config) {
+            args.push_back("-n");
+        }
 
         for (const auto& file : file_arguments) {
             args.push_back(file.c_str());

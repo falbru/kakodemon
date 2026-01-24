@@ -12,7 +12,7 @@ class LocalSession : public domain::KakouneSession
     explicit LocalSession(const std::string &session_id);
     ~LocalSession();
 
-    void start(const std::vector<std::string> &file_arguments = {});
+    void start(const std::vector<std::string> &file_arguments = {}, bool no_config = false);
 
     std::string getSessionId() const override;
     void setSessionId(const std::string &session_id) override;
