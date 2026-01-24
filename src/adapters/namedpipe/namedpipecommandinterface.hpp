@@ -32,6 +32,7 @@ class NamedPipeCommandInterface : public CommandInterface
     PipeMode m_mode;
 
     std::atomic<bool> m_running;
+    std::atomic<bool> m_ready;
     std::thread m_read_thread;
     std::mutex m_commands_mutex;
     std::vector<Command> m_pending_commands;

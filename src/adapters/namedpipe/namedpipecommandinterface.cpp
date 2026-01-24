@@ -1,5 +1,6 @@
 #include "namedpipecommandinterface.hpp"
 
+#include <csignal>
 #include <fcntl.h>
 #include <stdexcept>
 #include <sys/poll.h>
@@ -11,14 +12,15 @@
 #include "spdlog/spdlog.h"
 
 NamedPipeCommandInterface::NamedPipeCommandInterface(const std::string& pipe_id, PipeMode mode)
-    : m_pipe_path("/tmp/kakod-" + pipe_id), m_mode(mode), m_running(false) {}
+    : m_pipe_path("/tmp/kakod-" + pipe_id), m_mode(mode), m_running(false), m_ready(false) {}
 
 NamedPipeCommandInterface::~NamedPipeCommandInterface() {
-    m_running.store(false);
     if (m_mode == PipeMode::Receive || m_mode == PipeMode::Both) {
-        int fd = open(m_pipe_path.c_str(), O_WRONLY);
+        m_running.store(false);
+
+        int fd = open(m_pipe_path.c_str(), O_WRONLY | O_NONBLOCK);
         if (fd != -1) {
-            ssize_t written = write(fd, "a", 1);
+            write(fd, "\n", 1);
             close(fd);
         }
 
@@ -43,6 +45,10 @@ void NamedPipeCommandInterface::init() {
 
     m_running.store(true);
     m_read_thread = std::thread(&NamedPipeCommandInterface::readLoop, this);
+
+    while (!m_ready.load()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
 }
 
 void NamedPipeCommandInterface::setWakeEventLoopCallback(std::function<void()> callback) {
@@ -54,17 +60,42 @@ void NamedPipeCommandInterface::readLoop() {
         return;
     }
 
-    int fd = open(m_pipe_path.c_str(), O_RDONLY);
+    int fd = open(m_pipe_path.c_str(), O_RDWR | O_NONBLOCK);
     if (fd == -1) {
         spdlog::error("Failed to open named pipe for reading: {}", strerror(errno));
         return;
     }
 
+    m_ready.store(true);
+
+    pollfd fds;
+    fds.fd = fd;
+    fds.events = POLL_IN;
+
     while (m_running.load()) {
+        int ret = poll(&fds, 1, 500);
+
+        if (ret == -1) {
+            throw std::runtime_error("poll() failed: " + std::string(strerror(errno)));
+        }
+
+        if (ret == 0) {
+            continue;
+        }
+
+        if (fds.revents & (POLLERR | POLLNVAL)) {
+            throw std::runtime_error("poll error on pipe");
+            break;
+        }
+
+        if ((fds.revents & POLL_IN) == 0) {
+            continue;
+
+        }
+
         std::string buffer;
         char chunk[256];
         ssize_t bytes_read;
-
         while ((bytes_read = read(fd, chunk, sizeof(chunk) - 1)) > 0) {
             chunk[bytes_read] = '\0';
             buffer += chunk;

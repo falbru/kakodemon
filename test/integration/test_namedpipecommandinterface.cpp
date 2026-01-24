@@ -12,8 +12,6 @@ TEST_CASE("NamedPipeCommandInterface receives commands", "[integration][namedpip
     auto receiver = std::make_unique<NamedPipeCommandInterface>(pipe_id, PipeMode::Receive);
     receiver->init();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
     auto sender = std::make_unique<NamedPipeCommandInterface>(pipe_id, PipeMode::Send);
 
     SECTION("receives single command without args") {
@@ -96,8 +94,6 @@ TEST_CASE("NamedPipeCommandInterface wake callback is invoked", "[integration][n
 
     receiver->init();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
     auto sender = std::make_unique<NamedPipeCommandInterface>(pipe_id, PipeMode::Send);
 
     Command cmd;
@@ -149,8 +145,6 @@ TEST_CASE("NamedPipeCommandInterface pipe cleanup on destruction", "[integration
         auto receiver = std::make_unique<NamedPipeCommandInterface>(pipe_id, PipeMode::Receive);
         receiver->init();
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
         REQUIRE(access(pipe_path.c_str(), F_OK) == 0);
     }
 
@@ -162,8 +156,6 @@ TEST_CASE("NamedPipeCommandInterface ping command round-trip", "[integration][na
 
     auto receiver = std::make_unique<NamedPipeCommandInterface>(pipe_id, PipeMode::Receive);
     receiver->init();
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
     auto sender = std::make_unique<NamedPipeCommandInterface>(pipe_id, PipeMode::Send);
 
@@ -188,8 +180,6 @@ TEST_CASE("NamedPipeCommandInterface Both mode can send and receive", "[integrat
 
     interface_a->init();
     interface_b->init();
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
     auto sender_to_a = std::make_unique<NamedPipeCommandInterface>(pipe_id_a, PipeMode::Send);
     auto sender_to_b = std::make_unique<NamedPipeCommandInterface>(pipe_id_b, PipeMode::Send);
