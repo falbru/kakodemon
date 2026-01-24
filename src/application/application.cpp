@@ -72,11 +72,11 @@ void Application::init(const CliConfig &cli_config, ApplicationConfig &app_confi
         m_kakoune_session = std::make_unique<RemoteSession>(cli_config.session_id);
     }else {
         auto local_session = std::make_unique<LocalSession>(cli_config.session_id);
-        local_session->start();
+        local_session->start(cli_config.file_arguments);
         m_kakoune_session = std::move(local_session);
     }
 
-    auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*m_kakoune_session, cli_config.startup_command, cli_config.file_arguments);
+    auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*m_kakoune_session, cli_config.startup_command, cli_config.session_type == SessionType::Remote ? cli_config.file_arguments : std::vector<std::string>{});
     interface->setWakeEventLoopCallback([this]() { wakeEventLoop(); });
     m_kakoune_client = std::make_unique<KakouneClient>(m_kakoune_session.get(), std::move(interface));
     m_ui_options = std::make_unique<domain::UIOptions>();

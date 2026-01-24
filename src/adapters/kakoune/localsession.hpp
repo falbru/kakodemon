@@ -4,6 +4,7 @@
 #include "domain/ports/kakounesession.hpp"
 #include <string>
 #include <sys/types.h>
+#include <vector>
 
 class LocalSession : public domain::KakouneSession
 {
@@ -11,7 +12,7 @@ class LocalSession : public domain::KakouneSession
     explicit LocalSession(const std::string &session_id);
     ~LocalSession();
 
-    void start();
+    void start(const std::vector<std::string> &file_arguments = {});
 
     std::string getSessionId() const override;
     void setSessionId(const std::string &session_id) override;

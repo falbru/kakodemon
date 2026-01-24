@@ -59,7 +59,7 @@ LocalSession::~LocalSession()
     }
 }
 
-void LocalSession::start()
+void LocalSession::start(const std::vector<std::string>& file_arguments)
 {
     m_fifo_path = "/tmp/kakodemon_" + m_session_id + "_" + std::to_string(getpid()) + ".fifo";
 
@@ -80,7 +80,22 @@ void LocalSession::start()
     if (pid == 0)
     {
         std::string init_command = "nop %sh{ echo > '" + m_fifo_path + "'}";
-        execlp("kak", "kak", "-d", "-s", m_session_id.c_str(), "-ui", "json", "-E", init_command.c_str(), nullptr);
+        std::vector<const char*> args;
+        args.push_back("kak");
+        args.push_back("-d");
+        args.push_back("-s");
+        args.push_back(m_session_id.c_str());
+        args.push_back("-ui");
+        args.push_back("json");
+        args.push_back("-E");
+        args.push_back(init_command.c_str());
+
+        for (const auto& file : file_arguments) {
+            args.push_back(file.c_str());
+        }
+        args.push_back(nullptr);
+
+        execvp("kak", const_cast<char**>(args.data()));
         perror("execlp");
         _exit(1);
     }
