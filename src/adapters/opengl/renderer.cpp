@@ -11,7 +11,6 @@
 #include "domain/utf8string.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "opengl.hpp"
-#include "spdlog/spdlog.h"
 
 opengl::Renderer::Renderer() {
 }

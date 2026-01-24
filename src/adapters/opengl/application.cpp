@@ -51,7 +51,9 @@ void opengl::GLFWApplication::init(const CliConfig& cli_config, ApplicationConfi
         return;
     }
 
-    glViewport(0, 0, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
+    int framebuffer_width, framebuffer_height;
+    glfwGetFramebufferSize(m_window, &framebuffer_width, &framebuffer_height);
+    glViewport(0, 0, framebuffer_width, framebuffer_height);
 
     glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int width, int height) {
         GLFWApplication* app = static_cast<GLFWApplication*>(glfwGetWindowUserPointer(window));
@@ -89,9 +91,6 @@ void opengl::GLFWApplication::init(const CliConfig& cli_config, ApplicationConfi
         saveApplicationConfig(*app->m_app_config);
     });
 
-    int framebuffer_width, framebuffer_height;
-    glfwGetFramebufferSize(m_window, &framebuffer_width, &framebuffer_height);
-
     m_renderer = std::make_unique<opengl::Renderer>();
 
     m_cursor_ibeam = glfwCreateStandardCursor(GLFW_IBEAM_CURSOR);
@@ -115,6 +114,8 @@ void opengl::GLFWApplication::init(const CliConfig& cli_config, ApplicationConfi
 }
 
 void opengl::GLFWApplication::run() {
+    glfwSwapBuffers(m_window); // Updates the backbuffer size
+
     while (!glfwWindowShouldClose(m_window))
     {
         glfwWaitEvents();
