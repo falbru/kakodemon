@@ -1,6 +1,7 @@
 #ifndef KAKOUNECLIENTPROCESS_HPP_INCLUDED
 #define KAKOUNECLIENTPROCESS_HPP_INCLUDED
 
+#include <map>
 #include <sys/poll.h>
 #include <sys/types.h>
 
@@ -168,17 +169,22 @@ class KakouneClientProcess
     void start(std::optional<std::string> startup_command, const std::vector<std::string> &file_arguments);
 
     void pollForRequests();
-    void setRequestCallback(std::function<void(const IncomingRequest &)> callback);
+    void setRequestCallback(const std::function<void(const IncomingRequest &)> &callback);
+    void setExitCallback(const std::function<void()> &callback);
 
     void sendRequest(const OutgoingRequest &request);
 
-    bool isClientRunning();
-
   private:
+    static void handleSIGCHLD(int sig);
+    static std::map<pid_t, KakouneClientProcess *> pid_to_instances;
+    void registerProcess(pid_t pid);
+    pid_t m_client_pid;
+
+    std::function<void()> m_exit_callback;
+
     std::optional<IncomingRequest> parseRequest(std::string request);
 
     std::string m_session_name;
-    pid_t m_child_pid = -1;
 
     int m_stdout_pipefd[2];
     int m_stdin_pipefd[2];

@@ -296,8 +296,8 @@ std::string JsonRpcKakouneInterface::getMouseButtonString(domain::MouseButton bu
     }
 }
 
-bool JsonRpcKakouneInterface::isClientRunning() {
-    return m_process->isClientRunning();
+void JsonRpcKakouneInterface::setExitCallback(const std::function<void()>& callback) {
+    m_process->setExitCallback(callback);
 }
 
 }

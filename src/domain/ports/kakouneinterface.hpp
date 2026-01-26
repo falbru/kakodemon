@@ -50,7 +50,7 @@ class KakouneInterface
     virtual void releaseMouseButton(MouseButton button, int line, int column) = 0;
     virtual void selectMenuItem(int index) = 0;
 
-    virtual bool isClientRunning() = 0;
+    virtual void setExitCallback(const std::function<void()> &callback) = 0;
 
   protected:
     KakouneInterface(const KakouneSession &session);

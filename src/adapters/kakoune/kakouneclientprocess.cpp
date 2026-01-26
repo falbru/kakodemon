@@ -1,7 +1,8 @@
 #include "kakouneclientprocess.hpp"
 
-#include <exception>
+#include <cstdlib>
 #include <optional>
+#include <stdexcept>
 #include <sys/poll.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -30,11 +31,47 @@ KakouneClientProcess::~KakouneClientProcess()
     {
         close(m_stdout_pipefd[1]);
     }
+
+    if (m_client_pid > 0) {
+        auto proc = pid_to_instances.find(m_client_pid);
+        if (proc != pid_to_instances.end()) {
+            pid_to_instances.erase(proc);
+        }
+    }
 }
 
 void KakouneClientProcess::start()
 {
     start(std::nullopt);
+}
+
+std::map<pid_t, KakouneClientProcess*> KakouneClientProcess::pid_to_instances = std::map<pid_t, KakouneClientProcess*>();
+
+void KakouneClientProcess::handleSIGCHLD(int sig) {
+    int status;
+    pid_t pid = waitpid(-1, &status, WNOHANG);
+    if (pid > 0) {
+        auto proc = pid_to_instances.find(pid);
+        if (proc != pid_to_instances.end()) {
+            proc->second->m_exit_callback();
+        }
+    }
+
+}
+
+void KakouneClientProcess::registerProcess(pid_t pid) {
+    struct sigaction sa;
+
+    sa.sa_handler = handleSIGCHLD;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART;
+    if (sigaction(SIGCHLD, &sa, NULL) == -1) {
+        throw std::runtime_error("failed to setup SIGCHLD signal");
+    }
+
+    m_client_pid = pid;
+
+    pid_to_instances.emplace(pid, this);
 }
 
 void KakouneClientProcess::start(std::optional<std::string> startup_command)
@@ -57,7 +94,7 @@ void KakouneClientProcess::start(std::optional<std::string> startup_command, con
     pid_t pid = fork();
     if (pid == -1)
     {
-        throw std::runtime_error("fork failed");
+        throw std::runtime_error("kakoune client process fork failed");
     }
 
     if (pid == 0)
@@ -95,7 +132,7 @@ void KakouneClientProcess::start(std::optional<std::string> startup_command, con
     }
     else
     {
-        m_child_pid = pid;
+        registerProcess(pid);
         close(m_stdout_pipefd[1]);
         close(m_stdin_pipefd[0]);
         m_pollfd.fd = m_stdout_pipefd[0];
@@ -103,27 +140,14 @@ void KakouneClientProcess::start(std::optional<std::string> startup_command, con
     }
 }
 
-void KakouneClientProcess::setRequestCallback(std::function<void(const IncomingRequest &)> callback)
+void KakouneClientProcess::setRequestCallback(const std::function<void(const IncomingRequest &)>& callback)
 {
     m_request_callback = callback;
 }
 
-bool KakouneClientProcess::isClientRunning()
+void KakouneClientProcess::setExitCallback(const std::function<void()>& callback)
 {
-    if (m_client_exited || m_child_pid <= 0)
-    {
-        return false;
-    }
-
-    int status;
-    pid_t result = waitpid(m_child_pid, &status, WNOHANG);
-    if (result == m_child_pid)
-    {
-        m_client_exited = true;
-        return false;
-    }
-
-    return true;
+    m_exit_callback = callback;
 }
 
 void KakouneClientProcess::pollForRequests()

@@ -111,12 +111,17 @@ void opengl::GLFWApplication::init(const CliConfig& cli_config, ApplicationConfi
     Application::init(cli_config, app_config);
 
     onWindowResize(framebuffer_width, framebuffer_height);
+
+    m_kakoune_client->interface->setExitCallback([=] () {
+        glfwSetWindowShouldClose(m_window, GLFW_TRUE);
+        glfwPostEmptyEvent();
+    });
 }
 
 void opengl::GLFWApplication::run() {
     glfwSwapBuffers(m_window); // Updates the backbuffer size
 
-    while (!glfwWindowShouldClose(m_window) && m_kakoune_client->interface->isClientRunning())
+    while (!glfwWindowShouldClose(m_window))
     {
         glfwWaitEvents();
 
