@@ -15,6 +15,9 @@
 opengl::Renderer::Renderer() {
 }
 
+opengl::Renderer::~Renderer() {
+}
+
 void opengl::Renderer::init(int width, int height) {
     m_shader_program = std::make_unique<ShaderProgram>();
     m_shader_program->compile();

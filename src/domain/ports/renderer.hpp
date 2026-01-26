@@ -35,6 +35,8 @@ struct CornerRadius
 class Renderer
 {
   public:
+    virtual ~Renderer() = default;
+
     virtual void init(int width, int height) = 0;
     virtual void onWindowResize(int width, int height) = 0;
     virtual void addBounds(float x, float y, float width, float height) = 0;

@@ -23,6 +23,7 @@ class Renderer : public domain::Renderer
 {
   public:
     Renderer();
+    ~Renderer() override;
 
     void init(int width, int height) override;
     void onWindowResize(int width, int height) override;
