@@ -5,6 +5,7 @@
 #include "domain/uioptions.hpp"
 #include "styling.hpp"
 #include "widgets/scrolledmenuitems.hpp"
+#include <cmath>
 
 PromptMenuView::PromptMenuView()
 {
@@ -23,7 +24,7 @@ void PromptMenuView::render(const RenderContext& render_context, const domain::M
 {
     domain::Font* font = render_context.ui_options.font_menu;
 
-    m_x = (render_context.screen_width - WIDTH) / 2;
+    m_x = round((render_context.screen_width - WIDTH) / 2);
     m_height = 2 * BORDER_THICKNESS + 4 * SPACING_MEDIUM + m_input->height(font);
 
     float items_size = menu.hasItems() ? std::min(MAX_VISIBLE_ITEMS, (int)menu.getItems().items.size()) : 0;
