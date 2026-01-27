@@ -1,6 +1,7 @@
 #ifndef EDITORCONTROLLER_HPP_INCLUDED
 #define EDITORCONTROLLER_HPP_INCLUDED
 
+#include "application/controller/layoutcontroller.hpp"
 #include "application/model/kakouneclient.hpp"
 #include "application/view/kakounecontentview.hpp"
 #include "application/view/statusbar.hpp"
@@ -10,13 +11,16 @@
 #include "domain/uioptions.hpp"
 #include <functional>
 #include <map>
+#include <memory>
+#include <vector>
 
 class EditorController // TODO rename to KakouneContentViewController or something?
 {
   public:
     EditorController();
 
-    void init(KakouneClient *kakoune_client, KakouneContentView *kakoune_content_view, StatusBarView *status_bar_view,
+    void init(std::vector<std::unique_ptr<KakouneClient>> *kakoune_clients, LayoutController *layout_controller,
+              KakouneContentView *kakoune_content_view, StatusBarView *status_bar_view,
               domain::FontManager *font_manager, std::function<void(domain::RGBAColor)> set_clear_color,
               class MenuController *menu_controller);
     bool update(domain::UIOptions &ui_options);
@@ -31,7 +35,8 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
     int height() const;
 
   private:
-    KakouneClient *m_kakoune_client;
+    std::vector<std::unique_ptr<KakouneClient>> *m_kakoune_clients;
+    LayoutController *m_layout_controller;
     KakouneContentView *m_kakoune_content_view;
     StatusBarView *m_status_bar_view;
     domain::FontManager *m_font_manager;

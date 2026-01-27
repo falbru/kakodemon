@@ -13,7 +13,7 @@ class MouseController
   public:
     MouseController();
 
-    void init(KakouneClient *kakoune_client, EditorController *editor_controller, MenuController *menu_controller,
+    void init(KakouneClient **focused_client, EditorController *editor_controller, MenuController *menu_controller,
               InfoBoxController *info_box_controller);
 
     domain::MouseMoveResult onMouseMove(float x, float y, const domain::UIOptions *ui_options);
@@ -24,7 +24,7 @@ class MouseController
     double getScrollSpeed() const;
 
   private:
-    KakouneClient *m_kakoune_client;
+    KakouneClient **m_focused_client;
     EditorController *m_editor_controller;
     MenuController *m_menu_controller;
     InfoBoxController *m_info_box_controller;

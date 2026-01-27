@@ -57,8 +57,10 @@ set(SRC
     src/application/cliparser.cpp
     src/application/controller/commandcontroller.cpp
     src/application/controller/editorcontroller.cpp
+    src/application/controller/focuscontroller.cpp
     src/application/controller/infoboxcontroller.cpp
     src/application/controller/inputcontroller.cpp
+    src/application/controller/layoutcontroller.cpp
     src/application/controller/menucontroller.cpp
     src/application/controller/mousecontroller.cpp
     src/application/model/kakouneclient.cpp

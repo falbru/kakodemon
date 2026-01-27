@@ -13,10 +13,10 @@ void StatusBarView::init(domain::Renderer* renderer) {
     m_renderer = renderer;
 }
 
-void StatusBarView::render(const RenderContext &render_context, InputViewState &state, const domain::ModeLine& mode_line, domain::CursorPosition cursor_position) {
+void StatusBarView::render(const RenderContext &render_context, InputViewState &state, const domain::ModeLine& mode_line, domain::CursorPosition cursor_position, const domain::Rectangle &bounds) {
     float bar_height = this->height(render_context.ui_options.font_statusbar);
 
-    LayoutManager layout(0, render_context.screen_height - bar_height, render_context.screen_width, bar_height);
+    LayoutManager layout(bounds.x, bounds.y + bounds.height - bar_height, bounds.width, bar_height);
 
     m_renderer->renderRect(mode_line.getDefaultFace().getBg(render_context.ui_options.color_overrides), layout.current().x, layout.current().y, layout.current().width, layout.current().height);
 

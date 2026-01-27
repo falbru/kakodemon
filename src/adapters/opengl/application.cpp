@@ -112,10 +112,12 @@ void opengl::GLFWApplication::init(const CliConfig& cli_config, ApplicationConfi
 
     onWindowResize(framebuffer_width, framebuffer_height);
 
-    m_kakoune_client->interface->setExitCallback([=] () {
-        glfwSetWindowShouldClose(m_window, GLFW_TRUE);
-        glfwPostEmptyEvent();
-    });
+    for (auto& client : m_kakoune_clients) {
+        client->interface->setExitCallback([=] () {
+            glfwSetWindowShouldClose(m_window, GLFW_TRUE);
+            glfwPostEmptyEvent();
+        });
+    }
 }
 
 void opengl::GLFWApplication::run() {

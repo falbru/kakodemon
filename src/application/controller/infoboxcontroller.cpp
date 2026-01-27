@@ -6,8 +6,8 @@ InfoBoxController::InfoBoxController() {
 
 }
 
-void InfoBoxController::init(KakouneClient* kakoune_client, EditorController* editor_controller, domain::FontManager* font_manager, InfoBoxView* info_box_view, std::function<void()> mark_dirty) {
-    m_kakoune_client = kakoune_client;
+void InfoBoxController::init(KakouneClient** focused_client, EditorController* editor_controller, domain::FontManager* font_manager, InfoBoxView* info_box_view, std::function<void()> mark_dirty) {
+    m_focused_client = focused_client;
     m_editor_controller = editor_controller;
     m_font_manager = font_manager;
     m_info_box_view = info_box_view;
@@ -18,24 +18,24 @@ void InfoBoxController::update(const domain::UIOptions& ui_options) {
 }
 
 void InfoBoxController::render(const domain::UIOptions& ui_options) {
-    if (!m_kakoune_client->state.info_box.has_value() || (m_kakoune_client->state.info_box->title.size() == 0 && m_kakoune_client->state.info_box->content.size() == 0)) return;
+    if (!(*m_focused_client)->state.info_box.has_value() || ((*m_focused_client)->state.info_box->title.size() == 0 && (*m_focused_client)->state.info_box->content.size() == 0)) return;
 
     RenderContext render_context = {
         m_font_manager,
-        m_kakoune_client->state.default_face,
+        (*m_focused_client)->state.default_face,
         ui_options,
         static_cast<float>(m_editor_controller->width()),
         static_cast<float>(m_editor_controller->height())
     };
 
-    m_info_box_view->render(render_context, m_kakoune_client->info_box_state, *m_kakoune_client->state.info_box, m_kakoune_client->state.cursor_position);
+    m_info_box_view->render(render_context, (*m_focused_client)->info_box_state, *(*m_focused_client)->state.info_box, (*m_focused_client)->state.cursor_position);
 }
 
 void InfoBoxController::onMouseScroll(int scroll_amount)
 {
-    if (!m_kakoune_client->state.info_box.has_value()) return;
+    if (!(*m_focused_client)->state.info_box.has_value()) return;
 
-    m_info_box_view->onMouseScroll(m_kakoune_client->info_box_state, scroll_amount);
+    m_info_box_view->onMouseScroll((*m_focused_client)->info_box_state, scroll_amount);
 
     if (m_mark_dirty) {
         m_mark_dirty();

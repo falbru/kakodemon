@@ -11,14 +11,16 @@ EditorController::EditorController()
 {
 }
 
-void EditorController::init(KakouneClient* kakoune_client,
+void EditorController::init(std::vector<std::unique_ptr<KakouneClient>>* kakoune_clients,
+                            LayoutController* layout_controller,
                             KakouneContentView* kakoune_content_view,
                             StatusBarView* status_bar_view,
                             domain::FontManager* font_manager,
                             std::function<void(domain::RGBAColor)> set_clear_color,
                             MenuController* menu_controller)
 {
-    m_kakoune_client = kakoune_client;
+    m_kakoune_clients = kakoune_clients;
+    m_layout_controller = layout_controller;
     m_kakoune_content_view = kakoune_content_view;
     m_status_bar_view = status_bar_view;
     m_font_manager = font_manager;
@@ -29,19 +31,25 @@ void EditorController::init(KakouneClient* kakoune_client,
 bool EditorController::update(domain::UIOptions& ui_options)
 {
     bool state_updated = false;
-    auto result = m_kakoune_client->interface->getNextKakouneStateAndEvents();
-    if (result.has_value()) {
-        m_kakoune_client->state = result->first;
-        domain::FrameEvents events = result->second;
 
-        setClearColor(m_kakoune_client->state.default_face.getBg());
-        state_updated = true;
+    for (auto& client : *m_kakoune_clients) {
+        auto result = client->interface->getNextKakouneStateAndEvents();
+        if (result.has_value()) {
+            client->state = result->first;
+            domain::FrameEvents events = result->second;
+            state_updated = true;
 
-        if (events.menu_select && m_kakoune_client->state.menu.has_value() && m_kakoune_client->state.menu->hasItems()) {
-            m_menu_controller->ensureItemVisible(m_kakoune_client->state.menu->getItems().selected_index);
+            if (events.menu_select && client->state.menu.has_value() && client->state.menu->hasItems()) {
+                m_menu_controller->ensureItemVisible(client->state.menu->getItems().selected_index);
+            }
         }
+    }
 
-        domain::UIOptions new_ui_options = m_kakoune_client->interface->getUIOptions(m_font_manager);
+    if (state_updated && !m_kakoune_clients->empty()) {
+        auto& first_client = m_kakoune_clients->front();
+        setClearColor(first_client->state.default_face.getBg());
+
+        domain::UIOptions new_ui_options = first_client->interface->getUIOptions(m_font_manager);
         bool fonts_changed = new_ui_options.font_content != ui_options.font_content ||
                              new_ui_options.font_statusbar != ui_options.font_statusbar;
         ui_options = new_ui_options;
@@ -56,37 +64,56 @@ bool EditorController::update(domain::UIOptions& ui_options)
 
 void EditorController::render(const domain::UIOptions& ui_options)
 {
-    RenderContext render_context = {
-        m_font_manager,
-        m_kakoune_client->state.default_face,
-        ui_options,
-        static_cast<float>(m_width),
-        static_cast<float>(m_height)
-    };
+    for (const auto& layout : m_layout_controller->getLayouts()) {
+        auto* client = layout.client;
+        const auto& bounds = layout.bounds;
 
-    m_kakoune_content_view->render(render_context, m_kakoune_client->state.content, m_kakoune_client->state.default_face, 0.0f, 0.0f);
-    m_kakoune_content_view->setWidth(m_width);
-    m_content_height = m_rows * m_kakoune_content_view->getCellHeight(ui_options.font_content);
-    m_kakoune_content_view->setHeight(m_content_height);
-    m_status_bar_view->render(render_context, m_kakoune_client->status_line_state, m_kakoune_client->state.mode_line, m_kakoune_client->state.cursor_position);
+        RenderContext render_context = {
+            m_font_manager,
+            client->state.default_face,
+            ui_options,
+            bounds.width,
+            bounds.height
+        };
+
+        m_kakoune_content_view->render(render_context, client->state.content, client->state.default_face, bounds);
+        m_status_bar_view->render(render_context, client->status_line_state, client->state.mode_line, client->state.cursor_position, bounds);
+    }
 }
 
 void EditorController::onWindowResize(int width, int height, const domain::UIOptions& ui_options) {
-    int rows = (height - m_status_bar_view->height(ui_options.font_statusbar)) / m_kakoune_content_view->getCellHeight(ui_options.font_content);
-    int columns = width / m_kakoune_content_view->getCellWidth(ui_options.font_content);
-
-    if (rows != m_rows || columns != m_columns) {
-        m_kakoune_client->interface->resize(rows, columns);
-    }
-
-    m_rows = rows;
-    m_columns = columns;
     m_width = width;
     m_height = height;
+
+    m_layout_controller->arrange(static_cast<float>(width), static_cast<float>(height));
+
+    float cell_width = m_kakoune_content_view->getCellWidth(ui_options.font_content);
+    float cell_height = m_kakoune_content_view->getCellHeight(ui_options.font_content);
+    float status_bar_height = m_status_bar_view->height(ui_options.font_statusbar);
+
+    for (const auto& layout : m_layout_controller->getLayouts()) {
+        int rows = static_cast<int>((layout.bounds.height - status_bar_height) / cell_height);
+        int columns = static_cast<int>(layout.bounds.width / cell_width);
+        layout.client->interface->resize(rows, columns);
+    }
+
+    if (!m_layout_controller->getLayouts().empty()) {
+        const auto& first_layout = m_layout_controller->getLayouts().front();
+        m_rows = static_cast<int>((first_layout.bounds.height - status_bar_height) / cell_height);
+    }
 }
 
 domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const domain::UIOptions* ui_options, bool obscured) {
-    if (y >= m_content_height) {
+    ClientLayout* layout = m_layout_controller->findLayoutAt(x, y);
+    if (!layout) {
+        return domain::MouseMoveResult{domain::Cursor::DEFAULT};
+    }
+
+    float status_bar_height = m_status_bar_view->height(ui_options->font_statusbar);
+    float content_height = layout->bounds.height - status_bar_height;
+    float relative_y = y - layout->bounds.y;
+
+    if (relative_y >= content_height) {
         return domain::MouseMoveResult{domain::Cursor::DEFAULT};
     }
 
@@ -103,25 +130,30 @@ domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const do
     }
 
     if (is_any_mouse_button_pressed) {
-        int column = x / ui_options->font_content->getGlyphMetrics(97).advance;
-        int line = y / ui_options->font_content->getLineHeight();
-
-        m_kakoune_client->interface->moveMouse(line, column);
+        float relative_x = x - layout->bounds.x;
+        domain::Coord coord = m_kakoune_content_view->pixelToCoord(ui_options->font_content, relative_x, relative_y);
+        layout->client->interface->moveMouse(coord.line, coord.column);
     }
 
     return domain::MouseMoveResult{domain::Cursor::IBEAM};
 }
 
 void EditorController::onMouseButton(domain::MouseButtonEvent event, const domain::UIOptions* ui_options, bool obscured) {
-    int column = event.x / ui_options->font_content->getGlyphMetrics(97).advance;
-    int line = event.y / ui_options->font_content->getLineHeight();
+    ClientLayout* layout = m_layout_controller->findLayoutAt(event.x, event.y);
+    if (!layout) {
+        return;
+    }
+
+    float relative_x = event.x - layout->bounds.x;
+    float relative_y = event.y - layout->bounds.y;
+    domain::Coord coord = m_kakoune_content_view->pixelToCoord(ui_options->font_content, relative_x, relative_y);
 
     if (!obscured && event.action == domain::MouseButtonAction::PRESS) {
-        m_kakoune_client->interface->pressMouseButton(event.button, line, column);
+        layout->client->interface->pressMouseButton(event.button, coord.line, coord.column);
         m_mouse_button_pressed[event.button] = true;
-    }else if (event.action == domain::MouseButtonAction::RELEASE) {
+    } else if (event.action == domain::MouseButtonAction::RELEASE) {
         if (!obscured) {
-            m_kakoune_client->interface->releaseMouseButton(event.button, line, column);
+            layout->client->interface->releaseMouseButton(event.button, coord.line, coord.column);
         }
 
         m_mouse_button_pressed[event.button] = false;
@@ -138,10 +170,16 @@ int EditorController::height() const {
 }
 
 void EditorController::onMouseScroll(int amount, float x, float y, const domain::UIOptions* ui_options) {
-    int column = x / ui_options->font_content->getGlyphMetrics(97).advance;
-    int line = y / ui_options->font_content->getLineHeight();
+    ClientLayout* layout = m_layout_controller->findLayoutAt(x, y);
+    if (!layout) {
+        return;
+    }
 
-    m_kakoune_client->interface->scroll(amount, line, column);
+    float relative_x = x - layout->bounds.x;
+    float relative_y = y - layout->bounds.y;
+    domain::Coord coord = m_kakoune_content_view->pixelToCoord(ui_options->font_content, relative_x, relative_y);
+
+    layout->client->interface->scroll(amount, coord.line, coord.column);
 }
 
 void EditorController::setClearColor(domain::RGBAColor color) {

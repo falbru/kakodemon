@@ -11,7 +11,7 @@ class InfoBoxController
   public:
     InfoBoxController();
 
-    void init(KakouneClient *kakoune_client, EditorController *editor_controller, domain::FontManager *font_manager,
+    void init(KakouneClient **focused_client, EditorController *editor_controller, domain::FontManager *font_manager,
               InfoBoxView *info_box_view, std::function<void()> mark_dirty);
 
     void update(const domain::UIOptions &ui_options);
@@ -25,7 +25,7 @@ class InfoBoxController
     float height() const;
 
   private:
-    KakouneClient *m_kakoune_client;
+    KakouneClient **m_focused_client;
     EditorController *m_editor_controller;
     domain::FontManager *m_font_manager;
     InfoBoxView *m_info_box_view;

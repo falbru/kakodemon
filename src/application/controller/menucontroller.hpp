@@ -14,7 +14,7 @@ class MenuController
   public:
     MenuController();
 
-    void init(KakouneClient *kakoune_client, EditorController *editor_controller, domain::FontManager *font_manager,
+    void init(KakouneClient **focused_client, EditorController *editor_controller, domain::FontManager *font_manager,
               PromptMenuView *prompt_menu_view, InlineMenuView *inline_menu_view, SearchMenuView *search_menu_view,
               std::function<void()> mark_dirty);
 
@@ -31,7 +31,7 @@ class MenuController
     float height() const;
 
   private:
-    KakouneClient *m_kakoune_client;
+    KakouneClient **m_focused_client;
     EditorController *m_editor_controller;
     domain::FontManager *m_font_manager;
     InlineMenuView *m_inline_menu_view;
