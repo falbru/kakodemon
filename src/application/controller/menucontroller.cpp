@@ -39,13 +39,13 @@ void MenuController::render(const domain::UIOptions& ui_options) {
 
     switch(m_kakoune_client->state.menu->getStyle()) {
         case domain::MenuStyle::INLINE:
-            m_inline_menu_view->render(render_context, *m_kakoune_client->state.menu);
+            m_inline_menu_view->render(render_context, m_kakoune_client->inline_menu_state, *m_kakoune_client->state.menu);
             break;
         case domain::MenuStyle::PROMPT:
-            m_prompt_menu_view->render(render_context, *m_kakoune_client->state.menu, cursor_column);
+            m_prompt_menu_view->render(render_context, m_kakoune_client->prompt_menu_state, *m_kakoune_client->state.menu, cursor_column);
             break;
         case domain::MenuStyle::SEARCH:
-            m_search_menu_view->render(render_context, *m_kakoune_client->state.menu, cursor_column);
+            m_search_menu_view->render(render_context, m_kakoune_client->search_menu_state, *m_kakoune_client->state.menu, cursor_column);
             break;
     }
 }
@@ -136,13 +136,13 @@ bool MenuController::onMouseButton(domain::MouseButtonEvent event, const domain:
 
     switch(m_kakoune_client->state.menu->getStyle()) {
         case domain::MenuStyle::INLINE:
-            clicked_item_index = m_inline_menu_view->findItemAtPosition(event.x, event.y, *m_kakoune_client->state.menu);
+            clicked_item_index = m_inline_menu_view->findItemAtPosition(event.x, event.y, m_kakoune_client->inline_menu_state, *m_kakoune_client->state.menu);
             break;
         case domain::MenuStyle::PROMPT:
-            clicked_item_index = m_prompt_menu_view->findItemAtPosition(event.x, event.y, *m_kakoune_client->state.menu);
+            clicked_item_index = m_prompt_menu_view->findItemAtPosition(event.x, event.y, m_kakoune_client->prompt_menu_state, *m_kakoune_client->state.menu);
             break;
         case domain::MenuStyle::SEARCH:
-            clicked_item_index = m_search_menu_view->findItemAtPosition(event.x, event.y, *m_kakoune_client->state.menu);
+            clicked_item_index = m_search_menu_view->findItemAtPosition(event.x, event.y, m_kakoune_client->search_menu_state, *m_kakoune_client->state.menu);
             break;
     }
 
@@ -161,13 +161,13 @@ void MenuController::onMouseScroll(int scroll_amount) {
 
     switch(m_kakoune_client->state.menu->getStyle()) {
         case domain::MenuStyle::INLINE:
-            m_inline_menu_view->onMouseScroll(scroll_amount, *m_kakoune_client->state.menu);
+            m_inline_menu_view->onMouseScroll(m_kakoune_client->inline_menu_state, scroll_amount, *m_kakoune_client->state.menu);
             break;
         case domain::MenuStyle::PROMPT:
-            m_prompt_menu_view->onMouseScroll(scroll_amount, *m_kakoune_client->state.menu);
+            m_prompt_menu_view->onMouseScroll(m_kakoune_client->prompt_menu_state, scroll_amount, *m_kakoune_client->state.menu);
             break;
         case domain::MenuStyle::SEARCH:
-            m_search_menu_view->onMouseScroll(scroll_amount, *m_kakoune_client->state.menu);
+            m_search_menu_view->onMouseScroll(m_kakoune_client->search_menu_state, scroll_amount, *m_kakoune_client->state.menu);
             break;
     }
 
@@ -183,13 +183,13 @@ void MenuController::ensureItemVisible(int index) {
 
     switch(m_kakoune_client->state.menu->getStyle()) {
         case domain::MenuStyle::INLINE:
-            m_inline_menu_view->ensureItemVisible(index);
+            m_inline_menu_view->ensureItemVisible(m_kakoune_client->inline_menu_state, index);
             break;
         case domain::MenuStyle::PROMPT:
-            m_prompt_menu_view->ensureItemVisible(index);
+            m_prompt_menu_view->ensureItemVisible(m_kakoune_client->prompt_menu_state, index);
             break;
         case domain::MenuStyle::SEARCH:
-            m_search_menu_view->ensureItemVisible(index);
+            m_search_menu_view->ensureItemVisible(m_kakoune_client->search_menu_state, index);
             break;
     }
 }

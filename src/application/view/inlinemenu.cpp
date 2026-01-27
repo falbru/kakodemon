@@ -32,7 +32,7 @@ float InlineMenuView::height() const {
     return m_height;
 }
 
-void InlineMenuView::render(const RenderContext &render_context, const domain::Menu &menu)
+void InlineMenuView::render(const RenderContext &render_context, MenuViewState &state, const domain::Menu &menu)
 {
     if (!menu.hasItems()) return;
 
@@ -74,7 +74,7 @@ void InlineMenuView::render(const RenderContext &render_context, const domain::M
 
     layout.pad(0, SPACING_MEDIUM);
 
-    m_scrolled_menu_items->render(m_renderer, render_context, menu.getItems(), menu.getItems().face.getFg(render_context.default_face, render_context.ui_options.color_overrides), layout);
+    m_scrolled_menu_items->render(m_renderer, render_context, state, menu.getItems(), menu.getItems().face.getFg(render_context.default_face, render_context.ui_options.color_overrides), layout);
 }
 
 float InlineMenuView::scrolledItemsX() const {
@@ -112,18 +112,18 @@ domain::MouseMoveResult InlineMenuView::onMouseMove(float x, float y, const doma
     return domain::MouseMoveResult{std::nullopt};
 }
 
-std::optional<int> InlineMenuView::findItemAtPosition(float x, float y, const domain::Menu &menu) {
+std::optional<int> InlineMenuView::findItemAtPosition(float x, float y, const MenuViewState &state, const domain::Menu &menu) {
     if (!menu.hasItems()) return std::nullopt;
-    return m_scrolled_menu_items->findItemAtPosition(x, y, menu.getItems());
+    return m_scrolled_menu_items->findItemAtPosition(x, y, state, menu.getItems());
 }
 
-void InlineMenuView::onMouseScroll(int scroll_amount, const domain::Menu &menu) {
+void InlineMenuView::onMouseScroll(MenuViewState &state, int scroll_amount, const domain::Menu &menu) {
     if (!menu.hasItems()) return;
 
     int total_items = menu.getItems().items.size();
-    m_scrolled_menu_items->scroll(scroll_amount, total_items);
+    m_scrolled_menu_items->scroll(state, scroll_amount, total_items);
 }
 
-void InlineMenuView::ensureItemVisible(int index) {
-    m_scrolled_menu_items->ensureItemVisible(index);
+void InlineMenuView::ensureItemVisible(MenuViewState &state, int index) {
+    m_scrolled_menu_items->ensureItemVisible(state, index);
 }

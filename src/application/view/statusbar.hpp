@@ -1,6 +1,7 @@
 #ifndef STATUSBAR_HPP_INCLUDED
 #define STATUSBAR_HPP_INCLUDED
 
+#include "application/model/viewstate.hpp"
 #include "application/view/rendercontext.hpp"
 #include "application/view/widgets/input.hpp"
 #include "domain/editor.hpp"
@@ -15,7 +16,7 @@ class StatusBarView
 
     void init(domain::Renderer *renderer);
 
-    void render(const RenderContext &render_context, const domain::ModeLine &mode_line,
+    void render(const RenderContext &render_context, InputViewState &state, const domain::ModeLine &mode_line,
                 domain::CursorPosition cursor_position);
 
     float height(domain::Font *font);

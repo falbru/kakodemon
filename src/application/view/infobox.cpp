@@ -333,7 +333,7 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
     return std::nullopt;
 }
 
-void InfoBoxView::render(const RenderContext &render_context, const domain::InfoBox &info_box, const domain::CursorPosition &cursor_position)
+void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &state, const domain::InfoBox &info_box, const domain::CursorPosition &cursor_position)
 {
     domain::Font* font = render_context.ui_options.font_infobox;
     domain::Rectangle anchor;
@@ -484,7 +484,7 @@ void InfoBoxView::render(const RenderContext &render_context, const domain::Info
     bool needs_scroll = total_lines > visible_lines;
 
     int max_scroll = std::max(0, total_lines - visible_lines);
-    m_scroll_offset = std::max(0.0f, std::min(static_cast<float>(max_scroll), m_scroll_offset));
+    state.scroll_offset = std::max(0.0f, std::min(static_cast<float>(max_scroll), state.scroll_offset));
 
     auto content_layout = layout.copy();
     if (needs_scroll)
@@ -492,7 +492,7 @@ void InfoBoxView::render(const RenderContext &render_context, const domain::Info
         content_layout.padRight(SPACING_MEDIUM + m_scroll_bar->width());
     }
 
-    int start_line = static_cast<int>(m_scroll_offset);
+    int start_line = static_cast<int>(state.scroll_offset);
     int end_line = std::min(start_line + visible_lines, total_lines);
 
     float y_pos = content_layout.current().y;
@@ -507,16 +507,16 @@ void InfoBoxView::render(const RenderContext &render_context, const domain::Info
     if (needs_scroll)
     {
         int max_scroll = total_lines - visible_lines;
-        m_scroll_bar->setValue(m_scroll_offset, max_scroll, visible_lines);
+        m_scroll_bar->setValue(state.scroll_offset, max_scroll, visible_lines);
         m_scroll_bar->render(m_renderer,
                            info_box.default_face.getFg(render_context.default_face, render_context.ui_options.color_overrides),
                            layout);
     }
 }
 
-void InfoBoxView::onMouseScroll(int scroll_amount)
+void InfoBoxView::onMouseScroll(InfoBoxViewState &state, int scroll_amount)
 {
-    m_scroll_offset += scroll_amount;
+    state.scroll_offset += scroll_amount;
 }
 
 float InfoBoxView::x() const {

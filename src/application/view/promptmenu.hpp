@@ -1,7 +1,7 @@
 #ifndef VIEW_PROMPTMENU_HPP_INCLUDED
 #define VIEW_PROMPTMENU_HPP_INCLUDED
 
-#include "application/model/kakouneclient.hpp"
+#include "application/model/viewstate.hpp"
 #include "application/view/kakounecontentview.hpp"
 #include "application/view/widgets/input.hpp"
 #include "application/view/widgets/scrolledmenuitems.hpp"
@@ -14,12 +14,12 @@ class PromptMenuView
 
     void init(domain::Renderer *renderer, KakouneContentView *kakoune_content_view);
 
-    void render(const RenderContext &render_context, const domain::Menu &menu, int cursor_column);
+    void render(const RenderContext &render_context, MenuViewState &state, const domain::Menu &menu, int cursor_column);
 
     domain::MouseMoveResult onMouseMove(float x, float y, const domain::Menu &menu);
-    std::optional<int> findItemAtPosition(float x, float y, const domain::Menu &menu);
-    void onMouseScroll(int scroll_amount, const domain::Menu &menu);
-    void ensureItemVisible(int index);
+    std::optional<int> findItemAtPosition(float x, float y, const MenuViewState &state, const domain::Menu &menu);
+    void onMouseScroll(MenuViewState &state, int scroll_amount, const domain::Menu &menu);
+    void ensureItemVisible(MenuViewState &state, int index);
 
     float x() const;
     float y() const;
@@ -32,8 +32,6 @@ class PromptMenuView
     float scrolledItemsHeight() const;
 
   private:
-    int m_scroll_offset;
-
     const float Y = 60.0f;
     const float WIDTH = 600.0f;
     const int MAX_VISIBLE_ITEMS = 25;

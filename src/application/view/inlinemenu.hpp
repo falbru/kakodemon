@@ -1,6 +1,7 @@
 #ifndef VIEW_INLINEMENU_HPP_INCLUDED
 #define VIEW_INLINEMENU_HPP_INCLUDED
 
+#include "application/model/viewstate.hpp"
 #include "application/view/kakounecontentview.hpp"
 #include "application/view/rendercontext.hpp"
 #include "application/view/widgets/scrolledmenuitems.hpp"
@@ -15,12 +16,12 @@ class InlineMenuView
 
     void init(domain::Renderer *renderer, KakouneContentView *kakoune_content_view);
 
-    void render(const RenderContext &render_context, const domain::Menu &menu);
+    void render(const RenderContext &render_context, MenuViewState &state, const domain::Menu &menu);
 
     domain::MouseMoveResult onMouseMove(float x, float y, const domain::Menu &menu);
-    std::optional<int> findItemAtPosition(float x, float y, const domain::Menu &menu);
-    void onMouseScroll(int scroll_amount, const domain::Menu &menu);
-    void ensureItemVisible(int index);
+    std::optional<int> findItemAtPosition(float x, float y, const MenuViewState &state, const domain::Menu &menu);
+    void onMouseScroll(MenuViewState &state, int scroll_amount, const domain::Menu &menu);
+    void ensureItemVisible(MenuViewState &state, int index);
 
     float x() const;
     float y() const;
@@ -33,8 +34,6 @@ class InlineMenuView
     float scrolledItemsHeight() const;
 
   private:
-    int m_scroll_offset;
-
     const float MAX_MENU_WIDTH = 700;
     const int MAX_VISIBLE_ITEMS = 12;
 

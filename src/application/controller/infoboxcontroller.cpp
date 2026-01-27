@@ -28,14 +28,14 @@ void InfoBoxController::render(const domain::UIOptions& ui_options) {
         static_cast<float>(m_editor_controller->height())
     };
 
-    m_info_box_view->render(render_context, *m_kakoune_client->state.info_box, m_kakoune_client->state.cursor_position);
+    m_info_box_view->render(render_context, m_kakoune_client->info_box_state, *m_kakoune_client->state.info_box, m_kakoune_client->state.cursor_position);
 }
 
 void InfoBoxController::onMouseScroll(int scroll_amount)
 {
     if (!m_kakoune_client->state.info_box.has_value()) return;
 
-    m_info_box_view->onMouseScroll(scroll_amount);
+    m_info_box_view->onMouseScroll(m_kakoune_client->info_box_state, scroll_amount);
 
     if (m_mark_dirty) {
         m_mark_dirty();

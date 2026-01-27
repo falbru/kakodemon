@@ -1,6 +1,7 @@
 #ifndef VIEW_INFOBOX_HPP_INCLUDED
 #define VIEW_INFOBOX_HPP_INCLUDED
 #include "application/controller/menucontroller.hpp"
+#include "application/model/viewstate.hpp"
 #include "application/view/kakounecontentview.hpp"
 #include "application/view/rendercontext.hpp"
 #include "application/view/statusbar.hpp"
@@ -54,10 +55,10 @@ class InfoBoxView
                                              const domain::Rectangle &menu_rectangle,
                                              const domain::CursorPosition &cursor_position, domain::Font *font_content);
 
-    void render(const RenderContext &render_context, const domain::InfoBox &info_box,
+    void render(const RenderContext &render_context, InfoBoxViewState &state, const domain::InfoBox &info_box,
                 const domain::CursorPosition &cursor_position);
 
-    void onMouseScroll(int scroll_amount);
+    void onMouseScroll(InfoBoxViewState &state, int scroll_amount);
 
     float x() const;
     float y() const;
@@ -77,7 +78,6 @@ class InfoBoxView
     float m_y = 0.0f;
     float m_width = 0.0f;
     float m_height = 0.0f;
-    float m_scroll_offset = 0.0f;
     std::unique_ptr<ScrollBar> m_scroll_bar;
 };
 

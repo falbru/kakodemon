@@ -15,7 +15,7 @@ void SearchMenuView::init(domain::Renderer *renderer) {
     m_input = std::make_unique<Input>();
 }
 
-void SearchMenuView::render(const RenderContext &render_context, const domain::Menu &menu, int cursor_column) {
+void SearchMenuView::render(const RenderContext &render_context, MenuViewState &state, const domain::Menu &menu, int cursor_column) {
     domain::Font* font = render_context.ui_options.font_menu;
 
     m_x = render_context.screen_width - WIDTH;
@@ -51,7 +51,7 @@ void SearchMenuView::render(const RenderContext &render_context, const domain::M
 
     LayoutManager input_layout = layout.sliceTop(SPACING_MEDIUM * 2 + m_input->height(font));
     input_layout.pad(SPACING_MEDIUM, 0);
-    m_input->render(m_renderer, render_context, font, menu.getInput(), menu.getInputFace(), cursor_column, input_layout);
+    m_input->render(m_renderer, render_context, font, menu.getInput(), menu.getInputFace(), cursor_column, state.input_state, input_layout);
 
     if (menu.hasItems())
     {
@@ -63,7 +63,7 @@ void SearchMenuView::render(const RenderContext &render_context, const domain::M
             menu.getItems().face.getBg(render_context.default_face, render_context.ui_options.color_overrides), layout.current().x - SPACING_MEDIUM,
             layout.current().y, layout.current().width + SPACING_MEDIUM*2, layout.current().height + SPACING_MEDIUM, domain::CornerRadius(0.0f, 0.0f, CORNER_RADIUS, CORNER_RADIUS));
 
-        m_scrolled_menu_items->render(m_renderer, render_context, menu.getItems(), menu.getInputFace().getFg(render_context.default_face, render_context.ui_options.color_overrides), layout);
+        m_scrolled_menu_items->render(m_renderer, render_context, state, menu.getItems(), menu.getInputFace().getFg(render_context.default_face, render_context.ui_options.color_overrides), layout);
     }
 }
 
@@ -118,18 +118,18 @@ domain::MouseMoveResult SearchMenuView::onMouseMove(float x, float y, const doma
     return domain::MouseMoveResult{std::nullopt};
 }
 
-std::optional<int> SearchMenuView::findItemAtPosition(float x, float y, const domain::Menu &menu) {
+std::optional<int> SearchMenuView::findItemAtPosition(float x, float y, const MenuViewState &state, const domain::Menu &menu) {
     if (!menu.hasItems()) return std::nullopt;
-    return m_scrolled_menu_items->findItemAtPosition(x, y, menu.getItems());
+    return m_scrolled_menu_items->findItemAtPosition(x, y, state, menu.getItems());
 }
 
-void SearchMenuView::onMouseScroll(int scroll_amount, const domain::Menu &menu) {
+void SearchMenuView::onMouseScroll(MenuViewState &state, int scroll_amount, const domain::Menu &menu) {
     if (!menu.hasItems()) return;
 
     int total_items = menu.getItems().items.size();
-    m_scrolled_menu_items->scroll(scroll_amount, total_items);
+    m_scrolled_menu_items->scroll(state, scroll_amount, total_items);
 }
 
-void SearchMenuView::ensureItemVisible(int index) {
-    m_scrolled_menu_items->ensureItemVisible(index);
+void SearchMenuView::ensureItemVisible(MenuViewState &state, int index) {
+    m_scrolled_menu_items->ensureItemVisible(state, index);
 }

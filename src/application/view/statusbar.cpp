@@ -13,7 +13,7 @@ void StatusBarView::init(domain::Renderer* renderer) {
     m_renderer = renderer;
 }
 
-void StatusBarView::render(const RenderContext &render_context, const domain::ModeLine& mode_line, domain::CursorPosition cursor_position) {
+void StatusBarView::render(const RenderContext &render_context, InputViewState &state, const domain::ModeLine& mode_line, domain::CursorPosition cursor_position) {
     float bar_height = this->height(render_context.ui_options.font_statusbar);
 
     LayoutManager layout(0, render_context.screen_height - bar_height, render_context.screen_width, bar_height);
@@ -30,7 +30,7 @@ void StatusBarView::render(const RenderContext &render_context, const domain::Mo
         if (std::holds_alternative<domain::StatusLinePosition>(cursor_position))
             cursor_column = std::get<domain::StatusLinePosition>(cursor_position).column;
 
-        m_input_widget.render(m_renderer, render_context, render_context.ui_options.font_statusbar, mode_line.getStatusLine().value(), mode_line.getDefaultFace(), cursor_column, layout); // TODO Create prompt widget. use custom font.
+        m_input_widget.render(m_renderer, render_context, render_context.ui_options.font_statusbar, mode_line.getStatusLine().value(), mode_line.getDefaultFace(), cursor_column, state, layout);
     }
 }
 
