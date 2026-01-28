@@ -9,8 +9,9 @@ MenuController::MenuController() {
 
 }
 
-void MenuController::init(KakouneClient** focused_client, EditorController* editor_controller, domain::FontManager* font_manager, PromptMenuView* prompt_menu_view, InlineMenuView* inline_menu_view, SearchMenuView *search_menu_view, std::function<void()> mark_dirty) {
+void MenuController::init(KakouneClient** focused_client, LayoutController* layout_controller, EditorController* editor_controller, domain::FontManager* font_manager, PromptMenuView* prompt_menu_view, InlineMenuView* inline_menu_view, SearchMenuView *search_menu_view, std::function<void()> mark_dirty) {
     m_focused_client = focused_client;
+    m_layout_controller = layout_controller;
     m_editor_controller = editor_controller;
     m_font_manager = font_manager;
     m_inline_menu_view = inline_menu_view;
@@ -39,7 +40,7 @@ void MenuController::render(const domain::UIOptions& ui_options) {
 
     switch((*m_focused_client)->state.menu->getStyle()) {
         case domain::MenuStyle::INLINE:
-            m_inline_menu_view->render(render_context, (*m_focused_client)->inline_menu_state, *(*m_focused_client)->state.menu);
+            m_inline_menu_view->render(render_context, (*m_focused_client)->inline_menu_state, *(*m_focused_client)->state.menu, m_layout_controller->findLayoutForClient(*m_focused_client)->bounds);
             break;
         case domain::MenuStyle::PROMPT:
             m_prompt_menu_view->render(render_context, (*m_focused_client)->prompt_menu_state, *(*m_focused_client)->state.menu, cursor_column);

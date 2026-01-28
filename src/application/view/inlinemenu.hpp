@@ -5,6 +5,7 @@
 #include "application/view/kakounecontentview.hpp"
 #include "application/view/rendercontext.hpp"
 #include "application/view/widgets/scrolledmenuitems.hpp"
+#include "domain/geometry.hpp"
 #include "domain/menu.hpp"
 #include "domain/mouse.hpp"
 #include <memory>
@@ -16,7 +17,8 @@ class InlineMenuView
 
     void init(domain::Renderer *renderer, KakouneContentView *kakoune_content_view);
 
-    void render(const RenderContext &render_context, MenuViewState &state, const domain::Menu &menu);
+    void render(const RenderContext &render_context, MenuViewState &state, const domain::Menu &menu,
+                const domain::Rectangle &content_bounds);
 
     domain::MouseMoveResult onMouseMove(float x, float y, const domain::Menu &menu);
     std::optional<int> findItemAtPosition(float x, float y, const MenuViewState &state, const domain::Menu &menu);

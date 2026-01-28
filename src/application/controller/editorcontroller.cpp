@@ -134,9 +134,7 @@ domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const do
     if (is_any_mouse_button_pressed) {
         ClientLayout* focused_layout = m_layout_controller->findLayoutForClient(*m_focused_client);
         if (focused_layout) {
-            float relative_x = x - focused_layout->bounds.x;
-            float focused_relative_y = y - focused_layout->bounds.y;
-            domain::Coord coord = m_kakoune_content_view->pixelToCoord(ui_options->font_content, relative_x, focused_relative_y);
+            domain::Coord coord = m_kakoune_content_view->pixelToCoord(ui_options->font_content, x, y, focused_layout->bounds.x, focused_layout->bounds.y);
             (*m_focused_client)->interface->moveMouse(coord.line, coord.column);
             m_active_mouse_client = *m_focused_client;
         }
@@ -151,9 +149,7 @@ void EditorController::onMouseButton(domain::MouseButtonEvent event, const domai
         return;
     }
 
-    float relative_x = event.x - focused_layout->bounds.x;
-    float relative_y = event.y - focused_layout->bounds.y;
-    domain::Coord coord = m_kakoune_content_view->pixelToCoord(ui_options->font_content, relative_x, relative_y);
+    domain::Coord coord = m_kakoune_content_view->pixelToCoord(ui_options->font_content, event.x, event.y, focused_layout->bounds.x, focused_layout->bounds.y);
 
     if (!obscured && event.action == domain::MouseButtonAction::PRESS) {
         (*m_focused_client)->interface->pressMouseButton(event.button, coord.line, coord.column);
@@ -182,9 +178,7 @@ void EditorController::onMouseScroll(int amount, float x, float y, const domain:
         return;
     }
 
-    float relative_x = x - focused_layout->bounds.x;
-    float relative_y = y - focused_layout->bounds.y;
-    domain::Coord coord = m_kakoune_content_view->pixelToCoord(ui_options->font_content, relative_x, relative_y);
+    domain::Coord coord = m_kakoune_content_view->pixelToCoord(ui_options->font_content, x, y, focused_layout->bounds.x, focused_layout->bounds.y);
 
     (*m_focused_client)->interface->scroll(amount, coord.line, coord.column);
 }

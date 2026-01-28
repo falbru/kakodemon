@@ -19,14 +19,11 @@ class KakouneContentView
     float getCellWidth(domain::Font *font) const;
     float getCellHeight(domain::Font *font) const;
 
-    float width() const;
-    float height() const;
-
-    std::pair<float, float> coordToPixels(domain::Font *font, const domain::Coord &coord) const;
-    domain::Coord pixelToCoord(domain::Font *font, float x, float y) const;
+    std::pair<float, float> coordToPixels(domain::Font *font, const domain::Coord &coord, float origin_x,
+                                          float origin_y) const;
+    domain::Coord pixelToCoord(domain::Font *font, float x, float y, float origin_x, float origin_y) const;
 
   private:
-    float m_width, m_height;
     domain::Renderer *m_renderer;
 };
 

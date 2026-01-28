@@ -27,7 +27,8 @@ void InfoBoxView::init(domain::Renderer* renderer, MenuController* menu_controll
 
 std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection direction, CrossAxisAlignment alignment,
                                                       const domain::Lines &content, const domain::Line &title,
-                                                      const domain::Rectangle &anchor, float layout_width, float layout_height, domain::Font* font, domain::FontManager* font_manager, const domain::Rectangle& menu_rectangle, const domain::CursorPosition &cursor_position, domain::Font* font_content)
+                                                      const domain::Rectangle &anchor, float layout_width, float layout_height, domain::Font* font, domain::FontManager* font_manager, const domain::Rectangle& menu_rectangle, const domain::CursorPosition &cursor_position, domain::Font* font_content,
+                                                      const domain::Rectangle &content_bounds)
 {
     domain::GlyphLines glyph_lines = domain::GlyphLinesBuilder::build(content, font, font_manager);
 
@@ -36,7 +37,8 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
 
     if (std::holds_alternative<domain::BufferContentPosition>(cursor_position)) {
         auto buffer_pos = std::get<domain::BufferContentPosition>(cursor_position);
-        auto cursor_pixel_pos = m_kakoune_content_view->coordToPixels(font_content, buffer_pos.coord);
+        auto cursor_pixel_pos = m_kakoune_content_view->coordToPixels(font_content, buffer_pos.coord,
+                                                                      content_bounds.x, content_bounds.y);
         cursor_rect.x = cursor_pixel_pos.first;
         cursor_rect.y = cursor_pixel_pos.second;
         cursor_rect.width = m_kakoune_content_view->getCellWidth(font_content);
@@ -72,7 +74,7 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
 
         if (direction == PlacementDirection::RIGHT_WRAPPED)
         {
-            float available_width = m_kakoune_content_view->width() - info_box.x - SPACING_MEDIUM * 2.0f;
+            float available_width = content_bounds.x + content_bounds.width - info_box.x - SPACING_MEDIUM * 2.0f;
 
             if (available_width < MIN_WIDTH)
                 return std::nullopt;
@@ -117,9 +119,9 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
                 break;
         }
 
-        if (info_box.y + info_box.height + SPACING_MEDIUM * 2.0f > m_kakoune_content_view->height())
+        if (info_box.y + info_box.height + SPACING_MEDIUM * 2.0f > content_bounds.y + content_bounds.height)
         {
-            info_box.y = std::max(0.0f, m_kakoune_content_view->height() - info_box.height - SPACING_MEDIUM * 2.0f);
+            info_box.y = std::max(0.0f, content_bounds.y + content_bounds.height - info_box.height - SPACING_MEDIUM * 2.0f);
         }
 
         if (info_box.intersects(menu_rectangle)) {
@@ -183,9 +185,9 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
                 break;
         }
 
-        if (info_box.y + info_box.height + SPACING_MEDIUM * 2.0f > m_kakoune_content_view->height())
+        if (info_box.y + info_box.height + SPACING_MEDIUM * 2.0f > content_bounds.y + content_bounds.height)
         {
-            info_box.y = std::max(0.0f, m_kakoune_content_view->height() - info_box.height - SPACING_MEDIUM * 2.0f);
+            info_box.y = std::max(0.0f, content_bounds.y + content_bounds.height - info_box.height - SPACING_MEDIUM * 2.0f);
         }
 
         if (info_box.intersects(menu_rectangle)) {
@@ -232,9 +234,9 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
                 break;
         }
 
-        if (info_box.x + info_box.width + SPACING_MEDIUM * 2.0f > m_kakoune_content_view->width())
+        if (info_box.x + info_box.width + SPACING_MEDIUM * 2.0f > content_bounds.x + content_bounds.width)
         {
-            info_box.x = std::max(0.0f, m_kakoune_content_view->width() - info_box.width - SPACING_MEDIUM * 2.0f);
+            info_box.x = std::max(0.0f, content_bounds.x + content_bounds.width - info_box.width - SPACING_MEDIUM * 2.0f);
         }
 
         if (info_box.intersects(menu_rectangle)) {
@@ -280,9 +282,9 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
                 break;
         }
 
-        if (info_box.x + info_box.width + SPACING_MEDIUM * 2.0f > m_kakoune_content_view->width())
+        if (info_box.x + info_box.width + SPACING_MEDIUM * 2.0f > content_bounds.x + content_bounds.width)
         {
-            info_box.x = std::max(0.0f, m_kakoune_content_view->width() - info_box.width - SPACING_MEDIUM * 2.0f);
+            info_box.x = std::max(0.0f, content_bounds.x + content_bounds.width - info_box.width - SPACING_MEDIUM * 2.0f);
         }
 
         if (info_box.intersects(menu_rectangle)) {
@@ -333,7 +335,7 @@ std::optional<Placement> InfoBoxView::tryPlaceInfoBox(PlacementDirection directi
     return std::nullopt;
 }
 
-void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &state, const domain::InfoBox &info_box, const domain::CursorPosition &cursor_position)
+void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &state, const domain::InfoBox &info_box, const domain::CursorPosition &cursor_position, const domain::Rectangle &content_bounds)
 {
     domain::Font* font = render_context.ui_options.font_infobox;
     domain::Rectangle anchor;
@@ -363,7 +365,8 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
         break;
 
     case domain::InfoStyle::INLINE: {
-        auto pos = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, info_box.anchor);
+        auto pos = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, info_box.anchor,
+                                                         content_bounds.x, content_bounds.y);
         anchor = {pos.first, pos.second, m_kakoune_content_view->getCellWidth(render_context.ui_options.font_content),
                   m_kakoune_content_view->getCellHeight(render_context.ui_options.font_content)};
         direction = PlacementDirection::BELOW;
@@ -374,7 +377,8 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
     break;
 
     case domain::InfoStyle::INLINE_ABOVE: {
-        auto pos = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, info_box.anchor);
+        auto pos = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, info_box.anchor,
+                                                         content_bounds.x, content_bounds.y);
         anchor = {pos.first, pos.second, m_kakoune_content_view->getCellWidth(render_context.ui_options.font_content),
                   m_kakoune_content_view->getCellHeight(render_context.ui_options.font_content)};
         direction = PlacementDirection::ABOVE;
@@ -385,7 +389,8 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
     break;
 
     case domain::InfoStyle::INLINE_BELOW: {
-        auto pos = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, info_box.anchor);
+        auto pos = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, info_box.anchor,
+                                                         content_bounds.x, content_bounds.y);
         anchor = {pos.first, pos.second, 0, m_kakoune_content_view->getCellHeight(render_context.ui_options.font_content)};
         direction = PlacementDirection::BELOW;
         alignment = CrossAxisAlignment::START;
@@ -426,7 +431,7 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
     directions.insert(directions.begin() + 1, fallback_directions.begin(), fallback_directions.end());
     for (const auto& dir : directions)
     {
-        auto current_placement = tryPlaceInfoBox(dir, alignment, info_box.content, info_box.title, anchor, render_context.screen_width, render_context.screen_height, font, render_context.font_manager, menu_rectangle, cursor_position, render_context.ui_options.font_content);
+        auto current_placement = tryPlaceInfoBox(dir, alignment, info_box.content, info_box.title, anchor, render_context.screen_width, render_context.screen_height, font, render_context.font_manager, menu_rectangle, cursor_position, render_context.ui_options.font_content, content_bounds);
         if (current_placement.has_value()) {
             placement_opt = current_placement.value();
             break;

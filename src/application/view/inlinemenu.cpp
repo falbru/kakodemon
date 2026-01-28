@@ -32,14 +32,16 @@ float InlineMenuView::height() const {
     return m_height;
 }
 
-void InlineMenuView::render(const RenderContext &render_context, MenuViewState &state, const domain::Menu &menu)
+void InlineMenuView::render(const RenderContext &render_context, MenuViewState &state, const domain::Menu &menu,
+                            const domain::Rectangle &content_bounds)
 {
     if (!menu.hasItems()) return;
 
     domain::Font* font = render_context.ui_options.font_menu;
     auto anchor = menu.getItems().anchor;
 
-    auto menu_position = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, anchor);
+    auto menu_position = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, anchor,
+                                                               content_bounds.x, content_bounds.y);
 
     auto menu_item_width = 0.0f;
     for (const auto& item : menu.getItems().items) {

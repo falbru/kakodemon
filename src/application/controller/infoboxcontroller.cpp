@@ -1,4 +1,5 @@
 #include "infoboxcontroller.hpp"
+#include "application/controller/layoutcontroller.hpp"
 #include "application/view/rendercontext.hpp"
 #include "domain/uioptions.hpp"
 
@@ -6,8 +7,9 @@ InfoBoxController::InfoBoxController() {
 
 }
 
-void InfoBoxController::init(KakouneClient** focused_client, EditorController* editor_controller, domain::FontManager* font_manager, InfoBoxView* info_box_view, std::function<void()> mark_dirty) {
+void InfoBoxController::init(KakouneClient** focused_client, LayoutController* layout_controller, EditorController* editor_controller, domain::FontManager* font_manager, InfoBoxView* info_box_view, std::function<void()> mark_dirty) {
     m_focused_client = focused_client;
+    m_layout_controller = layout_controller;
     m_editor_controller = editor_controller;
     m_font_manager = font_manager;
     m_info_box_view = info_box_view;
@@ -28,7 +30,7 @@ void InfoBoxController::render(const domain::UIOptions& ui_options) {
         static_cast<float>(m_editor_controller->height())
     };
 
-    m_info_box_view->render(render_context, (*m_focused_client)->info_box_state, *(*m_focused_client)->state.info_box, (*m_focused_client)->state.cursor_position);
+    m_info_box_view->render(render_context, (*m_focused_client)->info_box_state, *(*m_focused_client)->state.info_box, (*m_focused_client)->state.cursor_position, m_layout_controller->findLayoutForClient(*m_focused_client)->bounds);
 }
 
 void InfoBoxController::onMouseScroll(int scroll_amount)
