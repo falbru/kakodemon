@@ -117,7 +117,7 @@ void Application::init(const CliConfig &cli_config, ApplicationConfig &app_confi
     m_layout_controller->init(&m_kakoune_clients);
     m_focus_controller->init(&m_focused_client, m_layout_controller.get());
     m_menu_controller->init(&m_focused_client, m_editor_controller.get(), m_font_manager.get(), m_prompt_menu.get(), m_inline_menu.get(), m_search_menu.get(), [this]() { markDirty(); });
-    m_editor_controller->init(&m_kakoune_clients, m_layout_controller.get(), m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager.get(), [&](domain::RGBAColor color) { setClearColor(color); }, m_menu_controller.get());
+    m_editor_controller->init(&m_kakoune_clients, &m_focused_client, m_layout_controller.get(), m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager.get(), [&](domain::RGBAColor color) { setClearColor(color); }, m_menu_controller.get());
     m_info_box_controller->init(&m_focused_client, m_editor_controller.get(), m_font_manager.get(), m_info_box.get(), [this]() { markDirty(); });
     m_mouse_controller->init(&m_focused_client, m_editor_controller.get(), m_menu_controller.get(), m_info_box_controller.get());
 
@@ -174,6 +174,7 @@ void Application::onMouseMove(float x, float y)
 
 void Application::onMouseButton(domain::MouseButtonEvent event)
 {
+    m_focus_controller->onMouseButton(event);
     m_mouse_controller->onMouseButton(event, m_ui_options.get());
     markDirty();
 }

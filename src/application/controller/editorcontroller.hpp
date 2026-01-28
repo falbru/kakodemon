@@ -14,15 +14,17 @@
 #include <memory>
 #include <vector>
 
+class MenuController;
+
 class EditorController // TODO rename to KakouneContentViewController or something?
 {
   public:
     EditorController();
 
-    void init(std::vector<std::unique_ptr<KakouneClient>> *kakoune_clients, LayoutController *layout_controller,
-              KakouneContentView *kakoune_content_view, StatusBarView *status_bar_view,
-              domain::FontManager *font_manager, std::function<void(domain::RGBAColor)> set_clear_color,
-              class MenuController *menu_controller);
+    void init(std::vector<std::unique_ptr<KakouneClient>> *kakoune_clients, KakouneClient **focused_client,
+              LayoutController *layout_controller, KakouneContentView *kakoune_content_view,
+              StatusBarView *status_bar_view, domain::FontManager *font_manager,
+              std::function<void(domain::RGBAColor)> set_clear_color, MenuController *menu_controller);
     bool update(domain::UIOptions &ui_options);
     void render(const domain::UIOptions &ui_options);
 
@@ -36,16 +38,18 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
 
   private:
     std::vector<std::unique_ptr<KakouneClient>> *m_kakoune_clients;
+    KakouneClient **m_focused_client;
     LayoutController *m_layout_controller;
     KakouneContentView *m_kakoune_content_view;
     StatusBarView *m_status_bar_view;
     domain::FontManager *m_font_manager;
-    class MenuController *m_menu_controller;
+    MenuController *m_menu_controller;
 
     std::function<void(domain::RGBAColor)> m_set_clear_color;
     void setClearColor(domain::RGBAColor color);
 
     std::map<domain::MouseButton, bool> m_mouse_button_pressed;
+    KakouneClient *m_active_mouse_client;
 
     int m_rows;
     int m_columns;

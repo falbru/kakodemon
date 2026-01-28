@@ -34,6 +34,15 @@ ClientLayout* LayoutController::findLayoutAt(float x, float y) {
     return nullptr;
 }
 
+ClientLayout* LayoutController::findLayoutForClient(KakouneClient* client) {
+    for (auto& layout : m_layouts) {
+        if (layout.client == client) {
+            return &layout;
+        }
+    }
+    return nullptr;
+}
+
 const std::vector<ClientLayout>& LayoutController::getLayouts() const {
     return m_layouts;
 }

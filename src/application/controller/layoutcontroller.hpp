@@ -18,6 +18,7 @@ class LayoutController
     void init(std::vector<std::unique_ptr<KakouneClient>> *clients);
     void arrange(float width, float height);
     ClientLayout *findLayoutAt(float x, float y);
+    ClientLayout *findLayoutForClient(KakouneClient *client);
     const std::vector<ClientLayout> &getLayouts() const;
 
   private:

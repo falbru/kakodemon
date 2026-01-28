@@ -12,6 +12,7 @@ EditorController::EditorController()
 }
 
 void EditorController::init(std::vector<std::unique_ptr<KakouneClient>>* kakoune_clients,
+                            KakouneClient** focused_client,
                             LayoutController* layout_controller,
                             KakouneContentView* kakoune_content_view,
                             StatusBarView* status_bar_view,
@@ -20,6 +21,7 @@ void EditorController::init(std::vector<std::unique_ptr<KakouneClient>>* kakoune
                             MenuController* menu_controller)
 {
     m_kakoune_clients = kakoune_clients;
+    m_focused_client = focused_client;
     m_layout_controller = layout_controller;
     m_kakoune_content_view = kakoune_content_view;
     m_status_bar_view = status_bar_view;
@@ -104,14 +106,14 @@ void EditorController::onWindowResize(int width, int height, const domain::UIOpt
 }
 
 domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const domain::UIOptions* ui_options, bool obscured) {
-    ClientLayout* layout = m_layout_controller->findLayoutAt(x, y);
-    if (!layout) {
+    ClientLayout* hover_layout = m_layout_controller->findLayoutAt(x, y);
+    if (!hover_layout) {
         return domain::MouseMoveResult{domain::Cursor::DEFAULT};
     }
 
     float status_bar_height = m_status_bar_view->height(ui_options->font_statusbar);
-    float content_height = layout->bounds.height - status_bar_height;
-    float relative_y = y - layout->bounds.y;
+    float content_height = hover_layout->bounds.height - status_bar_height;
+    float relative_y = y - hover_layout->bounds.y;
 
     if (relative_y >= content_height) {
         return domain::MouseMoveResult{domain::Cursor::DEFAULT};
@@ -130,30 +132,35 @@ domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const do
     }
 
     if (is_any_mouse_button_pressed) {
-        float relative_x = x - layout->bounds.x;
-        domain::Coord coord = m_kakoune_content_view->pixelToCoord(ui_options->font_content, relative_x, relative_y);
-        layout->client->interface->moveMouse(coord.line, coord.column);
+        ClientLayout* focused_layout = m_layout_controller->findLayoutForClient(*m_focused_client);
+        if (focused_layout) {
+            float relative_x = x - focused_layout->bounds.x;
+            float focused_relative_y = y - focused_layout->bounds.y;
+            domain::Coord coord = m_kakoune_content_view->pixelToCoord(ui_options->font_content, relative_x, focused_relative_y);
+            (*m_focused_client)->interface->moveMouse(coord.line, coord.column);
+            m_active_mouse_client = *m_focused_client;
+        }
     }
 
     return domain::MouseMoveResult{domain::Cursor::IBEAM};
 }
 
 void EditorController::onMouseButton(domain::MouseButtonEvent event, const domain::UIOptions* ui_options, bool obscured) {
-    ClientLayout* layout = m_layout_controller->findLayoutAt(event.x, event.y);
-    if (!layout) {
+    ClientLayout* focused_layout = m_layout_controller->findLayoutForClient(*m_focused_client);
+    if (!focused_layout) {
         return;
     }
 
-    float relative_x = event.x - layout->bounds.x;
-    float relative_y = event.y - layout->bounds.y;
+    float relative_x = event.x - focused_layout->bounds.x;
+    float relative_y = event.y - focused_layout->bounds.y;
     domain::Coord coord = m_kakoune_content_view->pixelToCoord(ui_options->font_content, relative_x, relative_y);
 
     if (!obscured && event.action == domain::MouseButtonAction::PRESS) {
-        layout->client->interface->pressMouseButton(event.button, coord.line, coord.column);
+        (*m_focused_client)->interface->pressMouseButton(event.button, coord.line, coord.column);
         m_mouse_button_pressed[event.button] = true;
     } else if (event.action == domain::MouseButtonAction::RELEASE) {
-        if (!obscured) {
-            layout->client->interface->releaseMouseButton(event.button, coord.line, coord.column);
+        if (!obscured && m_active_mouse_client) {
+            m_active_mouse_client->interface->releaseMouseButton(event.button, coord.line, coord.column);
         }
 
         m_mouse_button_pressed[event.button] = false;
@@ -170,16 +177,16 @@ int EditorController::height() const {
 }
 
 void EditorController::onMouseScroll(int amount, float x, float y, const domain::UIOptions* ui_options) {
-    ClientLayout* layout = m_layout_controller->findLayoutAt(x, y);
-    if (!layout) {
+    ClientLayout* focused_layout = m_layout_controller->findLayoutForClient(*m_focused_client);
+    if (!focused_layout) {
         return;
     }
 
-    float relative_x = x - layout->bounds.x;
-    float relative_y = y - layout->bounds.y;
+    float relative_x = x - focused_layout->bounds.x;
+    float relative_y = y - focused_layout->bounds.y;
     domain::Coord coord = m_kakoune_content_view->pixelToCoord(ui_options->font_content, relative_x, relative_y);
 
-    layout->client->interface->scroll(amount, coord.line, coord.column);
+    (*m_focused_client)->interface->scroll(amount, coord.line, coord.column);
 }
 
 void EditorController::setClearColor(domain::RGBAColor color) {
