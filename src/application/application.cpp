@@ -62,8 +62,8 @@ void Application::createKakouneClient(std::optional<std::string> startup_command
     auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*m_kakoune_session, startup_command, file_arguments);
     interface->setWakeEventLoopCallback([this]() { wakeEventLoop(); });
     m_kakoune_clients.push_back(std::make_unique<KakouneClient>(m_kakoune_session.get(), std::move(interface)));
-    if (m_layout_controller) {
-        m_layout_controller->arrange(getWidth(), getHeight());
+    if (m_pane_layout) {
+        m_pane_layout->arrange(getWidth(), getHeight());
         onWindowResize(getWidth(), getHeight());
     }
     m_focused_client = m_kakoune_clients.back().get();
@@ -92,12 +92,12 @@ void Application::init(const CliConfig &cli_config, ApplicationConfig &app_confi
     m_focused_client = m_kakoune_clients.front().get();
 
     m_ui_options = std::make_unique<domain::UIOptions>();
+    m_pane_layout = std::make_unique<PaneLayout>();
 
     m_command_controller = std::make_unique<CommandController>();
     m_editor_controller = std::make_unique<EditorController>();
     m_focus_controller = std::make_unique<FocusController>();
     m_input_controller = std::make_unique<InputController>();
-    m_layout_controller = std::make_unique<LayoutController>();
     m_mouse_controller = std::make_unique<MouseController>();
     m_menu_controller = std::make_unique<MenuController>();
     m_info_box_controller = std::make_unique<InfoBoxController>();
@@ -116,14 +116,14 @@ void Application::init(const CliConfig &cli_config, ApplicationConfig &app_confi
     m_search_menu->init(m_renderer.get());
     m_info_box->init(m_renderer.get(), m_menu_controller.get(), m_kakoune_content_view.get(), m_status_bar.get());
 
-    m_layout_controller->init(&m_kakoune_clients);
+    m_pane_layout->init(&m_kakoune_clients);
 
     m_command_controller->init(m_command_interface.get(), [=](std::optional<std::string> startup_command, std::vector<std::string> file_arguments) { createKakouneClient(startup_command, file_arguments); }, m_kakoune_session.get(), [this](const std::string &title) { setWindowTitle(title); });
     m_input_controller->init(&m_focused_client);
-    m_focus_controller->init(&m_focused_client, m_layout_controller.get());
-    m_menu_controller->init(&m_focused_client, m_layout_controller.get(), m_editor_controller.get(), m_font_manager.get(), m_prompt_menu.get(), m_inline_menu.get(), m_search_menu.get(), [this]() { markDirty(); });
-    m_editor_controller->init(&m_kakoune_clients, &m_focused_client, m_layout_controller.get(), m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager.get(), [&](domain::RGBAColor color) { setClearColor(color); }, m_menu_controller.get());
-    m_info_box_controller->init(&m_focused_client, m_layout_controller.get(), m_editor_controller.get(), m_font_manager.get(), m_info_box.get(), [this]() { markDirty(); });
+    m_focus_controller->init(&m_focused_client, m_pane_layout.get());
+    m_menu_controller->init(&m_focused_client, m_pane_layout.get(), m_editor_controller.get(), m_font_manager.get(), m_prompt_menu.get(), m_inline_menu.get(), m_search_menu.get(), [this]() { markDirty(); });
+    m_editor_controller->init(&m_kakoune_clients, &m_focused_client, m_pane_layout.get(), m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager.get(), [&](domain::RGBAColor color) { setClearColor(color); }, m_menu_controller.get());
+    m_info_box_controller->init(&m_focused_client, m_pane_layout.get(), m_editor_controller.get(), m_font_manager.get(), m_info_box.get(), [this]() { markDirty(); });
     m_mouse_controller->init(&m_focused_client, m_editor_controller.get(), m_menu_controller.get(), m_info_box_controller.get());
 
     m_ui_options->font = m_font_manager->getDefaultFont(14);

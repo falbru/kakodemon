@@ -1,8 +1,8 @@
 #ifndef EDITORCONTROLLER_HPP_INCLUDED
 #define EDITORCONTROLLER_HPP_INCLUDED
 
-#include "application/controller/layoutcontroller.hpp"
 #include "application/model/kakouneclient.hpp"
+#include "application/model/panelayout.hpp"
 #include "application/view/kakounecontentview.hpp"
 #include "application/view/statusbar.hpp"
 #include "domain/color.hpp"
@@ -22,9 +22,9 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
     EditorController();
 
     void init(std::vector<std::unique_ptr<KakouneClient>> *kakoune_clients, KakouneClient **focused_client,
-              LayoutController *layout_controller, KakouneContentView *kakoune_content_view,
-              StatusBarView *status_bar_view, domain::FontManager *font_manager,
-              std::function<void(domain::RGBAColor)> set_clear_color, MenuController *menu_controller);
+              PaneLayout *layout_controller, KakouneContentView *kakoune_content_view, StatusBarView *status_bar_view,
+              domain::FontManager *font_manager, std::function<void(domain::RGBAColor)> set_clear_color,
+              MenuController *menu_controller);
     bool update(domain::UIOptions &ui_options);
     void render(const domain::UIOptions &ui_options);
 
@@ -39,7 +39,7 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
   private:
     std::vector<std::unique_ptr<KakouneClient>> *m_kakoune_clients;
     KakouneClient **m_focused_client;
-    LayoutController *m_layout_controller;
+    PaneLayout *m_pane_layout;
     KakouneContentView *m_kakoune_content_view;
     StatusBarView *m_status_bar_view;
     domain::FontManager *m_font_manager;

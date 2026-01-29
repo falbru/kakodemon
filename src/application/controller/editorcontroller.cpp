@@ -13,7 +13,7 @@ EditorController::EditorController()
 
 void EditorController::init(std::vector<std::unique_ptr<KakouneClient>>* kakoune_clients,
                             KakouneClient** focused_client,
-                            LayoutController* layout_controller,
+                            PaneLayout* layout_controller,
                             KakouneContentView* kakoune_content_view,
                             StatusBarView* status_bar_view,
                             domain::FontManager* font_manager,
@@ -22,7 +22,7 @@ void EditorController::init(std::vector<std::unique_ptr<KakouneClient>>* kakoune
 {
     m_kakoune_clients = kakoune_clients;
     m_focused_client = focused_client;
-    m_layout_controller = layout_controller;
+    m_pane_layout = layout_controller;
     m_kakoune_content_view = kakoune_content_view;
     m_status_bar_view = status_bar_view;
     m_font_manager = font_manager;
@@ -66,9 +66,9 @@ bool EditorController::update(domain::UIOptions& ui_options)
 
 void EditorController::render(const domain::UIOptions& ui_options)
 {
-    for (const auto& layout : m_layout_controller->getLayouts()) {
-        auto* client = layout.client;
-        const auto& bounds = layout.bounds;
+    for (const auto& pane : m_pane_layout->getPanes()) {
+        auto* client = pane.client;
+        const auto& bounds = pane.bounds;
 
         RenderContext render_context = {
             m_font_manager,
@@ -87,33 +87,33 @@ void EditorController::onWindowResize(int width, int height, const domain::UIOpt
     m_width = width;
     m_height = height;
 
-    m_layout_controller->arrange(static_cast<float>(width), static_cast<float>(height));
+    m_pane_layout->arrange(static_cast<float>(width), static_cast<float>(height));
 
     float cell_width = m_kakoune_content_view->getCellWidth(ui_options.font_content);
     float cell_height = m_kakoune_content_view->getCellHeight(ui_options.font_content);
     float status_bar_height = m_status_bar_view->height(ui_options.font_statusbar);
 
-    for (const auto& layout : m_layout_controller->getLayouts()) {
-        int rows = static_cast<int>((layout.bounds.height - status_bar_height) / cell_height);
-        int columns = static_cast<int>(layout.bounds.width / cell_width);
-        layout.client->interface->resize(rows, columns);
+    for (const auto& pane : m_pane_layout->getPanes()) {
+        int rows = static_cast<int>((pane.bounds.height - status_bar_height) / cell_height);
+        int columns = static_cast<int>(pane.bounds.width / cell_width);
+        pane.client->interface->resize(rows, columns);
     }
 
-    if (!m_layout_controller->getLayouts().empty()) {
-        const auto& first_layout = m_layout_controller->getLayouts().front();
-        m_rows = static_cast<int>((first_layout.bounds.height - status_bar_height) / cell_height);
+    if (!m_pane_layout->getPanes().empty()) {
+        const auto& first_pane = m_pane_layout->getPanes().front();
+        m_rows = static_cast<int>((first_pane.bounds.height - status_bar_height) / cell_height);
     }
 }
 
 domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const domain::UIOptions* ui_options, bool obscured) {
-    ClientLayout* hover_layout = m_layout_controller->findLayoutAt(x, y);
-    if (!hover_layout) {
+    Pane* hover_pane = m_pane_layout->findPaneAt(x, y);
+    if (!hover_pane) {
         return domain::MouseMoveResult{domain::Cursor::DEFAULT};
     }
 
     float status_bar_height = m_status_bar_view->height(ui_options->font_statusbar);
-    float content_height = hover_layout->bounds.height - status_bar_height;
-    float relative_y = y - hover_layout->bounds.y;
+    float content_height = hover_pane->bounds.height - status_bar_height;
+    float relative_y = y - hover_pane->bounds.y;
 
     if (relative_y >= content_height) {
         return domain::MouseMoveResult{domain::Cursor::DEFAULT};
@@ -132,9 +132,9 @@ domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const do
     }
 
     if (is_any_mouse_button_pressed) {
-        ClientLayout* focused_layout = m_layout_controller->findLayoutForClient(*m_focused_client);
-        if (focused_layout) {
-            domain::Coord coord = m_kakoune_content_view->pixelToCoord(ui_options->font_content, x, y, focused_layout->bounds.x, focused_layout->bounds.y);
+        Pane* focused_pane = m_pane_layout->findPaneForClient(*m_focused_client);
+        if (focused_pane) {
+            domain::Coord coord = m_kakoune_content_view->pixelToCoord(ui_options->font_content, x, y, focused_pane->bounds.x, focused_pane->bounds.y);
             (*m_focused_client)->interface->moveMouse(coord.line, coord.column);
             m_active_mouse_client = *m_focused_client;
         }
@@ -144,12 +144,12 @@ domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const do
 }
 
 void EditorController::onMouseButton(domain::MouseButtonEvent event, const domain::UIOptions* ui_options, bool obscured) {
-    ClientLayout* focused_layout = m_layout_controller->findLayoutForClient(*m_focused_client);
-    if (!focused_layout) {
+    Pane* focused_pane = m_pane_layout->findPaneForClient(*m_focused_client);
+    if (!focused_pane) {
         return;
     }
 
-    domain::Coord coord = m_kakoune_content_view->pixelToCoord(ui_options->font_content, event.x, event.y, focused_layout->bounds.x, focused_layout->bounds.y);
+    domain::Coord coord = m_kakoune_content_view->pixelToCoord(ui_options->font_content, event.x, event.y, focused_pane->bounds.x, focused_pane->bounds.y);
 
     if (!obscured && event.action == domain::MouseButtonAction::PRESS) {
         (*m_focused_client)->interface->pressMouseButton(event.button, coord.line, coord.column);
@@ -173,12 +173,12 @@ int EditorController::height() const {
 }
 
 void EditorController::onMouseScroll(int amount, float x, float y, const domain::UIOptions* ui_options) {
-    ClientLayout* focused_layout = m_layout_controller->findLayoutForClient(*m_focused_client);
-    if (!focused_layout) {
+    Pane* focused_pane = m_pane_layout->findPaneForClient(*m_focused_client);
+    if (!focused_pane) {
         return;
     }
 
-    domain::Coord coord = m_kakoune_content_view->pixelToCoord(ui_options->font_content, x, y, focused_layout->bounds.x, focused_layout->bounds.y);
+    domain::Coord coord = m_kakoune_content_view->pixelToCoord(ui_options->font_content, x, y, focused_pane->bounds.x, focused_pane->bounds.y);
 
     (*m_focused_client)->interface->scroll(amount, coord.line, coord.column);
 }
