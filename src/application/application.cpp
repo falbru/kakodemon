@@ -62,6 +62,11 @@ void Application::createKakouneClient(std::optional<std::string> startup_command
     auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*m_kakoune_session, startup_command, file_arguments);
     interface->setWakeEventLoopCallback([this]() { wakeEventLoop(); });
     m_kakoune_clients.push_back(std::make_unique<KakouneClient>(m_kakoune_session.get(), std::move(interface)));
+    if (m_layout_controller) {
+        m_layout_controller->arrange(getWidth(), getHeight());
+        onWindowResize(getWidth(), getHeight());
+    }
+    m_focused_client = m_kakoune_clients.back().get();
 }
 
 void Application::init(const CliConfig &cli_config, ApplicationConfig &app_config)
@@ -84,7 +89,6 @@ void Application::init(const CliConfig &cli_config, ApplicationConfig &app_confi
     }
 
     createKakouneClient(cli_config.startup_command, cli_config.session_type == SessionType::Remote ? cli_config.file_arguments : std::vector<std::string>{});
-    createKakouneClient(std::nullopt, {});
     m_focused_client = m_kakoune_clients.front().get();
 
     m_ui_options = std::make_unique<domain::UIOptions>();
@@ -112,9 +116,10 @@ void Application::init(const CliConfig &cli_config, ApplicationConfig &app_confi
     m_search_menu->init(m_renderer.get());
     m_info_box->init(m_renderer.get(), m_menu_controller.get(), m_kakoune_content_view.get(), m_status_bar.get());
 
-    m_command_controller->init(m_command_interface.get(), m_kakoune_session.get(), [this](const std::string &title) { setWindowTitle(title); });
-    m_input_controller->init(&m_focused_client);
     m_layout_controller->init(&m_kakoune_clients);
+
+    m_command_controller->init(m_command_interface.get(), [=](std::optional<std::string> startup_command, std::vector<std::string> file_arguments) { createKakouneClient(startup_command, file_arguments); }, m_kakoune_session.get(), [this](const std::string &title) { setWindowTitle(title); });
+    m_input_controller->init(&m_focused_client);
     m_focus_controller->init(&m_focused_client, m_layout_controller.get());
     m_menu_controller->init(&m_focused_client, m_layout_controller.get(), m_editor_controller.get(), m_font_manager.get(), m_prompt_menu.get(), m_inline_menu.get(), m_search_menu.get(), [this]() { markDirty(); });
     m_editor_controller->init(&m_kakoune_clients, &m_focused_client, m_layout_controller.get(), m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager.get(), [&](domain::RGBAColor color) { setClearColor(color); }, m_menu_controller.get());

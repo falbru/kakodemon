@@ -287,3 +287,15 @@ void opengl::GLFWApplication::setWindowTitle(const std::string& title) {
 void opengl::GLFWApplication::wakeEventLoop() {
     glfwPostEmptyEvent();
 }
+
+float opengl::GLFWApplication::getWidth() {
+    int width, height;
+    glfwGetFramebufferSize(m_window, &width, &height);
+    return width;
+}
+
+float opengl::GLFWApplication::getHeight() {
+    int width, height;
+    glfwGetFramebufferSize(m_window, &width, &height);
+    return height;
+}

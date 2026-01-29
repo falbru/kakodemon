@@ -17,3 +17,14 @@ hook -group kakodemon global SessionRenamed .* %{
         }
     }
 }
+
+define-command kakodemon-new-client %{
+    nop %sh{
+        [ -z "$kak_client_env_KAKOD_ID" ] && exit
+
+        KAKOD_ID=$kak_client_env_KAKOD_ID \
+        ~/code/github.com/falbru/kakodemon/build/kakod -p new-client
+    }
+}
+
+alias global new kakodemon-new-client

@@ -58,6 +58,8 @@ class Application
     void markDirty();
     bool needsRender() const;
     virtual void wakeEventLoop() = 0;
+    virtual float getWidth() = 0;
+    virtual float getHeight() = 0;
 
   protected:
     const int DEFAULT_WINDOW_WIDTH = 640;

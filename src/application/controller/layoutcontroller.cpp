@@ -1,13 +1,21 @@
 #include "layoutcontroller.hpp"
 
 void LayoutController::init(std::vector<std::unique_ptr<KakouneClient>>* clients) {
+    m_clients = clients;
     m_layouts.clear();
+
     for (auto& client : *clients) {
         m_layouts.push_back({client.get(), {0, 0, 0, 0}});
     }
 }
 
 void LayoutController::arrange(float width, float height) {
+    m_layouts.clear();
+
+    for (auto& client : *m_clients) {
+        m_layouts.push_back({client.get(), {0, 0, 0, 0}});
+    }
+
     if (m_layouts.empty()) {
         return;
     }

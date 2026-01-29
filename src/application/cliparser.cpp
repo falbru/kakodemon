@@ -36,7 +36,7 @@ ParsedCliArgs parseCliArgs(int argc, char* argv[])
 
     int opt;
     int option_index = 0;
-    while ((opt = getopt_long(argc, argv, "c:s:e:p:n", long_options, &option_index)) != -1)
+    while ((opt = getopt_long(argc, argv, "c:s:e:pn", long_options, &option_index)) != -1)
     {
         switch (opt)
         {

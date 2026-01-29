@@ -21,6 +21,9 @@ class GLFWApplication : public Application
     void setWindowTitle(const std::string &title) override;
     void wakeEventLoop() override;
 
+    float getWidth() override;
+    float getHeight() override;
+
   private:
     void onGLFWKeyInput(int key, int scancode, int action, int mods);
     void onGLFWCharacterInsert(unsigned int codepoint, int mods);

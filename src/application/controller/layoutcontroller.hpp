@@ -23,6 +23,7 @@ class LayoutController
 
   private:
     std::vector<ClientLayout> m_layouts;
+    std::vector<std::unique_ptr<KakouneClient>> *m_clients;
 };
 
 #endif
