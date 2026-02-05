@@ -20,6 +20,7 @@ void InfoBoxController::update(const domain::UIOptions& ui_options) {
 }
 
 void InfoBoxController::render(const domain::UIOptions& ui_options) {
+    if (!*m_focused_client) return;
     if (!(*m_focused_client)->state.info_box.has_value() || ((*m_focused_client)->state.info_box->title.size() == 0 && (*m_focused_client)->state.info_box->content.size() == 0)) return;
 
     RenderContext render_context = {
@@ -35,7 +36,7 @@ void InfoBoxController::render(const domain::UIOptions& ui_options) {
 
 void InfoBoxController::onMouseScroll(int scroll_amount)
 {
-    if (!(*m_focused_client)->state.info_box.has_value()) return;
+    if (!*m_focused_client || !(*m_focused_client)->state.info_box.has_value()) return;
 
     m_info_box_view->onMouseScroll((*m_focused_client)->info_box_state, scroll_amount);
 

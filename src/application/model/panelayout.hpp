@@ -1,9 +1,10 @@
 #ifndef MODEL_PANELAYOUT_HPP_INCLUDED
 #define MODEL_PANELAYOUT_HPP_INCLUDED
 
+#include "application/model/clientmanager.hpp"
 #include "application/model/kakouneclient.hpp"
 #include "domain/geometry.hpp"
-#include <memory>
+#include <map>
 #include <vector>
 
 struct Pane
@@ -15,20 +16,27 @@ struct Pane
 class PaneLayout
 {
   public:
-    void init(std::vector<std::unique_ptr<KakouneClient>> *clients);
-    void arrange(float width, float height);
+    void init(ClientManager *client_manager);
+    void arrange();
+    void setBounds(const domain::Rectangle &bounds);
+
     Pane *findPaneAt(float x, float y);
     Pane *findPaneForClient(KakouneClient *client);
     const std::vector<Pane> &getPanes() const;
 
-    void addArrangeCallback(std::function<void(const std::vector<Pane> &)> callback);
-    void notifyArrangeCallbacks() const;
+    ObserverId onArrange(std::function<void(const std::vector<Pane> &)> callback);
+    void removeObserver(ObserverId id);
 
   private:
-    std::vector<Pane> m_panes;
-    std::vector<std::unique_ptr<KakouneClient>> *m_clients;
+    void notifyArrangeObservers() const;
 
-    std::vector<std::function<void(const std::vector<Pane> &)>> m_callbacks;
+    std::vector<Pane> m_panes;
+    ClientManager *m_client_manager;
+
+    ObserverId m_next_observer_id = 0;
+    std::map<ObserverId, std::function<void(const std::vector<Pane> &)>> m_arrange_observers;
+
+    domain::Rectangle m_bounds;
 };
 
 #endif

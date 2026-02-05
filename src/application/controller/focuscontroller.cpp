@@ -1,8 +1,22 @@
 #include "focuscontroller.hpp"
+#include "application/model/clientmanager.hpp"
+#include "application/model/kakouneclient.hpp"
 
-void FocusController::init(KakouneClient** focused_client, PaneLayout* layout_controller) {
+void FocusController::init(KakouneClient** focused_client, ClientManager* client_manager, PaneLayout* layout_controller) {
     m_focused_client = focused_client;
     m_pane_layout = layout_controller;
+    m_client_manager = client_manager;
+
+    m_client_manager->onClientAdded([=](KakouneClient* client) {
+        *m_focused_client = client;
+    });
+
+    m_client_manager->onClientRemoved([=](KakouneClient* client) {
+        if (*m_focused_client == client) {
+            auto& clients = m_client_manager->clients();
+            *m_focused_client = clients.empty() ? nullptr : clients.front().get();
+        }
+    });
 }
 
 void FocusController::onMouseMove(float x, float y) {

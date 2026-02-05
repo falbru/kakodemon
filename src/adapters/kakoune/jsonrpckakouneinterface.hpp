@@ -18,8 +18,6 @@ class JsonRpcKakouneInterface : public domain::KakouneInterface
                             const std::vector<std::string> &file_arguments = {});
     ~JsonRpcKakouneInterface();
 
-    void setWakeEventLoopCallback(std::function<void()> callback);
-
     std::optional<domain::KakouneState> getNextKakouneState() override;
     domain::UIOptions getUIOptions(domain::FontManager *font_manager) override;
     domain::FrameEvents getEvents() override;
@@ -33,7 +31,9 @@ class JsonRpcKakouneInterface : public domain::KakouneInterface
     void releaseMouseButton(domain::MouseButton button, int line, int column) override;
     void selectMenuItem(int index) override;
 
-    void setExitCallback(const std::function<void()> &callback) override;
+    ObserverId onRefresh(const std::function<void(bool)> &callback) override;
+    ObserverId onExit(const std::function<void()> &callback) override;
+    void removeObserver(ObserverId id) override;
 
   private:
     std::unique_ptr<KakouneClientProcess> m_process;

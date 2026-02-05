@@ -23,13 +23,13 @@ KakouneClientProcess::KakouneClientProcess(const std::string &session_name) : m_
 
 KakouneClientProcess::~KakouneClientProcess()
 {
-    if (m_stdin_pipefd[0] != -1)
+    if (m_stdout_pipefd[0] != -1)
     {
-        close(m_stdin_pipefd[0]);
+        close(m_stdout_pipefd[0]);
     }
-    if (m_stdout_pipefd[1] != -1)
+    if (m_stdin_pipefd[1] != -1)
     {
-        close(m_stdout_pipefd[1]);
+        close(m_stdin_pipefd[1]);
     }
 
     if (m_client_pid > 0) {
@@ -49,14 +49,26 @@ std::map<pid_t, KakouneClientProcess*> KakouneClientProcess::pid_to_instances = 
 
 void KakouneClientProcess::handleSIGCHLD(int sig) {
     int status;
-    pid_t pid = waitpid(-1, &status, WNOHANG);
-    if (pid > 0) {
+    pid_t pid;
+    while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
         auto proc = pid_to_instances.find(pid);
         if (proc != pid_to_instances.end()) {
-            proc->second->m_exit_callback();
+            proc->second->m_exited = true;
         }
     }
+}
 
+void KakouneClientProcess::processPendingExits() {
+    std::vector<KakouneClientProcess*> exited_processes;
+    for (auto& [pid, proc] : pid_to_instances) {
+        if (proc->m_exited) {
+            exited_processes.push_back(proc);
+        }
+    }
+    for (auto* proc : exited_processes) {
+        proc->m_exited = false;
+        proc->notifyExitObservers();
+    }
 }
 
 void KakouneClientProcess::registerProcess(pid_t pid) {
@@ -134,7 +146,9 @@ void KakouneClientProcess::start(std::optional<std::string> startup_command, con
     {
         registerProcess(pid);
         close(m_stdout_pipefd[1]);
+        m_stdout_pipefd[1] = -1;
         close(m_stdin_pipefd[0]);
+        m_stdin_pipefd[0] = -1;
         m_pollfd.fd = m_stdout_pipefd[0];
         m_pollfd.events = POLLIN;
     }
@@ -145,9 +159,16 @@ void KakouneClientProcess::setRequestCallback(const std::function<void(const Inc
     m_request_callback = callback;
 }
 
-void KakouneClientProcess::setExitCallback(const std::function<void()>& callback)
+ObserverId KakouneClientProcess::onExit(const std::function<void()>& callback)
 {
-    m_exit_callback = callback;
+    ObserverId id = m_next_observer_id++;
+    m_exit_observers[id] = callback;
+    return id;
+}
+
+void KakouneClientProcess::removeObserver(ObserverId id)
+{
+    m_exit_observers.erase(id);
 }
 
 void KakouneClientProcess::pollForRequests()
@@ -318,4 +339,11 @@ std::optional<IncomingRequest> KakouneClientProcess::parseRequest(std::string re
     }
 
     return std::nullopt;
+}
+
+void KakouneClientProcess::notifyExitObservers() {
+    auto observers_copy = m_exit_observers;
+    for (auto& [id, callback] : observers_copy) {
+        callback();
+    }
 }

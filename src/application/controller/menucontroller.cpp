@@ -21,7 +21,7 @@ void MenuController::init(KakouneClient** focused_client, PaneLayout* layout_con
 }
 
 void MenuController::render(const domain::UIOptions& ui_options) {
-    if (!(*m_focused_client)->state.menu.has_value()) {
+    if (!*m_focused_client || !(*m_focused_client)->state.menu.has_value()) {
         return;
     }
 
@@ -52,7 +52,7 @@ void MenuController::render(const domain::UIOptions& ui_options) {
 }
 
 domain::MouseMoveResult MenuController::onMouseMove(float x, float y) {
-    if (!(*m_focused_client)->state.menu.has_value()) {
+    if (!*m_focused_client || !(*m_focused_client)->state.menu.has_value()) {
         return domain::MouseMoveResult{std::nullopt};
     }
 
@@ -68,7 +68,7 @@ domain::MouseMoveResult MenuController::onMouseMove(float x, float y) {
 }
 
 float MenuController::x() const {
-    if (!(*m_focused_client)->state.menu.has_value()) return 0.0f;
+    if (!*m_focused_client || !(*m_focused_client)->state.menu.has_value()) return 0.0f;
 
     switch((*m_focused_client)->state.menu->getStyle()) {
         case domain::MenuStyle::INLINE:
@@ -82,7 +82,7 @@ float MenuController::x() const {
 }
 
 float MenuController::y() const {
-    if (!(*m_focused_client)->state.menu.has_value()) return 0.0f;
+    if (!*m_focused_client || !(*m_focused_client)->state.menu.has_value()) return 0.0f;
 
     switch((*m_focused_client)->state.menu->getStyle()) {
         case domain::MenuStyle::INLINE:
@@ -96,7 +96,7 @@ float MenuController::y() const {
 }
 
 float MenuController::width() const {
-    if (!(*m_focused_client)->state.menu.has_value()) return 0.0f;
+    if (!*m_focused_client || !(*m_focused_client)->state.menu.has_value()) return 0.0f;
 
     switch((*m_focused_client)->state.menu->getStyle()) {
         case domain::MenuStyle::INLINE:
@@ -110,7 +110,7 @@ float MenuController::width() const {
 }
 
 float MenuController::height() const {
-    if (!(*m_focused_client)->state.menu.has_value()) return 0.0f;
+    if (!*m_focused_client || !(*m_focused_client)->state.menu.has_value()) return 0.0f;
 
     switch((*m_focused_client)->state.menu->getStyle()) {
         case domain::MenuStyle::INLINE:
@@ -124,7 +124,7 @@ float MenuController::height() const {
 }
 
 bool MenuController::onMouseButton(domain::MouseButtonEvent event, const domain::UIOptions *ui_options) {
-    if (!(*m_focused_client)->state.menu || !(*m_focused_client)->state.menu->hasItems()) {
+    if (!*m_focused_client || !(*m_focused_client)->state.menu || !(*m_focused_client)->state.menu->hasItems()) {
         return false;
     }
 
@@ -156,7 +156,7 @@ bool MenuController::onMouseButton(domain::MouseButtonEvent event, const domain:
 }
 
 void MenuController::onMouseScroll(int scroll_amount) {
-    if (!(*m_focused_client)->state.menu.has_value()) {
+    if (!*m_focused_client || !(*m_focused_client)->state.menu.has_value()) {
         return;
     }
 
@@ -178,7 +178,7 @@ void MenuController::onMouseScroll(int scroll_amount) {
 }
 
 void MenuController::ensureItemVisible(int index) {
-    if (!(*m_focused_client)->state.menu.has_value()) {
+    if (!*m_focused_client || !(*m_focused_client)->state.menu.has_value()) {
         return;
     }
 

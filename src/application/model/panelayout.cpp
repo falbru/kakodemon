@@ -1,33 +1,39 @@
 #include "panelayout.hpp"
+#include "application/model/clientmanager.hpp"
+#include "application/model/kakouneclient.hpp"
 
-void PaneLayout::init(std::vector<std::unique_ptr<KakouneClient>>* clients) {
-    m_clients = clients;
+void PaneLayout::init(ClientManager* client_manager) {
     m_panes.clear();
+
+    m_client_manager = client_manager;
+    m_client_manager->onClientAdded([=](KakouneClient*) {
+        arrange();
+    });
 }
 
-void PaneLayout::arrange(float width, float height) {
-    if (m_clients->empty()) {
+void PaneLayout::arrange() {
+    if (m_client_manager->clients().empty()) {
         return;
     }
 
     m_panes.clear();
-    m_panes.reserve(m_clients->size());
-    for (auto& client : *m_clients) {
+    m_panes.reserve(m_client_manager->clients().size());
+    for (auto& client : m_client_manager->clients()) {
         m_panes.push_back({client.get(), {0, 0, 0, 0}});
     }
 
-    float pane_width = width / static_cast<float>(m_panes.size());
+    float pane_width = m_bounds.width / static_cast<float>(m_panes.size());
 
     for (size_t i = 0; i < m_panes.size(); ++i) {
         m_panes[i].bounds = {
-            pane_width * static_cast<float>(i),
-            0,
+            m_bounds.x + pane_width * static_cast<float>(i),
+            m_bounds.y,
             pane_width,
-            height
+            m_bounds.height
         };
     }
 
-    notifyArrangeCallbacks();
+    notifyArrangeObservers();
 }
 
 Pane* PaneLayout::findPaneAt(float x, float y) {
@@ -53,13 +59,22 @@ const std::vector<Pane>& PaneLayout::getPanes() const {
     return m_panes;
 }
 
-void PaneLayout::addArrangeCallback(std::function<void(const std::vector<Pane>&)> callback) {
-    m_callbacks.push_back(callback);
+ObserverId PaneLayout::onArrange(std::function<void(const std::vector<Pane>&)> callback) {
+    ObserverId id = m_next_observer_id++;
+    m_arrange_observers[id] = callback;
+    return id;
 }
 
-void PaneLayout::notifyArrangeCallbacks() const {
-    for (const auto& callback : m_callbacks) {
+void PaneLayout::removeObserver(ObserverId id) {
+    m_arrange_observers.erase(id);
+}
+
+void PaneLayout::setBounds(const domain::Rectangle& bounds) {
+    m_bounds = bounds;
+}
+
+void PaneLayout::notifyArrangeObservers() const {
+    for (const auto& [id, callback] : m_arrange_observers) {
         callback(m_panes);
     }
-    
 }

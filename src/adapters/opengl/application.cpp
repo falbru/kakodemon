@@ -2,6 +2,7 @@
 #include "GLFW/glfw3.h"
 #include "adapters/opengl/font.hpp"
 #include "adapters/opengl/renderer.hpp"
+#include "application/model/kakouneclient.hpp"
 #include "domain/fontmanager.hpp"
 #include "domain/mouse.hpp"
 
@@ -112,12 +113,12 @@ void opengl::GLFWApplication::init(const CliConfig& cli_config, ApplicationConfi
 
     onWindowResize(framebuffer_width, framebuffer_height);
 
-    for (auto& client : m_kakoune_clients) {
-        client->interface->setExitCallback([=] () {
+    m_client_manager->onClientRemoved([this](KakouneClient*) {
+        if (m_client_manager->clients().empty()) {
             glfwSetWindowShouldClose(m_window, GLFW_TRUE);
             glfwPostEmptyEvent();
-        });
-    }
+        }
+    });
 }
 
 void opengl::GLFWApplication::run() {

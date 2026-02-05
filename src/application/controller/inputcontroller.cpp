@@ -21,7 +21,7 @@ void InputController::onKeyInput(const domain::KeyEvent& event) {
 }
 
 void InputController::update() {
-    if (!m_pending_keys.empty()) {
+    if (!m_pending_keys.empty() && *m_focused_client) {
         (*m_focused_client)->interface->pressKeys(m_pending_keys);
         m_pending_keys.clear();
     }

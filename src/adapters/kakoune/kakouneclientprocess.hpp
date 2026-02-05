@@ -1,6 +1,8 @@
 #ifndef KAKOUNECLIENTPROCESS_HPP_INCLUDED
 #define KAKOUNECLIENTPROCESS_HPP_INCLUDED
 
+#include <atomic>
+#include <functional>
 #include <map>
 #include <sys/poll.h>
 #include <sys/types.h>
@@ -158,6 +160,8 @@ struct OutgoingRequest
     OutgoingRequestData data;
 };
 
+using ObserverId = int;
+
 class KakouneClientProcess
 {
   public:
@@ -170,9 +174,12 @@ class KakouneClientProcess
 
     void pollForRequests();
     void setRequestCallback(const std::function<void(const IncomingRequest &)> &callback);
-    void setExitCallback(const std::function<void()> &callback);
+    ObserverId onExit(const std::function<void()> &callback);
+    void removeObserver(ObserverId id);
 
     void sendRequest(const OutgoingRequest &request);
+
+    static void processPendingExits();
 
   private:
     static void handleSIGCHLD(int sig);
@@ -180,14 +187,16 @@ class KakouneClientProcess
     void registerProcess(pid_t pid);
     pid_t m_client_pid;
 
-    std::function<void()> m_exit_callback;
+    ObserverId m_next_observer_id = 0;
+    std::map<ObserverId, std::function<void()>> m_exit_observers;
+    void notifyExitObservers();
 
     std::optional<IncomingRequest> parseRequest(std::string request);
 
     std::string m_session_name;
 
-    int m_stdout_pipefd[2];
-    int m_stdin_pipefd[2];
+    int m_stdout_pipefd[2] = {-1, -1};
+    int m_stdin_pipefd[2] = {-1, -1};
 
     pollfd m_pollfd;
     char m_buffer[8192];
@@ -195,7 +204,7 @@ class KakouneClientProcess
     std::function<void(const IncomingRequest &)> m_request_callback;
     std::string m_request_remainder;
 
-    bool m_client_exited = false;
+    std::atomic<bool> m_exited{false};
 };
 
 #endif

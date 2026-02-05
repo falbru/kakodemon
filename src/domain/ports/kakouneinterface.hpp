@@ -14,6 +14,8 @@
 #include <string>
 #include <vector>
 
+using ObserverId = int;
+
 namespace domain
 {
 
@@ -50,7 +52,9 @@ class KakouneInterface
     virtual void releaseMouseButton(MouseButton button, int line, int column) = 0;
     virtual void selectMenuItem(int index) = 0;
 
-    virtual void setExitCallback(const std::function<void()> &callback) = 0;
+    virtual ObserverId onRefresh(const std::function<void(bool)> &callback) = 0;
+    virtual ObserverId onExit(const std::function<void()> &callback) = 0;
+    virtual void removeObserver(ObserverId id) = 0;
 
   protected:
     KakouneInterface(const KakouneSession &session);

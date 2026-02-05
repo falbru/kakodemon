@@ -36,10 +36,6 @@ void KakouneFrameStateManager::stop()
     }
 }
 
-void KakouneFrameStateManager::setWakeEventLoopCallback(std::function<void()> callback) {
-    m_wake_event_loop_callback = callback;
-}
-
 void KakouneFrameStateManager::onRequest(const IncomingRequest& request)
 {
     std::lock_guard<std::mutex> lock(m_state_mutex);
@@ -79,12 +75,11 @@ void KakouneFrameStateManager::onRequest(const IncomingRequest& request)
         break;
     }
     case IncomingRequestType::REFRESH: {
+        bool force = std::get<RefreshRequestData>(request.data).force;
         m_active_frame_state = m_next_frame_state;
         m_active_frame_state_ready = true;
         m_active_frame_events = m_next_frame_events;
-        if (m_wake_event_loop_callback) {
-            m_wake_event_loop_callback();
-        }
+        notifyRefreshObservers(force);
         break;
     }
     case IncomingRequestType::SET_UI_OPTIONS: {
@@ -132,4 +127,21 @@ std::optional<std::pair<FrameState, FrameEvents>> KakouneFrameStateManager::getN
     m_next_frame_events = FrameEvents{};
 
     return std::make_pair(state, events);
+}
+
+ObserverId KakouneFrameStateManager::onRefresh(std::function<void(bool)> callback) {
+    ObserverId id = m_next_observer_id++;
+    m_refresh_observers[id] = callback;
+    return id;
+}
+
+void KakouneFrameStateManager::removeObserver(ObserverId id) {
+    m_refresh_observers.erase(id);
+}
+
+void KakouneFrameStateManager::notifyRefreshObservers(bool force) {
+    auto observers_copy = m_refresh_observers;
+    for (auto& [id, callback] : observers_copy) {
+        callback(force);
+    }
 }

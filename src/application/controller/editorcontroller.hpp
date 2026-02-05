@@ -1,6 +1,7 @@
 #ifndef EDITORCONTROLLER_HPP_INCLUDED
 #define EDITORCONTROLLER_HPP_INCLUDED
 
+#include "application/model/clientmanager.hpp"
 #include "application/model/kakouneclient.hpp"
 #include "application/model/panelayout.hpp"
 #include "application/view/kakounecontentview.hpp"
@@ -11,8 +12,6 @@
 #include "domain/uioptions.hpp"
 #include <functional>
 #include <map>
-#include <memory>
-#include <vector>
 
 class MenuController;
 
@@ -21,7 +20,7 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
   public:
     EditorController();
 
-    void init(std::vector<std::unique_ptr<KakouneClient>> *kakoune_clients, KakouneClient **focused_client,
+    void init(ClientManager *client_manager, KakouneClient **focused_client, domain::UIOptions *ui_options,
               PaneLayout *layout_controller, KakouneContentView *kakoune_content_view, StatusBarView *status_bar_view,
               domain::FontManager *font_manager, std::function<void(domain::RGBAColor)> set_clear_color,
               MenuController *menu_controller);
@@ -37,8 +36,11 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
     int height() const;
 
   private:
-    std::vector<std::unique_ptr<KakouneClient>> *m_kakoune_clients;
+    void resizeClientsToPaneLayout(const std::vector<Pane> &panes);
+
+    ClientManager *m_client_manager;
     KakouneClient **m_focused_client;
+    domain::UIOptions *m_ui_options;
     PaneLayout *m_pane_layout;
     KakouneContentView *m_kakoune_content_view;
     StatusBarView *m_status_bar_view;
@@ -51,8 +53,6 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
     std::map<domain::MouseButton, bool> m_mouse_button_pressed;
     KakouneClient *m_active_mouse_client;
 
-    int m_rows;
-    int m_columns;
     int m_width;
     int m_height;
     int m_content_height;

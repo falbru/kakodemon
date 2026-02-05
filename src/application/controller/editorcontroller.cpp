@@ -1,5 +1,7 @@
 #include "editorcontroller.hpp"
 #include "application/controller/menucontroller.hpp"
+#include "application/model/clientmanager.hpp"
+#include "application/model/kakouneclient.hpp"
 #include "application/view/rendercontext.hpp"
 #include "domain/uioptions.hpp"
 #include "domain/color.hpp"
@@ -11,8 +13,9 @@ EditorController::EditorController()
 {
 }
 
-void EditorController::init(std::vector<std::unique_ptr<KakouneClient>>* kakoune_clients,
+void EditorController::init(ClientManager* client_manager,
                             KakouneClient** focused_client,
+                            domain::UIOptions* ui_options,
                             PaneLayout* layout_controller,
                             KakouneContentView* kakoune_content_view,
                             StatusBarView* status_bar_view,
@@ -20,21 +23,32 @@ void EditorController::init(std::vector<std::unique_ptr<KakouneClient>>* kakoune
                             std::function<void(domain::RGBAColor)> set_clear_color,
                             MenuController* menu_controller)
 {
-    m_kakoune_clients = kakoune_clients;
+    m_client_manager = client_manager;
     m_focused_client = focused_client;
+    m_ui_options = ui_options;
     m_pane_layout = layout_controller;
     m_kakoune_content_view = kakoune_content_view;
     m_status_bar_view = status_bar_view;
     m_font_manager = font_manager;
     m_set_clear_color = set_clear_color;
     m_menu_controller = menu_controller;
+
+    m_pane_layout->onArrange([=](const std::vector<Pane>& panes) {
+        resizeClientsToPaneLayout(panes);
+    });
+
+    client_manager->onClientRemoved([this](KakouneClient* client) {
+        if (m_active_mouse_client == client) {
+            m_active_mouse_client = nullptr;
+        }
+    });
 }
 
 bool EditorController::update(domain::UIOptions& ui_options)
 {
     bool state_updated = false;
 
-    for (auto& client : *m_kakoune_clients) {
+    for (auto& client : m_client_manager->clients()) {
         auto result = client->interface->getNextKakouneStateAndEvents();
         if (result.has_value()) {
             client->state = result->first;
@@ -47,8 +61,8 @@ bool EditorController::update(domain::UIOptions& ui_options)
         }
     }
 
-    if (state_updated && !m_kakoune_clients->empty()) {
-        auto& first_client = m_kakoune_clients->front();
+    if (state_updated && !m_client_manager->clients().empty()) {
+        auto& first_client = m_client_manager->clients().front();
         setClearColor(first_client->state.default_face.getBg());
 
         domain::UIOptions new_ui_options = first_client->interface->getUIOptions(m_font_manager);
@@ -86,22 +100,17 @@ void EditorController::render(const domain::UIOptions& ui_options)
 void EditorController::onWindowResize(int width, int height, const domain::UIOptions& ui_options) {
     m_width = width;
     m_height = height;
+}
 
-    m_pane_layout->arrange(static_cast<float>(width), static_cast<float>(height));
-
-    float cell_width = m_kakoune_content_view->getCellWidth(ui_options.font_content);
-    float cell_height = m_kakoune_content_view->getCellHeight(ui_options.font_content);
-    float status_bar_height = m_status_bar_view->height(ui_options.font_statusbar);
-
+void EditorController::resizeClientsToPaneLayout(const std::vector<Pane>& panes) {
     for (const auto& pane : m_pane_layout->getPanes()) {
+        float cell_width = m_kakoune_content_view->getCellWidth(m_ui_options->font_content);
+        float cell_height = m_kakoune_content_view->getCellHeight(m_ui_options->font_content);
+        float status_bar_height = m_status_bar_view->height(m_ui_options->font_statusbar);
+
         int rows = static_cast<int>((pane.bounds.height - status_bar_height) / cell_height);
         int columns = static_cast<int>(pane.bounds.width / cell_width);
         pane.client->interface->resize(rows, columns);
-    }
-
-    if (!m_pane_layout->getPanes().empty()) {
-        const auto& first_pane = m_pane_layout->getPanes().front();
-        m_rows = static_cast<int>((first_pane.bounds.height - status_bar_height) / cell_height);
     }
 }
 
@@ -131,7 +140,7 @@ domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const do
         }
     }
 
-    if (is_any_mouse_button_pressed) {
+    if (is_any_mouse_button_pressed && *m_focused_client) {
         Pane* focused_pane = m_pane_layout->findPaneForClient(*m_focused_client);
         if (focused_pane) {
             domain::Coord coord = m_kakoune_content_view->pixelToCoord(ui_options->font_content, x, y, focused_pane->bounds.x, focused_pane->bounds.y);
@@ -144,6 +153,8 @@ domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const do
 }
 
 void EditorController::onMouseButton(domain::MouseButtonEvent event, const domain::UIOptions* ui_options, bool obscured) {
+    if (!*m_focused_client) return;
+
     Pane* focused_pane = m_pane_layout->findPaneForClient(*m_focused_client);
     if (!focused_pane) {
         return;
@@ -173,6 +184,8 @@ int EditorController::height() const {
 }
 
 void EditorController::onMouseScroll(int amount, float x, float y, const domain::UIOptions* ui_options) {
+    if (!*m_focused_client) return;
+
     Pane* focused_pane = m_pane_layout->findPaneForClient(*m_focused_client);
     if (!focused_pane) {
         return;

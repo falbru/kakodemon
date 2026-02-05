@@ -2,6 +2,7 @@
 #define KAKOUNEFRAMESTATEMANAGER_HPP_INCLUDED
 
 #include <functional>
+#include <map>
 #include <mutex>
 #include <optional>
 #include <thread>
@@ -33,13 +34,16 @@ class KakouneFrameStateManager
     void start();
     void stop();
 
-    void setWakeEventLoopCallback(std::function<void()> callback);
+    ObserverId onRefresh(std::function<void(bool)> callback);
+    void removeObserver(ObserverId id);
 
     std::optional<FrameState> getNextFrameState();
     FrameEvents getEvents();
     std::optional<std::pair<FrameState, FrameEvents>> getNextFrameStateAndEvents();
 
   private:
+    void notifyRefreshObservers(bool force);
+
     void onRequest(const IncomingRequest &request);
 
     KakouneClientProcess *m_process;
@@ -55,7 +59,8 @@ class KakouneFrameStateManager
     std::thread m_polling_thread;
     std::mutex m_state_mutex;
 
-    std::function<void()> m_wake_event_loop_callback;
+    ObserverId m_next_observer_id = 0;
+    std::map<ObserverId, std::function<void(bool)>> m_refresh_observers;
 };
 
 #endif
