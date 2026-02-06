@@ -82,14 +82,54 @@ TEST_CASE("NamedPipeCommandInterface receives commands", "[integration][namedpip
     }
 }
 
-TEST_CASE("NamedPipeCommandInterface wake callback is invoked", "[integration][namedpipe]") {
+TEST_CASE("NamedPipeCommandInterface observer is notified", "[integration][namedpipe]") {
     std::string pipe_id = "test_pipe_callback_" + std::to_string(getpid());
 
     auto receiver = std::make_unique<NamedPipeCommandInterface>(pipe_id, PipeMode::Receive);
 
     std::atomic<int> callback_count{0};
-    receiver->setWakeEventLoopCallback([&callback_count]() {
+    std::string received_command_name;
+    std::vector<std::string> received_args;
+
+    receiver->onCommandReceived([&](const Command& cmd) {
         callback_count++;
+        received_command_name = cmd.name;
+        received_args = cmd.args;
+    });
+
+    receiver->init();
+
+    auto sender = std::make_unique<NamedPipeCommandInterface>(pipe_id, PipeMode::Send);
+
+    Command cmd;
+    cmd.name = "test-command";
+    cmd.args = {"arg1", "arg2"};
+
+    REQUIRE(sender->sendCommand(cmd));
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    REQUIRE(callback_count.load() == 1);
+    REQUIRE(received_command_name == "test-command");
+    REQUIRE(received_args.size() == 2);
+    REQUIRE(received_args[0] == "arg1");
+    REQUIRE(received_args[1] == "arg2");
+}
+
+TEST_CASE("NamedPipeCommandInterface multiple observers", "[integration][namedpipe]") {
+    std::string pipe_id = "test_pipe_multi_observers_" + std::to_string(getpid());
+
+    auto receiver = std::make_unique<NamedPipeCommandInterface>(pipe_id, PipeMode::Receive);
+
+    std::atomic<int> observer1_count{0};
+    std::atomic<int> observer2_count{0};
+
+    receiver->onCommandReceived([&](const Command&) {
+        observer1_count++;
+    });
+
+    receiver->onCommandReceived([&](const Command&) {
+        observer2_count++;
     });
 
     receiver->init();
@@ -103,7 +143,40 @@ TEST_CASE("NamedPipeCommandInterface wake callback is invoked", "[integration][n
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-    REQUIRE(callback_count.load() >= 1);
+    REQUIRE(observer1_count.load() == 1);
+    REQUIRE(observer2_count.load() == 1);
+}
+
+TEST_CASE("NamedPipeCommandInterface remove observer", "[integration][namedpipe]") {
+    std::string pipe_id = "test_pipe_remove_observer_" + std::to_string(getpid());
+
+    auto receiver = std::make_unique<NamedPipeCommandInterface>(pipe_id, PipeMode::Receive);
+
+    std::atomic<int> callback_count{0};
+
+    ObserverId observer_id = receiver->onCommandReceived([&](const Command&) {
+        callback_count++;
+    });
+
+    receiver->init();
+
+    auto sender = std::make_unique<NamedPipeCommandInterface>(pipe_id, PipeMode::Send);
+
+    Command cmd1;
+    cmd1.name = "first-command";
+    REQUIRE(sender->sendCommand(cmd1));
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    REQUIRE(callback_count.load() == 1);
+
+    receiver->removeCommandObserver(observer_id);
+
+    Command cmd2;
+    cmd2.name = "second-command";
+    REQUIRE(sender->sendCommand(cmd2));
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    REQUIRE(callback_count.load() == 1);
 }
 
 TEST_CASE("NamedPipeCommandInterface mode restrictions", "[integration][namedpipe]") {

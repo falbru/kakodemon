@@ -1,17 +1,40 @@
 #include "application/controller/mousecontroller.hpp"
 #include "application/controller/infoboxcontroller.hpp"
 #include "application/model/kakouneclient.hpp"
+#include "application/window.hpp"
 #include "domain/mouse.hpp"
 
 MouseController::MouseController() {
 
 }
 
-void MouseController::init(KakouneClient** focused_client, EditorController* editor_controller, MenuController* menu_controller, InfoBoxController* info_box_controller) {
+void MouseController::init(KakouneClient** focused_client, EditorController* editor_controller, MenuController* menu_controller,
+                           InfoBoxController* info_box_controller, Window* window, std::function<void()> mark_dirty) {
     m_focused_client = focused_client;
     m_editor_controller = editor_controller;
     m_menu_controller = menu_controller;
     m_info_box_controller = info_box_controller;
+    m_window = window;
+
+    window->onMouseMove([this, mark_dirty](float x, float y) {
+        m_mouse_x = x;
+        m_mouse_y = y;
+        domain::MouseMoveResult result = onMouseMove(x, y);
+        if (result.cursor.has_value()) {
+            m_window->setCursor(result.cursor.value());
+            mark_dirty();
+        }
+    });
+
+    window->onMouseButton([this, mark_dirty](domain::MouseButtonEvent event) {
+        onMouseButton(event);
+        mark_dirty();
+    });
+
+    window->onMouseScroll([this, mark_dirty](double offset) {
+        onMouseScroll(offset, m_mouse_x, m_mouse_y);
+        mark_dirty();
+    });
 }
 
 domain::MouseMoveResult MouseController::onMouseMove(float x, float y) {

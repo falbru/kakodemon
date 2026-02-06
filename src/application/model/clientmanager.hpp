@@ -2,10 +2,9 @@
 #define MODEL_CLIENTMANAGER_HPP_INCLUDED
 
 #include "application/model/kakouneclient.hpp"
+#include "application/observerid.hpp"
 #include "domain/ports/kakounesession.hpp"
 #include <map>
-
-using ObserverId = int;
 
 class ClientManager
 {

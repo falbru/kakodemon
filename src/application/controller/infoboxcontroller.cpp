@@ -6,10 +6,10 @@ InfoBoxController::InfoBoxController() {
 
 }
 
-void InfoBoxController::init(KakouneClient** focused_client, PaneLayout* layout_controller, EditorController* editor_controller, domain::FontManager* font_manager, InfoBoxView* info_box_view, std::function<void()> mark_dirty) {
+void InfoBoxController::init(KakouneClient** focused_client, PaneLayout* layout_controller, Window* window, domain::FontManager* font_manager, InfoBoxView* info_box_view, std::function<void()> mark_dirty) {
     m_focused_client = focused_client;
     m_pane_layout = layout_controller;
-    m_editor_controller = editor_controller;
+    m_window = window;
     m_font_manager = font_manager;
     m_info_box_view = info_box_view;
     m_mark_dirty = mark_dirty;
@@ -23,8 +23,8 @@ void InfoBoxController::render() {
         m_font_manager,
         (*m_focused_client)->state.default_face,
         (*m_focused_client)->uiOptions(),
-        static_cast<float>(m_editor_controller->width()),
-        static_cast<float>(m_editor_controller->height())
+        m_window->getWidth(),
+        m_window->getHeight()
     };
 
     m_info_box_view->render(render_context, (*m_focused_client)->info_box_state, *(*m_focused_client)->state.info_box, (*m_focused_client)->state.cursor_position, m_pane_layout->findPaneForClient(*m_focused_client)->bounds);

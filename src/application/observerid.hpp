@@ -1,0 +1,6 @@
+#ifndef APPLICATION_OBSERVERID_HPP_INCLUDED
+#define APPLICATION_OBSERVERID_HPP_INCLUDED
+
+using ObserverId = int;
+
+#endif

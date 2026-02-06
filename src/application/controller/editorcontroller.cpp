@@ -3,6 +3,7 @@
 #include "application/model/clientmanager.hpp"
 #include "application/model/kakouneclient.hpp"
 #include "application/view/rendercontext.hpp"
+#include "application/window.hpp"
 #include "domain/uioptions.hpp"
 #include "domain/color.hpp"
 #include "domain/mouse.hpp"
@@ -19,7 +20,7 @@ void EditorController::init(ClientManager* client_manager,
                             KakouneContentView* kakoune_content_view,
                             StatusBarView* status_bar_view,
                             domain::FontManager* font_manager,
-                            std::function<void(domain::RGBAColor)> set_clear_color,
+                            Window* window,
                             MenuController* menu_controller)
 {
     m_client_manager = client_manager;
@@ -28,7 +29,7 @@ void EditorController::init(ClientManager* client_manager,
     m_kakoune_content_view = kakoune_content_view;
     m_status_bar_view = status_bar_view;
     m_font_manager = font_manager;
-    m_set_clear_color = set_clear_color;
+    m_window = window;
     m_menu_controller = menu_controller;
 
     m_pane_layout->onArrange([=](const std::vector<Pane>& panes) {
@@ -51,7 +52,7 @@ bool EditorController::update()
         if (result.has_value()) {
             state_updated = true;
             client->state = result->first;
-            setClearColor(client->state.default_face.getBg());
+            m_window->setClearColor(client->state.default_face.getBg());
 
             domain::FrameEvents events = result->second;
 
@@ -59,7 +60,7 @@ bool EditorController::update()
                 client->setUIOptions(client->interface->getUIOptions(m_font_manager));
             }
 
-            if (events.menu_select && client->state.menu.has_value() && client->state.menu->hasItems()) { // TODO onClientEvent instead
+            if (events.menu_select && client->state.menu.has_value() && client->state.menu->hasItems()) {
                 m_menu_controller->ensureItemVisible(client->state.menu->getItems().selected_index);
             }
         }
@@ -85,11 +86,6 @@ void EditorController::render()
         m_kakoune_content_view->render(render_context, client->state.content, client->state.default_face, bounds);
         m_status_bar_view->render(render_context, client->status_line_state, client->state.mode_line, client->state.cursor_position, bounds);
     }
-}
-
-void EditorController::onWindowResize(int width, int height) {
-    m_width = width;
-    m_height = height;
 }
 
 void EditorController::resizeClientsToPaneLayout(const std::vector<Pane>& panes) {
@@ -164,15 +160,6 @@ void EditorController::onMouseButton(domain::MouseButtonEvent event, bool obscur
     }
 }
 
-
-int EditorController::width() const {
-    return m_width;
-}
-
-int EditorController::height() const {
-    return m_height;
-}
-
 void EditorController::onMouseScroll(int amount, float x, float y) {
     if (!*m_focused_client) return;
 
@@ -184,8 +171,4 @@ void EditorController::onMouseScroll(int amount, float x, float y) {
     domain::Coord coord = m_kakoune_content_view->pixelToCoord(focused_pane->client->uiOptions().font_content, x, y, focused_pane->bounds.x, focused_pane->bounds.y);
 
     (*m_focused_client)->interface->scroll(amount, coord.line, coord.column);
-}
-
-void EditorController::setClearColor(domain::RGBAColor color) {
-    m_set_clear_color(color);
 }

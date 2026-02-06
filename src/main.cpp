@@ -63,13 +63,16 @@ int main(int argc, char* argv[])
     ApplicationConfig app_config = loadApplicationConfig();
 
     ApplicationBuilder builder;
-    std::unique_ptr<Application> app = builder
+    auto window = builder
         .withPlatform(PlatformType::OPENGL_GLFW)
         .withFontResolver(FontResolverType::FONTCONFIG)
         .withFontEngine(FontEngineType::FREETYPE)
         .build();
 
-    app->init(parsed_args.config, app_config);
-    app->run();
+    window->init(app_config.maximized);
+
+    Application app;
+    app.init(window.get(), parsed_args.config, app_config);
+    app.run();
     return 0;
 }

@@ -6,10 +6,13 @@
 #include "application/model/panelayout.hpp"
 #include "domain/mouse.hpp"
 
+class Window;
+
 class FocusController
 {
   public:
-    void init(KakouneClient **focused_client, ClientManager *client_manager, PaneLayout *layout_controller);
+    void init(KakouneClient **focused_client, ClientManager *client_manager, PaneLayout *layout_controller,
+              Window *window);
     void onMouseMove(float x, float y);
     void onMouseButton(domain::MouseButtonEvent event);
 

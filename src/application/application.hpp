@@ -4,7 +4,6 @@
 #include <functional>
 #include <memory>
 
-#include "adapters/opengl/opengl.hpp"
 #include "application/applicationconfig.hpp"
 #include "application/cliconfig.hpp"
 #include "application/controller/commandcontroller.hpp"
@@ -25,63 +24,33 @@
 #include "application/view/searchmenu.hpp"
 #include "application/view/statusbar.hpp"
 #include "domain/fontmanager.hpp"
-#include "domain/keys.hpp"
-#include "domain/mouse.hpp"
 #include "domain/ports/commandinterface.hpp"
-#include "domain/ports/fontengine.hpp"
-#include "domain/ports/fontresolver.hpp"
 #include "domain/ports/kakounesession.hpp"
 #include "domain/ports/renderer.hpp"
 
-using FontEngineFactory = std::function<std::unique_ptr<domain::FontEngine>(const domain::FontMatch &)>;
+class Window;
 
 class Application
 {
   public:
     Application();
-    virtual ~Application();
+    ~Application();
 
-    void setFontDependencies(std::unique_ptr<domain::FontResolver> resolver, FontEngineFactory engine_factory);
-
-    virtual void init(const CliConfig &cli_config, ApplicationConfig &app_config);
-    virtual void run() = 0;
-
-    void setClearColor(domain::RGBAColor color);
-    virtual void setCursor(domain::Cursor cursor);
-    virtual void setWindowTitle(const std::string &title) = 0;
-
-    void onWindowResize(int width, int height);
-    void onKeyInput(domain::KeyEvent event);
-    void onMouseMove(float x, float y);
-    void onMouseButton(domain::MouseButtonEvent event);
-    void onMouseScroll(double offset);
+    void init(Window *window, const CliConfig &cli_config, ApplicationConfig &app_config);
+    void run();
 
     void markDirty();
-    bool needsRender() const;
-    virtual void wakeEventLoop() = 0;
-    virtual float getWidth() = 0;
-    virtual float getHeight() = 0;
 
-  protected:
-    const int DEFAULT_WINDOW_WIDTH = 640;
-    const int DEFAULT_WINDOW_HEIGHT = 480;
-
-    std::unique_ptr<domain::Renderer> m_renderer;
-    std::unique_ptr<domain::FontManager> m_font_manager;
-
-    std::unique_ptr<domain::FontResolver> m_font_resolver;
-    FontEngineFactory m_font_engine_factory;
-
+  private:
     void updateControllers();
     void renderControllers();
 
-    domain::RGBAColor m_clear_color;
-    domain::Cursor m_cursor;
-
-    float m_mouse_x = 0.0f;
-    float m_mouse_y = 0.0f;
-
+    Window *m_window;
+    bool m_running = true;
     bool m_needs_render = true;
+
+    domain::Renderer *m_renderer;
+    domain::FontManager *m_font_manager;
 
     std::string m_kakodemon_id;
     ApplicationConfig *m_app_config;

@@ -1,6 +1,7 @@
 #ifndef DOMAIN_KAKOUNEINTERFACE_HPP_INCLUDED
 #define DOMAIN_KAKOUNEINTERFACE_HPP_INCLUDED
 
+#include "application/observerid.hpp"
 #include "domain/editor.hpp"
 #include "domain/fontmanager.hpp"
 #include "domain/infobox.hpp"
@@ -13,8 +14,6 @@
 
 #include <string>
 #include <vector>
-
-using ObserverId = int;
 
 namespace domain
 {

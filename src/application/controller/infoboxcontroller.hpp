@@ -5,6 +5,7 @@
 #include "application/model/kakouneclient.hpp"
 #include "application/model/panelayout.hpp"
 #include "application/view/infobox.hpp"
+#include "application/window.hpp"
 #include <functional>
 
 class InfoBoxController
@@ -12,7 +13,7 @@ class InfoBoxController
   public:
     InfoBoxController();
 
-    void init(KakouneClient **focused_client, PaneLayout *layout_controller, EditorController *editor_controller,
+    void init(KakouneClient **focused_client, PaneLayout *layout_controller, Window *window,
               domain::FontManager *font_manager, InfoBoxView *info_box_view, std::function<void()> mark_dirty);
 
     void render();
@@ -27,7 +28,7 @@ class InfoBoxController
   private:
     KakouneClient **m_focused_client;
     PaneLayout *m_pane_layout;
-    EditorController *m_editor_controller;
+    Window *m_window;
     domain::FontManager *m_font_manager;
     InfoBoxView *m_info_box_view;
 

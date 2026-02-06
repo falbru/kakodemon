@@ -5,6 +5,7 @@
 #include "application/view/inlinemenu.hpp"
 #include "application/view/promptmenu.hpp"
 #include "application/view/searchmenu.hpp"
+#include "application/window.hpp"
 #include "domain/mouse.hpp"
 #include <functional>
 
@@ -13,7 +14,7 @@ class MenuController
   public:
     MenuController();
 
-    void init(KakouneClient **focused_client, PaneLayout *layout_controller, EditorController *editor_controller,
+    void init(KakouneClient **focused_client, PaneLayout *layout_controller, Window *window,
               domain::FontManager *font_manager, PromptMenuView *prompt_menu_view, InlineMenuView *inline_menu_view,
               SearchMenuView *search_menu_view, std::function<void()> mark_dirty);
 
@@ -31,7 +32,7 @@ class MenuController
 
   private:
     KakouneClient **m_focused_client;
-    EditorController *m_editor_controller;
+    Window *m_window;
     PaneLayout *m_pane_layout;
     domain::FontManager *m_font_manager;
     InlineMenuView *m_inline_menu_view;

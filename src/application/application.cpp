@@ -11,17 +11,16 @@
 #include "application/model/clientmanager.hpp"
 #include "application/model/kakouneclient.hpp"
 #include "application/view/searchmenu.hpp"
-#include "domain/color.hpp"
-#include "domain/keys.hpp"
+#include "application/window.hpp"
 #include "application/controller/editorcontroller.hpp"
 #include "application/controller/inputcontroller.hpp"
+#include "domain/ports/commandinterface.hpp"
 #include "domain/uioptions.hpp"
 #include "application/view/infobox.hpp"
 #include "application/view/inlinemenu.hpp"
 #include "application/view/kakounecontentview.hpp"
 #include "application/view/statusbar.hpp"
 #include "adapters/kakoune/remotesession.hpp"
-#include "domain/mouse.hpp"
 #include <cstdlib>
 #include <memory>
 #include <optional>
@@ -53,22 +52,20 @@ Application::~Application()
 {
 }
 
-void Application::setFontDependencies(
-    std::unique_ptr<domain::FontResolver> resolver,
-    FontEngineFactory engine_factory)
+void Application::init(Window *window, const CliConfig &cli_config, ApplicationConfig &app_config)
 {
-    m_font_resolver = std::move(resolver);
-    m_font_engine_factory = engine_factory;
-}
-
-void Application::init(const CliConfig &cli_config, ApplicationConfig &app_config)
-{
+    m_window = window;
     m_app_config = &app_config;
+    m_renderer = window->getRenderer();
+    m_font_manager = window->getFontManager();
+
     m_kakodemon_id = generateId();
     setenv("KAKOD_ID", m_kakodemon_id.c_str(), 1);
 
     m_command_interface = std::make_unique<NamedPipeCommandInterface>(m_kakodemon_id, PipeMode::Receive);
-    m_command_interface->setWakeEventLoopCallback([this]() { wakeEventLoop(); });
+    m_command_interface->onCommandReceived([this](const Command&) {
+        m_window->wakeEventLoop();
+    });
     m_command_interface->init();
 
     if (cli_config.session_type == SessionType::Remote)
@@ -83,10 +80,24 @@ void Application::init(const CliConfig &cli_config, ApplicationConfig &app_confi
     m_client_manager = std::make_unique<ClientManager>(m_kakoune_session.get());
 
     m_client_manager->onClientAdded([this](KakouneClient* client) {
-        client->interface->onRefresh([this](bool) { wakeEventLoop(); });
+        client->interface->onRefresh([this](bool) { m_window->wakeEventLoop(); });
         client->interface->onExit([this, client]() {
             m_client_manager->removeClient(client);
         });
+    });
+
+    m_client_manager->onClientRemoved([this](KakouneClient*) {
+        if (m_client_manager->clients().empty()) {
+            m_running = false;
+            m_window->wakeEventLoop();
+        }
+    });
+
+    m_window->onClose([this]() { m_running = false; });
+
+    m_window->onMaximizedChanged([this](bool maximized) {
+        m_app_config->maximized = maximized;
+        saveApplicationConfig(*m_app_config);
     });
 
     m_pane_layout = std::make_unique<PaneLayout>();
@@ -107,27 +118,49 @@ void Application::init(const CliConfig &cli_config, ApplicationConfig &app_confi
     m_search_menu = std::make_unique<SearchMenuView>();
     m_info_box = std::make_unique<InfoBoxView>();
 
-    m_kakoune_content_view->init(m_renderer.get());
-    m_status_bar->init(m_renderer.get());
-    m_prompt_menu->init(m_renderer.get(), m_kakoune_content_view.get());
-    m_inline_menu->init(m_renderer.get(), m_kakoune_content_view.get());
-    m_search_menu->init(m_renderer.get());
-    m_info_box->init(m_renderer.get(), m_menu_controller.get(), m_kakoune_content_view.get(), m_status_bar.get());
+    m_kakoune_content_view->init(m_renderer);
+    m_status_bar->init(m_renderer);
+    m_prompt_menu->init(m_renderer, m_kakoune_content_view.get());
+    m_inline_menu->init(m_renderer, m_kakoune_content_view.get());
+    m_search_menu->init(m_renderer);
+    m_info_box->init(m_renderer, m_menu_controller.get(), m_kakoune_content_view.get(), m_status_bar.get());
 
     m_pane_layout->init(m_client_manager.get());
 
-    m_command_controller->init(m_command_interface.get(), m_client_manager.get(), m_kakoune_session.get(), [this](const std::string &title) { setWindowTitle(title); });
-    m_input_controller->init(&m_focused_client);
-    m_focus_controller->init(&m_focused_client, m_client_manager.get(), m_pane_layout.get());
-    m_menu_controller->init(&m_focused_client, m_pane_layout.get(), m_editor_controller.get(), m_font_manager.get(), m_prompt_menu.get(), m_inline_menu.get(), m_search_menu.get(), [this]() { markDirty(); });
-    m_editor_controller->init(m_client_manager.get(), &m_focused_client, m_pane_layout.get(), m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager.get(), [&](domain::RGBAColor color) { setClearColor(color); }, m_menu_controller.get());
-    m_info_box_controller->init(&m_focused_client, m_pane_layout.get(), m_editor_controller.get(), m_font_manager.get(), m_info_box.get(), [this]() { markDirty(); });
-    m_mouse_controller->init(&m_focused_client, m_editor_controller.get(), m_menu_controller.get(), m_info_box_controller.get());
-    m_layout_controller->init(m_pane_layout.get(), m_client_manager.get());
+    auto mark_dirty = [this]() { markDirty(); };
 
-    m_client_manager->setDefaultUIOptions(domain::getDefaultUIOptions(m_font_manager.get()));
+    m_command_controller->init(m_command_interface.get(), m_client_manager.get(), m_kakoune_session.get(), m_window);
+    m_input_controller->init(&m_focused_client, m_window);
+    m_focus_controller->init(&m_focused_client, m_client_manager.get(), m_pane_layout.get(), m_window);
+    m_menu_controller->init(&m_focused_client, m_pane_layout.get(), m_window, m_font_manager, m_prompt_menu.get(), m_inline_menu.get(), m_search_menu.get(), mark_dirty);
+    m_editor_controller->init(m_client_manager.get(), &m_focused_client, m_pane_layout.get(), m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager, m_window, m_menu_controller.get());
+    m_info_box_controller->init(&m_focused_client, m_pane_layout.get(), m_window, m_font_manager, m_info_box.get(), mark_dirty);
+    m_mouse_controller->init(&m_focused_client, m_editor_controller.get(), m_menu_controller.get(), m_info_box_controller.get(), m_window, mark_dirty);
+    m_layout_controller->init(m_pane_layout.get(), m_client_manager.get(), m_window, mark_dirty);
+
+    m_client_manager->setDefaultUIOptions(domain::getDefaultUIOptions(m_font_manager));
 
     m_client_manager->createClient(cli_config.startup_command, cli_config.session_type == SessionType::Remote ? cli_config.file_arguments : std::vector<std::string>{});
+
+    float initial_width = m_window->getWidth();
+    float initial_height = m_window->getHeight();
+    m_pane_layout->setBounds(domain::Rectangle{0, 0, initial_width, initial_height});
+    m_pane_layout->arrange();
+}
+
+void Application::run() {
+    while (m_running) {
+        m_window->waitEvents();
+
+        updateControllers();
+
+        if (m_needs_render) {
+            m_window->renderBegin();
+            renderControllers();
+            m_window->renderEnd();
+            m_needs_render = false;
+        }
+    }
 }
 
 void Application::updateControllers()
@@ -148,57 +181,6 @@ void Application::renderControllers()
     m_info_box_controller->render();
 }
 
-void Application::onWindowResize(int width, int height)
-{
-    m_renderer->onWindowResize(width, height);
-    m_layout_controller->onWindowResize(width, height);
-    m_editor_controller->onWindowResize(width, height);
-    markDirty();
-}
-
-void Application::onMouseScroll(double offset)
-{
-    m_mouse_controller->onMouseScroll(offset, m_mouse_x, m_mouse_y);
-}
-
-void Application::onMouseMove(float x, float y)
-{
-    m_mouse_x = x;
-    m_mouse_y = y;
-    m_focus_controller->onMouseMove(x, y);
-    domain::MouseMoveResult result = m_mouse_controller->onMouseMove(x, y);
-
-    if (result.cursor.has_value()) {
-        setCursor(result.cursor.value());
-        markDirty();
-    }
-}
-
-void Application::onMouseButton(domain::MouseButtonEvent event)
-{
-    m_focus_controller->onMouseButton(event);
-    m_mouse_controller->onMouseButton(event);
-    markDirty();
-}
-
-void Application::onKeyInput(domain::KeyEvent event)
-{
-    m_input_controller->onKeyInput(event);
-    markDirty();
-}
-
-void Application::setClearColor(domain::RGBAColor color) {
-    m_clear_color = color;
-}
-
-void Application::setCursor(domain::Cursor cursor) {
-    m_cursor = cursor;
-}
-
 void Application::markDirty() {
     m_needs_render = true;
-}
-
-bool Application::needsRender() const {
-    return m_needs_render;
 }

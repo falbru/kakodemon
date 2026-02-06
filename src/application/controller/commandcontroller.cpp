@@ -8,13 +8,12 @@ CommandController::CommandController()
 {
 }
 
-void CommandController::init(CommandInterface *command_interface, ClientManager* client_manager, domain::KakouneSession *kakoune_session,
-                             std::function<void(const std::string &)> set_window_title)
+void CommandController::init(CommandInterface *command_interface, ClientManager* client_manager, domain::KakouneSession *kakoune_session, Window *window)
 {
     m_command_interface = command_interface;
     m_client_manager = client_manager;
     m_kakoune_session = kakoune_session;
-    m_set_window_title = set_window_title;
+    m_window = window;
 }
 
 void CommandController::update()
@@ -24,7 +23,7 @@ void CommandController::update()
     {
         if (command.name == "rename-session" && !command.args.empty())
         {
-            m_set_window_title(command.args[0]);
+            m_window->setTitle(command.args[0]);
             m_kakoune_session->setSessionId(command.args[0]);
         }else if (command.name == "new-client") {
             if (command.args.empty()) {

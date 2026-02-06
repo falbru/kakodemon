@@ -2,14 +2,13 @@
 #define KAKOUNECLIENT_HPP_INCLUDED
 
 #include "application/model/viewstate.hpp"
+#include "application/observerid.hpp"
 #include "domain/ports/kakouneinterface.hpp"
 #include "domain/ports/kakounesession.hpp"
 #include "domain/uioptions.hpp"
 #include <functional>
 #include <map>
 #include <memory>
-
-using ObserverId = int;
 
 class KakouneClient
 {

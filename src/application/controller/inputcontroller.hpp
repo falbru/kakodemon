@@ -4,13 +4,15 @@
 #include "application/model/kakouneclient.hpp"
 #include "domain/keys.hpp"
 
+class Window;
+
 class InputController
 {
   public:
     InputController();
     ~InputController();
 
-    void init(KakouneClient **focused_client);
+    void init(KakouneClient **focused_client, Window *window);
     void onKeyInput(const domain::KeyEvent &event);
     void update();
 

@@ -2,7 +2,7 @@
 #include "adapters/fontconfig/fontconfigresolver.hpp"
 #include "adapters/freetype/freetypefontengine.hpp"
 #include "adapters/freetype/freetypelibrary.hpp"
-#include "adapters/opengl/application.hpp"
+#include "adapters/opengl/window.hpp"
 
 ApplicationBuilder::ApplicationBuilder()
     : m_platform(PlatformType::OPENGL_GLFW),
@@ -29,25 +29,25 @@ ApplicationBuilder &ApplicationBuilder::withFontEngine(FontEngineType engine)
     return *this;
 }
 
-std::unique_ptr<Application> ApplicationBuilder::build()
+std::unique_ptr<Window> ApplicationBuilder::build()
 {
-    std::unique_ptr<Application> app;
+    std::unique_ptr<Window> window;
 
     switch (m_platform)
     {
     case PlatformType::OPENGL_GLFW:
-        app = std::make_unique<opengl::GLFWApplication>();
+        window = std::make_unique<opengl::GLFWWindow>();
         break;
     }
 
-    if (app)
+    if (window)
     {
-        app->setFontDependencies(
+        window->setFontDependencies(
             createFontResolver(),
             createFontEngineFactory());
     }
 
-    return app;
+    return window;
 }
 
 std::unique_ptr<domain::FontResolver> ApplicationBuilder::createFontResolver()

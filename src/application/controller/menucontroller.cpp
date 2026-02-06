@@ -9,10 +9,10 @@ MenuController::MenuController() {
 
 }
 
-void MenuController::init(KakouneClient** focused_client, PaneLayout* layout_controller, EditorController* editor_controller, domain::FontManager* font_manager, PromptMenuView* prompt_menu_view, InlineMenuView* inline_menu_view, SearchMenuView *search_menu_view, std::function<void()> mark_dirty) {
+void MenuController::init(KakouneClient** focused_client, PaneLayout* layout_controller, Window* window, domain::FontManager* font_manager, PromptMenuView* prompt_menu_view, InlineMenuView* inline_menu_view, SearchMenuView *search_menu_view, std::function<void()> mark_dirty) {
     m_focused_client = focused_client;
     m_pane_layout = layout_controller;
-    m_editor_controller = editor_controller;
+    m_window = window;
     m_font_manager = font_manager;
     m_inline_menu_view = inline_menu_view;
     m_prompt_menu_view = prompt_menu_view;
@@ -29,8 +29,8 @@ void MenuController::render() {
         m_font_manager,
         (*m_focused_client)->state.default_face,
         (*m_focused_client)->uiOptions(),
-        static_cast<float>(m_editor_controller->width()),
-        static_cast<float>(m_editor_controller->height())
+        static_cast<float>(m_window->getWidth()),
+        static_cast<float>(m_window->getHeight())
     };
 
     int cursor_column = -1;

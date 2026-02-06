@@ -1,4 +1,5 @@
 #include "inputcontroller.hpp"
+#include "application/window.hpp"
 #include "domain/keys.hpp"
 #include "domain/utf8string.hpp"
 #include <string>
@@ -12,8 +13,12 @@ InputController::~InputController() {
 
 }
 
-void InputController::init(KakouneClient **focused_client) {
+void InputController::init(KakouneClient **focused_client, Window *window) {
     m_focused_client = focused_client;
+
+    window->onKeyInput([this](domain::KeyEvent event) {
+        onKeyInput(event);
+    });
 }
 
 void InputController::onKeyInput(const domain::KeyEvent& event) {
