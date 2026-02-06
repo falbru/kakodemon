@@ -96,6 +96,7 @@ set(SRC
     src/domain/ports/kakouneinterface.cpp
     src/domain/ports/renderer.cpp
     src/domain/statusline.cpp
+    src/domain/uioptions.cpp
     src/domain/utf8string.cpp
     src/main.cpp
     vendor/glad/src/glad.c

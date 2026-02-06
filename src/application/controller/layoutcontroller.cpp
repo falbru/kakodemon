@@ -11,7 +11,10 @@ LayoutController::LayoutController() {
 void LayoutController::init(PaneLayout* pane_layout, ClientManager* client_manager) {
     m_pane_layout = pane_layout;
 
-    client_manager->onClientAdded([=](KakouneClient*) {
+    client_manager->onClientAdded([=](KakouneClient* client) {
+        client->onUIOptionsChanged([=](const domain::UIOptions&) {
+            m_pane_layout->arrange();
+        });
         m_pane_layout->arrange();
     });
 

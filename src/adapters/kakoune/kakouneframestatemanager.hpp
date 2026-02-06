@@ -23,6 +23,7 @@ struct FrameState
 struct FrameEvents
 {
     bool menu_select = false;
+    bool ui_options_updated = false;
 };
 
 class KakouneFrameStateManager
@@ -38,7 +39,7 @@ class KakouneFrameStateManager
     void removeObserver(ObserverId id);
 
     std::optional<FrameState> getNextFrameState();
-    FrameEvents getEvents();
+    FrameEvents popEvents();
     std::optional<std::pair<FrameState, FrameEvents>> getNextFrameStateAndEvents();
 
   private:

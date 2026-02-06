@@ -20,7 +20,7 @@ void MenuController::init(KakouneClient** focused_client, PaneLayout* layout_con
     m_mark_dirty = mark_dirty;
 }
 
-void MenuController::render(const domain::UIOptions& ui_options) {
+void MenuController::render() {
     if (!*m_focused_client || !(*m_focused_client)->state.menu.has_value()) {
         return;
     }
@@ -28,7 +28,7 @@ void MenuController::render(const domain::UIOptions& ui_options) {
     RenderContext render_context = {
         m_font_manager,
         (*m_focused_client)->state.default_face,
-        ui_options,
+        (*m_focused_client)->uiOptions(),
         static_cast<float>(m_editor_controller->width()),
         static_cast<float>(m_editor_controller->height())
     };
@@ -123,7 +123,7 @@ float MenuController::height() const {
     return 0;
 }
 
-bool MenuController::onMouseButton(domain::MouseButtonEvent event, const domain::UIOptions *ui_options) {
+bool MenuController::onMouseButton(domain::MouseButtonEvent event) {
     if (!*m_focused_client || !(*m_focused_client)->state.menu || !(*m_focused_client)->state.menu->hasItems()) {
         return false;
     }

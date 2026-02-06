@@ -11,6 +11,7 @@ ClientManager::ClientManager(domain::KakouneSession* session) : m_session(sessio
 KakouneClient* ClientManager::createClient(std::optional<std::string> startup_command, std::vector<std::string> file_arguments) {
     auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*m_session, startup_command, file_arguments);
     std::unique_ptr<KakouneClient> new_client = std::make_unique<KakouneClient>(m_session, std::move(interface));
+    new_client->setUIOptions(m_default_ui_options);
     KakouneClient* new_client_ptr = new_client.get();
 
     m_clients.push_back(std::move(new_client));
@@ -18,6 +19,10 @@ KakouneClient* ClientManager::createClient(std::optional<std::string> startup_co
     notifyClientAddedObservers(new_client_ptr);
 
     return new_client_ptr;
+}
+
+void ClientManager::setDefaultUIOptions(domain::UIOptions ui_options) {
+    m_default_ui_options = std::move(ui_options);
 }
 
 void ClientManager::removeClient(KakouneClient *client) {

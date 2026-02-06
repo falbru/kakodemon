@@ -46,6 +46,7 @@ add_executable(tests
     ${CMAKE_SOURCE_DIR}/src/domain/ports/font.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/ports/kakouneinterface.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/statusline.cpp
+    ${CMAKE_SOURCE_DIR}/src/domain/uioptions.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/utf8string.cpp
 )
 

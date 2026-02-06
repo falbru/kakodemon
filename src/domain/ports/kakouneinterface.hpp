@@ -32,6 +32,7 @@ struct KakouneState
 struct FrameEvents
 {
     bool menu_select = false;
+    bool ui_options_updated = false;
 };
 
 class KakouneInterface

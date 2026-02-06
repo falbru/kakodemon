@@ -89,7 +89,6 @@ void Application::init(const CliConfig &cli_config, ApplicationConfig &app_confi
         });
     });
 
-    m_ui_options = std::make_unique<domain::UIOptions>();
     m_pane_layout = std::make_unique<PaneLayout>();
 
     m_command_controller = std::make_unique<CommandController>();
@@ -121,17 +120,12 @@ void Application::init(const CliConfig &cli_config, ApplicationConfig &app_confi
     m_input_controller->init(&m_focused_client);
     m_focus_controller->init(&m_focused_client, m_client_manager.get(), m_pane_layout.get());
     m_menu_controller->init(&m_focused_client, m_pane_layout.get(), m_editor_controller.get(), m_font_manager.get(), m_prompt_menu.get(), m_inline_menu.get(), m_search_menu.get(), [this]() { markDirty(); });
-    m_editor_controller->init(m_client_manager.get(), &m_focused_client, m_ui_options.get(), m_pane_layout.get(), m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager.get(), [&](domain::RGBAColor color) { setClearColor(color); }, m_menu_controller.get());
+    m_editor_controller->init(m_client_manager.get(), &m_focused_client, m_pane_layout.get(), m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager.get(), [&](domain::RGBAColor color) { setClearColor(color); }, m_menu_controller.get());
     m_info_box_controller->init(&m_focused_client, m_pane_layout.get(), m_editor_controller.get(), m_font_manager.get(), m_info_box.get(), [this]() { markDirty(); });
     m_mouse_controller->init(&m_focused_client, m_editor_controller.get(), m_menu_controller.get(), m_info_box_controller.get());
     m_layout_controller->init(m_pane_layout.get(), m_client_manager.get());
 
-    m_ui_options->font = m_font_manager->getDefaultFont(14);
-    loadBasicGlyphs(m_ui_options->font);
-    m_ui_options->font_menu = m_ui_options->font;
-    m_ui_options->font_infobox = m_ui_options->font;
-    m_ui_options->font_statusbar = m_ui_options->font;
-    m_ui_options->font_content = m_ui_options->font;
+    m_client_manager->setDefaultUIOptions(domain::getDefaultUIOptions(m_font_manager.get()));
 
     m_client_manager->createClient(cli_config.startup_command, cli_config.session_type == SessionType::Remote ? cli_config.file_arguments : std::vector<std::string>{});
 }
@@ -141,31 +135,30 @@ void Application::updateControllers()
     KakouneClientProcess::processPendingExits();
     m_command_controller->update();
     m_input_controller->update();
-    bool state_updated = m_editor_controller->update(*m_ui_options.get());
+    bool state_updated = m_editor_controller->update();
     if (state_updated) {
         markDirty();
     }
-    m_info_box_controller->update(*m_ui_options.get());
 }
 
 void Application::renderControllers()
 {
-    m_editor_controller->render(*m_ui_options.get());
-    m_menu_controller->render(*m_ui_options.get());
-    m_info_box_controller->render(*m_ui_options.get());
+    m_editor_controller->render();
+    m_menu_controller->render();
+    m_info_box_controller->render();
 }
 
 void Application::onWindowResize(int width, int height)
 {
     m_renderer->onWindowResize(width, height);
     m_layout_controller->onWindowResize(width, height);
-    m_editor_controller->onWindowResize(width, height, *m_ui_options.get());
+    m_editor_controller->onWindowResize(width, height);
     markDirty();
 }
 
 void Application::onMouseScroll(double offset)
 {
-    m_mouse_controller->onMouseScroll(offset, m_mouse_x, m_mouse_y, m_ui_options.get());
+    m_mouse_controller->onMouseScroll(offset, m_mouse_x, m_mouse_y);
 }
 
 void Application::onMouseMove(float x, float y)
@@ -173,7 +166,7 @@ void Application::onMouseMove(float x, float y)
     m_mouse_x = x;
     m_mouse_y = y;
     m_focus_controller->onMouseMove(x, y);
-    domain::MouseMoveResult result = m_mouse_controller->onMouseMove(x, y, m_ui_options.get());
+    domain::MouseMoveResult result = m_mouse_controller->onMouseMove(x, y);
 
     if (result.cursor.has_value()) {
         setCursor(result.cursor.value());
@@ -184,7 +177,7 @@ void Application::onMouseMove(float x, float y)
 void Application::onMouseButton(domain::MouseButtonEvent event)
 {
     m_focus_controller->onMouseButton(event);
-    m_mouse_controller->onMouseButton(event, m_ui_options.get());
+    m_mouse_controller->onMouseButton(event);
     markDirty();
 }
 

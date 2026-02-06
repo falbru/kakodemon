@@ -200,10 +200,11 @@ domain::UIOptions JsonRpcKakouneInterface::getUIOptions(domain::FontManager* fon
 }
 
 domain::FrameEvents JsonRpcKakouneInterface::getEvents() {
-    FrameEvents adapter_events = m_frame_state_manager->getEvents();
+    FrameEvents frame_events = m_frame_state_manager->popEvents();
 
     return domain::FrameEvents{
-        .menu_select = adapter_events.menu_select,
+        .menu_select = frame_events.menu_select,
+        .ui_options_updated = frame_events.ui_options_updated,
     };
 }
 
@@ -215,14 +216,15 @@ std::optional<std::pair<domain::KakouneState, domain::FrameEvents>> JsonRpcKakou
     }
 
     FrameState frame_state = result->first;
-    FrameEvents adapter_events = result->second;
+    FrameEvents frame_events = result->second;
 
     if (frame_state.ui_options.has_value()) m_ui_options = frame_state.ui_options.value();
 
     domain::KakouneState kakoune_state = convertFrameStateToKakouneState(frame_state);
 
     domain::FrameEvents events{
-        .menu_select = adapter_events.menu_select,
+        .menu_select = frame_events.menu_select,
+        .ui_options_updated = frame_events.ui_options_updated,
     };
 
     return std::make_pair(kakoune_state, events);

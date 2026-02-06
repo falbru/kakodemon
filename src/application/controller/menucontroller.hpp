@@ -6,7 +6,6 @@
 #include "application/view/promptmenu.hpp"
 #include "application/view/searchmenu.hpp"
 #include "domain/mouse.hpp"
-#include "domain/uioptions.hpp"
 #include <functional>
 
 class MenuController
@@ -18,10 +17,10 @@ class MenuController
               domain::FontManager *font_manager, PromptMenuView *prompt_menu_view, InlineMenuView *inline_menu_view,
               SearchMenuView *search_menu_view, std::function<void()> mark_dirty);
 
-    void render(const domain::UIOptions &ui_options);
+    void render();
 
     domain::MouseMoveResult onMouseMove(float x, float y);
-    bool onMouseButton(domain::MouseButtonEvent event, const domain::UIOptions *ui_options);
+    bool onMouseButton(domain::MouseButtonEvent event);
     void onMouseScroll(int scroll_amount);
     void ensureItemVisible(int index);
 

@@ -13,6 +13,8 @@ class ClientManager
     ClientManager(domain::KakouneSession *session);
 
     KakouneClient *createClient(std::optional<std::string> startup_command, std::vector<std::string> file_arguments);
+
+    void setDefaultUIOptions(domain::UIOptions ui_options);
     void removeClient(KakouneClient *client);
 
     ObserverId onClientAdded(std::function<void(KakouneClient *)> callback);
@@ -26,6 +28,7 @@ class ClientManager
     void notifyClientRemovedObservers(KakouneClient *client);
 
     domain::KakouneSession *m_session;
+    domain::UIOptions m_default_ui_options;
     std::vector<std::unique_ptr<KakouneClient>> m_clients;
 
     ObserverId m_next_observer_id = 0;

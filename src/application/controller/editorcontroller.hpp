@@ -9,7 +9,6 @@
 #include "domain/color.hpp"
 #include "domain/fontmanager.hpp"
 #include "domain/mouse.hpp"
-#include "domain/uioptions.hpp"
 #include <functional>
 #include <map>
 
@@ -20,17 +19,17 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
   public:
     EditorController();
 
-    void init(ClientManager *client_manager, KakouneClient **focused_client, domain::UIOptions *ui_options,
-              PaneLayout *layout_controller, KakouneContentView *kakoune_content_view, StatusBarView *status_bar_view,
+    void init(ClientManager *client_manager, KakouneClient **focused_client, PaneLayout *layout_controller,
+              KakouneContentView *kakoune_content_view, StatusBarView *status_bar_view,
               domain::FontManager *font_manager, std::function<void(domain::RGBAColor)> set_clear_color,
               MenuController *menu_controller);
-    bool update(domain::UIOptions &ui_options);
-    void render(const domain::UIOptions &ui_options);
+    bool update();
+    void render();
 
-    void onWindowResize(int width, int height, const domain::UIOptions &ui_options);
-    domain::MouseMoveResult onMouseMove(float x, float y, const domain::UIOptions *ui_options, bool obscured);
-    void onMouseButton(domain::MouseButtonEvent event, const domain::UIOptions *ui_options, bool obscured);
-    void onMouseScroll(int amount, float x, float y, const domain::UIOptions *ui_options);
+    void onWindowResize(int width, int height);
+    domain::MouseMoveResult onMouseMove(float x, float y, bool obscured);
+    void onMouseButton(domain::MouseButtonEvent event, bool obscured);
+    void onMouseScroll(int amount, float x, float y);
 
     int width() const;
     int height() const;
@@ -40,7 +39,6 @@ class EditorController // TODO rename to KakouneContentViewController or somethi
 
     ClientManager *m_client_manager;
     KakouneClient **m_focused_client;
-    domain::UIOptions *m_ui_options;
     PaneLayout *m_pane_layout;
     KakouneContentView *m_kakoune_content_view;
     StatusBarView *m_status_bar_view;

@@ -32,7 +32,6 @@
 #include "domain/ports/fontresolver.hpp"
 #include "domain/ports/kakounesession.hpp"
 #include "domain/ports/renderer.hpp"
-#include "domain/uioptions.hpp"
 
 using FontEngineFactory = std::function<std::unique_ptr<domain::FontEngine>(const domain::FontMatch &)>;
 
@@ -93,7 +92,6 @@ class Application
     std::unique_ptr<ClientManager> m_client_manager;
     std::unique_ptr<PaneLayout> m_pane_layout;
     KakouneClient *m_focused_client;
-    std::unique_ptr<domain::UIOptions> m_ui_options;
 
     std::unique_ptr<CommandController> m_command_controller;
     std::unique_ptr<EditorController> m_editor_controller;

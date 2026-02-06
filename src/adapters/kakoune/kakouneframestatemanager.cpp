@@ -76,14 +76,16 @@ void KakouneFrameStateManager::onRequest(const IncomingRequest& request)
     }
     case IncomingRequestType::REFRESH: {
         bool force = std::get<RefreshRequestData>(request.data).force;
-        m_active_frame_state = m_next_frame_state;
         m_active_frame_state_ready = true;
+        m_active_frame_state = m_next_frame_state;
         m_active_frame_events = m_next_frame_events;
+        m_next_frame_events = FrameEvents{};
         notifyRefreshObservers(force);
         break;
     }
     case IncomingRequestType::SET_UI_OPTIONS: {
         m_next_frame_state.ui_options = std::get<UIOptionsData>(request.data).ui_options;
+        m_next_frame_events.ui_options_updated = true;
         break;
     }
     }
@@ -101,12 +103,11 @@ std::optional<FrameState> KakouneFrameStateManager::getNextFrameState() {
     return m_active_frame_state;
 }
 
-FrameEvents KakouneFrameStateManager::getEvents() {
+FrameEvents KakouneFrameStateManager::popEvents() {
     std::lock_guard<std::mutex> lock(m_state_mutex);
 
     FrameEvents events = m_active_frame_events;
     m_active_frame_events = FrameEvents{};
-    m_next_frame_events = FrameEvents{};
 
     return events;
 }
@@ -124,7 +125,6 @@ std::optional<std::pair<FrameState, FrameEvents>> KakouneFrameStateManager::getN
     FrameEvents events = m_active_frame_events;
 
     m_active_frame_events = FrameEvents{};
-    m_next_frame_events = FrameEvents{};
 
     return std::make_pair(state, events);
 }

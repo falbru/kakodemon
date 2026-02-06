@@ -15,7 +15,6 @@ EditorController::EditorController()
 
 void EditorController::init(ClientManager* client_manager,
                             KakouneClient** focused_client,
-                            domain::UIOptions* ui_options,
                             PaneLayout* layout_controller,
                             KakouneContentView* kakoune_content_view,
                             StatusBarView* status_bar_view,
@@ -25,7 +24,6 @@ void EditorController::init(ClientManager* client_manager,
 {
     m_client_manager = client_manager;
     m_focused_client = focused_client;
-    m_ui_options = ui_options;
     m_pane_layout = layout_controller;
     m_kakoune_content_view = kakoune_content_view;
     m_status_bar_view = status_bar_view;
@@ -44,41 +42,33 @@ void EditorController::init(ClientManager* client_manager,
     });
 }
 
-bool EditorController::update(domain::UIOptions& ui_options)
+bool EditorController::update()
 {
     bool state_updated = false;
 
     for (auto& client : m_client_manager->clients()) {
         auto result = client->interface->getNextKakouneStateAndEvents();
         if (result.has_value()) {
-            client->state = result->first;
-            domain::FrameEvents events = result->second;
             state_updated = true;
+            client->state = result->first;
+            setClearColor(client->state.default_face.getBg());
 
-            if (events.menu_select && client->state.menu.has_value() && client->state.menu->hasItems()) {
+            domain::FrameEvents events = result->second;
+
+            if (events.ui_options_updated) {
+                client->setUIOptions(client->interface->getUIOptions(m_font_manager));
+            }
+
+            if (events.menu_select && client->state.menu.has_value() && client->state.menu->hasItems()) { // TODO onClientEvent instead
                 m_menu_controller->ensureItemVisible(client->state.menu->getItems().selected_index);
             }
-        }
-    }
-
-    if (state_updated && !m_client_manager->clients().empty()) {
-        auto& first_client = m_client_manager->clients().front();
-        setClearColor(first_client->state.default_face.getBg());
-
-        domain::UIOptions new_ui_options = first_client->interface->getUIOptions(m_font_manager);
-        bool fonts_changed = new_ui_options.font_content != ui_options.font_content ||
-                             new_ui_options.font_statusbar != ui_options.font_statusbar;
-        ui_options = new_ui_options;
-
-        if (fonts_changed && m_width > 0 && m_height > 0) {
-            onWindowResize(m_width, m_height, ui_options);
         }
     }
 
     return state_updated;
 }
 
-void EditorController::render(const domain::UIOptions& ui_options)
+void EditorController::render()
 {
     for (const auto& pane : m_pane_layout->getPanes()) {
         auto* client = pane.client;
@@ -87,7 +77,7 @@ void EditorController::render(const domain::UIOptions& ui_options)
         RenderContext render_context = {
             m_font_manager,
             client->state.default_face,
-            ui_options,
+            client->uiOptions(),
             bounds.width,
             bounds.height
         };
@@ -97,16 +87,16 @@ void EditorController::render(const domain::UIOptions& ui_options)
     }
 }
 
-void EditorController::onWindowResize(int width, int height, const domain::UIOptions& ui_options) {
+void EditorController::onWindowResize(int width, int height) {
     m_width = width;
     m_height = height;
 }
 
 void EditorController::resizeClientsToPaneLayout(const std::vector<Pane>& panes) {
     for (const auto& pane : m_pane_layout->getPanes()) {
-        float cell_width = m_kakoune_content_view->getCellWidth(m_ui_options->font_content);
-        float cell_height = m_kakoune_content_view->getCellHeight(m_ui_options->font_content);
-        float status_bar_height = m_status_bar_view->height(m_ui_options->font_statusbar);
+        float cell_width = m_kakoune_content_view->getCellWidth(pane.client->uiOptions().font_content);
+        float cell_height = m_kakoune_content_view->getCellHeight(pane.client->uiOptions().font_content);
+        float status_bar_height = m_status_bar_view->height(pane.client->uiOptions().font_statusbar);
 
         int rows = static_cast<int>((pane.bounds.height - status_bar_height) / cell_height);
         int columns = static_cast<int>(pane.bounds.width / cell_width);
@@ -114,13 +104,13 @@ void EditorController::resizeClientsToPaneLayout(const std::vector<Pane>& panes)
     }
 }
 
-domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const domain::UIOptions* ui_options, bool obscured) {
+domain::MouseMoveResult EditorController::onMouseMove(float x, float y, bool obscured) {
     Pane* hover_pane = m_pane_layout->findPaneAt(x, y);
     if (!hover_pane) {
         return domain::MouseMoveResult{domain::Cursor::DEFAULT};
     }
 
-    float status_bar_height = m_status_bar_view->height(ui_options->font_statusbar);
+    float status_bar_height = m_status_bar_view->height(hover_pane->client->uiOptions().font_statusbar);
     float content_height = hover_pane->bounds.height - status_bar_height;
     float relative_y = y - hover_pane->bounds.y;
 
@@ -143,7 +133,7 @@ domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const do
     if (is_any_mouse_button_pressed && *m_focused_client) {
         Pane* focused_pane = m_pane_layout->findPaneForClient(*m_focused_client);
         if (focused_pane) {
-            domain::Coord coord = m_kakoune_content_view->pixelToCoord(ui_options->font_content, x, y, focused_pane->bounds.x, focused_pane->bounds.y);
+            domain::Coord coord = m_kakoune_content_view->pixelToCoord((*m_focused_client)->uiOptions().font_content, x, y, focused_pane->bounds.x, focused_pane->bounds.y);
             (*m_focused_client)->interface->moveMouse(coord.line, coord.column);
             m_active_mouse_client = *m_focused_client;
         }
@@ -152,7 +142,7 @@ domain::MouseMoveResult EditorController::onMouseMove(float x, float y, const do
     return domain::MouseMoveResult{domain::Cursor::IBEAM};
 }
 
-void EditorController::onMouseButton(domain::MouseButtonEvent event, const domain::UIOptions* ui_options, bool obscured) {
+void EditorController::onMouseButton(domain::MouseButtonEvent event, bool obscured) {
     if (!*m_focused_client) return;
 
     Pane* focused_pane = m_pane_layout->findPaneForClient(*m_focused_client);
@@ -160,7 +150,7 @@ void EditorController::onMouseButton(domain::MouseButtonEvent event, const domai
         return;
     }
 
-    domain::Coord coord = m_kakoune_content_view->pixelToCoord(ui_options->font_content, event.x, event.y, focused_pane->bounds.x, focused_pane->bounds.y);
+    domain::Coord coord = m_kakoune_content_view->pixelToCoord((*m_focused_client)->uiOptions().font_content, event.x, event.y, focused_pane->bounds.x, focused_pane->bounds.y);
 
     if (!obscured && event.action == domain::MouseButtonAction::PRESS) {
         (*m_focused_client)->interface->pressMouseButton(event.button, coord.line, coord.column);
@@ -183,7 +173,7 @@ int EditorController::height() const {
     return m_height;
 }
 
-void EditorController::onMouseScroll(int amount, float x, float y, const domain::UIOptions* ui_options) {
+void EditorController::onMouseScroll(int amount, float x, float y) {
     if (!*m_focused_client) return;
 
     Pane* focused_pane = m_pane_layout->findPaneForClient(*m_focused_client);
@@ -191,7 +181,7 @@ void EditorController::onMouseScroll(int amount, float x, float y, const domain:
         return;
     }
 
-    domain::Coord coord = m_kakoune_content_view->pixelToCoord(ui_options->font_content, x, y, focused_pane->bounds.x, focused_pane->bounds.y);
+    domain::Coord coord = m_kakoune_content_view->pixelToCoord(focused_pane->client->uiOptions().font_content, x, y, focused_pane->bounds.x, focused_pane->bounds.y);
 
     (*m_focused_client)->interface->scroll(amount, coord.line, coord.column);
 }

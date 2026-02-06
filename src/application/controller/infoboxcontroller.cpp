@@ -1,7 +1,6 @@
 #include "infoboxcontroller.hpp"
 #include "application/model/panelayout.hpp"
 #include "application/view/rendercontext.hpp"
-#include "domain/uioptions.hpp"
 
 InfoBoxController::InfoBoxController() {
 
@@ -16,17 +15,14 @@ void InfoBoxController::init(KakouneClient** focused_client, PaneLayout* layout_
     m_mark_dirty = mark_dirty;
 }
 
-void InfoBoxController::update(const domain::UIOptions& ui_options) {
-}
-
-void InfoBoxController::render(const domain::UIOptions& ui_options) {
+void InfoBoxController::render() {
     if (!*m_focused_client) return;
     if (!(*m_focused_client)->state.info_box.has_value() || ((*m_focused_client)->state.info_box->title.size() == 0 && (*m_focused_client)->state.info_box->content.size() == 0)) return;
 
     RenderContext render_context = {
         m_font_manager,
         (*m_focused_client)->state.default_face,
-        ui_options,
+        (*m_focused_client)->uiOptions(),
         static_cast<float>(m_editor_controller->width()),
         static_cast<float>(m_editor_controller->height())
     };

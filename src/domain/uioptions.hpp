@@ -8,6 +8,8 @@
 namespace domain
 {
 
+class FontManager;
+
 struct UIOptions
 {
     Font *font = nullptr;
@@ -17,7 +19,11 @@ struct UIOptions
     Font *font_content = nullptr;
     OptionalColor color_border;
     std::unordered_map<FixedColor, RGBAColor> color_overrides;
+
+    bool operator==(const UIOptions &other) const;
 };
+
+UIOptions getDefaultUIOptions(FontManager *font_manager);
 
 } // namespace domain
 

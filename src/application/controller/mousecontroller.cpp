@@ -1,7 +1,6 @@
 #include "application/controller/mousecontroller.hpp"
 #include "application/controller/infoboxcontroller.hpp"
 #include "application/model/kakouneclient.hpp"
-#include "domain/uioptions.hpp"
 #include "domain/mouse.hpp"
 
 MouseController::MouseController() {
@@ -15,7 +14,7 @@ void MouseController::init(KakouneClient** focused_client, EditorController* edi
     m_info_box_controller = info_box_controller;
 }
 
-domain::MouseMoveResult MouseController::onMouseMove(float x, float y, const domain::UIOptions* ui_options) {
+domain::MouseMoveResult MouseController::onMouseMove(float x, float y) {
     domain::MouseMoveResult mouse_move_result;
     std::optional<domain::Cursor> cursor;
 
@@ -39,7 +38,7 @@ domain::MouseMoveResult MouseController::onMouseMove(float x, float y, const dom
         }
     }
 
-    mouse_move_result = m_editor_controller->onMouseMove(x, y, ui_options, obscured);
+    mouse_move_result = m_editor_controller->onMouseMove(x, y, obscured);
     cursor = mouse_move_result.cursor;
 
     mouse_move_result = m_menu_controller->onMouseMove(x, y);
@@ -50,7 +49,7 @@ domain::MouseMoveResult MouseController::onMouseMove(float x, float y, const dom
     return mouse_move_result;
 }
 
-void MouseController::onMouseButton(domain::MouseButtonEvent event, const domain::UIOptions *ui_options) {
+void MouseController::onMouseButton(domain::MouseButtonEvent event) {
     bool obscured = false;
     if (*m_focused_client && (*m_focused_client)->state.menu.has_value()) {
         float menu_x = m_menu_controller->x();
@@ -71,12 +70,12 @@ void MouseController::onMouseButton(domain::MouseButtonEvent event, const domain
         }
     }
 
-    bool handled_by_menu = m_menu_controller->onMouseButton(event, ui_options);
+    bool handled_by_menu = m_menu_controller->onMouseButton(event);
 
-    m_editor_controller->onMouseButton(event, ui_options, obscured | handled_by_menu);
+    m_editor_controller->onMouseButton(event, obscured | handled_by_menu);
 }
 
-void MouseController::onMouseScroll(double offset, float x, float y, const domain::UIOptions *ui_options) {
+void MouseController::onMouseScroll(double offset, float x, float y) {
     m_scroll_accumulator += offset * m_scroll_speed;
 
     int scroll_amount = 0;
@@ -116,7 +115,7 @@ void MouseController::onMouseScroll(double offset, float x, float y, const domai
         } else if (over_info_box) {
             m_info_box_controller->onMouseScroll(-scroll_amount);
         } else {
-            m_editor_controller->onMouseScroll(-scroll_amount, x, y, ui_options);
+            m_editor_controller->onMouseScroll(-scroll_amount, x, y);
         }
     }
 }
