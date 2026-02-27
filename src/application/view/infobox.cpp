@@ -519,7 +519,7 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
     }
 }
 
-void InfoBoxView::onMouseScroll(InfoBoxViewState &state, int scroll_amount)
+void InfoBoxView::handleMouseScroll(InfoBoxViewState &state, int scroll_amount)
 {
     state.scroll_offset += scroll_amount;
 }

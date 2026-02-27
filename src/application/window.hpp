@@ -32,6 +32,19 @@ class Window
 
     virtual void renderBegin() = 0;
     virtual void renderEnd() = 0;
+
+    void setNeedsRerender()
+    {
+        m_needs_rerender = true;
+    }
+    bool needsRerender() const
+    {
+        return m_needs_rerender;
+    }
+    void clearRerender()
+    {
+        m_needs_rerender = false;
+    }
     virtual void setClearColor(domain::RGBAColor color) = 0;
 
     virtual void setTitle(const std::string &title) = 0;
@@ -53,6 +66,9 @@ class Window
     virtual ObserverId onClose(std::function<void()> callback) = 0;
     virtual ObserverId onMaximizedChanged(std::function<void(bool)> callback) = 0;
     virtual void removeObserver(ObserverId id) = 0;
+
+  private:
+    bool m_needs_rerender = true;
 };
 
 #endif

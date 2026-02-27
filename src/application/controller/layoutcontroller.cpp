@@ -9,8 +9,7 @@ LayoutController::LayoutController() {
 
 }
 
-void LayoutController::init(PaneLayout* pane_layout, ClientManager* client_manager, Window* window,
-                            std::function<void()> mark_dirty) {
+void LayoutController::init(PaneLayout* pane_layout, ClientManager* client_manager, Window* window) {
     m_pane_layout = pane_layout;
 
     client_manager->onClientAdded([=](KakouneClient* client) {
@@ -24,9 +23,9 @@ void LayoutController::init(PaneLayout* pane_layout, ClientManager* client_manag
         m_pane_layout->arrange();
     });
 
-    window->onResize([this, mark_dirty](int width, int height) {
+    window->onResize([this, window](int width, int height) {
         m_pane_layout->setBounds(domain::Rectangle{0, 0, (float)width, (float)height});
         m_pane_layout->arrange();
-        mark_dirty();
+        window->setNeedsRerender();
     });
 }

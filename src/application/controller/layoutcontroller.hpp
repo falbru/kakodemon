@@ -10,7 +10,7 @@ class LayoutController
   public:
     LayoutController();
 
-    void init(PaneLayout *pane_layout, ClientManager *client_manager, Window *window, std::function<void()> mark_dirty);
+    void init(PaneLayout *pane_layout, ClientManager *client_manager, Window *window);
 
   private:
     PaneLayout *m_pane_layout;

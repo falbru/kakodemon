@@ -64,8 +64,8 @@ set(SRC
     src/application/model/panelayout.cpp
     src/application/model/clientmanager.cpp
     src/application/controller/menucontroller.cpp
-    src/application/controller/mousecontroller.cpp
     src/application/model/kakouneclient.cpp
+    src/application/scene.cpp
     src/application/view/glyphsequence.cpp
     src/application/view/rendercontext.cpp
     src/application/view/infobox.cpp

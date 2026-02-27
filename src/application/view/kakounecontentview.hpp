@@ -1,10 +1,15 @@
 #ifndef KAKOUNECONTENTVIEW_HPP_INCLUDED
 #define KAKOUNECONTENTVIEW_HPP_INCLUDED
 
+#include "application/model/kakouneclient.hpp"
+#include "application/observerid.hpp"
 #include "application/view/rendercontext.hpp"
 #include "domain/coord.hpp"
 #include "domain/geometry.hpp"
+#include "domain/mouse.hpp"
 #include "domain/ports/renderer.hpp"
+#include <functional>
+#include <map>
 
 class KakouneContentView
 {
@@ -16,6 +21,15 @@ class KakouneContentView
     void render(const RenderContext &render_context, const domain::Lines &lines, const domain::Face &default_face,
                 const domain::Rectangle &bounds);
 
+    void handleMouseButton(KakouneClient *client, domain::MouseButtonEvent event, domain::Rectangle bounds);
+    void handleMouseMove(KakouneClient *client, float x, float y, domain::Rectangle bounds);
+    void handleMouseScroll(KakouneClient *client, float x, float y, domain::Rectangle bounds, int amount);
+
+    ObserverId onMouseButton(std::function<void(KakouneClient *, domain::MouseButtonEvent, domain::Coord)> callback);
+    ObserverId onMouseMove(std::function<void(KakouneClient *, domain::Coord)> callback);
+    ObserverId onMouseScroll(std::function<void(KakouneClient *, domain::Coord, int)> callback);
+    void removeObserver(ObserverId id);
+
     float getCellWidth(domain::Font *font) const;
     float getCellHeight(domain::Font *font) const;
 
@@ -25,6 +39,12 @@ class KakouneContentView
 
   private:
     domain::Renderer *m_renderer;
+
+    ObserverId m_next_observer_id = 0;
+    std::map<ObserverId, std::function<void(KakouneClient *, domain::MouseButtonEvent, domain::Coord)>>
+        m_mouse_button_observers;
+    std::map<ObserverId, std::function<void(KakouneClient *, domain::Coord)>> m_mouse_move_observers;
+    std::map<ObserverId, std::function<void(KakouneClient *, domain::Coord, int)>> m_mouse_scroll_observers;
 };
 
 #endif

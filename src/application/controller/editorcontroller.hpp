@@ -2,7 +2,6 @@
 #define EDITORCONTROLLER_HPP_INCLUDED
 
 #include "application/model/clientmanager.hpp"
-#include "application/model/kakouneclient.hpp"
 #include "application/model/panelayout.hpp"
 #include "application/view/kakounecontentview.hpp"
 #include "application/view/statusbar.hpp"
@@ -18,21 +17,15 @@ class EditorController
   public:
     EditorController();
 
-    void init(ClientManager *client_manager, KakouneClient **focused_client, PaneLayout *layout_controller,
-              KakouneContentView *kakoune_content_view, StatusBarView *status_bar_view,
-              domain::FontManager *font_manager, Window *window, MenuController *menu_controller);
-    bool update();
-    void render();
-
-    domain::MouseMoveResult onMouseMove(float x, float y, bool obscured);
-    void onMouseButton(domain::MouseButtonEvent event, bool obscured);
-    void onMouseScroll(int amount, float x, float y);
+    void init(ClientManager *client_manager, PaneLayout *pane_layout, KakouneContentView *kakoune_content_view,
+              StatusBarView *status_bar_view, domain::FontManager *font_manager, Window *window,
+              MenuController *menu_controller);
+    void update();
 
   private:
     void resizeClientsToPaneLayout(const std::vector<Pane> &panes);
 
     ClientManager *m_client_manager;
-    KakouneClient **m_focused_client;
     PaneLayout *m_pane_layout;
     KakouneContentView *m_kakoune_content_view;
     StatusBarView *m_status_bar_view;
@@ -41,9 +34,6 @@ class EditorController
     Window *m_window;
 
     std::map<domain::MouseButton, bool> m_mouse_button_pressed;
-    KakouneClient *m_active_mouse_client;
-
-    int m_content_height;
 };
 
 #endif

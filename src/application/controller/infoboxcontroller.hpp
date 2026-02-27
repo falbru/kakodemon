@@ -6,7 +6,6 @@
 #include "application/model/panelayout.hpp"
 #include "application/view/infobox.hpp"
 #include "application/window.hpp"
-#include <functional>
 
 class InfoBoxController
 {
@@ -14,11 +13,9 @@ class InfoBoxController
     InfoBoxController();
 
     void init(KakouneClient **focused_client, PaneLayout *layout_controller, Window *window,
-              domain::FontManager *font_manager, InfoBoxView *info_box_view, std::function<void()> mark_dirty);
+              domain::FontManager *font_manager, InfoBoxView *info_box_view);
 
-    void render();
-
-    void onMouseScroll(int scroll_amount);
+    void handleMouseScroll(int scroll_amount);
 
     float x() const;
     float y() const;
@@ -31,8 +28,6 @@ class InfoBoxController
     Window *m_window;
     domain::FontManager *m_font_manager;
     InfoBoxView *m_info_box_view;
-
-    std::function<void()> m_mark_dirty;
 };
 
 #endif

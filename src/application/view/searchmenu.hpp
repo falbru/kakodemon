@@ -2,12 +2,15 @@
 #define VIEW_SEARCHMENU_HPP_INCLUDED
 
 #include "application/model/viewstate.hpp"
+#include "application/observerid.hpp"
 #include "application/view/rendercontext.hpp"
 #include "application/view/widgets/input.hpp"
 #include "application/view/widgets/scrolledmenuitems.hpp"
 #include "domain/menu.hpp"
 #include "domain/mouse.hpp"
 #include "domain/ports/renderer.hpp"
+#include <functional>
+#include <map>
 
 class SearchMenuView
 {
@@ -18,10 +21,13 @@ class SearchMenuView
 
     void render(const RenderContext &render_context, MenuViewState &state, const domain::Menu &menu, int cursor_column);
 
-    domain::MouseMoveResult onMouseMove(float x, float y, const domain::Menu &menu);
-    std::optional<int> findItemAtPosition(float x, float y, const MenuViewState &state, const domain::Menu &menu);
-    void onMouseScroll(MenuViewState &state, int scroll_amount, const domain::Menu &menu);
+    domain::MouseMoveResult handleMouseMove(float x, float y, const domain::Menu &menu);
+    bool handleMouseButton(domain::MouseButtonEvent event, MenuViewState &state, const domain::Menu &menu);
+    void handleMouseScroll(MenuViewState &state, int scroll_amount, const domain::Menu &menu);
     void ensureItemVisible(MenuViewState &state, int index);
+
+    ObserverId onMouseButton(std::function<void(int)> callback);
+    void removeObserver(ObserverId id);
 
     float x() const;
     float y() const;
@@ -44,6 +50,11 @@ class SearchMenuView
 
     std::unique_ptr<Input> m_input;
     std::unique_ptr<ScrolledMenuItems> m_scrolled_menu_items;
+
+    ObserverId m_next_observer_id = 0;
+    std::map<ObserverId, std::function<void(int)>> m_mouse_button_observers;
+
+    std::optional<int> findItemAtPosition(float x, float y, const MenuViewState &state, const domain::Menu &menu);
 };
 
 #endif

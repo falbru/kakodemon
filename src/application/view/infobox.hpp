@@ -59,7 +59,7 @@ class InfoBoxView
     void render(const RenderContext &render_context, InfoBoxViewState &state, const domain::InfoBox &info_box,
                 const domain::CursorPosition &cursor_position, const domain::Rectangle &content_bounds);
 
-    void onMouseScroll(InfoBoxViewState &state, int scroll_amount);
+    void handleMouseScroll(InfoBoxViewState &state, int scroll_amount);
 
     float x() const;
     float y() const;

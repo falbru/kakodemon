@@ -7,7 +7,6 @@
 #include "application/controller/infoboxcontroller.hpp"
 #include "application/controller/layoutcontroller.hpp"
 #include "application/controller/menucontroller.hpp"
-#include "application/controller/mousecontroller.hpp"
 #include "application/model/clientmanager.hpp"
 #include "application/model/kakouneclient.hpp"
 #include "application/view/searchmenu.hpp"
@@ -106,10 +105,10 @@ void Application::init(Window *window, const CliConfig &cli_config, ApplicationC
     m_editor_controller = std::make_unique<EditorController>();
     m_focus_controller = std::make_unique<FocusController>();
     m_input_controller = std::make_unique<InputController>();
-    m_mouse_controller = std::make_unique<MouseController>();
     m_menu_controller = std::make_unique<MenuController>();
     m_info_box_controller = std::make_unique<InfoBoxController>();
     m_layout_controller = std::make_unique<LayoutController>();
+    m_scene = std::make_unique<Scene>();
 
     m_kakoune_content_view = std::make_unique<KakouneContentView>();
     m_status_bar = std::make_unique<StatusBarView>();
@@ -127,16 +126,17 @@ void Application::init(Window *window, const CliConfig &cli_config, ApplicationC
 
     m_pane_layout->init(m_client_manager.get());
 
-    auto mark_dirty = [this]() { markDirty(); };
-
     m_command_controller->init(m_command_interface.get(), m_client_manager.get(), m_kakoune_session.get(), m_window);
     m_input_controller->init(&m_focused_client, m_window);
     m_focus_controller->init(&m_focused_client, m_client_manager.get(), m_pane_layout.get(), m_window);
-    m_menu_controller->init(&m_focused_client, m_pane_layout.get(), m_window, m_font_manager, m_prompt_menu.get(), m_inline_menu.get(), m_search_menu.get(), mark_dirty);
-    m_editor_controller->init(m_client_manager.get(), &m_focused_client, m_pane_layout.get(), m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager, m_window, m_menu_controller.get());
-    m_info_box_controller->init(&m_focused_client, m_pane_layout.get(), m_window, m_font_manager, m_info_box.get(), mark_dirty);
-    m_mouse_controller->init(&m_focused_client, m_editor_controller.get(), m_menu_controller.get(), m_info_box_controller.get(), m_window, mark_dirty);
-    m_layout_controller->init(m_pane_layout.get(), m_client_manager.get(), m_window, mark_dirty);
+    m_menu_controller->init(&m_focused_client, m_pane_layout.get(), m_window, m_font_manager, m_prompt_menu.get(), m_inline_menu.get(), m_search_menu.get());
+    m_editor_controller->init(m_client_manager.get(), m_pane_layout.get(), m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager, m_window, m_menu_controller.get());
+    m_info_box_controller->init(&m_focused_client, m_pane_layout.get(), m_window, m_font_manager, m_info_box.get());
+    m_scene->init(m_client_manager.get(), &m_focused_client, m_pane_layout.get(), m_kakoune_content_view.get(),
+                  m_status_bar.get(), m_prompt_menu.get(), m_inline_menu.get(), m_search_menu.get(),
+                  m_info_box.get(), m_menu_controller.get(), m_info_box_controller.get(),
+                  m_font_manager, m_window);
+    m_layout_controller->init(m_pane_layout.get(), m_client_manager.get(), m_window);
 
     m_client_manager->setDefaultUIOptions(domain::getDefaultUIOptions(m_font_manager));
 
@@ -154,11 +154,11 @@ void Application::run() {
 
         updateControllers();
 
-        if (m_needs_render) {
+        if (m_window->needsRerender()) {
             m_window->renderBegin();
             renderControllers();
             m_window->renderEnd();
-            m_needs_render = false;
+            m_window->clearRerender();
         }
     }
 }
@@ -168,19 +168,11 @@ void Application::updateControllers()
     KakouneClientProcess::processPendingExits();
     m_command_controller->update();
     m_input_controller->update();
-    bool state_updated = m_editor_controller->update();
-    if (state_updated) {
-        markDirty();
-    }
+    m_editor_controller->update();
 }
 
 void Application::renderControllers()
 {
-    m_editor_controller->render();
-    m_menu_controller->render();
-    m_info_box_controller->render();
+    m_scene->render();
 }
 
-void Application::markDirty() {
-    m_needs_render = true;
-}
