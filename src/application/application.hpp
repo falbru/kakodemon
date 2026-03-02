@@ -12,16 +12,13 @@
 #include "application/controller/infoboxcontroller.hpp"
 #include "application/controller/inputcontroller.hpp"
 #include "application/controller/layoutcontroller.hpp"
-#include "application/controller/menucontroller.hpp"
 #include "application/model/clientmanager.hpp"
 #include "application/model/kakouneclient.hpp"
 #include "application/model/panelayout.hpp"
 #include "application/scene.hpp"
 #include "application/view/infobox.hpp"
-#include "application/view/inlinemenu.hpp"
 #include "application/view/kakounecontentview.hpp"
-#include "application/view/promptmenu.hpp"
-#include "application/view/searchmenu.hpp"
+#include "application/view/multistyledmenu.hpp"
 #include "application/view/statusbar.hpp"
 #include "domain/fontmanager.hpp"
 #include "domain/ports/commandinterface.hpp"
@@ -64,15 +61,12 @@ class Application
     std::unique_ptr<FocusController> m_focus_controller;
     std::unique_ptr<LayoutController> m_layout_controller;
     std::unique_ptr<InputController> m_input_controller;
-    std::unique_ptr<MenuController> m_menu_controller;
     std::unique_ptr<InfoBoxController> m_info_box_controller;
     std::unique_ptr<Scene> m_scene;
 
     std::unique_ptr<KakouneContentView> m_kakoune_content_view;
     std::unique_ptr<StatusBarView> m_status_bar;
-    std::unique_ptr<PromptMenuView> m_prompt_menu;
-    std::unique_ptr<InlineMenuView> m_inline_menu;
-    std::unique_ptr<SearchMenuView> m_search_menu;
+    std::unique_ptr<MultiStyledMenuView> m_multi_styled_menu;
     std::unique_ptr<InfoBoxView> m_info_box;
 };
 

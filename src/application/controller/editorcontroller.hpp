@@ -4,12 +4,12 @@
 #include "application/model/clientmanager.hpp"
 #include "application/model/panelayout.hpp"
 #include "application/view/kakounecontentview.hpp"
+#include "application/view/multistyledmenu.hpp"
 #include "application/view/statusbar.hpp"
 #include "domain/fontmanager.hpp"
 #include "domain/mouse.hpp"
 #include <map>
 
-class MenuController;
 class Window;
 
 class EditorController
@@ -19,7 +19,7 @@ class EditorController
 
     void init(ClientManager *client_manager, PaneLayout *pane_layout, KakouneContentView *kakoune_content_view,
               StatusBarView *status_bar_view, domain::FontManager *font_manager, Window *window,
-              MenuController *menu_controller);
+              MultiStyledMenuView *multi_styled_menu);
     void update();
 
   private:
@@ -30,7 +30,7 @@ class EditorController
     KakouneContentView *m_kakoune_content_view;
     StatusBarView *m_status_bar_view;
     domain::FontManager *m_font_manager;
-    MenuController *m_menu_controller;
+    MultiStyledMenuView *m_multi_styled_menu;
     Window *m_window;
 
     std::map<domain::MouseButton, bool> m_mouse_button_pressed;

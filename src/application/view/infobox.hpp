@@ -1,8 +1,8 @@
 #ifndef VIEW_INFOBOX_HPP_INCLUDED
 #define VIEW_INFOBOX_HPP_INCLUDED
-#include "application/controller/menucontroller.hpp"
 #include "application/model/viewstate.hpp"
 #include "application/view/kakounecontentview.hpp"
+#include "application/view/multistyledmenu.hpp"
 #include "application/view/rendercontext.hpp"
 #include "application/view/statusbar.hpp"
 #include "application/view/widgets/scrollbar.hpp"
@@ -41,8 +41,8 @@ class InfoBoxView
 {
   public:
     InfoBoxView();
-    void init(domain::Renderer *renderer, MenuController *menu_controller, KakouneContentView *kakoune_content_view,
-              StatusBarView *status_bar_view);
+    void init(domain::Renderer *renderer, MultiStyledMenuView *multi_styled_menu,
+              KakouneContentView *kakoune_content_view, StatusBarView *status_bar_view);
 
     std::pair<float, float> calculateInfoBoxPosition(const domain::Rectangle &anchor, float info_box_width,
                                                      float info_box_height, float viewport_width, float viewport_height,
@@ -72,7 +72,7 @@ class InfoBoxView
     const float MAX_HEIGHT = 600.0f;
     domain::Renderer *m_renderer;
     KakouneContentView *m_kakoune_content_view;
-    MenuController *m_menu_controller;
+    MultiStyledMenuView *m_multi_styled_menu;
     StatusBarView *m_status_bar_view;
 
     float m_x = 0.0f;

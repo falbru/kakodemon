@@ -7,20 +7,16 @@
 Scene::Scene() {}
 
 void Scene::init(ClientManager *client_manager, KakouneClient **focused_client, PaneLayout *pane_layout,
-                 KakouneContentView *content_view, StatusBarView *status_bar_view, PromptMenuView *prompt_menu_view,
-                 InlineMenuView *inline_menu_view, SearchMenuView *search_menu_view, InfoBoxView *info_box_view,
-                 MenuController *menu_controller, InfoBoxController *info_box_controller,
-                 domain::FontManager *font_manager, Window *window)
+                 KakouneContentView *content_view, StatusBarView *status_bar_view,
+                 MultiStyledMenuView *multi_styled_menu, InfoBoxView *info_box_view,
+                 InfoBoxController *info_box_controller, domain::FontManager *font_manager, Window *window)
 {
     m_focused_client = focused_client;
     m_pane_layout = pane_layout;
     m_content_view = content_view;
     m_status_bar_view = status_bar_view;
-    m_prompt_menu_view = prompt_menu_view;
-    m_inline_menu_view = inline_menu_view;
-    m_search_menu_view = search_menu_view;
+    m_multi_styled_menu = multi_styled_menu;
     m_info_box_view = info_box_view;
-    m_menu_controller = menu_controller;
     m_info_box_controller = info_box_controller;
     m_font_manager = font_manager;
     m_window = window;
@@ -99,31 +95,18 @@ void Scene::render()
         }
 
         Pane *pane = m_pane_layout->findPaneForClient(focused);
+        std::optional<domain::Rectangle> content_bounds = pane ? std::optional<domain::Rectangle>(pane->bounds) : std::nullopt;
 
-        switch (focused->state.menu->getStyle()) {
-            case domain::MenuStyle::INLINE:
-                if (pane) {
-                    m_inline_menu_view->render(focused_context, focused->inline_menu_state,
-                                               *focused->state.menu, pane->bounds);
-                }
-                break;
-            case domain::MenuStyle::PROMPT:
-                m_prompt_menu_view->render(focused_context, focused->prompt_menu_state,
-                                           *focused->state.menu, cursor_column);
-                break;
-            case domain::MenuStyle::SEARCH:
-                m_search_menu_view->render(focused_context, focused->search_menu_state,
-                                           *focused->state.menu, cursor_column);
-                break;
-        }
+        m_multi_styled_menu->render(focused_context, focused->menu_state, *focused->state.menu,
+                                    cursor_column, content_bounds);
     }
 }
 
 bool Scene::hitTestMenu(float x, float y) const
 {
     if (!*m_focused_client || !(*m_focused_client)->state.menu.has_value()) return false;
-    return x >= m_menu_controller->x() && x <= m_menu_controller->x() + m_menu_controller->width() &&
-           y >= m_menu_controller->y() && y <= m_menu_controller->y() + m_menu_controller->height();
+    return x >= m_multi_styled_menu->x() && x <= m_multi_styled_menu->x() + m_multi_styled_menu->width() &&
+           y >= m_multi_styled_menu->y() && y <= m_multi_styled_menu->y() + m_multi_styled_menu->height();
 }
 
 bool Scene::hitTestInfoBox(float x, float y) const
@@ -143,8 +126,10 @@ domain::MouseMoveResult Scene::onMouseMove(float x, float y)
         return domain::MouseMoveResult{domain::Cursor::IBEAM};
     }
 
-    domain::MouseMoveResult menu_result = m_menu_controller->handleMouseMove(x, y);
-    if (menu_result.cursor.has_value()) return menu_result;
+    if (*m_focused_client && (*m_focused_client)->state.menu.has_value()) {
+        domain::MouseMoveResult menu_result = m_multi_styled_menu->handleMouseMove(x, y, *(*m_focused_client)->state.menu);
+        if (menu_result.cursor.has_value()) return menu_result;
+    }
 
     if (hitTestInfoBox(x, y)) return domain::MouseMoveResult{domain::Cursor::DEFAULT};
 
@@ -162,8 +147,12 @@ domain::MouseMoveResult Scene::onMouseMove(float x, float y)
 void Scene::onMouseButton(domain::MouseButtonEvent event)
 {
     if (event.action == domain::MouseButtonAction::PRESS) {
-        bool handled_by_menu = m_menu_controller->handleMouseButton(event);
-        if (handled_by_menu) return;
+        if (*m_focused_client && (*m_focused_client)->state.menu && (*m_focused_client)->state.menu->hasItems()) {
+            if (event.button == domain::MouseButton::LEFT) {
+                bool handled = m_multi_styled_menu->handleMouseButton(event, (*m_focused_client)->menu_state, *(*m_focused_client)->state.menu);
+                if (handled) return;
+            }
+        }
 
         if (hitTestInfoBox(event.x, event.y)) return;
 
@@ -202,7 +191,7 @@ void Scene::onMouseScroll(double offset)
     if (scroll_amount == 0) return;
 
     if (hitTestMenu(m_mouse_x, m_mouse_y)) {
-        m_menu_controller->handleMouseScroll(-scroll_amount);
+        m_multi_styled_menu->handleMouseScroll((*m_focused_client)->menu_state, -scroll_amount, *(*m_focused_client)->state.menu);
         return;
     }
 

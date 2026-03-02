@@ -6,17 +6,15 @@
 #include "application/controller/commandcontroller.hpp"
 #include "application/controller/infoboxcontroller.hpp"
 #include "application/controller/layoutcontroller.hpp"
-#include "application/controller/menucontroller.hpp"
 #include "application/model/clientmanager.hpp"
 #include "application/model/kakouneclient.hpp"
-#include "application/view/searchmenu.hpp"
 #include "application/window.hpp"
 #include "application/controller/editorcontroller.hpp"
 #include "application/controller/inputcontroller.hpp"
 #include "domain/ports/commandinterface.hpp"
 #include "domain/uioptions.hpp"
 #include "application/view/infobox.hpp"
-#include "application/view/inlinemenu.hpp"
+#include "application/view/multistyledmenu.hpp"
 #include "application/view/kakounecontentview.hpp"
 #include "application/view/statusbar.hpp"
 #include "adapters/kakoune/remotesession.hpp"
@@ -105,37 +103,34 @@ void Application::init(Window *window, const CliConfig &cli_config, ApplicationC
     m_editor_controller = std::make_unique<EditorController>();
     m_focus_controller = std::make_unique<FocusController>();
     m_input_controller = std::make_unique<InputController>();
-    m_menu_controller = std::make_unique<MenuController>();
     m_info_box_controller = std::make_unique<InfoBoxController>();
     m_layout_controller = std::make_unique<LayoutController>();
     m_scene = std::make_unique<Scene>();
 
     m_kakoune_content_view = std::make_unique<KakouneContentView>();
     m_status_bar = std::make_unique<StatusBarView>();
-    m_prompt_menu = std::make_unique<PromptMenuView>();
-    m_inline_menu = std::make_unique<InlineMenuView>();
-    m_search_menu = std::make_unique<SearchMenuView>();
+    m_multi_styled_menu = std::make_unique<MultiStyledMenuView>();
     m_info_box = std::make_unique<InfoBoxView>();
 
     m_kakoune_content_view->init(m_renderer);
     m_status_bar->init(m_renderer);
-    m_prompt_menu->init(m_renderer, m_kakoune_content_view.get());
-    m_inline_menu->init(m_renderer, m_kakoune_content_view.get());
-    m_search_menu->init(m_renderer);
-    m_info_box->init(m_renderer, m_menu_controller.get(), m_kakoune_content_view.get(), m_status_bar.get());
+    m_multi_styled_menu->init(m_renderer, m_kakoune_content_view.get());
+    m_info_box->init(m_renderer, m_multi_styled_menu.get(), m_kakoune_content_view.get(), m_status_bar.get());
+
+    m_multi_styled_menu->onMouseButton([this](int item_index) {
+        m_focused_client->interface->selectMenuItem(item_index);
+    });
 
     m_pane_layout->init(m_client_manager.get());
 
     m_command_controller->init(m_command_interface.get(), m_client_manager.get(), m_kakoune_session.get(), m_window);
     m_input_controller->init(&m_focused_client, m_window);
     m_focus_controller->init(&m_focused_client, m_client_manager.get(), m_pane_layout.get(), m_window);
-    m_menu_controller->init(&m_focused_client, m_pane_layout.get(), m_window, m_font_manager, m_prompt_menu.get(), m_inline_menu.get(), m_search_menu.get());
-    m_editor_controller->init(m_client_manager.get(), m_pane_layout.get(), m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager, m_window, m_menu_controller.get());
+    m_editor_controller->init(m_client_manager.get(), m_pane_layout.get(), m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager, m_window, m_multi_styled_menu.get());
     m_info_box_controller->init(&m_focused_client, m_pane_layout.get(), m_window, m_font_manager, m_info_box.get());
     m_scene->init(m_client_manager.get(), &m_focused_client, m_pane_layout.get(), m_kakoune_content_view.get(),
-                  m_status_bar.get(), m_prompt_menu.get(), m_inline_menu.get(), m_search_menu.get(),
-                  m_info_box.get(), m_menu_controller.get(), m_info_box_controller.get(),
-                  m_font_manager, m_window);
+                  m_status_bar.get(), m_multi_styled_menu.get(), m_info_box.get(),
+                  m_info_box_controller.get(), m_font_manager, m_window);
     m_layout_controller->init(m_pane_layout.get(), m_client_manager.get(), m_window);
 
     m_client_manager->setDefaultUIOptions(domain::getDefaultUIOptions(m_font_manager));

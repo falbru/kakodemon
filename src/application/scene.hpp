@@ -2,15 +2,12 @@
 #define APPLICATION_SCENE_HPP_INCLUDED
 
 #include "application/controller/infoboxcontroller.hpp"
-#include "application/controller/menucontroller.hpp"
 #include "application/model/clientmanager.hpp"
 #include "application/model/kakouneclient.hpp"
 #include "application/model/panelayout.hpp"
 #include "application/view/infobox.hpp"
-#include "application/view/inlinemenu.hpp"
 #include "application/view/kakounecontentview.hpp"
-#include "application/view/promptmenu.hpp"
-#include "application/view/searchmenu.hpp"
+#include "application/view/multistyledmenu.hpp"
 #include "application/view/statusbar.hpp"
 #include "domain/fontmanager.hpp"
 #include "domain/mouse.hpp"
@@ -23,10 +20,9 @@ class Scene
     Scene();
 
     void init(ClientManager *client_manager, KakouneClient **focused_client, PaneLayout *pane_layout,
-              KakouneContentView *content_view, StatusBarView *status_bar_view, PromptMenuView *prompt_menu_view,
-              InlineMenuView *inline_menu_view, SearchMenuView *search_menu_view, InfoBoxView *info_box_view,
-              MenuController *menu_controller, InfoBoxController *info_box_controller,
-              domain::FontManager *font_manager, Window *window);
+              KakouneContentView *content_view, StatusBarView *status_bar_view, MultiStyledMenuView *multi_styled_menu,
+              InfoBoxView *info_box_view, InfoBoxController *info_box_controller, domain::FontManager *font_manager,
+              Window *window);
 
     void render();
 
@@ -45,11 +41,8 @@ class Scene
     PaneLayout *m_pane_layout;
     KakouneContentView *m_content_view;
     StatusBarView *m_status_bar_view;
-    PromptMenuView *m_prompt_menu_view;
-    InlineMenuView *m_inline_menu_view;
-    SearchMenuView *m_search_menu_view;
+    MultiStyledMenuView *m_multi_styled_menu;
     InfoBoxView *m_info_box_view;
-    MenuController *m_menu_controller;
     InfoBoxController *m_info_box_controller;
     domain::FontManager *m_font_manager;
     Window *m_window;

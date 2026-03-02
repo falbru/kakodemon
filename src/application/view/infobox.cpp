@@ -1,4 +1,3 @@
-#include "application/controller/menucontroller.hpp"
 #include "domain/color.hpp"
 #include "domain/geometry.hpp"
 #include "domain/glyphlinesbuilder.hpp"
@@ -16,11 +15,11 @@ InfoBoxView::InfoBoxView()
     m_scroll_bar = std::make_unique<ScrollBar>();
 }
 
-void InfoBoxView::init(domain::Renderer* renderer, MenuController* menu_controller,
+void InfoBoxView::init(domain::Renderer* renderer, MultiStyledMenuView* multi_styled_menu,
                        KakouneContentView* kakoune_content_view, StatusBarView* status_bar_view)
 {
     m_renderer = renderer;
-    m_menu_controller = menu_controller;
+    m_multi_styled_menu = multi_styled_menu;
     m_kakoune_content_view = kakoune_content_view;
     m_status_bar_view = status_bar_view;
 }
@@ -346,10 +345,10 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
     switch (info_box.style)
     {
     case domain::InfoStyle::PROMPT:
-        if (m_menu_controller->height() > 0)
+        if (m_multi_styled_menu->height() > 0)
         {
-            anchor = {m_menu_controller->x(), m_menu_controller->y(), m_menu_controller->width(),
-                      m_menu_controller->height()};
+            anchor = {m_multi_styled_menu->x(), m_multi_styled_menu->y(), m_multi_styled_menu->width(),
+                      m_multi_styled_menu->height()};
             direction = PlacementDirection::BELOW;
             alignment = CrossAxisAlignment::START;
             fallback_directions = {PlacementDirection::ABOVE};
@@ -400,8 +399,8 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
     break;
 
     case domain::InfoStyle::MENUDOC:
-        anchor = {m_menu_controller->x(), m_menu_controller->y(), m_menu_controller->width(),
-                  m_menu_controller->height()};
+        anchor = {m_multi_styled_menu->x(), m_multi_styled_menu->y(), m_multi_styled_menu->width(),
+                  m_multi_styled_menu->height()};
         direction = PlacementDirection::RIGHT;
         alignment = CrossAxisAlignment::START;
         fallback_directions = {PlacementDirection::LEFT, PlacementDirection::RIGHT_WRAPPED,
@@ -417,10 +416,10 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
     }
 
     domain::Rectangle menu_rectangle = {
-        m_menu_controller->x(),
-        m_menu_controller->y(),
-        m_menu_controller->width(),
-        m_menu_controller->height(),
+        m_multi_styled_menu->x(),
+        m_multi_styled_menu->y(),
+        m_multi_styled_menu->width(),
+        m_multi_styled_menu->height(),
     };
 
     std::optional<Placement> placement_opt;

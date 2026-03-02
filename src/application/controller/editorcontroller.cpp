@@ -1,5 +1,4 @@
 #include "editorcontroller.hpp"
-#include "application/controller/menucontroller.hpp"
 #include "application/model/clientmanager.hpp"
 #include "application/window.hpp"
 #include "domain/mouse.hpp"
@@ -11,7 +10,8 @@ EditorController::EditorController()
 
 void EditorController::init(ClientManager *client_manager, PaneLayout *pane_layout,
                              KakouneContentView *kakoune_content_view, StatusBarView *status_bar_view,
-                             domain::FontManager *font_manager, Window *window, MenuController *menu_controller)
+                             domain::FontManager *font_manager, Window *window,
+                             MultiStyledMenuView *multi_styled_menu)
 {
     m_client_manager = client_manager;
     m_pane_layout = pane_layout;
@@ -19,7 +19,7 @@ void EditorController::init(ClientManager *client_manager, PaneLayout *pane_layo
     m_status_bar_view = status_bar_view;
     m_font_manager = font_manager;
     m_window = window;
-    m_menu_controller = menu_controller;
+    m_multi_styled_menu = multi_styled_menu;
 
     m_pane_layout->onArrange([this](const std::vector<Pane> &panes) {
         resizeClientsToPaneLayout(panes);
@@ -67,7 +67,7 @@ void EditorController::update()
             }
 
             if (events.menu_select && client->state.menu.has_value() && client->state.menu->hasItems()) {
-                m_menu_controller->ensureItemVisible(client->state.menu->getItems().selected_index);
+                m_multi_styled_menu->ensureItemVisible(client->menu_state, client->state.menu->getItems().selected_index, *client->state.menu);
             }
         }
     }

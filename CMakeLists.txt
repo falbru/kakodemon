@@ -63,7 +63,6 @@ set(SRC
     src/application/controller/layoutcontroller.cpp
     src/application/model/panelayout.cpp
     src/application/model/clientmanager.cpp
-    src/application/controller/menucontroller.cpp
     src/application/model/kakouneclient.cpp
     src/application/scene.cpp
     src/application/view/glyphsequence.cpp
@@ -72,6 +71,7 @@ set(SRC
     src/application/view/inlinemenu.cpp
     src/application/view/kakounecontentview.cpp
     src/application/view/layoutmanager.cpp
+    src/application/view/multistyledmenu.cpp
     src/application/view/promptmenu.cpp
     src/application/view/searchmenu.cpp
     src/application/view/statusbar.cpp

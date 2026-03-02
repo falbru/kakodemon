@@ -17,4 +17,11 @@ struct InfoBoxViewState
     float scroll_offset = 0.0f;
 };
 
+struct MultiStyledMenuState
+{
+    MenuViewState inline_state;
+    MenuViewState prompt_state;
+    MenuViewState search_state;
+};
+
 #endif
