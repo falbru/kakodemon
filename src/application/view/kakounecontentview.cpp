@@ -24,57 +24,45 @@ void KakouneContentView::handleMouseButton(KakouneClient *client, domain::MouseB
                                         domain::Rectangle bounds)
 {
     domain::Coord coord = pixelToCoord(client->uiOptions().font_content, event.x, event.y, bounds.x, bounds.y);
-    for (auto &[id, callback] : m_mouse_button_observers) {
-        callback(client, event, coord);
-    }
+    m_mouse_button_observers.notify(client, event, coord);
 }
 
 void KakouneContentView::handleMouseMove(KakouneClient *client, float x, float y, domain::Rectangle bounds)
 {
     domain::Coord coord = pixelToCoord(client->uiOptions().font_content, x, y, bounds.x, bounds.y);
-    for (auto &[id, callback] : m_mouse_move_observers) {
-        callback(client, coord);
-    }
+    m_mouse_move_observers.notify(client, coord);
 }
 
 void KakouneContentView::handleMouseScroll(KakouneClient *client, float x, float y, domain::Rectangle bounds,
                                         int amount)
 {
     domain::Coord coord = pixelToCoord(client->uiOptions().font_content, x, y, bounds.x, bounds.y);
-    for (auto &[id, callback] : m_mouse_scroll_observers) {
-        callback(client, coord, amount);
-    }
+    m_mouse_scroll_observers.notify(client, coord, amount);
 }
 
 ObserverId KakouneContentView::onMouseButton(
     std::function<void(KakouneClient *, domain::MouseButtonEvent, domain::Coord)> callback)
 {
-    ObserverId id = m_next_observer_id++;
-    m_mouse_button_observers[id] = std::move(callback);
-    return id;
+    return m_mouse_button_observers.addObserver(std::move(callback));
 }
 
 ObserverId KakouneContentView::onMouseMove(
     std::function<void(KakouneClient *, domain::Coord)> callback)
 {
-    ObserverId id = m_next_observer_id++;
-    m_mouse_move_observers[id] = std::move(callback);
-    return id;
+    return m_mouse_move_observers.addObserver(std::move(callback));
 }
 
 ObserverId KakouneContentView::onMouseScroll(
     std::function<void(KakouneClient *, domain::Coord, int)> callback)
 {
-    ObserverId id = m_next_observer_id++;
-    m_mouse_scroll_observers[id] = std::move(callback);
-    return id;
+    return m_mouse_scroll_observers.addObserver(std::move(callback));
 }
 
 void KakouneContentView::removeObserver(ObserverId id)
 {
-    m_mouse_button_observers.erase(id);
-    m_mouse_move_observers.erase(id);
-    m_mouse_scroll_observers.erase(id);
+    m_mouse_button_observers.removeObserver(id);
+    m_mouse_move_observers.removeObserver(id);
+    m_mouse_scroll_observers.removeObserver(id);
 }
 
 float KakouneContentView::getCellWidth(domain::Font *font) const

@@ -80,7 +80,7 @@ void KakouneFrameStateManager::onRequest(const IncomingRequest& request)
         m_active_frame_state = m_next_frame_state;
         m_active_frame_events = m_next_frame_events;
         m_next_frame_events = FrameEvents{};
-        notifyRefreshObservers(force);
+        m_refresh_observers.notify(force);
         break;
     }
     case IncomingRequestType::SET_UI_OPTIONS: {
@@ -130,18 +130,9 @@ std::optional<std::pair<FrameState, FrameEvents>> KakouneFrameStateManager::getN
 }
 
 ObserverId KakouneFrameStateManager::onRefresh(std::function<void(bool)> callback) {
-    ObserverId id = m_next_observer_id++;
-    m_refresh_observers[id] = callback;
-    return id;
+    return m_refresh_observers.addObserver(std::move(callback));
 }
 
 void KakouneFrameStateManager::removeObserver(ObserverId id) {
-    m_refresh_observers.erase(id);
-}
-
-void KakouneFrameStateManager::notifyRefreshObservers(bool force) {
-    auto observers_copy = m_refresh_observers;
-    for (auto& [id, callback] : observers_copy) {
-        callback(force);
-    }
+    m_refresh_observers.removeObserver(id);
 }

@@ -2,12 +2,11 @@
 #define KAKOUNECLIENT_HPP_INCLUDED
 
 #include "application/model/viewstate.hpp"
-#include "application/observerid.hpp"
+#include "application/observerlist.hpp"
 #include "domain/ports/kakouneinterface.hpp"
 #include "domain/ports/kakounesession.hpp"
 #include "domain/uioptions.hpp"
 #include <functional>
-#include <map>
 #include <memory>
 
 class KakouneClient
@@ -30,12 +29,8 @@ class KakouneClient
     InfoBoxViewState info_box_state;
 
   private:
-    void notifyUIOptionsChangedObservers();
-
     domain::UIOptions m_ui_options;
-
-    ObserverId m_next_observer_id = 0;
-    std::map<ObserverId, std::function<void(const domain::UIOptions &)>> m_ui_options_observers;
+    ObserverList<const domain::UIOptions &> m_ui_options_observers;
 };
 
 #endif

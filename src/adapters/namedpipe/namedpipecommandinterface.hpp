@@ -1,11 +1,10 @@
 #ifndef NAMEDPIPECOMMANDINTERFACE_HPP_INCLUDED
 #define NAMEDPIPECOMMANDINTERFACE_HPP_INCLUDED
 
-#include "application/observerid.hpp"
+#include "application/observerlist.hpp"
 #include "domain/ports/commandinterface.hpp"
 #include <atomic>
 #include <functional>
-#include <map>
 #include <mutex>
 #include <thread>
 
@@ -41,11 +40,9 @@ class NamedPipeCommandInterface : public CommandInterface
     std::mutex m_commands_mutex;
     std::vector<Command> m_pending_commands;
 
-    ObserverId m_next_observer_id = 0;
-    std::map<ObserverId, std::function<void(const Command &)>> m_command_observers;
+    ObserverList<const Command &> m_command_observers;
 
     void readLoop();
-    void notifyCommandObservers(const Command &command);
 };
 
 #endif

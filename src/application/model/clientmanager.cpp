@@ -16,7 +16,7 @@ KakouneClient* ClientManager::createClient(std::optional<std::string> startup_co
 
     m_clients.push_back(std::move(new_client));
 
-    notifyClientAddedObservers(new_client_ptr);
+    m_client_added_observers.notify(new_client_ptr);
 
     return new_client_ptr;
 }
@@ -31,39 +31,21 @@ void ClientManager::removeClient(KakouneClient *client) {
     if (it != m_clients.end()) {
         auto client_unique_ptr = std::move(*it);
         m_clients.erase(it);
-        notifyClientRemovedObservers(client_unique_ptr.get());
+        m_client_removed_observers.notify(client_unique_ptr.get());
     }
 }
 
 ObserverId ClientManager::onClientAdded(std::function<void(KakouneClient *)> callback) {
-    ObserverId id = m_next_observer_id++;
-    m_client_added_observers[id] = callback;
-    return id;
+    return m_client_added_observers.addObserver(std::move(callback));
 }
 
 ObserverId ClientManager::onClientRemoved(std::function<void(KakouneClient *)> callback) {
-    ObserverId id = m_next_observer_id++;
-    m_client_removed_observers[id] = callback;
-    return id;
+    return m_client_removed_observers.addObserver(std::move(callback));
 }
 
 void ClientManager::removeObserver(ObserverId id) {
-    m_client_added_observers.erase(id);
-    m_client_removed_observers.erase(id);
-}
-
-void ClientManager::notifyClientAddedObservers(KakouneClient* client) {
-    auto observers_copy = m_client_added_observers;
-    for (auto& [id, callback] : observers_copy) {
-        callback(client);
-    }
-}
-
-void ClientManager::notifyClientRemovedObservers(KakouneClient* client) {
-    auto observers_copy = m_client_removed_observers;
-    for (auto& [id, callback] : observers_copy) {
-        callback(client);
-    }
+    m_client_added_observers.removeObserver(id);
+    m_client_removed_observers.removeObserver(id);
 }
 
 const std::vector<std::unique_ptr<KakouneClient>>& ClientManager::clients() const {

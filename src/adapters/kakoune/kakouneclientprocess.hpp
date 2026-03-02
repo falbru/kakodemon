@@ -1,9 +1,9 @@
 #ifndef KAKOUNECLIENTPROCESS_HPP_INCLUDED
 #define KAKOUNECLIENTPROCESS_HPP_INCLUDED
 
+#include "application/observerlist.hpp"
 #include <atomic>
 #include <functional>
-#include <map>
 #include <sys/poll.h>
 #include <sys/types.h>
 
@@ -160,8 +160,6 @@ struct OutgoingRequest
     OutgoingRequestData data;
 };
 
-using ObserverId = int;
-
 class KakouneClientProcess
 {
   public:
@@ -187,9 +185,7 @@ class KakouneClientProcess
     void registerProcess(pid_t pid);
     pid_t m_client_pid;
 
-    ObserverId m_next_observer_id = 0;
-    std::map<ObserverId, std::function<void()>> m_exit_observers;
-    void notifyExitObservers();
+    ObserverList<> m_exit_observers;
 
     std::optional<IncomingRequest> parseRequest(std::string request);
 

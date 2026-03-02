@@ -2,7 +2,7 @@
 #define VIEW_SEARCHMENU_HPP_INCLUDED
 
 #include "application/model/viewstate.hpp"
-#include "application/observerid.hpp"
+#include "application/observerlist.hpp"
 #include "application/view/rendercontext.hpp"
 #include "application/view/widgets/input.hpp"
 #include "application/view/widgets/scrolledmenuitems.hpp"
@@ -10,7 +10,6 @@
 #include "domain/mouse.hpp"
 #include "domain/ports/renderer.hpp"
 #include <functional>
-#include <map>
 
 class SearchMenuView
 {
@@ -51,8 +50,7 @@ class SearchMenuView
     std::unique_ptr<Input> m_input;
     std::unique_ptr<ScrolledMenuItems> m_scrolled_menu_items;
 
-    ObserverId m_next_observer_id = 0;
-    std::map<ObserverId, std::function<void(int)>> m_mouse_button_observers;
+    ObserverList<int> m_mouse_button_observers;
 
     std::optional<int> findItemAtPosition(float x, float y, const MenuViewState &state, const domain::Menu &menu);
 };

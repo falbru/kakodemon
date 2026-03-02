@@ -27,22 +27,13 @@ const domain::UIOptions &KakouneClient::uiOptions() const {
 void KakouneClient::setUIOptions(domain::UIOptions ui_options) {
     if (m_ui_options == ui_options) return;
     m_ui_options = std::move(ui_options);
-    notifyUIOptionsChangedObservers();
+    m_ui_options_observers.notify(m_ui_options);
 }
 
 ObserverId KakouneClient::onUIOptionsChanged(std::function<void(const domain::UIOptions &)> callback) {
-    ObserverId id = m_next_observer_id++;
-    m_ui_options_observers[id] = callback;
-    return id;
+    return m_ui_options_observers.addObserver(std::move(callback));
 }
 
 void KakouneClient::removeUIOptionsObserver(ObserverId id) {
-    m_ui_options_observers.erase(id);
-}
-
-void KakouneClient::notifyUIOptionsChangedObservers() {
-    auto observers_copy = m_ui_options_observers;
-    for (auto &[id, callback] : observers_copy) {
-        callback(m_ui_options);
-    }
+    m_ui_options_observers.removeObserver(id);
 }

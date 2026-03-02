@@ -2,14 +2,13 @@
 #define KAKOUNECONTENTVIEW_HPP_INCLUDED
 
 #include "application/model/kakouneclient.hpp"
-#include "application/observerid.hpp"
+#include "application/observerlist.hpp"
 #include "application/view/rendercontext.hpp"
 #include "domain/coord.hpp"
 #include "domain/geometry.hpp"
 #include "domain/mouse.hpp"
 #include "domain/ports/renderer.hpp"
 #include <functional>
-#include <map>
 
 class KakouneContentView
 {
@@ -40,11 +39,9 @@ class KakouneContentView
   private:
     domain::Renderer *m_renderer;
 
-    ObserverId m_next_observer_id = 0;
-    std::map<ObserverId, std::function<void(KakouneClient *, domain::MouseButtonEvent, domain::Coord)>>
-        m_mouse_button_observers;
-    std::map<ObserverId, std::function<void(KakouneClient *, domain::Coord)>> m_mouse_move_observers;
-    std::map<ObserverId, std::function<void(KakouneClient *, domain::Coord, int)>> m_mouse_scroll_observers;
+    ObserverList<KakouneClient *, domain::MouseButtonEvent, domain::Coord> m_mouse_button_observers;
+    ObserverList<KakouneClient *, domain::Coord> m_mouse_move_observers;
+    ObserverList<KakouneClient *, domain::Coord, int> m_mouse_scroll_observers;
 };
 
 #endif

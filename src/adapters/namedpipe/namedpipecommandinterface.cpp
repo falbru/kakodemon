@@ -52,20 +52,11 @@ void NamedPipeCommandInterface::init() {
 }
 
 ObserverId NamedPipeCommandInterface::onCommandReceived(std::function<void(const Command &)> callback) {
-    ObserverId id = m_next_observer_id++;
-    m_command_observers[id] = callback;
-    return id;
+    return m_command_observers.addObserver(std::move(callback));
 }
 
 void NamedPipeCommandInterface::removeCommandObserver(ObserverId id) {
-    m_command_observers.erase(id);
-}
-
-void NamedPipeCommandInterface::notifyCommandObservers(const Command &command) {
-    auto observers_copy = m_command_observers;
-    for (auto &[id, callback] : observers_copy) {
-        callback(command);
-    }
+    m_command_observers.removeObserver(id);
 }
 
 void NamedPipeCommandInterface::readLoop() {
@@ -153,7 +144,7 @@ void NamedPipeCommandInterface::readLoop() {
                     std::lock_guard<std::mutex> lock(m_commands_mutex);
                     m_pending_commands.push_back(cmd);
                 }
-                notifyCommandObservers(cmd);
+                m_command_observers.notify(cmd);
             } catch (const nlohmann::json::exception& e) {
                 spdlog::warn("Failed to parse command JSON: {}", e.what());
             }

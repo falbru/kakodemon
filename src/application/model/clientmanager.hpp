@@ -2,9 +2,8 @@
 #define MODEL_CLIENTMANAGER_HPP_INCLUDED
 
 #include "application/model/kakouneclient.hpp"
-#include "application/observerid.hpp"
+#include "application/observerlist.hpp"
 #include "domain/ports/kakounesession.hpp"
-#include <map>
 
 class ClientManager
 {
@@ -23,16 +22,12 @@ class ClientManager
     const std::vector<std::unique_ptr<KakouneClient>> &clients() const;
 
   private:
-    void notifyClientAddedObservers(KakouneClient *client);
-    void notifyClientRemovedObservers(KakouneClient *client);
-
     domain::KakouneSession *m_session;
     domain::UIOptions m_default_ui_options;
     std::vector<std::unique_ptr<KakouneClient>> m_clients;
 
-    ObserverId m_next_observer_id = 0;
-    std::map<ObserverId, std::function<void(KakouneClient *)>> m_client_added_observers;
-    std::map<ObserverId, std::function<void(KakouneClient *)>> m_client_removed_observers;
+    ObserverList<KakouneClient *> m_client_added_observers;
+    ObserverList<KakouneClient *> m_client_removed_observers;
 };
 
 #endif

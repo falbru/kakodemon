@@ -2,7 +2,7 @@
 #define VIEW_MULTISTYLEDMENU_HPP_INCLUDED
 
 #include "application/model/viewstate.hpp"
-#include "application/observerid.hpp"
+#include "application/observerlist.hpp"
 #include "application/view/inlinemenu.hpp"
 #include "application/view/kakounecontentview.hpp"
 #include "application/view/promptmenu.hpp"
@@ -12,7 +12,6 @@
 #include "domain/menu.hpp"
 #include "domain/mouse.hpp"
 #include <functional>
-#include <map>
 #include <memory>
 #include <optional>
 
@@ -46,8 +45,7 @@ class MultiStyledMenuView
 
     domain::MenuStyle m_last_style = domain::MenuStyle::PROMPT;
 
-    ObserverId m_next_observer_id = 0;
-    std::map<ObserverId, std::function<void(int)>> m_mouse_button_observers;
+    ObserverList<int> m_mouse_button_observers;
 
     void forwardMouseButton(int item_index);
 };

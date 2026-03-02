@@ -67,7 +67,7 @@ void KakouneClientProcess::processPendingExits() {
     }
     for (auto* proc : exited_processes) {
         proc->m_exited = false;
-        proc->notifyExitObservers();
+        proc->m_exit_observers.notify();
     }
 }
 
@@ -161,14 +161,12 @@ void KakouneClientProcess::setRequestCallback(const std::function<void(const Inc
 
 ObserverId KakouneClientProcess::onExit(const std::function<void()>& callback)
 {
-    ObserverId id = m_next_observer_id++;
-    m_exit_observers[id] = callback;
-    return id;
+    return m_exit_observers.addObserver(callback);
 }
 
 void KakouneClientProcess::removeObserver(ObserverId id)
 {
-    m_exit_observers.erase(id);
+    m_exit_observers.removeObserver(id);
 }
 
 void KakouneClientProcess::pollForRequests()
@@ -341,9 +339,3 @@ std::optional<IncomingRequest> KakouneClientProcess::parseRequest(std::string re
     return std::nullopt;
 }
 
-void KakouneClientProcess::notifyExitObservers() {
-    auto observers_copy = m_exit_observers;
-    for (auto& [id, callback] : observers_copy) {
-        callback();
-    }
-}

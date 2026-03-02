@@ -3,8 +3,8 @@
 
 #include "application/model/clientmanager.hpp"
 #include "application/model/kakouneclient.hpp"
+#include "application/observerlist.hpp"
 #include "domain/geometry.hpp"
-#include <map>
 #include <vector>
 
 struct Pane
@@ -28,14 +28,9 @@ class PaneLayout
     void removeObserver(ObserverId id);
 
   private:
-    void notifyArrangeObservers() const;
-
     std::vector<Pane> m_panes;
     ClientManager *m_client_manager;
-
-    ObserverId m_next_observer_id = 0;
-    std::map<ObserverId, std::function<void(const std::vector<Pane> &)>> m_arrange_observers;
-
+    ObserverList<const std::vector<Pane> &> m_arrange_observers;
     domain::Rectangle m_bounds;
 };
 

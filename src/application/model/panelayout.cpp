@@ -33,7 +33,7 @@ void PaneLayout::arrange() {
         };
     }
 
-    notifyArrangeObservers();
+    m_arrange_observers.notify(m_panes);
 }
 
 Pane* PaneLayout::findPaneAt(float x, float y) {
@@ -60,21 +60,14 @@ const std::vector<Pane>& PaneLayout::getPanes() const {
 }
 
 ObserverId PaneLayout::onArrange(std::function<void(const std::vector<Pane>&)> callback) {
-    ObserverId id = m_next_observer_id++;
-    m_arrange_observers[id] = callback;
-    return id;
+    return m_arrange_observers.addObserver(std::move(callback));
 }
 
 void PaneLayout::removeObserver(ObserverId id) {
-    m_arrange_observers.erase(id);
+    m_arrange_observers.removeObserver(id);
 }
 
 void PaneLayout::setBounds(const domain::Rectangle& bounds) {
     m_bounds = bounds;
 }
 
-void PaneLayout::notifyArrangeObservers() const {
-    for (const auto& [id, callback] : m_arrange_observers) {
-        callback(m_panes);
-    }
-}

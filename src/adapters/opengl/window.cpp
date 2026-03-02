@@ -66,9 +66,7 @@ void opengl::GLFWWindow::init(bool maximized) {
     glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int width, int height) {
         GLFWWindow* self = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
         self->m_renderer->onWindowResize(width, height);
-        for (auto& [id, cb] : self->m_resize_observers) {
-            cb(width, height);
-        }
+        self->m_resize_observers.notify(width, height);
     });
 
     glfwSetCharModsCallback(m_window, [](GLFWwindow* window, unsigned int codepoint, int mods) {
@@ -93,23 +91,17 @@ void opengl::GLFWWindow::init(bool maximized) {
 
     glfwSetScrollCallback(m_window, [](GLFWwindow* window, double xoffset, double yoffset) {
         GLFWWindow* self = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
-        for (auto& [id, cb] : self->m_mouse_scroll_observers) {
-            cb(yoffset);
-        }
+        self->m_mouse_scroll_observers.notify(yoffset);
     });
 
     glfwSetWindowMaximizeCallback(m_window, [](GLFWwindow* window, int maximized) {
         GLFWWindow* self = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
-        for (auto& [id, cb] : self->m_maximized_changed_observers) {
-            cb(maximized == GLFW_TRUE);
-        }
+        self->m_maximized_changed_observers.notify(maximized == GLFW_TRUE);
     });
 
     glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {
         GLFWWindow* self = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
-        for (auto& [id, cb] : self->m_close_observers) {
-            cb();
-        }
+        self->m_close_observers.notify();
     });
 
     m_renderer = std::make_unique<opengl::Renderer>();
@@ -200,18 +192,14 @@ void opengl::GLFWWindow::onGLFWKeyInput(int key, int scancode, int action, int m
     std::optional<domain::KeyEvent> event = glfwSpecialKeyToKeyEvent(key, mods);
 
     if (event.has_value()) {
-        for (auto& [id, cb] : m_key_input_observers) {
-            cb(event.value());
-        }
+        m_key_input_observers.notify(event.value());
     }
 }
 
 void opengl::GLFWWindow::onGLFWCharacterInsert(unsigned int codepoint, int mods)
 {
     domain::KeyEvent event = glfwCharToKeyEvent(codepoint, mods);
-    for (auto& [id, cb] : m_key_input_observers) {
-        cb(event);
-    }
+    m_key_input_observers.notify(event);
 }
 
 std::optional<domain::KeyEvent> opengl::GLFWWindow::glfwSpecialKeyToKeyEvent(int key, int mods) {
@@ -248,9 +236,7 @@ void opengl::GLFWWindow::onGLFWMouseMove(float cursor_x, float cursor_y) {
     m_cursor_x = cursor_x;
     m_cursor_y = cursor_y;
 
-    for (auto& [id, cb] : m_mouse_move_observers) {
-        cb(cursor_x, cursor_y);
-    }
+    m_mouse_move_observers.notify(cursor_x, cursor_y);
 }
 
 void opengl::GLFWWindow::onGLFWMouseButton(int button, int action, int mods) {
@@ -281,9 +267,7 @@ void opengl::GLFWWindow::onGLFWMouseButton(int button, int action, int mods) {
     event.x = m_cursor_x;
     event.y = m_cursor_y;
 
-    for (auto& [id, cb] : m_mouse_button_observers) {
-        cb(event);
-    }
+    m_mouse_button_observers.notify(event);
 }
 
 int opengl::GLFWWindow::toDomainModifiers(int mods) {
@@ -322,53 +306,39 @@ domain::KeyEvent opengl::GLFWWindow::glfwCharToKeyEvent(unsigned int codepoint, 
 }
 
 ObserverId opengl::GLFWWindow::onResize(std::function<void(int, int)> callback) {
-    ObserverId id = m_next_observer_id++;
-    m_resize_observers[id] = callback;
-    return id;
+    return m_resize_observers.addObserver(std::move(callback));
 }
 
 ObserverId opengl::GLFWWindow::onKeyInput(std::function<void(domain::KeyEvent)> callback) {
-    ObserverId id = m_next_observer_id++;
-    m_key_input_observers[id] = callback;
-    return id;
+    return m_key_input_observers.addObserver(std::move(callback));
 }
 
 ObserverId opengl::GLFWWindow::onMouseMove(std::function<void(float, float)> callback) {
-    ObserverId id = m_next_observer_id++;
-    m_mouse_move_observers[id] = callback;
-    return id;
+    return m_mouse_move_observers.addObserver(std::move(callback));
 }
 
 ObserverId opengl::GLFWWindow::onMouseButton(std::function<void(domain::MouseButtonEvent)> callback) {
-    ObserverId id = m_next_observer_id++;
-    m_mouse_button_observers[id] = callback;
-    return id;
+    return m_mouse_button_observers.addObserver(std::move(callback));
 }
 
 ObserverId opengl::GLFWWindow::onMouseScroll(std::function<void(double)> callback) {
-    ObserverId id = m_next_observer_id++;
-    m_mouse_scroll_observers[id] = callback;
-    return id;
+    return m_mouse_scroll_observers.addObserver(std::move(callback));
 }
 
 ObserverId opengl::GLFWWindow::onClose(std::function<void()> callback) {
-    ObserverId id = m_next_observer_id++;
-    m_close_observers[id] = callback;
-    return id;
+    return m_close_observers.addObserver(std::move(callback));
 }
 
 ObserverId opengl::GLFWWindow::onMaximizedChanged(std::function<void(bool)> callback) {
-    ObserverId id = m_next_observer_id++;
-    m_maximized_changed_observers[id] = callback;
-    return id;
+    return m_maximized_changed_observers.addObserver(std::move(callback));
 }
 
 void opengl::GLFWWindow::removeObserver(ObserverId id) {
-    m_resize_observers.erase(id);
-    m_key_input_observers.erase(id);
-    m_mouse_move_observers.erase(id);
-    m_mouse_button_observers.erase(id);
-    m_mouse_scroll_observers.erase(id);
-    m_close_observers.erase(id);
-    m_maximized_changed_observers.erase(id);
+    m_resize_observers.removeObserver(id);
+    m_key_input_observers.removeObserver(id);
+    m_mouse_move_observers.removeObserver(id);
+    m_mouse_button_observers.removeObserver(id);
+    m_mouse_scroll_observers.removeObserver(id);
+    m_close_observers.removeObserver(id);
+    m_maximized_changed_observers.removeObserver(id);
 }

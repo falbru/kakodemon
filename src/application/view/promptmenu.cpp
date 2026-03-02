@@ -124,22 +124,18 @@ std::optional<int> PromptMenuView::findItemAtPosition(float x, float y, const Me
 bool PromptMenuView::handleMouseButton(domain::MouseButtonEvent event, MenuViewState &state, const domain::Menu &menu) {
     auto item_index = findItemAtPosition(event.x, event.y, state, menu);
     if (item_index.has_value()) {
-        for (auto &[id, callback] : m_mouse_button_observers) {
-            callback(item_index.value());
-        }
+        m_mouse_button_observers.notify(item_index.value());
         return true;
     }
     return false;
 }
 
 ObserverId PromptMenuView::onMouseButton(std::function<void(int)> callback) {
-    ObserverId id = m_next_observer_id++;
-    m_mouse_button_observers[id] = std::move(callback);
-    return id;
+    return m_mouse_button_observers.addObserver(std::move(callback));
 }
 
 void PromptMenuView::removeObserver(ObserverId id) {
-    m_mouse_button_observers.erase(id);
+    m_mouse_button_observers.removeObserver(id);
 }
 
 void PromptMenuView::handleMouseScroll(MenuViewState &state, int scroll_amount, const domain::Menu &menu) {

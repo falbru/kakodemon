@@ -1,8 +1,8 @@
 #ifndef KAKOUNEFRAMESTATEMANAGER_HPP_INCLUDED
 #define KAKOUNEFRAMESTATEMANAGER_HPP_INCLUDED
 
+#include "application/observerlist.hpp"
 #include <functional>
-#include <map>
 #include <mutex>
 #include <optional>
 #include <thread>
@@ -43,8 +43,6 @@ class KakouneFrameStateManager
     std::optional<std::pair<FrameState, FrameEvents>> getNextFrameStateAndEvents();
 
   private:
-    void notifyRefreshObservers(bool force);
-
     void onRequest(const IncomingRequest &request);
 
     KakouneClientProcess *m_process;
@@ -60,8 +58,7 @@ class KakouneFrameStateManager
     std::thread m_polling_thread;
     std::mutex m_state_mutex;
 
-    ObserverId m_next_observer_id = 0;
-    std::map<ObserverId, std::function<void(bool)>> m_refresh_observers;
+    ObserverList<bool> m_refresh_observers;
 };
 
 #endif

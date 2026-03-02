@@ -1,9 +1,9 @@
 #ifndef OPENGL_WINDOW_HPP_INCLUDED
 #define OPENGL_WINDOW_HPP_INCLUDED
 
+#include "application/observerlist.hpp"
 #include "application/window.hpp"
 #include "opengl.hpp"
-#include <map>
 #include <optional>
 
 namespace opengl
@@ -71,14 +71,13 @@ class GLFWWindow : public Window
     std::unique_ptr<domain::FontResolver> m_font_resolver;
     FontEngineFactory m_font_engine_factory;
 
-    ObserverId m_next_observer_id = 0;
-    std::map<ObserverId, std::function<void(int, int)>> m_resize_observers;
-    std::map<ObserverId, std::function<void(domain::KeyEvent)>> m_key_input_observers;
-    std::map<ObserverId, std::function<void(float, float)>> m_mouse_move_observers;
-    std::map<ObserverId, std::function<void(domain::MouseButtonEvent)>> m_mouse_button_observers;
-    std::map<ObserverId, std::function<void(double)>> m_mouse_scroll_observers;
-    std::map<ObserverId, std::function<void()>> m_close_observers;
-    std::map<ObserverId, std::function<void(bool)>> m_maximized_changed_observers;
+    ObserverList<int, int> m_resize_observers;
+    ObserverList<domain::KeyEvent> m_key_input_observers;
+    ObserverList<float, float> m_mouse_move_observers;
+    ObserverList<domain::MouseButtonEvent> m_mouse_button_observers;
+    ObserverList<double> m_mouse_scroll_observers;
+    ObserverList<> m_close_observers;
+    ObserverList<bool> m_maximized_changed_observers;
 };
 
 } // namespace opengl

@@ -19,9 +19,7 @@ void MultiStyledMenuView::init(domain::Renderer *renderer, KakouneContentView *k
 
 void MultiStyledMenuView::forwardMouseButton(int item_index)
 {
-    for (auto &[id, callback] : m_mouse_button_observers) {
-        callback(item_index);
-    }
+    m_mouse_button_observers.notify(item_index);
 }
 
 void MultiStyledMenuView::render(const RenderContext &render_context, MultiStyledMenuState &state,
@@ -104,14 +102,12 @@ void MultiStyledMenuView::ensureItemVisible(MultiStyledMenuState &state, int ind
 
 ObserverId MultiStyledMenuView::onMouseButton(std::function<void(int)> callback)
 {
-    ObserverId id = m_next_observer_id++;
-    m_mouse_button_observers[id] = std::move(callback);
-    return id;
+    return m_mouse_button_observers.addObserver(std::move(callback));
 }
 
 void MultiStyledMenuView::removeObserver(ObserverId id)
 {
-    m_mouse_button_observers.erase(id);
+    m_mouse_button_observers.removeObserver(id);
 }
 
 float MultiStyledMenuView::x() const
