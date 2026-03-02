@@ -4,7 +4,6 @@
 #include "adapters/namedpipe/namedpipecommandinterface.hpp"
 #include "application/cliconfig.hpp"
 #include "application/controller/commandcontroller.hpp"
-#include "application/controller/infoboxcontroller.hpp"
 #include "application/controller/layoutcontroller.hpp"
 #include "application/model/clientmanager.hpp"
 #include "application/model/kakouneclient.hpp"
@@ -103,7 +102,6 @@ void Application::init(Window *window, const CliConfig &cli_config, ApplicationC
     m_editor_controller = std::make_unique<EditorController>();
     m_focus_controller = std::make_unique<FocusController>();
     m_input_controller = std::make_unique<InputController>();
-    m_info_box_controller = std::make_unique<InfoBoxController>();
     m_layout_controller = std::make_unique<LayoutController>();
     m_scene = std::make_unique<Scene>();
 
@@ -127,10 +125,8 @@ void Application::init(Window *window, const CliConfig &cli_config, ApplicationC
     m_input_controller->init(&m_focused_client, m_window);
     m_focus_controller->init(&m_focused_client, m_client_manager.get(), m_pane_layout.get(), m_window);
     m_editor_controller->init(m_client_manager.get(), m_pane_layout.get(), m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager, m_window, m_multi_styled_menu.get());
-    m_info_box_controller->init(&m_focused_client, m_pane_layout.get(), m_window, m_font_manager, m_info_box.get());
     m_scene->init(m_client_manager.get(), &m_focused_client, m_pane_layout.get(), m_kakoune_content_view.get(),
-                  m_status_bar.get(), m_multi_styled_menu.get(), m_info_box.get(),
-                  m_info_box_controller.get(), m_font_manager, m_window);
+                  m_status_bar.get(), m_multi_styled_menu.get(), m_info_box.get(), m_font_manager, m_window);
     m_layout_controller->init(m_pane_layout.get(), m_client_manager.get(), m_window);
 
     m_client_manager->setDefaultUIOptions(domain::getDefaultUIOptions(m_font_manager));

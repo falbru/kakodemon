@@ -9,7 +9,6 @@
 #include "application/controller/commandcontroller.hpp"
 #include "application/controller/editorcontroller.hpp"
 #include "application/controller/focuscontroller.hpp"
-#include "application/controller/infoboxcontroller.hpp"
 #include "application/controller/inputcontroller.hpp"
 #include "application/controller/layoutcontroller.hpp"
 #include "application/model/clientmanager.hpp"
@@ -61,7 +60,6 @@ class Application
     std::unique_ptr<FocusController> m_focus_controller;
     std::unique_ptr<LayoutController> m_layout_controller;
     std::unique_ptr<InputController> m_input_controller;
-    std::unique_ptr<InfoBoxController> m_info_box_controller;
     std::unique_ptr<Scene> m_scene;
 
     std::unique_ptr<KakouneContentView> m_kakoune_content_view;

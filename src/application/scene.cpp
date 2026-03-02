@@ -9,7 +9,7 @@ Scene::Scene() {}
 void Scene::init(ClientManager *client_manager, KakouneClient **focused_client, PaneLayout *pane_layout,
                  KakouneContentView *content_view, StatusBarView *status_bar_view,
                  MultiStyledMenuView *multi_styled_menu, InfoBoxView *info_box_view,
-                 InfoBoxController *info_box_controller, domain::FontManager *font_manager, Window *window)
+                 domain::FontManager *font_manager, Window *window)
 {
     m_focused_client = focused_client;
     m_pane_layout = pane_layout;
@@ -17,7 +17,6 @@ void Scene::init(ClientManager *client_manager, KakouneClient **focused_client, 
     m_status_bar_view = status_bar_view;
     m_multi_styled_menu = multi_styled_menu;
     m_info_box_view = info_box_view;
-    m_info_box_controller = info_box_controller;
     m_font_manager = font_manager;
     m_window = window;
 
@@ -196,7 +195,7 @@ void Scene::onMouseScroll(double offset)
     }
 
     if (hitTestInfoBox(m_mouse_x, m_mouse_y)) {
-        m_info_box_controller->handleMouseScroll(-scroll_amount);
+        m_info_box_view->handleMouseScroll((*m_focused_client)->info_box_state, -scroll_amount);
         return;
     }
 

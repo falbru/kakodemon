@@ -58,7 +58,6 @@ set(SRC
     src/application/controller/commandcontroller.cpp
     src/application/controller/editorcontroller.cpp
     src/application/controller/focuscontroller.cpp
-    src/application/controller/infoboxcontroller.cpp
     src/application/controller/inputcontroller.cpp
     src/application/controller/layoutcontroller.cpp
     src/application/model/panelayout.cpp

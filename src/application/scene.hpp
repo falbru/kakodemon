@@ -1,7 +1,6 @@
 #ifndef APPLICATION_SCENE_HPP_INCLUDED
 #define APPLICATION_SCENE_HPP_INCLUDED
 
-#include "application/controller/infoboxcontroller.hpp"
 #include "application/model/clientmanager.hpp"
 #include "application/model/kakouneclient.hpp"
 #include "application/model/panelayout.hpp"
@@ -21,8 +20,7 @@ class Scene
 
     void init(ClientManager *client_manager, KakouneClient **focused_client, PaneLayout *pane_layout,
               KakouneContentView *content_view, StatusBarView *status_bar_view, MultiStyledMenuView *multi_styled_menu,
-              InfoBoxView *info_box_view, InfoBoxController *info_box_controller, domain::FontManager *font_manager,
-              Window *window);
+              InfoBoxView *info_box_view, domain::FontManager *font_manager, Window *window);
 
     void render();
 
@@ -43,7 +41,6 @@ class Scene
     StatusBarView *m_status_bar_view;
     MultiStyledMenuView *m_multi_styled_menu;
     InfoBoxView *m_info_box_view;
-    InfoBoxController *m_info_box_controller;
     domain::FontManager *m_font_manager;
     Window *m_window;
 
