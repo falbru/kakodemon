@@ -2,6 +2,7 @@
 #define COMMANDCONTROLLER_HPP_INCLUDED
 
 #include "application/model/clientmanager.hpp"
+#include "application/model/panelayout.hpp"
 #include "domain/ports/commandinterface.hpp"
 #include "domain/ports/kakounesession.hpp"
 #include "domain/ports/window.hpp"
@@ -12,7 +13,7 @@ class CommandController
     CommandController();
 
     void init(CommandInterface *command_interface, ClientManager *client_manager,
-              domain::KakouneSession *kakoune_session, domain::Window *window);
+              domain::KakouneSession *kakoune_session, domain::Window *window, PaneLayout *pane_layout);
     void update();
 
   private:
@@ -20,6 +21,7 @@ class CommandController
     domain::KakouneSession *m_kakoune_session;
     ClientManager *m_client_manager;
     domain::Window *m_window;
+    PaneLayout *m_pane_layout;
 };
 
 #endif

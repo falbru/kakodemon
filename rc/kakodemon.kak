@@ -28,3 +28,14 @@ define-command kakodemon-new-client %{
 }
 
 alias global new kakodemon-new-client
+
+define-command -params 1 kakodemon-layout %{
+    nop %sh{
+        [ -z "$kak_client_env_KAKOD_ID" ] && exit
+
+        KAKOD_ID=$kak_client_env_KAKOD_ID \
+        kakod -p set-layout $1
+    }
+}
+
+complete-command -menu kakodemon-layout shell-script-candidates %{ printf 'tall\nwide\n' }

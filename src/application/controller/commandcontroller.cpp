@@ -8,12 +8,13 @@ CommandController::CommandController()
 {
 }
 
-void CommandController::init(CommandInterface *command_interface, ClientManager* client_manager, domain::KakouneSession *kakoune_session, domain::Window *window)
+void CommandController::init(CommandInterface *command_interface, ClientManager* client_manager, domain::KakouneSession *kakoune_session, domain::Window *window, PaneLayout *pane_layout)
 {
     m_command_interface = command_interface;
     m_client_manager = client_manager;
     m_kakoune_session = kakoune_session;
     m_window = window;
+    m_pane_layout = pane_layout;
 }
 
 void CommandController::update()
@@ -25,6 +26,14 @@ void CommandController::update()
         {
             m_window->setTitle(command.args[0]);
             m_kakoune_session->setSessionId(command.args[0]);
+        }else if (command.name == "set-layout" && !command.args.empty()) {
+            if (command.args[0] == "tall") {
+                m_pane_layout->setLayoutType(LayoutType::TALL);
+            } else if (command.args[0] == "wide") {
+                m_pane_layout->setLayoutType(LayoutType::WIDE);
+            }
+            m_pane_layout->arrange();
+            m_window->setNeedsRerender();
         }else if (command.name == "new-client") {
             if (command.args.empty()) {
                 m_client_manager->createClient(std::nullopt, {});

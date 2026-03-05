@@ -7,6 +7,12 @@
 #include "domain/observerlist.hpp"
 #include <vector>
 
+enum class LayoutType
+{
+    TALL,
+    WIDE,
+};
+
 struct Pane
 {
     KakouneClient *client;
@@ -21,6 +27,8 @@ class PaneLayout
     void init(ClientManager *client_manager);
     void arrange();
     void setBounds(const domain::Rectangle &bounds);
+    void setLayoutType(LayoutType layout_type);
+    LayoutType getLayoutType() const;
 
     Pane *findPaneAt(float x, float y);
     Pane *findPaneForClient(KakouneClient *client);
@@ -30,10 +38,14 @@ class PaneLayout
     void removeObserver(ObserverId id);
 
   private:
+    void arrangeTall();
+    void arrangeWide();
+
     std::vector<Pane> m_panes;
     ClientManager *m_client_manager;
     ObserverList<const std::vector<Pane> &> m_arrange_observers;
     domain::Rectangle m_bounds;
+    LayoutType m_layout_type = LayoutType::TALL;
 };
 
 #endif
