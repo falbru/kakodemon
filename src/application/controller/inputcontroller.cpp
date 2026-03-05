@@ -12,8 +12,8 @@ InputController::~InputController() {
 
 }
 
-void InputController::init(KakouneClient **focused_client, domain::Window *window) {
-    m_focused_client = focused_client;
+void InputController::init(FocusedClientStack *focused_client_stack, domain::Window *window) {
+    m_focused_client_stack = focused_client_stack;
 
     window->onKeyInput([this](domain::KeyEvent event) {
         onKeyInput(event);
@@ -25,8 +25,8 @@ void InputController::onKeyInput(const domain::KeyEvent& event) {
 }
 
 void InputController::update() {
-    if (!m_pending_keys.empty() && *m_focused_client) {
-        (*m_focused_client)->interface->pressKeys(m_pending_keys);
+    if (!m_pending_keys.empty() && m_focused_client_stack->focused()) {
+        m_focused_client_stack->focused()->interface->pressKeys(m_pending_keys);
         m_pending_keys.clear();
     }
 }

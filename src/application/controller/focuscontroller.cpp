@@ -1,21 +1,20 @@
 #include "focuscontroller.hpp"
 #include "application/model/clientmanager.hpp"
+#include "application/model/focusedclientstack.hpp"
 #include "application/model/kakouneclient.hpp"
-void FocusController::init(KakouneClient** focused_client, ClientManager* client_manager, PaneLayout* layout_controller,
-                           domain::Window* window) {
-    m_focused_client = focused_client;
+
+void FocusController::init(FocusedClientStack *focused_client_stack, ClientManager *client_manager,
+                           PaneLayout *layout_controller, domain::Window *window) {
+    m_focused_client_stack = focused_client_stack;
     m_pane_layout = layout_controller;
     m_client_manager = client_manager;
 
-    m_client_manager->onClientAdded([=](KakouneClient* client) {
-        *m_focused_client = client;
+    m_client_manager->onClientAdded([this](KakouneClient *client) {
+        m_focused_client_stack->focus(client);
     });
 
-    m_client_manager->onClientRemoved([=](KakouneClient* client) {
-        if (*m_focused_client == client) {
-            auto& clients = m_client_manager->clients();
-            *m_focused_client = clients.empty() ? nullptr : clients.front().get();
-        }
+    m_client_manager->onClientRemoved([this](KakouneClient *client) {
+        m_focused_client_stack->remove(client);
     });
 
     window->onMouseMove([this](float x, float y) {
@@ -32,9 +31,9 @@ void FocusController::onMouseMove(float x, float y) {
         return;
     }
 
-    Pane* pane = m_pane_layout->findPaneAt(x, y);
-    if (pane && pane->client != *m_focused_client) {
-        *m_focused_client = pane->client;
+    Pane *pane = m_pane_layout->findPaneAt(x, y);
+    if (pane && pane->client != m_focused_client_stack->focused()) {
+        m_focused_client_stack->focus(pane->client);
     }
 }
 

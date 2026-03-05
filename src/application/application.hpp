@@ -11,6 +11,7 @@
 #include "application/controller/inputcontroller.hpp"
 #include "application/controller/layoutcontroller.hpp"
 #include "application/model/clientmanager.hpp"
+#include "application/model/focusedclientstack.hpp"
 #include "application/model/kakouneclient.hpp"
 #include "application/model/panelayout.hpp"
 #include "application/scene.hpp"
@@ -51,8 +52,8 @@ class Application
 
     std::unique_ptr<domain::KakouneSession> m_kakoune_session;
     std::unique_ptr<ClientManager> m_client_manager;
+    std::unique_ptr<FocusedClientStack> m_focused_client_stack;
     std::unique_ptr<PaneLayout> m_pane_layout;
-    KakouneClient *m_focused_client;
 
     std::unique_ptr<CommandController> m_command_controller;
     std::unique_ptr<EditorController> m_editor_controller;

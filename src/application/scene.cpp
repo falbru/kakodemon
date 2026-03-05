@@ -1,16 +1,17 @@
 #include "application/scene.hpp"
+#include "application/model/focusedclientstack.hpp"
 #include "application/view/rendercontext.hpp"
 #include "domain/editor.hpp"
 #include "domain/mouse.hpp"
 
 Scene::Scene() {}
 
-void Scene::init(ClientManager *client_manager, KakouneClient **focused_client, PaneLayout *pane_layout,
+void Scene::init(ClientManager *client_manager, FocusedClientStack *focused_client_stack, PaneLayout *pane_layout,
                  KakouneContentView *content_view, StatusBarView *status_bar_view,
                  MultiStyledMenuView *multi_styled_menu, InfoBoxView *info_box_view,
                  domain::FontManager *font_manager, domain::Window *window)
 {
-    m_focused_client = focused_client;
+    m_focused_client_stack = focused_client_stack;
     m_pane_layout = pane_layout;
     m_content_view = content_view;
     m_status_bar_view = status_bar_view;
@@ -65,8 +66,8 @@ void Scene::render()
                                   client->state.cursor_position, bounds);
     }
 
-    if (!*m_focused_client) return;
-    auto *focused = *m_focused_client;
+    if (!m_focused_client_stack->focused()) return;
+    auto *focused = m_focused_client_stack->focused();
 
     RenderContext focused_context = {
         m_font_manager,
@@ -102,16 +103,16 @@ void Scene::render()
 
 bool Scene::hitTestMenu(float x, float y) const
 {
-    if (!*m_focused_client || !(*m_focused_client)->state.menu.has_value()) return false;
+    if (!m_focused_client_stack->focused() || !m_focused_client_stack->focused()->state.menu.has_value()) return false;
     return x >= m_multi_styled_menu->x() && x <= m_multi_styled_menu->x() + m_multi_styled_menu->width() &&
            y >= m_multi_styled_menu->y() && y <= m_multi_styled_menu->y() + m_multi_styled_menu->height();
 }
 
 bool Scene::hitTestInfoBox(float x, float y) const
 {
-    if (!*m_focused_client || !(*m_focused_client)->state.info_box.has_value()) return false;
-    if ((*m_focused_client)->state.info_box->title.size() == 0 &&
-        (*m_focused_client)->state.info_box->content.size() == 0) return false;
+    if (!m_focused_client_stack->focused() || !m_focused_client_stack->focused()->state.info_box.has_value()) return false;
+    if (m_focused_client_stack->focused()->state.info_box->title.size() == 0 &&
+        m_focused_client_stack->focused()->state.info_box->content.size() == 0) return false;
     return x >= m_info_box_view->x() && x <= m_info_box_view->x() + m_info_box_view->width() &&
            y >= m_info_box_view->y() && y <= m_info_box_view->y() + m_info_box_view->height();
 }
@@ -124,8 +125,8 @@ domain::MouseMoveResult Scene::onMouseMove(float x, float y)
         return domain::MouseMoveResult{domain::Cursor::IBEAM};
     }
 
-    if (*m_focused_client && (*m_focused_client)->state.menu.has_value()) {
-        domain::MouseMoveResult menu_result = m_multi_styled_menu->handleMouseMove(x, y, *(*m_focused_client)->state.menu);
+    if (m_focused_client_stack->focused() && m_focused_client_stack->focused()->state.menu.has_value()) {
+        domain::MouseMoveResult menu_result = m_multi_styled_menu->handleMouseMove(x, y, *m_focused_client_stack->focused()->state.menu);
         if (menu_result.cursor.has_value()) return menu_result;
     }
 
@@ -145,9 +146,9 @@ domain::MouseMoveResult Scene::onMouseMove(float x, float y)
 void Scene::onMouseButton(domain::MouseButtonEvent event)
 {
     if (event.action == domain::MouseButtonAction::PRESS) {
-        if (*m_focused_client && (*m_focused_client)->state.menu && (*m_focused_client)->state.menu->hasItems()) {
+        if (m_focused_client_stack->focused() && m_focused_client_stack->focused()->state.menu && m_focused_client_stack->focused()->state.menu->hasItems()) {
             if (event.button == domain::MouseButton::LEFT) {
-                bool handled = m_multi_styled_menu->handleMouseButton(event, (*m_focused_client)->menu_state, *(*m_focused_client)->state.menu);
+                bool handled = m_multi_styled_menu->handleMouseButton(event, m_focused_client_stack->focused()->menu_state, *m_focused_client_stack->focused()->state.menu);
                 if (handled) return;
             }
         }
@@ -189,20 +190,20 @@ void Scene::onMouseScroll(double offset)
     if (scroll_amount == 0) return;
 
     if (hitTestMenu(m_mouse_x, m_mouse_y)) {
-        m_multi_styled_menu->handleMouseScroll((*m_focused_client)->menu_state, -scroll_amount, *(*m_focused_client)->state.menu);
+        m_multi_styled_menu->handleMouseScroll(m_focused_client_stack->focused()->menu_state, -scroll_amount, *m_focused_client_stack->focused()->state.menu);
         return;
     }
 
     if (hitTestInfoBox(m_mouse_x, m_mouse_y)) {
-        m_info_box_view->handleMouseScroll((*m_focused_client)->info_box_state, -scroll_amount);
+        m_info_box_view->handleMouseScroll(m_focused_client_stack->focused()->info_box_state, -scroll_amount);
         return;
     }
 
-    if (!*m_focused_client) return;
-    Pane *pane = m_pane_layout->findPaneForClient(*m_focused_client);
+    if (!m_focused_client_stack->focused()) return;
+    Pane *pane = m_pane_layout->findPaneForClient(m_focused_client_stack->focused());
     if (!pane) return;
 
-    m_content_view->handleMouseScroll(*m_focused_client, m_mouse_x, m_mouse_y, pane->bounds, -scroll_amount);
+    m_content_view->handleMouseScroll(m_focused_client_stack->focused(), m_mouse_x, m_mouse_y, pane->bounds, -scroll_amount);
 }
 
 void Scene::setScrollSpeed(double speed) { m_scroll_speed = speed; }

@@ -6,6 +6,7 @@
 #include "application/controller/commandcontroller.hpp"
 #include "application/controller/layoutcontroller.hpp"
 #include "application/model/clientmanager.hpp"
+#include "application/model/focusedclientstack.hpp"
 #include "application/model/kakouneclient.hpp"
 #include "domain/ports/window.hpp"
 #include "application/controller/editorcontroller.hpp"
@@ -74,6 +75,7 @@ void Application::init(const CliConfig &cli_config, const ApplicationConfig &app
     }
 
     m_client_manager = std::make_unique<ClientManager>(m_kakoune_session.get());
+    m_focused_client_stack = std::make_unique<FocusedClientStack>();
 
     m_client_manager->onClientAdded([this](KakouneClient* client) {
         client->interface->onRefresh([this](bool) { m_window->wakeEventLoop(); });
@@ -116,16 +118,16 @@ void Application::init(const CliConfig &cli_config, const ApplicationConfig &app
     m_info_box->init(m_renderer.get(), m_multi_styled_menu.get(), m_kakoune_content_view.get(), m_status_bar.get());
 
     m_multi_styled_menu->onMouseButton([this](int item_index) {
-        m_focused_client->interface->selectMenuItem(item_index);
+        m_focused_client_stack->focused()->interface->selectMenuItem(item_index); // TODO move to controller
     });
 
     m_pane_layout->init(m_client_manager.get());
 
     m_command_controller->init(m_command_interface.get(), m_client_manager.get(), m_kakoune_session.get(), m_window.get());
-    m_input_controller->init(&m_focused_client, m_window.get());
-    m_focus_controller->init(&m_focused_client, m_client_manager.get(), m_pane_layout.get(), m_window.get());
+    m_input_controller->init(m_focused_client_stack.get(), m_window.get());
+    m_focus_controller->init(m_focused_client_stack.get(), m_client_manager.get(), m_pane_layout.get(), m_window.get());
     m_editor_controller->init(m_client_manager.get(), m_pane_layout.get(), m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager.get(), m_window.get(), m_multi_styled_menu.get());
-    m_scene->init(m_client_manager.get(), &m_focused_client, m_pane_layout.get(), m_kakoune_content_view.get(),
+    m_scene->init(m_client_manager.get(), m_focused_client_stack.get(), m_pane_layout.get(), m_kakoune_content_view.get(),
                   m_status_bar.get(), m_multi_styled_menu.get(), m_info_box.get(), m_font_manager.get(), m_window.get());
     m_layout_controller->init(m_pane_layout.get(), m_client_manager.get(), m_window.get());
 

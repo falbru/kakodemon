@@ -6,6 +6,7 @@ add_executable(tests
     unit/test_glyphlinesbuilder.cpp
     unit/test_utf8string.cpp
     unit/test_cliparser.cpp
+    unit/test_focusedclientstack.cpp
     unit/test_line.cpp
     unit/test_color.cpp
     integration/test_fontconfigresolver.cpp
@@ -28,6 +29,7 @@ add_executable(tests
     ${CMAKE_SOURCE_DIR}/src/adapters/namedpipe/namedpipecommandinterface.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/remotesession.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/uioptions.cpp
+    ${CMAKE_SOURCE_DIR}/src/application/model/focusedclientstack.cpp
     ${CMAKE_SOURCE_DIR}/src/application/model/kakouneclient.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/alignment.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/atom.cpp
