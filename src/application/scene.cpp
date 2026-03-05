@@ -119,12 +119,6 @@ bool Scene::hitTestInfoBox(float x, float y) const
 
 domain::MouseMoveResult Scene::onMouseMove(float x, float y)
 {
-    Pane* pane = m_active_mouse_client ? m_pane_layout->findPaneForClient(m_active_mouse_client) : m_pane_layout->findPaneAt(x, y);
-    if (pane) {
-        m_content_view->handleMouseMove(pane->client, x, y, pane->bounds);
-        return domain::MouseMoveResult{domain::Cursor::IBEAM};
-    }
-
     if (m_focused_client_stack->focused() && m_focused_client_stack->focused()->state.menu.has_value()) {
         domain::MouseMoveResult menu_result = m_multi_styled_menu->handleMouseMove(x, y, *m_focused_client_stack->focused()->state.menu);
         if (menu_result.cursor.has_value()) return menu_result;
@@ -138,6 +132,11 @@ domain::MouseMoveResult Scene::onMouseMove(float x, float y)
     float status_bar_height = m_status_bar_view->height(hover_pane->client->uiOptions().font_statusbar);
     if (y - hover_pane->bounds.y >= hover_pane->bounds.height - status_bar_height) {
         return domain::MouseMoveResult{domain::Cursor::DEFAULT};
+    }
+
+    Pane* pane = m_active_mouse_client ? m_pane_layout->findPaneForClient(m_active_mouse_client) : m_pane_layout->findPaneAt(x, y);
+    if (pane) {
+        m_content_view->handleMouseMove(pane->client, x, y, pane->bounds);
     }
 
     return domain::MouseMoveResult{domain::Cursor::IBEAM};

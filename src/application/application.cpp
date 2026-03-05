@@ -118,7 +118,7 @@ void Application::init(const CliConfig &cli_config, const ApplicationConfig &app
     m_info_box->init(m_renderer.get(), m_multi_styled_menu.get(), m_kakoune_content_view.get(), m_status_bar.get());
 
     m_multi_styled_menu->onMouseButton([this](int item_index) {
-        m_focused_client_stack->focused()->interface->selectMenuItem(item_index); // TODO move to controller
+        m_focused_client_stack->focused()->interface->selectMenuItem(item_index); // TODO move to controller
     });
 
     m_pane_layout->init(m_client_manager.get());
