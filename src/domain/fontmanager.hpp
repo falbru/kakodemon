@@ -20,7 +20,7 @@ struct GlyphWithFont
 
 class FontManager;
 
-using FontFactory = std::function<std::unique_ptr<Font>(FontEngine *, FontManager *)>;
+using FontFactory = std::function<std::unique_ptr<Font>(FontEngine *)>;
 
 using FontEngineFactory = std::function<std::unique_ptr<FontEngine>(const FontMatch &)>;
 

@@ -8,9 +8,8 @@
 #include "application/view/statusbar.hpp"
 #include "domain/fontmanager.hpp"
 #include "domain/mouse.hpp"
+#include "domain/ports/window.hpp"
 #include <map>
-
-class Window;
 
 class EditorController
 {
@@ -18,7 +17,7 @@ class EditorController
     EditorController();
 
     void init(ClientManager *client_manager, PaneLayout *pane_layout, KakouneContentView *kakoune_content_view,
-              StatusBarView *status_bar_view, domain::FontManager *font_manager, Window *window,
+              StatusBarView *status_bar_view, domain::FontManager *font_manager, domain::Window *window,
               MultiStyledMenuView *multi_styled_menu);
     void update();
 
@@ -31,7 +30,7 @@ class EditorController
     StatusBarView *m_status_bar_view;
     domain::FontManager *m_font_manager;
     MultiStyledMenuView *m_multi_styled_menu;
-    Window *m_window;
+    domain::Window *m_window;
 
     std::map<domain::MouseButton, bool> m_mouse_button_pressed;
 };

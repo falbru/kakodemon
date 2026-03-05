@@ -7,10 +7,12 @@
 #include "application/controller/layoutcontroller.hpp"
 #include "application/model/clientmanager.hpp"
 #include "application/model/kakouneclient.hpp"
-#include "application/window.hpp"
+#include "domain/ports/window.hpp"
 #include "application/controller/editorcontroller.hpp"
 #include "application/controller/inputcontroller.hpp"
+#include "domain/fontmanager.hpp"
 #include "domain/ports/commandinterface.hpp"
+#include "domain/ports/renderer.hpp"
 #include "domain/uioptions.hpp"
 #include "application/view/infobox.hpp"
 #include "application/view/multistyledmenu.hpp"
@@ -40,20 +42,18 @@ std::string generateId(size_t length = 8) {
 
 }
 
-Application::Application()
+Application::Application(std::unique_ptr<domain::Window> window, std::unique_ptr<domain::Renderer> renderer, std::unique_ptr<domain::FontManager> font_manager)
+    : m_window(std::move(window)), m_renderer(std::move(renderer)), m_font_manager(std::move(font_manager))
 {
 }
 
-Application::~Application()
+void Application::init(const CliConfig &cli_config, const ApplicationConfig &app_config)
 {
-}
+    m_app_config = app_config;
 
-void Application::init(Window *window, const CliConfig &cli_config, ApplicationConfig &app_config)
-{
-    m_window = window;
-    m_app_config = &app_config;
-    m_renderer = window->getRenderer();
-    m_font_manager = window->getFontManager();
+    m_window->init(m_app_config.maximized);
+    m_renderer->init(m_window->getWidth(), m_window->getHeight());
+    m_window->onResize([this](int width, int height) { m_renderer->onWindowResize(width, height); });
 
     m_kakodemon_id = generateId();
     setenv("KAKOD_ID", m_kakodemon_id.c_str(), 1);
@@ -92,8 +92,8 @@ void Application::init(Window *window, const CliConfig &cli_config, ApplicationC
     m_window->onClose([this]() { m_running = false; });
 
     m_window->onMaximizedChanged([this](bool maximized) {
-        m_app_config->maximized = maximized;
-        saveApplicationConfig(*m_app_config);
+        m_app_config.maximized = maximized;
+        saveApplicationConfig(m_app_config);
     });
 
     m_pane_layout = std::make_unique<PaneLayout>();
@@ -110,10 +110,10 @@ void Application::init(Window *window, const CliConfig &cli_config, ApplicationC
     m_multi_styled_menu = std::make_unique<MultiStyledMenuView>();
     m_info_box = std::make_unique<InfoBoxView>();
 
-    m_kakoune_content_view->init(m_renderer);
-    m_status_bar->init(m_renderer);
-    m_multi_styled_menu->init(m_renderer, m_kakoune_content_view.get());
-    m_info_box->init(m_renderer, m_multi_styled_menu.get(), m_kakoune_content_view.get(), m_status_bar.get());
+    m_kakoune_content_view->init(m_renderer.get());
+    m_status_bar->init(m_renderer.get());
+    m_multi_styled_menu->init(m_renderer.get(), m_kakoune_content_view.get());
+    m_info_box->init(m_renderer.get(), m_multi_styled_menu.get(), m_kakoune_content_view.get(), m_status_bar.get());
 
     m_multi_styled_menu->onMouseButton([this](int item_index) {
         m_focused_client->interface->selectMenuItem(item_index);
@@ -121,15 +121,15 @@ void Application::init(Window *window, const CliConfig &cli_config, ApplicationC
 
     m_pane_layout->init(m_client_manager.get());
 
-    m_command_controller->init(m_command_interface.get(), m_client_manager.get(), m_kakoune_session.get(), m_window);
-    m_input_controller->init(&m_focused_client, m_window);
-    m_focus_controller->init(&m_focused_client, m_client_manager.get(), m_pane_layout.get(), m_window);
-    m_editor_controller->init(m_client_manager.get(), m_pane_layout.get(), m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager, m_window, m_multi_styled_menu.get());
+    m_command_controller->init(m_command_interface.get(), m_client_manager.get(), m_kakoune_session.get(), m_window.get());
+    m_input_controller->init(&m_focused_client, m_window.get());
+    m_focus_controller->init(&m_focused_client, m_client_manager.get(), m_pane_layout.get(), m_window.get());
+    m_editor_controller->init(m_client_manager.get(), m_pane_layout.get(), m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager.get(), m_window.get(), m_multi_styled_menu.get());
     m_scene->init(m_client_manager.get(), &m_focused_client, m_pane_layout.get(), m_kakoune_content_view.get(),
-                  m_status_bar.get(), m_multi_styled_menu.get(), m_info_box.get(), m_font_manager, m_window);
-    m_layout_controller->init(m_pane_layout.get(), m_client_manager.get(), m_window);
+                  m_status_bar.get(), m_multi_styled_menu.get(), m_info_box.get(), m_font_manager.get(), m_window.get());
+    m_layout_controller->init(m_pane_layout.get(), m_client_manager.get(), m_window.get());
 
-    m_client_manager->setDefaultUIOptions(domain::getDefaultUIOptions(m_font_manager));
+    m_client_manager->setDefaultUIOptions(domain::getDefaultUIOptions(m_font_manager.get()));
 
     m_client_manager->createClient(cli_config.startup_command, cli_config.session_type == SessionType::Remote ? cli_config.file_arguments : std::vector<std::string>{});
 
@@ -137,6 +137,10 @@ void Application::init(Window *window, const CliConfig &cli_config, ApplicationC
     float initial_height = m_window->getHeight();
     m_pane_layout->setBounds(domain::Rectangle{0, 0, initial_width, initial_height});
     m_pane_layout->arrange();
+}
+
+Application::~Application()
+{
 }
 
 void Application::run() {

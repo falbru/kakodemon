@@ -8,7 +8,7 @@ CommandController::CommandController()
 {
 }
 
-void CommandController::init(CommandInterface *command_interface, ClientManager* client_manager, domain::KakouneSession *kakoune_session, Window *window)
+void CommandController::init(CommandInterface *command_interface, ClientManager* client_manager, domain::KakouneSession *kakoune_session, domain::Window *window)
 {
     m_command_interface = command_interface;
     m_client_manager = client_manager;

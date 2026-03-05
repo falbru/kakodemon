@@ -1,7 +1,7 @@
 #ifndef NAMEDPIPECOMMANDINTERFACE_HPP_INCLUDED
 #define NAMEDPIPECOMMANDINTERFACE_HPP_INCLUDED
 
-#include "application/observerlist.hpp"
+#include "domain/observerlist.hpp"
 #include "domain/ports/commandinterface.hpp"
 #include <atomic>
 #include <functional>

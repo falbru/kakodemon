@@ -3,8 +3,8 @@
 
 #include "application/model/clientmanager.hpp"
 #include "application/model/kakouneclient.hpp"
-#include "application/observerlist.hpp"
 #include "domain/geometry.hpp"
+#include "domain/observerlist.hpp"
 #include <vector>
 
 struct Pane

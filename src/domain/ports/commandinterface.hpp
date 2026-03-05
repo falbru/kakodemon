@@ -1,7 +1,7 @@
 #ifndef DOMAIN_COMMANDINTERFACE_HPP_INCLUDED
 #define DOMAIN_COMMANDINTERFACE_HPP_INCLUDED
 
-#include "application/observerid.hpp"
+#include "domain/observerid.hpp"
 #include <functional>
 #include <string>
 #include <vector>

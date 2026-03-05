@@ -12,6 +12,12 @@
 #include "glm/ext/matrix_clip_space.hpp"
 #include "opengl.hpp"
 
+domain::FontFactory opengl::Renderer::getFontFactory() {
+    return [](domain::FontEngine *engine) -> std::unique_ptr<domain::Font> {
+        return std::make_unique<opengl::Font>(engine);
+    };
+}
+
 opengl::Renderer::Renderer() {
 }
 

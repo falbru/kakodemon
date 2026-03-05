@@ -1,7 +1,6 @@
 #ifndef DOMAIN_KAKOUNEINTERFACE_HPP_INCLUDED
 #define DOMAIN_KAKOUNEINTERFACE_HPP_INCLUDED
 
-#include "application/observerid.hpp"
 #include "domain/editor.hpp"
 #include "domain/fontmanager.hpp"
 #include "domain/infobox.hpp"
@@ -9,6 +8,7 @@
 #include "domain/menu.hpp"
 #include "domain/modeline.hpp"
 #include "domain/mouse.hpp"
+#include "domain/observerid.hpp"
 #include "domain/ports/kakounesession.hpp"
 #include "domain/uioptions.hpp"
 

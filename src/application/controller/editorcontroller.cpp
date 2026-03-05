@@ -1,6 +1,5 @@
 #include "editorcontroller.hpp"
 #include "application/model/clientmanager.hpp"
-#include "application/window.hpp"
 #include "domain/mouse.hpp"
 #include "domain/uioptions.hpp"
 
@@ -10,7 +9,7 @@ EditorController::EditorController()
 
 void EditorController::init(ClientManager *client_manager, PaneLayout *pane_layout,
                              KakouneContentView *kakoune_content_view, StatusBarView *status_bar_view,
-                             domain::FontManager *font_manager, Window *window,
+                             domain::FontManager *font_manager, domain::Window *window,
                              MultiStyledMenuView *multi_styled_menu)
 {
     m_client_manager = client_manager;

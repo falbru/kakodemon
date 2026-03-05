@@ -1,6 +1,5 @@
 #include "application/scene.hpp"
 #include "application/view/rendercontext.hpp"
-#include "application/window.hpp"
 #include "domain/editor.hpp"
 #include "domain/mouse.hpp"
 
@@ -9,7 +8,7 @@ Scene::Scene() {}
 void Scene::init(ClientManager *client_manager, KakouneClient **focused_client, PaneLayout *pane_layout,
                  KakouneContentView *content_view, StatusBarView *status_bar_view,
                  MultiStyledMenuView *multi_styled_menu, InfoBoxView *info_box_view,
-                 domain::FontManager *font_manager, Window *window)
+                 domain::FontManager *font_manager, domain::Window *window)
 {
     m_focused_client = focused_client;
     m_pane_layout = pane_layout;

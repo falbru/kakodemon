@@ -2,13 +2,13 @@
 #define VIEW_INLINEMENU_HPP_INCLUDED
 
 #include "application/model/viewstate.hpp"
-#include "application/observerlist.hpp"
 #include "application/view/kakounecontentview.hpp"
 #include "application/view/rendercontext.hpp"
 #include "application/view/widgets/scrolledmenuitems.hpp"
 #include "domain/geometry.hpp"
 #include "domain/menu.hpp"
 #include "domain/mouse.hpp"
+#include "domain/observerlist.hpp"
 #include <functional>
 #include <memory>
 

@@ -1,11 +1,8 @@
 #ifndef APPLICATION_APPLICATIONBUILDER_HPP_INCLUDED
 #define APPLICATION_APPLICATIONBUILDER_HPP_INCLUDED
 
-#include "application/window.hpp"
-#include "domain/ports/font.hpp"
-#include "domain/ports/fontengine.hpp"
-#include "domain/ports/fontresolver.hpp"
-#include <functional>
+#include "application/application.hpp"
+#include "domain/fontmanager.hpp"
 #include <memory>
 
 enum class PlatformType
@@ -32,7 +29,7 @@ class ApplicationBuilder
     ApplicationBuilder &withFontResolver(FontResolverType resolver);
     ApplicationBuilder &withFontEngine(FontEngineType engine);
 
-    std::unique_ptr<Window> build();
+    std::unique_ptr<Application> build();
 
   private:
     PlatformType m_platform;
@@ -40,7 +37,7 @@ class ApplicationBuilder
     FontEngineType m_font_engine;
 
     std::unique_ptr<domain::FontResolver> createFontResolver();
-    FontEngineFactory createFontEngineFactory();
+    domain::FontEngineFactory createFontEngineFactory();
 };
 
 #endif

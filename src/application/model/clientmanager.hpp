@@ -2,7 +2,7 @@
 #define MODEL_CLIENTMANAGER_HPP_INCLUDED
 
 #include "application/model/kakouneclient.hpp"
-#include "application/observerlist.hpp"
+#include "domain/observerlist.hpp"
 #include "domain/ports/kakounesession.hpp"
 
 class ClientManager

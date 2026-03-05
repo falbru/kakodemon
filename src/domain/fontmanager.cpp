@@ -27,7 +27,7 @@ Font *FontManager::getOrCreateFont(const FontMatch &match)
     }
 
     auto engine = m_engine_factory(match);
-    auto font = m_font_factory(engine.get(), this);
+    auto font = m_font_factory(engine.get());
 
     CachedFont cached{std::move(engine), std::move(font)};
     Font *font_ptr = cached.font.get();

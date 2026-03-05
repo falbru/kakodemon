@@ -2,15 +2,14 @@
 #define LAYOUTCONTROLLER_HPP_INCLUDED
 
 #include "application/model/panelayout.hpp"
-
-class Window;
+#include "domain/ports/window.hpp"
 
 class LayoutController
 {
   public:
     LayoutController();
 
-    void init(PaneLayout *pane_layout, ClientManager *client_manager, Window *window);
+    void init(PaneLayout *pane_layout, ClientManager *client_manager, domain::Window *window);
 
   private:
     PaneLayout *m_pane_layout;

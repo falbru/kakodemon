@@ -1,7 +1,6 @@
 #ifndef APPLICATION_APPLICATION_HPP_INCLUDED
 #define APPLICATION_APPLICATION_HPP_INCLUDED
 
-#include <functional>
 #include <memory>
 
 #include "application/applicationconfig.hpp"
@@ -23,30 +22,30 @@
 #include "domain/ports/commandinterface.hpp"
 #include "domain/ports/kakounesession.hpp"
 #include "domain/ports/renderer.hpp"
-
-class Window;
+#include "domain/ports/window.hpp"
 
 class Application
 {
   public:
-    Application();
+    Application(std::unique_ptr<domain::Window> window, std::unique_ptr<domain::Renderer> renderer,
+                std::unique_ptr<domain::FontManager> font_manager);
     ~Application();
 
-    void init(Window *window, const CliConfig &cli_config, ApplicationConfig &app_config);
+    void init(const CliConfig &cli_config, const ApplicationConfig &app_config);
     void run();
 
   private:
     void updateControllers();
     void renderControllers();
 
-    Window *m_window;
+    std::unique_ptr<domain::Window> m_window;
     bool m_running = true;
 
-    domain::Renderer *m_renderer;
-    domain::FontManager *m_font_manager;
+    std::unique_ptr<domain::Renderer> m_renderer;
+    std::unique_ptr<domain::FontManager> m_font_manager;
 
     std::string m_kakodemon_id;
-    ApplicationConfig *m_app_config;
+    ApplicationConfig m_app_config;
 
     std::unique_ptr<CommandInterface> m_command_interface;
 

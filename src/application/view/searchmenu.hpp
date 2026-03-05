@@ -2,12 +2,12 @@
 #define VIEW_SEARCHMENU_HPP_INCLUDED
 
 #include "application/model/viewstate.hpp"
-#include "application/observerlist.hpp"
 #include "application/view/rendercontext.hpp"
 #include "application/view/widgets/input.hpp"
 #include "application/view/widgets/scrolledmenuitems.hpp"
 #include "domain/menu.hpp"
 #include "domain/mouse.hpp"
+#include "domain/observerlist.hpp"
 #include "domain/ports/renderer.hpp"
 #include <functional>
 

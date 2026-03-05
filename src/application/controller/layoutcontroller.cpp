@@ -2,14 +2,13 @@
 #include "application/model/clientmanager.hpp"
 #include "application/model/kakouneclient.hpp"
 #include "application/model/panelayout.hpp"
-#include "application/window.hpp"
 #include "domain/geometry.hpp"
 
 LayoutController::LayoutController() {
 
 }
 
-void LayoutController::init(PaneLayout* pane_layout, ClientManager* client_manager, Window* window) {
+void LayoutController::init(PaneLayout* pane_layout, ClientManager* client_manager, domain::Window* window) {
     m_pane_layout = pane_layout;
 
     client_manager->onClientAdded([=](KakouneClient* client) {

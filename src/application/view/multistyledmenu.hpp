@@ -2,7 +2,6 @@
 #define VIEW_MULTISTYLEDMENU_HPP_INCLUDED
 
 #include "application/model/viewstate.hpp"
-#include "application/observerlist.hpp"
 #include "application/view/inlinemenu.hpp"
 #include "application/view/kakounecontentview.hpp"
 #include "application/view/promptmenu.hpp"
@@ -11,6 +10,7 @@
 #include "domain/geometry.hpp"
 #include "domain/menu.hpp"
 #include "domain/mouse.hpp"
+#include "domain/observerlist.hpp"
 #include <functional>
 #include <memory>
 #include <optional>

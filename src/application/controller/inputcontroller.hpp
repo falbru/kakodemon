@@ -3,8 +3,7 @@
 
 #include "application/model/kakouneclient.hpp"
 #include "domain/keys.hpp"
-
-class Window;
+#include "domain/ports/window.hpp"
 
 class InputController
 {
@@ -12,7 +11,7 @@ class InputController
     InputController();
     ~InputController();
 
-    void init(KakouneClient **focused_client, Window *window);
+    void init(KakouneClient **focused_client, domain::Window *window);
     void onKeyInput(const domain::KeyEvent &event);
     void update();
 

@@ -1,7 +1,7 @@
 #ifndef KAKOUNECLIENTPROCESS_HPP_INCLUDED
 #define KAKOUNECLIENTPROCESS_HPP_INCLUDED
 
-#include "application/observerlist.hpp"
+#include "domain/observerlist.hpp"
 #include <atomic>
 #include <functional>
 #include <sys/poll.h>

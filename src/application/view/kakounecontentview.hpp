@@ -2,11 +2,11 @@
 #define KAKOUNECONTENTVIEW_HPP_INCLUDED
 
 #include "application/model/kakouneclient.hpp"
-#include "application/observerlist.hpp"
 #include "application/view/rendercontext.hpp"
 #include "domain/coord.hpp"
 #include "domain/geometry.hpp"
 #include "domain/mouse.hpp"
+#include "domain/observerlist.hpp"
 #include "domain/ports/renderer.hpp"
 #include <functional>
 

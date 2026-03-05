@@ -1,15 +1,15 @@
 #ifndef OPENGL_WINDOW_HPP_INCLUDED
 #define OPENGL_WINDOW_HPP_INCLUDED
 
-#include "application/observerlist.hpp"
-#include "application/window.hpp"
+#include "domain/observerlist.hpp"
+#include "domain/ports/window.hpp"
 #include "opengl.hpp"
 #include <optional>
 
 namespace opengl
 {
 
-class GLFWWindow : public Window
+class GLFWWindow : public domain::Window
 {
   public:
     GLFWWindow();
@@ -28,11 +28,6 @@ class GLFWWindow : public Window
     void setCursor(domain::Cursor cursor) override;
     float getWidth() override;
     float getHeight() override;
-
-    domain::Renderer *getRenderer() override;
-    domain::FontManager *getFontManager() override;
-
-    void setFontDependencies(std::unique_ptr<domain::FontResolver> resolver, FontEngineFactory engine_factory) override;
 
     ObserverId onResize(std::function<void(int, int)> callback) override;
     ObserverId onKeyInput(std::function<void(domain::KeyEvent)> callback) override;
@@ -64,12 +59,6 @@ class GLFWWindow : public Window
     float m_cursor_y = 0.0f;
 
     domain::RGBAColor m_clear_color = {};
-
-    std::unique_ptr<domain::Renderer> m_renderer;
-    std::unique_ptr<domain::FontManager> m_font_manager;
-
-    std::unique_ptr<domain::FontResolver> m_font_resolver;
-    FontEngineFactory m_font_engine_factory;
 
     ObserverList<int, int> m_resize_observers;
     ObserverList<domain::KeyEvent> m_key_input_observers;

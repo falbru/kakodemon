@@ -10,8 +10,7 @@
 #include "application/view/statusbar.hpp"
 #include "domain/fontmanager.hpp"
 #include "domain/mouse.hpp"
-
-class Window;
+#include "domain/ports/window.hpp"
 
 class Scene
 {
@@ -20,7 +19,7 @@ class Scene
 
     void init(ClientManager *client_manager, KakouneClient **focused_client, PaneLayout *pane_layout,
               KakouneContentView *content_view, StatusBarView *status_bar_view, MultiStyledMenuView *multi_styled_menu,
-              InfoBoxView *info_box_view, domain::FontManager *font_manager, Window *window);
+              InfoBoxView *info_box_view, domain::FontManager *font_manager, domain::Window *window);
 
     void render();
 
@@ -42,7 +41,7 @@ class Scene
     MultiStyledMenuView *m_multi_styled_menu;
     InfoBoxView *m_info_box_view;
     domain::FontManager *m_font_manager;
-    Window *m_window;
+    domain::Window *m_window;
 
     KakouneClient *m_active_mouse_client = nullptr;
     float m_mouse_x = 0.0f;

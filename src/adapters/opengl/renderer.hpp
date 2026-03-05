@@ -6,6 +6,7 @@
 
 #include "domain/alignment.hpp"
 #include "domain/color.hpp"
+#include "domain/fontmanager.hpp"
 #include "domain/ports/renderer.hpp"
 #include "shaderprogram.hpp"
 
@@ -41,6 +42,8 @@ class Renderer : public domain::Renderer
                     float x, float y, const domain::Alignment &alignment = domain::Alignment()) const override;
     void renderLines(const domain::TextRenderConfig &config, const domain::Lines &lines,
                      const domain::Face &default_face, float x, float y) const override;
+
+    static domain::FontFactory getFontFactory();
 
   private:
     void _renderLine(const domain::TextRenderConfig &config, const domain::Line &line, const domain::Face &default_face,

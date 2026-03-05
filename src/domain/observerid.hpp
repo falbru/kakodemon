@@ -1,0 +1,6 @@
+#ifndef DOMAIN_OBSERVERID_HPP_INCLUDED
+#define DOMAIN_OBSERVERID_HPP_INCLUDED
+
+using ObserverId = int;
+
+#endif

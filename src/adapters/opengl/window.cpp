@@ -1,29 +1,15 @@
 #include "window.hpp"
 #include "GLFW/glfw3.h"
-#include "adapters/opengl/font.hpp"
-#include "adapters/opengl/renderer.hpp"
-#include "domain/fontmanager.hpp"
 #include "domain/mouse.hpp"
 
 opengl::GLFWWindow::GLFWWindow() {
 }
 
 opengl::GLFWWindow::~GLFWWindow() {
-    m_font_manager.reset();
-    m_renderer.reset();
-
     if (m_cursor_ibeam) glfwDestroyCursor(m_cursor_ibeam);
     if (m_cursor_pointer) glfwDestroyCursor(m_cursor_pointer);
 
     if (m_window) glfwTerminate();
-}
-
-void opengl::GLFWWindow::setFontDependencies(
-    std::unique_ptr<domain::FontResolver> resolver,
-    FontEngineFactory engine_factory)
-{
-    m_font_resolver = std::move(resolver);
-    m_font_engine_factory = engine_factory;
 }
 
 void opengl::GLFWWindow::init(bool maximized) {
@@ -65,7 +51,6 @@ void opengl::GLFWWindow::init(bool maximized) {
 
     glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int width, int height) {
         GLFWWindow* self = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
-        self->m_renderer->onWindowResize(width, height);
         self->m_resize_observers.notify(width, height);
     });
 
@@ -104,22 +89,8 @@ void opengl::GLFWWindow::init(bool maximized) {
         self->m_close_observers.notify();
     });
 
-    m_renderer = std::make_unique<opengl::Renderer>();
-
     m_cursor_ibeam = glfwCreateStandardCursor(GLFW_IBEAM_CURSOR);
     m_cursor_pointer = glfwCreateStandardCursor(GLFW_POINTING_HAND_CURSOR);
-
-    auto font_factory = [](domain::FontEngine *engine, domain::FontManager *font_manager) -> std::unique_ptr<domain::Font> {
-        return std::make_unique<opengl::Font>(engine);
-    };
-
-    m_font_manager = std::make_unique<domain::FontManager>(
-        std::move(m_font_resolver),
-        m_font_engine_factory,
-        font_factory
-    );
-
-    m_renderer->init(framebuffer_width, framebuffer_height);
 
     glfwSwapBuffers(m_window);
 }
@@ -173,14 +144,6 @@ float opengl::GLFWWindow::getHeight() {
     int width, height;
     glfwGetFramebufferSize(m_window, &width, &height);
     return height;
-}
-
-domain::Renderer *opengl::GLFWWindow::getRenderer() {
-    return m_renderer.get();
-}
-
-domain::FontManager *opengl::GLFWWindow::getFontManager() {
-    return m_font_manager.get();
 }
 
 void opengl::GLFWWindow::onGLFWKeyInput(int key, int scancode, int action, int mods)

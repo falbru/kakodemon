@@ -2,7 +2,7 @@
 #define KAKOUNECLIENT_HPP_INCLUDED
 
 #include "application/model/viewstate.hpp"
-#include "application/observerlist.hpp"
+#include "domain/observerlist.hpp"
 #include "domain/ports/kakouneinterface.hpp"
 #include "domain/ports/kakounesession.hpp"
 #include "domain/uioptions.hpp"

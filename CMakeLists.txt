@@ -46,11 +46,11 @@ set(SRC
     src/adapters/kakoune/menustyle.cpp
     src/adapters/kakoune/remotesession.cpp
     src/adapters/kakoune/uioptions.cpp
-    src/adapters/opengl/window.cpp
+    src/adapters/namedpipe/namedpipecommandinterface.cpp
     src/adapters/opengl/font.cpp
     src/adapters/opengl/renderer.cpp
     src/adapters/opengl/shaderprogram.cpp
-    src/adapters/namedpipe/namedpipecommandinterface.cpp
+    src/adapters/opengl/window.cpp
     src/application/application.cpp
     src/application/applicationbuilder.cpp
     src/application/applicationconfig.cpp
@@ -60,18 +60,18 @@ set(SRC
     src/application/controller/focuscontroller.cpp
     src/application/controller/inputcontroller.cpp
     src/application/controller/layoutcontroller.cpp
-    src/application/model/panelayout.cpp
     src/application/model/clientmanager.cpp
     src/application/model/kakouneclient.cpp
+    src/application/model/panelayout.cpp
     src/application/scene.cpp
     src/application/view/glyphsequence.cpp
-    src/application/view/rendercontext.cpp
     src/application/view/infobox.cpp
     src/application/view/inlinemenu.cpp
     src/application/view/kakounecontentview.cpp
     src/application/view/layoutmanager.cpp
     src/application/view/multistyledmenu.cpp
     src/application/view/promptmenu.cpp
+    src/application/view/rendercontext.cpp
     src/application/view/searchmenu.cpp
     src/application/view/statusbar.cpp
     src/application/view/widgets/input.cpp
@@ -94,6 +94,7 @@ set(SRC
     src/domain/ports/font.cpp
     src/domain/ports/kakouneinterface.cpp
     src/domain/ports/renderer.cpp
+    src/domain/ports/window.cpp
     src/domain/statusline.cpp
     src/domain/uioptions.cpp
     src/domain/utf8string.cpp

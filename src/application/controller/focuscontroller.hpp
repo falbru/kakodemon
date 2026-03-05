@@ -5,14 +5,13 @@
 #include "application/model/kakouneclient.hpp"
 #include "application/model/panelayout.hpp"
 #include "domain/mouse.hpp"
-
-class Window;
+#include "domain/ports/window.hpp"
 
 class FocusController
 {
   public:
     void init(KakouneClient **focused_client, ClientManager *client_manager, PaneLayout *layout_controller,
-              Window *window);
+              domain::Window *window);
     void onMouseMove(float x, float y);
     void onMouseButton(domain::MouseButtonEvent event);
 

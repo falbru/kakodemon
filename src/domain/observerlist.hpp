@@ -1,12 +1,11 @@
-#ifndef APPLICATION_OBSERVERLIST_HPP_INCLUDED
-#define APPLICATION_OBSERVERLIST_HPP_INCLUDED
+#ifndef DOMAIN_OBSERVERLIST_HPP_INCLUDED
+#define DOMAIN_OBSERVERLIST_HPP_INCLUDED
 
-#include "application/observerid.hpp"
+#include "domain/observerid.hpp"
 #include <functional>
 #include <map>
 
-template <typename... Args>
-class ObserverList
+template <typename... Args> class ObserverList
 {
   public:
     ObserverId addObserver(std::function<void(Args...)> callback)

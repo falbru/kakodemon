@@ -1,10 +1,8 @@
 #include "focuscontroller.hpp"
 #include "application/model/clientmanager.hpp"
 #include "application/model/kakouneclient.hpp"
-#include "application/window.hpp"
-
 void FocusController::init(KakouneClient** focused_client, ClientManager* client_manager, PaneLayout* layout_controller,
-                           Window* window) {
+                           domain::Window* window) {
     m_focused_client = focused_client;
     m_pane_layout = layout_controller;
     m_client_manager = client_manager;

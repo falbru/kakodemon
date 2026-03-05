@@ -1,7 +1,7 @@
 #ifndef KAKOUNEFRAMESTATEMANAGER_HPP_INCLUDED
 #define KAKOUNEFRAMESTATEMANAGER_HPP_INCLUDED
 
-#include "application/observerlist.hpp"
+#include "domain/observerlist.hpp"
 #include <functional>
 #include <mutex>
 #include <optional>
