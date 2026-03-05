@@ -18,6 +18,7 @@
 #include "application/view/infobox.hpp"
 #include "application/view/kakounecontentview.hpp"
 #include "application/view/multistyledmenu.hpp"
+#include "application/view/paneborderview.hpp"
 #include "application/view/statusbar.hpp"
 #include "domain/fontmanager.hpp"
 #include "domain/ports/commandinterface.hpp"
@@ -66,6 +67,7 @@ class Application
     std::unique_ptr<StatusBarView> m_status_bar;
     std::unique_ptr<MultiStyledMenuView> m_multi_styled_menu;
     std::unique_ptr<InfoBoxView> m_info_box;
+    std::unique_ptr<PaneBorderView> m_pane_border_view;
 };
 
 #endif

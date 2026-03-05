@@ -74,6 +74,7 @@ set(SRC
     src/application/view/promptmenu.cpp
     src/application/view/rendercontext.cpp
     src/application/view/searchmenu.cpp
+    src/application/view/paneborderview.cpp
     src/application/view/statusbar.cpp
     src/application/view/widgets/input.cpp
     src/application/view/widgets/scrollbar.cpp

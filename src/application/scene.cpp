@@ -9,8 +9,10 @@ Scene::Scene() {}
 void Scene::init(ClientManager *client_manager, FocusedClientStack *focused_client_stack, PaneLayout *pane_layout,
                  KakouneContentView *content_view, StatusBarView *status_bar_view,
                  MultiStyledMenuView *multi_styled_menu, InfoBoxView *info_box_view,
-                 domain::FontManager *font_manager, domain::Window *window)
+                 domain::FontManager *font_manager, domain::Window *window,
+                 PaneBorderView *pane_border_view)
 {
+    m_pane_border_view = pane_border_view;
     m_focused_client_stack = focused_client_stack;
     m_pane_layout = pane_layout;
     m_content_view = content_view;
@@ -49,6 +51,8 @@ void Scene::init(ClientManager *client_manager, FocusedClientStack *focused_clie
 
 void Scene::render()
 {
+    m_pane_border_view->render(m_pane_layout->getPanes());
+
     for (const auto &pane : m_pane_layout->getPanes()) {
         auto *client = pane.client;
         const auto &bounds = pane.bounds;
@@ -127,14 +131,14 @@ domain::MouseMoveResult Scene::onMouseMove(float x, float y)
     if (hitTestInfoBox(x, y)) return domain::MouseMoveResult{domain::Cursor::DEFAULT};
 
     Pane *hover_pane = m_pane_layout->findPaneAt(x, y);
-    if (!hover_pane) return domain::MouseMoveResult{domain::Cursor::DEFAULT};
-
-    float status_bar_height = m_status_bar_view->height(hover_pane->client->uiOptions().font_statusbar);
-    if (y - hover_pane->bounds.y >= hover_pane->bounds.height - status_bar_height) {
-        return domain::MouseMoveResult{domain::Cursor::DEFAULT};
+    if (hover_pane) {
+        float status_bar_height = m_status_bar_view->height(hover_pane->client->uiOptions().font_statusbar);
+        if (y - hover_pane->bounds.y >= hover_pane->bounds.height - status_bar_height) {
+            return domain::MouseMoveResult{domain::Cursor::DEFAULT};
+        }
     }
 
-    Pane* pane = m_active_mouse_client ? m_pane_layout->findPaneForClient(m_active_mouse_client) : m_pane_layout->findPaneAt(x, y);
+    Pane* pane = m_active_mouse_client ? m_pane_layout->findPaneForClient(m_active_mouse_client) : hover_pane;
     if (pane) {
         m_content_view->handleMouseMove(pane->client, x, y, pane->bounds);
     }

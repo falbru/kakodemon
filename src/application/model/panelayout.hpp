@@ -16,6 +16,8 @@ struct Pane
 class PaneLayout
 {
   public:
+    static constexpr float BORDER_WIDTH = 1.0f;
+
     void init(ClientManager *client_manager);
     void arrange();
     void setBounds(const domain::Rectangle &bounds);

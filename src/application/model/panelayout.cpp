@@ -22,11 +22,12 @@ void PaneLayout::arrange() {
         m_panes.push_back({client.get(), {0, 0, 0, 0}});
     }
 
-    float pane_width = m_bounds.width / static_cast<float>(m_panes.size());
+    float n = static_cast<float>(m_panes.size());
+    float pane_width = (m_bounds.width - (n - 1) * BORDER_WIDTH) / n;
 
     for (size_t i = 0; i < m_panes.size(); ++i) {
         m_panes[i].bounds = {
-            m_bounds.x + pane_width * static_cast<float>(i),
+            m_bounds.x + (pane_width + BORDER_WIDTH) * static_cast<float>(i),
             m_bounds.y,
             pane_width,
             m_bounds.height

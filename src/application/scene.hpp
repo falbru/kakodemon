@@ -8,6 +8,7 @@
 #include "application/view/infobox.hpp"
 #include "application/view/kakounecontentview.hpp"
 #include "application/view/multistyledmenu.hpp"
+#include "application/view/paneborderview.hpp"
 #include "application/view/statusbar.hpp"
 #include "domain/fontmanager.hpp"
 #include "domain/mouse.hpp"
@@ -20,7 +21,8 @@ class Scene
 
     void init(ClientManager *client_manager, FocusedClientStack *focused_client_stack, PaneLayout *pane_layout,
               KakouneContentView *content_view, StatusBarView *status_bar_view, MultiStyledMenuView *multi_styled_menu,
-              InfoBoxView *info_box_view, domain::FontManager *font_manager, domain::Window *window);
+              InfoBoxView *info_box_view, domain::FontManager *font_manager, domain::Window *window,
+              PaneBorderView *pane_border_view);
 
     void render();
 
@@ -43,6 +45,8 @@ class Scene
     InfoBoxView *m_info_box_view;
     domain::FontManager *m_font_manager;
     domain::Window *m_window;
+
+    PaneBorderView *m_pane_border_view;
 
     KakouneClient *m_active_mouse_client = nullptr;
     float m_mouse_x = 0.0f;
