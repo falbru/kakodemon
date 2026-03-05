@@ -13,6 +13,7 @@ add_executable(tests
     integration/test_localsession.cpp
     integration/test_kakouneclientprocess.cpp
     integration/test_namedpipecommandinterface.cpp
+    integration/test_benchmark_latency.cpp
     ${CMAKE_SOURCE_DIR}/src/application/cliparser.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/fontconfig/fontconfigresolver.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/atom.cpp
