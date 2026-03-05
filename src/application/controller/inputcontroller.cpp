@@ -1,6 +1,7 @@
 #include "inputcontroller.hpp"
 #include "domain/keys.hpp"
 #include "domain/utf8string.hpp"
+#include <algorithm>
 #include <string>
 #include <variant>
 
@@ -12,8 +13,9 @@ InputController::~InputController() {
 
 }
 
-void InputController::init(FocusedClientStack *focused_client_stack, domain::Window *window) {
+void InputController::init(FocusedClientStack *focused_client_stack, ClientManager *client_manager, domain::Window *window) {
     m_focused_client_stack = focused_client_stack;
+    m_client_manager = client_manager;
 
     window->onKeyInput([this](domain::KeyEvent event) {
         onKeyInput(event);
@@ -21,7 +23,64 @@ void InputController::init(FocusedClientStack *focused_client_stack, domain::Win
 }
 
 void InputController::onKeyInput(const domain::KeyEvent& event) {
+    if (tryHandleGlobalKeybinding(event)) {
+        return;
+    }
     m_pending_keys.push_back(keyEventToKakouneKey(event));
+}
+
+bool InputController::tryHandleGlobalKeybinding(const domain::KeyEvent &event) {
+    if (!std::holds_alternative<domain::Codepoint>(event.key)) {
+        return false;
+    }
+
+    bool ctrl_shift = (event.modifiers & (domain::CONTROL | domain::SHIFT)) == (domain::CONTROL | domain::SHIFT);
+    if (!ctrl_shift) {
+        return false;
+    }
+
+    auto cp = std::get<domain::Codepoint>(event.key);
+    std::string key = domain::codePointToString(cp);
+
+    if (key == "j" || key == "J") {
+        focusNext();
+        return true;
+    }
+    if (key == "k" || key == "K") {
+        focusPrev();
+        return true;
+    }
+    return false;
+}
+
+void InputController::focusNext() {
+    const auto &clients = m_client_manager->clients();
+    if (clients.empty()) return;
+
+    KakouneClient *current = m_focused_client_stack->focused();
+    auto it = std::find_if(clients.begin(), clients.end(),
+                           [current](const auto &c) { return c.get() == current; });
+
+    if (it == clients.end() || std::next(it) == clients.end()) {
+        m_focused_client_stack->focus(clients.front().get());
+    } else {
+        m_focused_client_stack->focus(std::next(it)->get());
+    }
+}
+
+void InputController::focusPrev() {
+    const auto &clients = m_client_manager->clients();
+    if (clients.empty()) return;
+
+    KakouneClient *current = m_focused_client_stack->focused();
+    auto it = std::find_if(clients.begin(), clients.end(),
+                           [current](const auto &c) { return c.get() == current; });
+
+    if (it == clients.end() || it == clients.begin()) {
+        m_focused_client_stack->focus(clients.back().get());
+    } else {
+        m_focused_client_stack->focus(std::prev(it)->get());
+    }
 }
 
 void InputController::update() {
