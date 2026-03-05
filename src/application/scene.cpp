@@ -81,16 +81,6 @@ void Scene::render()
         static_cast<float>(m_window->getHeight()),
     };
 
-    if (focused->state.info_box.has_value() &&
-        (focused->state.info_box->title.size() > 0 || focused->state.info_box->content.size() > 0)) // TODO if content and title size == 0, it should just be a nullopt
-    {
-        Pane *pane = m_pane_layout->findPaneForClient(focused);
-        if (pane) {
-            m_info_box_view->render(focused_context, focused->info_box_state, *focused->state.info_box,
-                                    focused->state.cursor_position, pane->bounds);
-        }
-    }
-
     if (focused->state.menu.has_value()) {
         int cursor_column = -1;
         if (std::holds_alternative<domain::StatusLinePosition>(focused->state.cursor_position)) {
@@ -102,6 +92,16 @@ void Scene::render()
 
         m_multi_styled_menu->render(focused_context, focused->menu_state, *focused->state.menu,
                                     cursor_column, content_bounds);
+    }
+
+    if (focused->state.info_box.has_value() &&
+        (focused->state.info_box->title.size() > 0 || focused->state.info_box->content.size() > 0)) // TODO if content and title size == 0, it should just be a nullopt
+    {
+        Pane *pane = m_pane_layout->findPaneForClient(focused);
+        if (pane) {
+            m_info_box_view->render(focused_context, focused->info_box_state, *focused->state.info_box,
+                                    focused->state.cursor_position, pane->bounds);
+        }
     }
 }
 
