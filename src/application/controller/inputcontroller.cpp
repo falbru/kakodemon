@@ -13,9 +13,11 @@ InputController::~InputController() {
 
 }
 
-void InputController::init(FocusedClientStack *focused_client_stack, ClientManager *client_manager, domain::Window *window) {
+void InputController::init(FocusedClientStack *focused_client_stack, ClientManager *client_manager, domain::Window *window, PaneLayout *pane_layout) {
     m_focused_client_stack = focused_client_stack;
     m_client_manager = client_manager;
+    m_pane_layout = pane_layout;
+    m_window = window;
 
     window->onKeyInput([this](domain::KeyEvent event) {
         onKeyInput(event);
@@ -48,6 +50,30 @@ bool InputController::tryHandleGlobalKeybinding(const domain::KeyEvent &event) {
     }
     if (key == "k" || key == "K") {
         focusPrev();
+        return true;
+    }
+    if (key == "h" || key == "H") {
+        m_pane_layout->setMasterRatio(m_pane_layout->getMasterRatio() - 0.05f);
+        m_pane_layout->arrange();
+        m_window->setNeedsRerender();
+        return true;
+    }
+    if (key == "l" || key == "L") {
+        m_pane_layout->setMasterRatio(m_pane_layout->getMasterRatio() + 0.05f);
+        m_pane_layout->arrange();
+        m_window->setNeedsRerender();
+        return true;
+    }
+    if (key == "i" || key == "I") {
+        m_pane_layout->setNumMasters(m_pane_layout->getNumMasters() + 1);
+        m_pane_layout->arrange();
+        m_window->setNeedsRerender();
+        return true;
+    }
+    if (key == "d" || key == "D") {
+        m_pane_layout->setNumMasters(m_pane_layout->getNumMasters() - 1);
+        m_pane_layout->arrange();
+        m_window->setNeedsRerender();
         return true;
     }
     return false;

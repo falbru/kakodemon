@@ -1,6 +1,7 @@
 #include "panelayout.hpp"
 #include "application/model/clientmanager.hpp"
 #include "application/model/kakouneclient.hpp"
+#include <algorithm>
 
 void PaneLayout::init(ClientManager* client_manager) {
     m_panes.clear();
@@ -32,54 +33,100 @@ void PaneLayout::arrange() {
 }
 
 void PaneLayout::arrangeTall() {
-    if (m_panes.size() == 1) {
-        m_panes[0].bounds = m_bounds;
+    size_t master_count = std::min(static_cast<size_t>(m_num_masters), m_panes.size());
+    size_t stack_count = m_panes.size() - master_count;
+
+    if (stack_count == 0) {
+        float n = static_cast<float>(master_count);
+        float pane_height = (m_bounds.height - (n - 1) * BORDER_WIDTH) / n;
+        for (size_t i = 0; i < master_count; ++i) {
+            m_panes[i].bounds = {
+                m_bounds.x,
+                m_bounds.y + (pane_height + BORDER_WIDTH) * static_cast<float>(i),
+                m_bounds.width,
+                pane_height
+            };
+        }
         return;
     }
 
-    float main_width = m_bounds.width * 0.6f;
-    float stack_width = m_bounds.width - main_width - BORDER_WIDTH;
-    float stack_x = m_bounds.x + main_width + BORDER_WIDTH;
+    float master_width = m_bounds.width * m_master_ratio;
+    float stack_width = m_bounds.width - master_width - BORDER_WIDTH;
+    float stack_x = m_bounds.x + master_width + BORDER_WIDTH;
 
-    m_panes[0].bounds = {m_bounds.x, m_bounds.y, main_width, m_bounds.height};
+    {
+        float n = static_cast<float>(master_count);
+        float pane_height = (m_bounds.height - (n - 1) * BORDER_WIDTH) / n;
+        for (size_t i = 0; i < master_count; ++i) {
+            m_panes[i].bounds = {
+                m_bounds.x,
+                m_bounds.y + (pane_height + BORDER_WIDTH) * static_cast<float>(i),
+                master_width,
+                pane_height
+            };
+        }
+    }
 
-    size_t stack_count = m_panes.size() - 1;
-    float n = static_cast<float>(stack_count);
-    float pane_height = (m_bounds.height - (n - 1) * BORDER_WIDTH) / n;
-
-    for (size_t i = 0; i < stack_count; ++i) {
-        m_panes[i + 1].bounds = {
-            stack_x,
-            m_bounds.y + (pane_height + BORDER_WIDTH) * static_cast<float>(i),
-            stack_width,
-            pane_height
-        };
+    {
+        float n = static_cast<float>(stack_count);
+        float pane_height = (m_bounds.height - (n - 1) * BORDER_WIDTH) / n;
+        for (size_t i = 0; i < stack_count; ++i) {
+            m_panes[master_count + i].bounds = {
+                stack_x,
+                m_bounds.y + (pane_height + BORDER_WIDTH) * static_cast<float>(i),
+                stack_width,
+                pane_height
+            };
+        }
     }
 }
 
 void PaneLayout::arrangeWide() {
-    if (m_panes.size() == 1) {
-        m_panes[0].bounds = m_bounds;
+    size_t master_count = std::min(static_cast<size_t>(m_num_masters), m_panes.size());
+    size_t stack_count = m_panes.size() - master_count;
+
+    if (stack_count == 0) {
+        float n = static_cast<float>(master_count);
+        float pane_width = (m_bounds.width - (n - 1) * BORDER_WIDTH) / n;
+        for (size_t i = 0; i < master_count; ++i) {
+            m_panes[i].bounds = {
+                m_bounds.x + (pane_width + BORDER_WIDTH) * static_cast<float>(i),
+                m_bounds.y,
+                pane_width,
+                m_bounds.height
+            };
+        }
         return;
     }
 
-    float main_height = m_bounds.height * 0.6f;
-    float stack_height = m_bounds.height - main_height - BORDER_WIDTH;
-    float stack_y = m_bounds.y + main_height + BORDER_WIDTH;
+    float master_height = m_bounds.height * m_master_ratio;
+    float stack_height = m_bounds.height - master_height - BORDER_WIDTH;
+    float stack_y = m_bounds.y + master_height + BORDER_WIDTH;
 
-    m_panes[0].bounds = {m_bounds.x, m_bounds.y, m_bounds.width, main_height};
+    {
+        float n = static_cast<float>(master_count);
+        float pane_width = (m_bounds.width - (n - 1) * BORDER_WIDTH) / n;
+        for (size_t i = 0; i < master_count; ++i) {
+            m_panes[i].bounds = {
+                m_bounds.x + (pane_width + BORDER_WIDTH) * static_cast<float>(i),
+                m_bounds.y,
+                pane_width,
+                master_height
+            };
+        }
+    }
 
-    size_t stack_count = m_panes.size() - 1;
-    float n = static_cast<float>(stack_count);
-    float pane_width = (m_bounds.width - (n - 1) * BORDER_WIDTH) / n;
-
-    for (size_t i = 0; i < stack_count; ++i) {
-        m_panes[i + 1].bounds = {
-            m_bounds.x + (pane_width + BORDER_WIDTH) * static_cast<float>(i),
-            stack_y,
-            pane_width,
-            stack_height
-        };
+    {
+        float n = static_cast<float>(stack_count);
+        float pane_width = (m_bounds.width - (n - 1) * BORDER_WIDTH) / n;
+        for (size_t i = 0; i < stack_count; ++i) {
+            m_panes[master_count + i].bounds = {
+                m_bounds.x + (pane_width + BORDER_WIDTH) * static_cast<float>(i),
+                stack_y,
+                pane_width,
+                stack_height
+            };
+        }
     }
 }
 
@@ -89,6 +136,22 @@ void PaneLayout::setLayoutType(LayoutType layout_type) {
 
 LayoutType PaneLayout::getLayoutType() const {
     return m_layout_type;
+}
+
+void PaneLayout::setNumMasters(int num_masters) {
+    m_num_masters = std::max(1, num_masters);
+}
+
+int PaneLayout::getNumMasters() const {
+    return m_num_masters;
+}
+
+void PaneLayout::setMasterRatio(float master_ratio) {
+    m_master_ratio = std::max(0.1f, std::min(0.9f, master_ratio));
+}
+
+float PaneLayout::getMasterRatio() const {
+    return m_master_ratio;
 }
 
 Pane* PaneLayout::findPaneAt(float x, float y) {

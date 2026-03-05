@@ -29,6 +29,10 @@ class PaneLayout
     void setBounds(const domain::Rectangle &bounds);
     void setLayoutType(LayoutType layout_type);
     LayoutType getLayoutType() const;
+    void setNumMasters(int num_masters);
+    int getNumMasters() const;
+    void setMasterRatio(float master_ratio);
+    float getMasterRatio() const;
 
     Pane *findPaneAt(float x, float y);
     Pane *findPaneForClient(KakouneClient *client);
@@ -46,6 +50,8 @@ class PaneLayout
     ObserverList<const std::vector<Pane> &> m_arrange_observers;
     domain::Rectangle m_bounds;
     LayoutType m_layout_type = LayoutType::TALL;
+    int m_num_masters = 1;
+    float m_master_ratio = 0.6f;
 };
 
 #endif

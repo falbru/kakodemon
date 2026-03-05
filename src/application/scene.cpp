@@ -51,7 +51,7 @@ void Scene::init(ClientManager *client_manager, FocusedClientStack *focused_clie
 
 void Scene::render()
 {
-    m_pane_border_view->render(m_pane_layout->getPanes(), m_pane_layout->getLayoutType());
+    m_pane_border_view->render(m_pane_layout->getPanes(), m_pane_layout->getLayoutType(), m_pane_layout->getNumMasters());
 
     for (const auto &pane : m_pane_layout->getPanes()) {
         auto *client = pane.client;

@@ -9,7 +9,7 @@ class PaneBorderView
 {
   public:
     void init(domain::Renderer *renderer);
-    void render(const std::vector<Pane> &panes, LayoutType layout_type);
+    void render(const std::vector<Pane> &panes, LayoutType layout_type, int num_masters);
 
   private:
     domain::Renderer *m_renderer;
