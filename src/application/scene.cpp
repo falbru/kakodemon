@@ -167,8 +167,7 @@ void Scene::onMouseButton(domain::MouseButtonEvent event)
         m_content_view->handleMouseButton(pane->client, event, pane->bounds);
         m_active_mouse_client = pane->client;
     } else {
-
-        if (m_active_mouse_client) {
+        if (m_active_mouse_client && !hitTestMenu(event.x, event.y)) {
             Pane *pane = m_pane_layout->findPaneForClient(m_active_mouse_client);
             if (pane) {
                 m_content_view->handleMouseButton(m_active_mouse_client, event, pane->bounds);
