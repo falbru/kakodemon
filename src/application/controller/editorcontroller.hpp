@@ -2,6 +2,7 @@
 #define EDITORCONTROLLER_HPP_INCLUDED
 
 #include "application/model/clientmanager.hpp"
+#include "application/model/focusedclientstack.hpp"
 #include "application/model/panelayout.hpp"
 #include "application/view/kakounecontentview.hpp"
 #include "application/view/multistyledmenu.hpp"
@@ -16,15 +17,16 @@ class EditorController
   public:
     EditorController();
 
-    void init(ClientManager *client_manager, PaneLayout *pane_layout, KakouneContentView *kakoune_content_view,
-              StatusBarView *status_bar_view, domain::FontManager *font_manager, domain::Window *window,
-              MultiStyledMenuView *multi_styled_menu);
+    void init(ClientManager *client_manager, FocusedClientStack *focused_client_stack, PaneLayout *pane_layout,
+              KakouneContentView *kakoune_content_view, StatusBarView *status_bar_view,
+              domain::FontManager *font_manager, domain::Window *window, MultiStyledMenuView *multi_styled_menu);
     void update();
 
   private:
     void resizeClientsToPaneLayout(const std::vector<Pane> &panes);
 
     ClientManager *m_client_manager;
+    FocusedClientStack *m_focused_client_stack;
     PaneLayout *m_pane_layout;
     KakouneContentView *m_kakoune_content_view;
     StatusBarView *m_status_bar_view;

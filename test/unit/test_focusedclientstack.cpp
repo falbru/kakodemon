@@ -93,25 +93,36 @@ TEST_CASE("FocusedClientStack - stack order preserved across multiple focuses", 
 TEST_CASE("FocusedClientStack - onFocusChanged fires when focus changes", "[focusedclientstack]")
 {
     FocusedClientStack stack;
-    KakouneClient* notified = nullptr;
-    stack.onFocusChanged([&](KakouneClient* client) { notified = client; });
+    KakouneClient* notified_previous = reinterpret_cast<KakouneClient*>(0xFF);
+    KakouneClient* notified_next = nullptr;
+    stack.onFocusChanged([&](KakouneClient* previous, KakouneClient* next) {
+        notified_previous = previous;
+        notified_next = next;
+    });
 
     stack.focus(A);
-    REQUIRE(notified == A);
+    REQUIRE(notified_previous == nullptr);
+    REQUIRE(notified_next == A);
 
     stack.focus(B);
-    REQUIRE(notified == B);
+    REQUIRE(notified_previous == A);
+    REQUIRE(notified_next == B);
 }
 
 TEST_CASE("FocusedClientStack - onFocusChanged fires with nullptr when last client removed", "[focusedclientstack]")
 {
     FocusedClientStack stack;
-    KakouneClient* notified = reinterpret_cast<KakouneClient*>(0xFF);
-    stack.onFocusChanged([&](KakouneClient* client) { notified = client; });
+    KakouneClient* notified_previous = nullptr;
+    KakouneClient* notified_next = reinterpret_cast<KakouneClient*>(0xFF);
+    stack.onFocusChanged([&](KakouneClient* previous, KakouneClient* next) {
+        notified_previous = previous;
+        notified_next = next;
+    });
 
     stack.focus(A);
     stack.remove(A);
-    REQUIRE(notified == nullptr);
+    REQUIRE(notified_previous == A);
+    REQUIRE(notified_next == nullptr);
 }
 
 TEST_CASE("FocusedClientStack - onFocusChanged does not fire when non-focused client removed", "[focusedclientstack]")
@@ -121,7 +132,7 @@ TEST_CASE("FocusedClientStack - onFocusChanged does not fire when non-focused cl
     stack.focus(B);
 
     int call_count = 0;
-    stack.onFocusChanged([&](KakouneClient*) { call_count++; });
+    stack.onFocusChanged([&](KakouneClient*, KakouneClient*) { call_count++; });
 
     stack.remove(A);
     REQUIRE(call_count == 0);
@@ -132,7 +143,7 @@ TEST_CASE("FocusedClientStack - removeObserver stops notifications", "[focusedcl
 {
     FocusedClientStack stack;
     int call_count = 0;
-    ObserverId id = stack.onFocusChanged([&](KakouneClient*) { call_count++; });
+    ObserverId id = stack.onFocusChanged([&](KakouneClient*, KakouneClient*) { call_count++; });
 
     stack.focus(A);
     REQUIRE(call_count == 1);

@@ -6,12 +6,13 @@ KakouneClient *FocusedClientStack::focused() const {
 }
 
 void FocusedClientStack::focus(KakouneClient *client) {
+    KakouneClient *previous = focused();
     auto it = std::find(m_stack.begin(), m_stack.end(), client);
     if (it != m_stack.end()) {
         m_stack.erase(it);
     }
     m_stack.push_back(client);
-    m_focus_changed_observers.notify(client);
+    m_focus_changed_observers.notify(previous, client);
 }
 
 void FocusedClientStack::remove(KakouneClient *client) {
@@ -22,11 +23,11 @@ void FocusedClientStack::remove(KakouneClient *client) {
     m_stack.erase(it);
 
     if (was_focused) {
-        m_focus_changed_observers.notify(focused());
+        m_focus_changed_observers.notify(client, focused());
     }
 }
 
-ObserverId FocusedClientStack::onFocusChanged(std::function<void(KakouneClient *)> callback) {
+ObserverId FocusedClientStack::onFocusChanged(std::function<void(KakouneClient *, KakouneClient *)> callback) {
     return m_focus_changed_observers.addObserver(std::move(callback));
 }
 

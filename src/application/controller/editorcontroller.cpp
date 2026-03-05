@@ -1,5 +1,6 @@
 #include "editorcontroller.hpp"
 #include "application/model/clientmanager.hpp"
+#include "application/model/focusedclientstack.hpp"
 #include "domain/mouse.hpp"
 #include "domain/uioptions.hpp"
 
@@ -7,18 +8,28 @@ EditorController::EditorController()
 {
 }
 
-void EditorController::init(ClientManager *client_manager, PaneLayout *pane_layout,
-                             KakouneContentView *kakoune_content_view, StatusBarView *status_bar_view,
-                             domain::FontManager *font_manager, domain::Window *window,
-                             MultiStyledMenuView *multi_styled_menu)
+void EditorController::init(ClientManager *client_manager, FocusedClientStack *focused_client_stack,
+                             PaneLayout *pane_layout, KakouneContentView *kakoune_content_view,
+                             StatusBarView *status_bar_view, domain::FontManager *font_manager,
+                             domain::Window *window, MultiStyledMenuView *multi_styled_menu)
 {
     m_client_manager = client_manager;
+    m_focused_client_stack = focused_client_stack;
     m_pane_layout = pane_layout;
     m_kakoune_content_view = kakoune_content_view;
     m_status_bar_view = status_bar_view;
     m_font_manager = font_manager;
     m_window = window;
     m_multi_styled_menu = multi_styled_menu;
+
+    m_focused_client_stack->onFocusChanged([](KakouneClient *previous, KakouneClient *next) {
+        if (previous) {
+            previous->interface->pressKeys({"<focus_out>"});
+        }
+        if (next) {
+            next->interface->pressKeys({"<focus_in>"});
+        }
+    });
 
     m_pane_layout->onArrange([this](const std::vector<Pane> &panes) {
         resizeClientsToPaneLayout(panes);
