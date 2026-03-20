@@ -345,7 +345,7 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
     switch (info_box.style)
     {
     case domain::InfoStyle::PROMPT:
-        if (m_multi_styled_menu->height() > 0)
+        if (m_multi_styled_menu->isVisible())
         {
             anchor = {m_multi_styled_menu->x(), m_multi_styled_menu->y(), m_multi_styled_menu->width(),
                       m_multi_styled_menu->height()};

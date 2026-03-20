@@ -2,6 +2,7 @@
 #include "application/model/focusedclientstack.hpp"
 #include "application/view/rendercontext.hpp"
 #include "domain/editor.hpp"
+#include "domain/geometry.hpp"
 #include "domain/mouse.hpp"
 
 Scene::Scene() {}
@@ -90,8 +91,11 @@ void Scene::render()
         Pane *pane = m_pane_layout->findPaneForClient(focused);
         std::optional<domain::Rectangle> content_bounds = pane ? std::optional<domain::Rectangle>(pane->bounds) : std::nullopt;
 
+        m_multi_styled_menu->setVisible(true);
         m_multi_styled_menu->render(focused_context, focused->menu_state, *focused->state.menu,
                                     cursor_column, content_bounds);
+    }else {
+        m_multi_styled_menu->setVisible(false);
     }
 
     if (focused->state.info_box.has_value() &&
@@ -100,7 +104,7 @@ void Scene::render()
         Pane *pane = m_pane_layout->findPaneForClient(focused);
         if (pane) {
             m_info_box_view->render(focused_context, focused->info_box_state, *focused->state.info_box,
-                                    focused->state.cursor_position, pane->bounds);
+                                    focused->state.cursor_position, domain::Rectangle{0, 0, m_window->getWidth(), m_window->getHeight()});
         }
     }
 }

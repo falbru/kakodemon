@@ -26,6 +26,8 @@ void MultiStyledMenuView::render(const RenderContext &render_context, MultiStyle
                                   const domain::Menu &menu, int cursor_column,
                                   std::optional<domain::Rectangle> content_bounds)
 {
+    if (!m_visible) return;
+
     m_last_style = menu.getStyle();
     switch (menu.getStyle()) {
         case domain::MenuStyle::INLINE:
@@ -110,8 +112,18 @@ void MultiStyledMenuView::removeObserver(ObserverId id)
     m_mouse_button_observers.removeObserver(id);
 }
 
+void MultiStyledMenuView::setVisible(bool visible) {
+    m_visible = visible;
+}
+
+bool MultiStyledMenuView::isVisible() {
+    return m_visible;
+}
+
 float MultiStyledMenuView::x() const
 {
+    if (!m_visible) return 0;
+
     switch (m_last_style) {
         case domain::MenuStyle::INLINE: return m_inline_menu->x();
         case domain::MenuStyle::PROMPT: return m_prompt_menu->x();
@@ -122,6 +134,8 @@ float MultiStyledMenuView::x() const
 
 float MultiStyledMenuView::y() const
 {
+    if (!m_visible) return 0;
+
     switch (m_last_style) {
         case domain::MenuStyle::INLINE: return m_inline_menu->y();
         case domain::MenuStyle::PROMPT: return m_prompt_menu->y();
@@ -132,6 +146,8 @@ float MultiStyledMenuView::y() const
 
 float MultiStyledMenuView::width() const
 {
+    if (!m_visible) return 0;
+
     switch (m_last_style) {
         case domain::MenuStyle::INLINE: return m_inline_menu->width();
         case domain::MenuStyle::PROMPT: return m_prompt_menu->width();
@@ -142,6 +158,8 @@ float MultiStyledMenuView::width() const
 
 float MultiStyledMenuView::height() const
 {
+    if (!m_visible) return 0;
+
     switch (m_last_style) {
         case domain::MenuStyle::INLINE: return m_inline_menu->height();
         case domain::MenuStyle::PROMPT: return m_prompt_menu->height();

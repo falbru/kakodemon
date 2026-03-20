@@ -33,6 +33,9 @@ class MultiStyledMenuView
     ObserverId onMouseButton(std::function<void(int)> callback);
     void removeObserver(ObserverId id);
 
+    void setVisible(bool visible);
+    bool isVisible();
+
     float x() const;
     float y() const;
     float width() const;
@@ -42,6 +45,8 @@ class MultiStyledMenuView
     std::unique_ptr<InlineMenuView> m_inline_menu;
     std::unique_ptr<PromptMenuView> m_prompt_menu;
     std::unique_ptr<SearchMenuView> m_search_menu;
+
+    bool m_visible = false;
 
     domain::MenuStyle m_last_style = domain::MenuStyle::PROMPT;
 
