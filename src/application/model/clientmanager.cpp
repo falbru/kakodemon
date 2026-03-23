@@ -8,10 +8,19 @@
 ClientManager::ClientManager(domain::KakouneSession* session) : m_session(session) {
 }
 
+int ClientManager::generateUniqueClientId() {
+    return m_next_client_id++;
+}
+
 KakouneClient* ClientManager::createClient(std::optional<std::string> startup_command, std::vector<std::string> file_arguments) {
-    auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*m_session, startup_command, file_arguments);
+    int client_id = generateUniqueClientId();
+    auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*m_session, client_id, startup_command, file_arguments);
     std::unique_ptr<KakouneClient> new_client = std::make_unique<KakouneClient>(m_session, std::move(interface));
     new_client->setUIOptions(m_default_ui_options);
+
+    new_client->client_id = client_id;
+    new_client->client_name = "";
+
     KakouneClient* new_client_ptr = new_client.get();
 
     m_clients.push_back(std::move(new_client));
@@ -50,4 +59,29 @@ void ClientManager::removeObserver(ObserverId id) {
 
 const std::vector<std::unique_ptr<KakouneClient>>& ClientManager::clients() const {
     return m_clients;
+}
+
+KakouneClient* ClientManager::findClientById(int client_id) {
+    for (auto& client : m_clients) {
+        if (client->client_id == client_id) {
+            return client.get();
+        }
+    }
+    return nullptr;
+}
+
+KakouneClient* ClientManager::findClientByName(const std::string& client_name) {
+    for (auto& client : m_clients) {
+        if (client->client_name == client_name) {
+            return client.get();
+        }
+    }
+    return nullptr;
+}
+
+void ClientManager::renameClient(int client_id, const std::string& new_name) {
+    KakouneClient* client = findClientById(client_id);
+    if (client) {
+        client->client_name = new_name;
+    }
 }

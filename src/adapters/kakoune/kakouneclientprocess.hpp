@@ -163,7 +163,7 @@ struct OutgoingRequest
 class KakouneClientProcess
 {
   public:
-    KakouneClientProcess(const std::string &session_name);
+    KakouneClientProcess(int client_id, const std::string &session_name);
     ~KakouneClientProcess();
 
     void start();
@@ -190,6 +190,7 @@ class KakouneClientProcess
     std::optional<IncomingRequest> parseRequest(std::string request);
 
     std::string m_session_name;
+    int m_client_id;
 
     int m_stdout_pipefd[2] = {-1, -1};
     int m_stdin_pipefd[2] = {-1, -1};

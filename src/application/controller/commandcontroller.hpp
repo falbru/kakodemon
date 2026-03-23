@@ -2,6 +2,7 @@
 #define COMMANDCONTROLLER_HPP_INCLUDED
 
 #include "application/model/clientmanager.hpp"
+#include "application/model/focusedclientstack.hpp"
 #include "application/model/panelayout.hpp"
 #include "domain/ports/commandinterface.hpp"
 #include "domain/ports/kakounesession.hpp"
@@ -13,7 +14,8 @@ class CommandController
     CommandController();
 
     void init(CommandInterface *command_interface, ClientManager *client_manager,
-              domain::KakouneSession *kakoune_session, domain::Window *window, PaneLayout *pane_layout);
+              domain::KakouneSession *kakoune_session, domain::Window *window, PaneLayout *pane_layout,
+              FocusedClientStack *focused_client_stack);
     void update();
 
   private:
@@ -22,6 +24,7 @@ class CommandController
     ClientManager *m_client_manager;
     domain::Window *m_window;
     PaneLayout *m_pane_layout;
+    FocusedClientStack *m_focused_client_stack;
 };
 
 #endif

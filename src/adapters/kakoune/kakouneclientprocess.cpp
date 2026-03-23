@@ -17,7 +17,7 @@
 #include "line.hpp"
 #include "spdlog/spdlog.h"
 
-KakouneClientProcess::KakouneClientProcess(const std::string &session_name) : m_session_name(session_name)
+KakouneClientProcess::KakouneClientProcess(int client_id, const std::string &session_name) : m_client_id(client_id), m_session_name(session_name)
 {
 }
 
@@ -118,6 +118,8 @@ void KakouneClientProcess::start(std::optional<std::string> startup_command, con
         close(m_stdout_pipefd[0]);
         dup2(m_stdout_pipefd[1], STDOUT_FILENO);
         close(m_stdout_pipefd[1]);
+
+        setenv("KAKOD_CLIENT_ID", std::to_string(m_client_id).c_str(), 1);
 
         std::vector<const char*> args;
         args.push_back("kak");

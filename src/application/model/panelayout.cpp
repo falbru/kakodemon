@@ -173,6 +173,8 @@ Pane* PaneLayout::findPaneForClient(KakouneClient* client) {
     return nullptr;
 }
 
+
+
 const std::vector<Pane>& PaneLayout::getPanes() const {
     return m_panes;
 }

@@ -23,6 +23,8 @@ class KakouneClient
     domain::KakouneState state;
     domain::KakouneSession *session;
     std::unique_ptr<domain::KakouneInterface> interface;
+    int client_id;
+    std::string client_name;
 
     MultiStyledMenuState menu_state;
     InputViewState status_line_state;

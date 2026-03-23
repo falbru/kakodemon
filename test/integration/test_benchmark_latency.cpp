@@ -23,7 +23,7 @@ TEST_CASE("Benchmark: JsonRpcKakouneInterface request-response latency", "[bench
     auto local_session = std::make_unique<LocalSession>(session_id);
     local_session->start({}, true);
 
-    auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*local_session, std::nullopt);
+    auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*local_session, 0, std::nullopt);
 
     std::mutex mtx;
     std::condition_variable cv;
@@ -65,7 +65,7 @@ TEST_CASE("Benchmark: KakouneClientProcess request callback latency", "[benchmar
     auto local_session = std::make_unique<LocalSession>(session_id);
     local_session->start({}, true);
 
-    auto process = std::make_unique<KakouneClientProcess>(session_id);
+    auto process = std::make_unique<KakouneClientProcess>(0, session_id);
 
     std::mutex mtx;
     std::condition_variable cv;

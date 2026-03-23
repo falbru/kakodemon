@@ -20,14 +20,19 @@ class ClientManager
     void removeObserver(ObserverId id);
 
     const std::vector<std::unique_ptr<KakouneClient>> &clients() const;
+    KakouneClient *findClientById(int client_id);
+    KakouneClient *findClientByName(const std::string &client_name);
+    void renameClient(int client_id, const std::string &new_name);
 
   private:
     domain::KakouneSession *m_session;
     domain::UIOptions m_default_ui_options;
     std::vector<std::unique_ptr<KakouneClient>> m_clients;
+    int m_next_client_id = 0;
 
     ObserverList<KakouneClient *> m_client_added_observers;
     ObserverList<KakouneClient *> m_client_removed_observers;
+    int generateUniqueClientId();
 };
 
 #endif

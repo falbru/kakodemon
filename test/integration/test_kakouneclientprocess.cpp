@@ -22,7 +22,7 @@ TEST_CASE("KakouneClientProcess executes startup_command", "[integration][kakoun
 
     std::string startup_command = "echo -to-file " + fifo_path + " test";
 
-    auto client_process = std::make_unique<KakouneClientProcess>(session_id);
+    auto client_process = std::make_unique<KakouneClientProcess>(0, session_id);
     REQUIRE_NOTHROW(client_process->start(startup_command));
 
     int fd = open(fifo_path.c_str(), O_RDONLY | O_NONBLOCK);
@@ -50,7 +50,7 @@ TEST_CASE("KakouneClientProcess starts without startup_command", "[integration][
     auto session = std::make_unique<LocalSession>(session_id);
     session->start();
 
-    auto client_process = std::make_unique<KakouneClientProcess>(session_id);
+    auto client_process = std::make_unique<KakouneClientProcess>(0, session_id);
 
     REQUIRE_NOTHROW(client_process->start());
 

@@ -8,13 +8,14 @@ CommandController::CommandController()
 {
 }
 
-void CommandController::init(CommandInterface *command_interface, ClientManager* client_manager, domain::KakouneSession *kakoune_session, domain::Window *window, PaneLayout *pane_layout)
+void CommandController::init(CommandInterface *command_interface, ClientManager* client_manager, domain::KakouneSession *kakoune_session, domain::Window *window, PaneLayout *pane_layout, FocusedClientStack *focused_client_stack)
 {
     m_command_interface = command_interface;
     m_client_manager = client_manager;
     m_kakoune_session = kakoune_session;
     m_window = window;
     m_pane_layout = pane_layout;
+    m_focused_client_stack = focused_client_stack;
 }
 
 void CommandController::update()
@@ -44,6 +45,21 @@ void CommandController::update()
                 }
 
                 m_client_manager->createClient(startup_command, {});
+            }
+        }else if (command.name == "rename-client" && !command.args.empty()) {
+            if (command.args.size() >= 2) {
+                try {
+                    int client_id = std::stoi(command.args[0]);
+                    std::string new_name = command.args[1];
+                    m_client_manager->renameClient(client_id, new_name);
+                } catch (const std::exception&) {
+                }
+            }
+        }else if (command.name == "focus" && !command.args.empty()) {
+            std::string client_name = command.args[0];
+            KakouneClient* client = m_client_manager->findClientByName(client_name);
+            if (client) {
+                m_focused_client_stack->focus(client);
             }
         }
     }
