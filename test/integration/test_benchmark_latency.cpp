@@ -17,7 +17,7 @@ void waitForRefresh(std::mutex &mtx, std::condition_variable &cv, bool &refreshe
     refreshed = false;
 }
 
-TEST_CASE("Benchmark: JsonRpcKakouneInterface request-response latency", "[benchmark][integration]")
+TEST_CASE("Benchmark: JsonRpcKakouneInterface request-response latency", "[!benchmark][integration]")
 {
     std::string session_id = "bench_jsonrpc_" + std::to_string(getpid());
     auto local_session = std::make_unique<LocalSession>(session_id);
@@ -59,7 +59,7 @@ TEST_CASE("Benchmark: JsonRpcKakouneInterface request-response latency", "[bench
     };
 }
 
-TEST_CASE("Benchmark: KakouneClientProcess request callback latency", "[benchmark][integration]")
+TEST_CASE("Benchmark: KakouneClientProcess request callback latency", "[!benchmark][integration]")
 {
     std::string session_id = "bench_clientproc_" + std::to_string(getpid());
     auto local_session = std::make_unique<LocalSession>(session_id);
