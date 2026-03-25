@@ -37,6 +37,9 @@ void EditorController::init(ClientManager *client_manager, FocusedClientStack *f
 
     m_kakoune_content_view->onMouseButton(
         [this](KakouneClient *client, domain::MouseButtonEvent event, domain::Coord coord) {
+            coord.line = std::max(0, coord.line);
+            coord.column = std::max(0, coord.column);
+
             if (event.action == domain::MouseButtonAction::PRESS) {
                 m_mouse_button_pressed[event.button] = true;
                 client->interface->pressMouseButton(event.button, coord.line, coord.column);
@@ -47,6 +50,9 @@ void EditorController::init(ClientManager *client_manager, FocusedClientStack *f
         });
 
     m_kakoune_content_view->onMouseMove([this](KakouneClient *client, domain::Coord coord) {
+        coord.line = std::max(0, coord.line);
+        coord.column = std::max(0, coord.column);
+
         for (const auto &[button, pressed] : m_mouse_button_pressed) {
             if (pressed) {
                 client->interface->moveMouse(coord.line, coord.column);
