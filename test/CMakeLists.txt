@@ -25,6 +25,7 @@ add_executable(tests
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/jsonrpckakouneinterface.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/kakouneclientprocess.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/kakouneframestatemanager.cpp
+    ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/statusstyle.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/line.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/menustyle.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/localsession.cpp

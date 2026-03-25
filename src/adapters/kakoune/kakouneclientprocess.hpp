@@ -16,6 +16,7 @@
 #include "infostyle.hpp"
 #include "line.hpp"
 #include "menustyle.hpp"
+#include "statusstyle.hpp"
 
 enum class IncomingRequestType
 {
@@ -44,6 +45,7 @@ struct DrawStatusRequestData
     int cursor_pos;
     kakoune::Line mode_line;
     kakoune::Face default_face;
+    kakoune::StatusStyle style;
 };
 
 struct MenuShowData

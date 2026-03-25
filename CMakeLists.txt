@@ -40,6 +40,7 @@ set(SRC
     src/adapters/kakoune/jsonrpckakouneinterface.cpp
     src/adapters/kakoune/kakouneclientprocess.cpp
     src/adapters/kakoune/kakouneframestatemanager.cpp
+    src/adapters/kakoune/statusstyle.cpp
     src/adapters/kakoune/line.cpp
     src/adapters/kakoune/localsession.cpp
     src/adapters/kakoune/menustyle.cpp
