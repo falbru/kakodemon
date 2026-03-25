@@ -52,9 +52,14 @@ ObserverId ClientManager::onClientRemoved(std::function<void(KakouneClient *)> c
     return m_client_removed_observers.addObserver(std::move(callback));
 }
 
+ObserverId ClientManager::onClientRenamed(std::function<void(KakouneClient *)> callback) {
+    return m_client_renamed_observers.addObserver(std::move(callback));
+}
+
 void ClientManager::removeObserver(ObserverId id) {
     m_client_added_observers.removeObserver(id);
     m_client_removed_observers.removeObserver(id);
+    m_client_renamed_observers.removeObserver(id);
 }
 
 const std::vector<std::unique_ptr<KakouneClient>>& ClientManager::clients() const {
@@ -83,5 +88,6 @@ void ClientManager::renameClient(int client_id, const std::string& new_name) {
     KakouneClient* client = findClientById(client_id);
     if (client) {
         client->client_name = new_name;
+        m_client_renamed_observers.notify(client);
     }
 }

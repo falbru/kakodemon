@@ -140,6 +140,7 @@ LayoutType PaneLayout::getLayoutType() const {
 
 void PaneLayout::setNumMasters(int num_masters) {
     m_num_masters = std::max(1, num_masters);
+    m_num_masters_changed_observers.notify(m_num_masters);
 }
 
 int PaneLayout::getNumMasters() const {
@@ -183,8 +184,13 @@ ObserverId PaneLayout::onArrange(std::function<void(const std::vector<Pane>&)> c
     return m_arrange_observers.addObserver(std::move(callback));
 }
 
+ObserverId PaneLayout::onNumMastersChanged(std::function<void(int)> callback) {
+    return m_num_masters_changed_observers.addObserver(std::move(callback));
+}
+
 void PaneLayout::removeObserver(ObserverId id) {
     m_arrange_observers.removeObserver(id);
+    m_num_masters_changed_observers.removeObserver(id);
 }
 
 void PaneLayout::setBounds(const domain::Rectangle& bounds) {

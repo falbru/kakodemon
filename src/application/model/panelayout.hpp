@@ -39,6 +39,7 @@ class PaneLayout
     const std::vector<Pane> &getPanes() const;
 
     ObserverId onArrange(std::function<void(const std::vector<Pane> &)> callback);
+    ObserverId onNumMastersChanged(std::function<void(int)> callback);
     void removeObserver(ObserverId id);
 
   private:
@@ -48,6 +49,7 @@ class PaneLayout
     std::vector<Pane> m_panes;
     ClientManager *m_client_manager;
     ObserverList<const std::vector<Pane> &> m_arrange_observers;
+    ObserverList<int> m_num_masters_changed_observers;
     domain::Rectangle m_bounds;
     LayoutType m_layout_type = LayoutType::TALL;
     int m_num_masters = 1;

@@ -105,6 +105,7 @@ void Application::init(const CliConfig &cli_config, const ApplicationConfig &app
     m_focus_controller = std::make_unique<FocusController>();
     m_input_controller = std::make_unique<InputController>();
     m_layout_controller = std::make_unique<LayoutController>();
+    m_master_client_controller = std::make_unique<MasterClientController>();
     m_scene = std::make_unique<Scene>();
 
     m_kakoune_content_view = std::make_unique<KakouneContentView>();
@@ -133,6 +134,7 @@ void Application::init(const CliConfig &cli_config, const ApplicationConfig &app
                   m_status_bar.get(), m_multi_styled_menu.get(), m_info_box.get(), m_font_manager.get(), m_window.get(),
                   m_pane_border_view.get());
     m_layout_controller->init(m_pane_layout.get(), m_client_manager.get(), m_window.get());
+    m_master_client_controller->init(m_kakoune_session.get(), m_pane_layout.get());
 
     m_client_manager->setDefaultUIOptions(domain::getDefaultUIOptions(m_font_manager.get()));
 

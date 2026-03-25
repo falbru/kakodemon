@@ -9,6 +9,7 @@ add_executable(tests
     unit/test_focusedclientstack.cpp
     unit/test_line.cpp
     unit/test_color.cpp
+    unit/test_masterclientcontroller.cpp
     integration/test_fontconfigresolver.cpp
     integration/test_localsession.cpp
     integration/test_kakouneclientprocess.cpp
@@ -30,8 +31,11 @@ add_executable(tests
     ${CMAKE_SOURCE_DIR}/src/adapters/namedpipe/namedpipecommandinterface.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/remotesession.cpp
     ${CMAKE_SOURCE_DIR}/src/adapters/kakoune/uioptions.cpp
+    ${CMAKE_SOURCE_DIR}/src/application/model/clientmanager.cpp
     ${CMAKE_SOURCE_DIR}/src/application/model/focusedclientstack.cpp
     ${CMAKE_SOURCE_DIR}/src/application/model/kakouneclient.cpp
+    ${CMAKE_SOURCE_DIR}/src/application/model/panelayout.cpp
+    ${CMAKE_SOURCE_DIR}/src/application/controllers/masterclientcontroller.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/alignment.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/atom.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/color.cpp

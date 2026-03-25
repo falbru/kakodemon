@@ -16,6 +16,7 @@ class LocalSession : public domain::KakouneSession
 
     std::string getSessionId() const override;
     void setSessionId(const std::string &session_id) override;
+    void sendCommand(const std::string &command) override;
 
   private:
     std::string m_session_id;

@@ -1,3 +1,5 @@
+declare-option str-list kakodemon_masters
+
 hook -group kakodemon global ClientCreate .* %{
     nop %sh{
         [ -z "$kak_client_env_KAKOD_ID" ] && exit

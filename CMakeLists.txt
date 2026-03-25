@@ -37,7 +37,6 @@ set(SRC
     src/adapters/kakoune/coord.cpp
     src/adapters/kakoune/face.cpp
     src/adapters/kakoune/infostyle.cpp
-    src/adapters/kakoune/infostyle.cpp
     src/adapters/kakoune/jsonrpckakouneinterface.cpp
     src/adapters/kakoune/kakouneclientprocess.cpp
     src/adapters/kakoune/kakouneframestatemanager.cpp
@@ -60,6 +59,7 @@ set(SRC
     src/application/controller/focuscontroller.cpp
     src/application/controller/inputcontroller.cpp
     src/application/controller/layoutcontroller.cpp
+    src/application/controllers/masterclientcontroller.cpp
     src/application/model/clientmanager.cpp
     src/application/model/focusedclientstack.cpp
     src/application/model/kakouneclient.cpp

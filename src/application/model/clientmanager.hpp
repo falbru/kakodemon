@@ -17,6 +17,7 @@ class ClientManager
 
     ObserverId onClientAdded(std::function<void(KakouneClient *)> callback);
     ObserverId onClientRemoved(std::function<void(KakouneClient *)> callback);
+    ObserverId onClientRenamed(std::function<void(KakouneClient *)> callback);
     void removeObserver(ObserverId id);
 
     const std::vector<std::unique_ptr<KakouneClient>> &clients() const;
@@ -32,6 +33,7 @@ class ClientManager
 
     ObserverList<KakouneClient *> m_client_added_observers;
     ObserverList<KakouneClient *> m_client_removed_observers;
+    ObserverList<KakouneClient *> m_client_renamed_observers;
     int generateUniqueClientId();
 };
 

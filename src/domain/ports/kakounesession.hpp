@@ -13,6 +13,7 @@ class KakouneSession
 
     virtual std::string getSessionId() const = 0;
     virtual void setSessionId(const std::string &session_id) = 0;
+    virtual void sendCommand(const std::string &command) = 0;
 };
 
 } // namespace domain
