@@ -40,8 +40,11 @@ void CommandController::update()
                 m_client_manager->createClient(std::nullopt, {});
             }else {
                 std::string startup_command;
-                for (const auto& str : command.args) {
-                    startup_command += str;
+                for (size_t i = 0; i < command.args.size(); i++) {
+                    if (i != 0) {
+                        startup_command += " ";
+                    }
+                    startup_command += command.args[i];
                 }
 
                 m_client_manager->createClient(startup_command, {});

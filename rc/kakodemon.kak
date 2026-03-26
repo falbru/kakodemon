@@ -20,14 +20,16 @@ hook -group kakodemon global ClientRenamed .* %{
     }
 }
 
-define-command kakodemon-new-client %{
+define-command kakodemon-new-client -params .. %{
     nop %sh{
         [ -z "$kak_client_env_KAKOD_ID" ] && exit
 
         KAKOD_ID=$kak_client_env_KAKOD_ID \
-        ~/code/github.com/falbru/kakodemon/build/kakod -p new-client
+        ~/code/github.com/falbru/kakodemon/build/kakod -p new-client "$@"
     }
 }
+
+complete-command kakodemon-new-client command
 
 alias global new kakodemon-new-client
 
