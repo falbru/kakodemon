@@ -18,6 +18,7 @@ void StatusBarView::render(const RenderContext &render_context, InputViewState &
 
     LayoutManager layout(bounds.x, bounds.y + bounds.height - bar_height, bounds.width, bar_height);
 
+    m_renderer->addBounds(bounds.x, bounds.y, bounds.width, bounds.height);
     m_renderer->renderRect(mode_line.getDefaultFace().getBg(render_context.ui_options.color_overrides), layout.current().x, layout.current().y, layout.current().width, layout.current().height);
 
     layout.pad(SPACING_SMALL);
@@ -32,6 +33,7 @@ void StatusBarView::render(const RenderContext &render_context, InputViewState &
 
         m_input_widget.render(m_renderer, render_context, render_context.ui_options.font_statusbar, mode_line.getStatusLine().value(), mode_line.getDefaultFace(), cursor_column, state, layout);
     }
+    m_renderer->popBounds();
 }
 
 float StatusBarView::height(domain::Font* font) {
