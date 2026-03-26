@@ -1,6 +1,8 @@
 #include "kakouneclientprocess.hpp"
 
 #include <cstdlib>
+#include <cerrno>
+#include <cstring>
 #include <optional>
 #include <stdexcept>
 #include <sys/poll.h>
@@ -209,6 +211,11 @@ void KakouneClientProcess::pollForRequests()
 
 void KakouneClientProcess::sendRequest(const OutgoingRequest &request)
 {
+    if (m_stdin_pipefd[1] == -1 || m_exited.load())
+    {
+        return;
+    }
+
     nlohmann::json data;
     data["jsonrpc"] = "2.0";
 
@@ -265,7 +272,14 @@ void KakouneClientProcess::sendRequest(const OutgoingRequest &request)
     ssize_t bytes_written = write(m_stdin_pipefd[1], json_str.c_str(), json_str.size());
     if (bytes_written == -1)
     {
-        spdlog::error("Failed to write to Kakoune client");
+        if (errno == EPIPE || errno == EBADF)
+        {
+            m_exited = true;
+        }
+        else
+        {
+            spdlog::error("Failed to write to Kakoune client: {}", strerror(errno));
+        }
     }
 }
 
