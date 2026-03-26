@@ -140,8 +140,8 @@ void Application::init(const CliConfig &cli_config, const ApplicationConfig &app
 
     m_client_manager->createClient(cli_config.startup_command, cli_config.session_type == SessionType::Remote ? cli_config.file_arguments : std::vector<std::string>{});
 
-    float initial_width = m_window->getWidth();
-    float initial_height = m_window->getHeight();
+    int initial_width = m_window->getWidth();
+    int initial_height = m_window->getHeight();
     m_pane_layout->setBounds(domain::Rectangle{0, 0, initial_width, initial_height});
     m_pane_layout->arrange();
 }

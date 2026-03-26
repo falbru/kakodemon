@@ -24,10 +24,10 @@ struct Vec2
 
 struct Rectangle
 {
-    float x;
-    float y;
-    float width;
-    float height;
+    int x;
+    int y;
+    int width;
+    int height;
 
     bool intersects(const Rectangle &Rectangle) const;
 };

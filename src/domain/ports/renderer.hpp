@@ -39,7 +39,7 @@ class Renderer
 
     virtual void init(int width, int height) = 0;
     virtual void onWindowResize(int width, int height) = 0;
-    virtual void addBounds(float x, float y, float width, float height) = 0;
+    virtual void addBounds(int x, int y, int width, int height) = 0;
     virtual void popBounds() = 0;
 
     virtual void renderRect(const RGBAColor color, float x, float y, float width, float height) const = 0;

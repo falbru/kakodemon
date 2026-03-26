@@ -28,7 +28,7 @@ class Renderer : public domain::Renderer
 
     void init(int width, int height) override;
     void onWindowResize(int width, int height) override;
-    void addBounds(float x, float y, float width, float height) override;
+    void addBounds(int x, int y, int width, int height) override;
     void popBounds() override;
 
     void renderRect(const domain::RGBAColor color, float x, float y, float width, float height) const override;

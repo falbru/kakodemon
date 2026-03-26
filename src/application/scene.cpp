@@ -62,8 +62,8 @@ void Scene::render()
             m_font_manager,
             client->state.default_face,
             client->uiOptions(),
-            bounds.width,
-            bounds.height,
+            static_cast<float>(bounds.width),
+            static_cast<float>(bounds.height),
         };
 
         m_content_view->render(render_context, client->state.content, client->state.default_face, bounds);
@@ -104,7 +104,7 @@ void Scene::render()
         Pane *pane = m_pane_layout->findPaneForClient(focused);
         if (pane) {
             m_info_box_view->render(focused_context, focused->info_box_state, *focused->state.info_box,
-                                    focused->state.cursor_position, domain::Rectangle{0, 0, m_window->getWidth(), m_window->getHeight()});
+                                    focused->state.cursor_position, domain::Rectangle{0, 0, static_cast<int>(m_window->getWidth()), static_cast<int>(m_window->getHeight())});
         }
     }
 }

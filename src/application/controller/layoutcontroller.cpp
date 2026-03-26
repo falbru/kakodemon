@@ -23,7 +23,7 @@ void LayoutController::init(PaneLayout* pane_layout, ClientManager* client_manag
     });
 
     window->onResize([this, window](int width, int height) {
-        m_pane_layout->setBounds(domain::Rectangle{0, 0, (float)width, (float)height});
+        m_pane_layout->setBounds(domain::Rectangle{0, 0, width, height});
         m_pane_layout->arrange();
         window->setNeedsRerender();
     });

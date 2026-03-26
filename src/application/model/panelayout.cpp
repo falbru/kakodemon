@@ -37,15 +37,20 @@ void PaneLayout::arrangeTall() {
     size_t stack_count = m_panes.size() - master_count;
 
     if (stack_count == 0) {
-        float n = static_cast<float>(master_count);
-        float pane_height = (m_bounds.height - (n - 1) * BORDER_WIDTH) / n;
+        int total_height = m_bounds.height - static_cast<int>(BORDER_WIDTH) * (master_count - 1);
+        int base_pane_height = total_height / master_count;
+        int remainder = total_height % master_count;
+        
+        int y_pos = m_bounds.y;
         for (size_t i = 0; i < master_count; ++i) {
+            int current_height = base_pane_height + (i < remainder ? 1 : 0);
             m_panes[i].bounds = {
                 m_bounds.x,
-                m_bounds.y + (pane_height + BORDER_WIDTH) * static_cast<float>(i),
+                y_pos,
                 m_bounds.width,
-                pane_height
+                current_height
             };
+            y_pos += current_height + static_cast<int>(BORDER_WIDTH);
         }
         return;
     }
@@ -55,28 +60,38 @@ void PaneLayout::arrangeTall() {
     float stack_x = m_bounds.x + master_width + BORDER_WIDTH;
 
     {
-        float n = static_cast<float>(master_count);
-        float pane_height = (m_bounds.height - (n - 1) * BORDER_WIDTH) / n;
+        int total_height = m_bounds.height - static_cast<int>(BORDER_WIDTH) * (master_count - 1);
+        int base_pane_height = total_height / master_count;
+        int remainder = total_height % master_count;
+        
+        int y_pos = m_bounds.y;
         for (size_t i = 0; i < master_count; ++i) {
+            int current_height = base_pane_height + (i < remainder ? 1 : 0);
             m_panes[i].bounds = {
                 m_bounds.x,
-                m_bounds.y + (pane_height + BORDER_WIDTH) * static_cast<float>(i),
-                master_width,
-                pane_height
+                y_pos,
+                static_cast<int>(master_width),
+                current_height
             };
+            y_pos += current_height + static_cast<int>(BORDER_WIDTH);
         }
     }
 
     {
-        float n = static_cast<float>(stack_count);
-        float pane_height = (m_bounds.height - (n - 1) * BORDER_WIDTH) / n;
+        int total_height = m_bounds.height - static_cast<int>(BORDER_WIDTH) * (stack_count - 1);
+        int base_pane_height = total_height / stack_count;
+        int remainder = total_height % stack_count;
+        
+        int y_pos = m_bounds.y;
         for (size_t i = 0; i < stack_count; ++i) {
+            int current_height = base_pane_height + (i < remainder ? 1 : 0);
             m_panes[master_count + i].bounds = {
-                stack_x,
-                m_bounds.y + (pane_height + BORDER_WIDTH) * static_cast<float>(i),
-                stack_width,
-                pane_height
+                static_cast<int>(stack_x),
+                y_pos,
+                static_cast<int>(stack_width),
+                current_height
             };
+            y_pos += current_height + static_cast<int>(BORDER_WIDTH);
         }
     }
 }
@@ -86,15 +101,20 @@ void PaneLayout::arrangeWide() {
     size_t stack_count = m_panes.size() - master_count;
 
     if (stack_count == 0) {
-        float n = static_cast<float>(master_count);
-        float pane_width = (m_bounds.width - (n - 1) * BORDER_WIDTH) / n;
+        int total_width = m_bounds.width - static_cast<int>(BORDER_WIDTH) * (master_count - 1);
+        int base_pane_width = total_width / master_count;
+        int remainder = total_width % master_count;
+        
+        int x_pos = m_bounds.x;
         for (size_t i = 0; i < master_count; ++i) {
+            int current_width = base_pane_width + (i < remainder ? 1 : 0);
             m_panes[i].bounds = {
-                m_bounds.x + (pane_width + BORDER_WIDTH) * static_cast<float>(i),
+                x_pos,
                 m_bounds.y,
-                pane_width,
+                current_width,
                 m_bounds.height
             };
+            x_pos += current_width + static_cast<int>(BORDER_WIDTH);
         }
         return;
     }
@@ -104,28 +124,38 @@ void PaneLayout::arrangeWide() {
     float stack_y = m_bounds.y + master_height + BORDER_WIDTH;
 
     {
-        float n = static_cast<float>(master_count);
-        float pane_width = (m_bounds.width - (n - 1) * BORDER_WIDTH) / n;
+        int total_width = m_bounds.width - static_cast<int>(BORDER_WIDTH) * (master_count - 1);
+        int base_pane_width = total_width / master_count;
+        int remainder = total_width % master_count;
+        
+        int x_pos = m_bounds.x;
         for (size_t i = 0; i < master_count; ++i) {
+            int current_width = base_pane_width + (i < remainder ? 1 : 0);
             m_panes[i].bounds = {
-                m_bounds.x + (pane_width + BORDER_WIDTH) * static_cast<float>(i),
+                x_pos,
                 m_bounds.y,
-                pane_width,
-                master_height
+                current_width,
+                static_cast<int>(master_height)
             };
+            x_pos += current_width + static_cast<int>(BORDER_WIDTH);
         }
     }
 
     {
-        float n = static_cast<float>(stack_count);
-        float pane_width = (m_bounds.width - (n - 1) * BORDER_WIDTH) / n;
+        int total_width = m_bounds.width - static_cast<int>(BORDER_WIDTH) * (stack_count - 1);
+        int base_pane_width = total_width / stack_count;
+        int remainder = total_width % stack_count;
+        
+        int x_pos = m_bounds.x;
         for (size_t i = 0; i < stack_count; ++i) {
+            int current_width = base_pane_width + (i < remainder ? 1 : 0);
             m_panes[master_count + i].bounds = {
-                m_bounds.x + (pane_width + BORDER_WIDTH) * static_cast<float>(i),
-                stack_y,
-                pane_width,
-                stack_height
+                x_pos,
+                static_cast<int>(stack_y),
+                current_width,
+                static_cast<int>(stack_height)
             };
+            x_pos += current_width + static_cast<int>(BORDER_WIDTH);
         }
     }
 }

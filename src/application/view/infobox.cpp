@@ -347,8 +347,8 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
     case domain::InfoStyle::PROMPT:
         if (m_multi_styled_menu->isVisible())
         {
-            anchor = {m_multi_styled_menu->x(), m_multi_styled_menu->y(), m_multi_styled_menu->width(),
-                      m_multi_styled_menu->height()};
+            anchor = {static_cast<int>(m_multi_styled_menu->x()), static_cast<int>(m_multi_styled_menu->y()), static_cast<int>(m_multi_styled_menu->width()),
+                      static_cast<int>(m_multi_styled_menu->height())};
             direction = PlacementDirection::BELOW;
             alignment = CrossAxisAlignment::START;
             fallback_directions = {PlacementDirection::ABOVE};
@@ -356,7 +356,7 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
         else
         {
             float statusbar_height = m_status_bar_view->height(render_context.ui_options.font_statusbar);
-            anchor = {0, render_context.screen_height - statusbar_height, render_context.screen_width, 0};
+            anchor = {0, static_cast<int>(render_context.screen_height - statusbar_height), static_cast<int>(render_context.screen_width), 0};
             direction = PlacementDirection::ABOVE;
             alignment = CrossAxisAlignment::END;
             fallback_directions = {PlacementDirection::FULL};
@@ -366,8 +366,8 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
     case domain::InfoStyle::INLINE: {
         auto pos = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, info_box.anchor,
                                                          content_bounds.x, content_bounds.y);
-        anchor = {pos.first, pos.second, m_kakoune_content_view->getCellWidth(render_context.ui_options.font_content),
-                  m_kakoune_content_view->getCellHeight(render_context.ui_options.font_content)};
+        anchor = {static_cast<int>(pos.first), static_cast<int>(pos.second), static_cast<int>(m_kakoune_content_view->getCellWidth(render_context.ui_options.font_content)),
+                  static_cast<int>(m_kakoune_content_view->getCellHeight(render_context.ui_options.font_content))};
         direction = PlacementDirection::BELOW;
         alignment = CrossAxisAlignment::START;
         fallback_directions = {PlacementDirection::ABOVE, PlacementDirection::RIGHT_WRAPPED,
@@ -378,8 +378,8 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
     case domain::InfoStyle::INLINE_ABOVE: {
         auto pos = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, info_box.anchor,
                                                          content_bounds.x, content_bounds.y);
-        anchor = {pos.first, pos.second, m_kakoune_content_view->getCellWidth(render_context.ui_options.font_content),
-                  m_kakoune_content_view->getCellHeight(render_context.ui_options.font_content)};
+        anchor = {static_cast<int>(pos.first), static_cast<int>(pos.second), static_cast<int>(m_kakoune_content_view->getCellWidth(render_context.ui_options.font_content)),
+                  static_cast<int>(m_kakoune_content_view->getCellHeight(render_context.ui_options.font_content))};
         direction = PlacementDirection::ABOVE;
         alignment = CrossAxisAlignment::START;
         fallback_directions = {PlacementDirection::BELOW, PlacementDirection::RIGHT_WRAPPED,
@@ -390,7 +390,7 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
     case domain::InfoStyle::INLINE_BELOW: {
         auto pos = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, info_box.anchor,
                                                          content_bounds.x, content_bounds.y);
-        anchor = {pos.first, pos.second, 0, m_kakoune_content_view->getCellHeight(render_context.ui_options.font_content)};
+        anchor = {static_cast<int>(pos.first), static_cast<int>(pos.second), 0, static_cast<int>(m_kakoune_content_view->getCellHeight(render_context.ui_options.font_content))};
         direction = PlacementDirection::BELOW;
         alignment = CrossAxisAlignment::START;
         fallback_directions = {PlacementDirection::ABOVE, PlacementDirection::RIGHT_WRAPPED,
@@ -399,8 +399,8 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
     break;
 
     case domain::InfoStyle::MENUDOC:
-        anchor = {m_multi_styled_menu->x(), m_multi_styled_menu->y(), m_multi_styled_menu->width(),
-                  m_multi_styled_menu->height()};
+        anchor = {static_cast<int>(m_multi_styled_menu->x()), static_cast<int>(m_multi_styled_menu->y()), static_cast<int>(m_multi_styled_menu->width()),
+                  static_cast<int>(m_multi_styled_menu->height())};
         direction = PlacementDirection::RIGHT;
         alignment = CrossAxisAlignment::START;
         fallback_directions = {PlacementDirection::LEFT, PlacementDirection::RIGHT_WRAPPED,
@@ -408,7 +408,7 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
         break;
 
     case domain::InfoStyle::MODAL:
-        anchor = {0, 0, render_context.screen_width, render_context.screen_height};
+        anchor = {0, 0, static_cast<int>(render_context.screen_width), static_cast<int>(render_context.screen_height)};
         direction = PlacementDirection::CENTER;
         alignment = CrossAxisAlignment::CENTER;
         fallback_directions = {PlacementDirection::FULL};
@@ -416,10 +416,10 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
     }
 
     domain::Rectangle menu_rectangle = {
-        m_multi_styled_menu->x(),
-        m_multi_styled_menu->y(),
-        m_multi_styled_menu->width(),
-        m_multi_styled_menu->height(),
+        static_cast<int>(m_multi_styled_menu->x()),
+        static_cast<int>(m_multi_styled_menu->y()),
+        static_cast<int>(m_multi_styled_menu->width()),
+        static_cast<int>(m_multi_styled_menu->height()),
     };
 
     std::optional<Placement> placement_opt;

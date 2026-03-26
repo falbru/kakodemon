@@ -16,6 +16,6 @@ enum class StatusStyle
 void to_json(nlohmann::json &j, const StatusStyle &style);
 void from_json(const nlohmann::json &j, StatusStyle &style);
 
-}
+} // namespace kakoune
 
 #endif

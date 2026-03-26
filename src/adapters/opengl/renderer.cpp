@@ -62,9 +62,9 @@ void opengl::Renderer::onWindowResize(int width, int height) {
     m_screen_height = height;
 }
 
-void opengl::Renderer::addBounds(float x, float y, float width, float height) {
+void opengl::Renderer::addBounds(int x, int y, int width, int height) {
     glEnable(GL_SCISSOR_TEST);
-    domain::Rectangle r{x, m_screen_height - height - y, width, height};
+    domain::Rectangle r{x, static_cast<int>(m_screen_height) - height - y, width, height};
     glScissor(r.x, r.y, r.width, r.height);
     m_bounds.push(r);
 }
