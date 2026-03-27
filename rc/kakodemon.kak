@@ -5,7 +5,9 @@ hook -group kakodemon global ClientCreate .* %{
         [ -z "$kak_client_env_KAKOD_ID" ] && exit
         [ -z "$kak_client_env_KAKOD_CLIENT_ID" ] && exit
 
-        KAKOD_ID=$kak_client_env_KAKOD_ID \
+        export KAKOD_ID=$kak_client_env_KAKOD_ID
+
+        kakod -p rename-session $kak_session
         kakod -p rename-client $kak_client_env_KAKOD_CLIENT_ID $kak_client
     }
 }
@@ -20,12 +22,23 @@ hook -group kakodemon global ClientRenamed .* %{
     }
 }
 
+hook -group kakodemon global SessionRenamed .* %{
+    evaluate-commands -client * %{
+        nop %sh{
+            [ -z "$kak_client_env_KAKOD_ID" ] && exit
+
+            KAKOD_ID=$kak_client_env_KAKOD_ID \
+            kakod -p rename-session $kak_session
+        }
+     }
+ }
+
 define-command kakodemon-new-client -params .. %{
     nop %sh{
         [ -z "$kak_client_env_KAKOD_ID" ] && exit
 
         KAKOD_ID=$kak_client_env_KAKOD_ID \
-        ~/code/github.com/falbru/kakodemon/build/kakod -p new-client "$@"
+        kakod -p new-client "$@"
     }
 }
 
