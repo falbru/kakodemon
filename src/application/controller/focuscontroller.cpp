@@ -2,12 +2,14 @@
 #include "application/model/clientmanager.hpp"
 #include "application/model/focusedclientstack.hpp"
 #include "application/model/kakouneclient.hpp"
+#include "application/view/multistyledmenu.hpp"
 
 void FocusController::init(FocusedClientStack *focused_client_stack, ClientManager *client_manager,
-                           PaneLayout *layout_controller, domain::Window *window) {
+                           PaneLayout *layout_controller, domain::Window *window, MultiStyledMenuView* menu_view) {
     m_focused_client_stack = focused_client_stack;
     m_pane_layout = layout_controller;
     m_client_manager = client_manager;
+    m_menu_view = menu_view;
 
     m_client_manager->onClientAdded([this](KakouneClient *client) {
         m_focused_client_stack->focus(client);
@@ -28,6 +30,10 @@ void FocusController::init(FocusedClientStack *focused_client_stack, ClientManag
 
 void FocusController::onMouseMove(float x, float y) {
     if (m_is_mouse_pressed) {
+        return;
+    }
+
+    if (m_menu_view->isVisible()) {
         return;
     }
 

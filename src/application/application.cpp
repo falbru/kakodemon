@@ -128,7 +128,7 @@ void Application::init(const CliConfig &cli_config, const ApplicationConfig &app
 
     m_command_controller->init(m_command_interface.get(), m_client_manager.get(), m_kakoune_session.get(), m_window.get(), m_pane_layout.get(), m_focused_client_stack.get());
     m_input_controller->init(m_focused_client_stack.get(), m_client_manager.get(), m_window.get(), m_pane_layout.get());
-    m_focus_controller->init(m_focused_client_stack.get(), m_client_manager.get(), m_pane_layout.get(), m_window.get());
+    m_focus_controller->init(m_focused_client_stack.get(), m_client_manager.get(), m_pane_layout.get(), m_window.get(), m_multi_styled_menu.get());
     m_editor_controller->init(m_client_manager.get(), m_focused_client_stack.get(), m_pane_layout.get(), m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager.get(), m_window.get(), m_multi_styled_menu.get());
     m_scene->init(m_client_manager.get(), m_focused_client_stack.get(), m_pane_layout.get(), m_kakoune_content_view.get(),
                   m_status_bar.get(), m_multi_styled_menu.get(), m_info_box.get(), m_font_manager.get(), m_window.get(),
