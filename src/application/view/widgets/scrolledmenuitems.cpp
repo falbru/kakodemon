@@ -18,6 +18,10 @@ void ScrolledMenuItems::render(domain::Renderer* renderer, const RenderContext &
 
     int selected_index = menu_items.selected_index;
 
+    if (state.items_scroll_offset + m_max_visible_items > menu_items.items.size()) {
+        state.items_scroll_offset = std::max(0, (int)menu_items.items.size() - m_max_visible_items);
+    }
+
     for (int i = state.items_scroll_offset; i < state.items_scroll_offset + m_max_visible_items && i < menu_items.items.size(); i++)
     {
         auto item = menu_items.items.at(i);
