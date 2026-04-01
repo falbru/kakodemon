@@ -63,7 +63,7 @@ void SearchMenuView::render(const RenderContext &render_context, MenuViewState &
             menu.getItems().face.getBg(render_context.default_face, render_context.ui_options.color_overrides), layout.current().x - SPACING_MEDIUM,
             layout.current().y, layout.current().width + SPACING_MEDIUM*2, layout.current().height + SPACING_MEDIUM, domain::CornerRadius(0.0f, 0.0f, CORNER_RADIUS, CORNER_RADIUS));
 
-        m_scrolled_menu_items->render(m_renderer, render_context, state, menu.getItems(), menu.getInputFace().getFg(render_context.default_face, render_context.ui_options.color_overrides), layout);
+        m_scrolled_menu_items->render(m_renderer, render_context, state, menu.getItems(), menu.getItems().face.getFg(render_context.default_face, render_context.ui_options.color_overrides), layout);
     }
 }
 
