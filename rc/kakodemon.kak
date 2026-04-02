@@ -1,3 +1,5 @@
+provide-module kakodemon %{
+
 declare-option str-list kakodemon_masters
 
 hook -group kakodemon global ClientCreate .* %{
@@ -33,7 +35,9 @@ hook -group kakodemon global SessionRenamed .* %{
      }
  }
 
-define-command kakodemon-new-client -params .. %{
+define-command -docstring '
+kakodemon-new-client [<commands>]: create a new Kakoune client in Kakodemon
+' -params .. kakodemon-new-client %{
     nop %sh{
         [ -z "$kak_client_env_KAKOD_ID" ] && exit
 
@@ -42,24 +46,25 @@ define-command kakodemon-new-client -params .. %{
     }
 }
 
-complete-command kakodemon-new-client command
+complete-command -menu kakodemon-new-client command
 
-alias global new kakodemon-new-client
-
-define-command kakodemon-focus -params 1 %{
+define-command -docstring "
+kakodemon-focus [<kakoune_client>]: focus a given client's pane in Kakodemon
+If no client is passed, then the current client is used
+" -params 0..1 kakodemon-focus %{
     nop %sh{
         [ -z "$kak_client_env_KAKOD_ID" ] && exit
 
         KAKOD_ID=$kak_client_env_KAKOD_ID \
-        kakod -p focus $1
+        kakod -p focus ${1:-$kak_client}
     }
 }
 
 complete-command -menu kakodemon-focus client
 
-alias global focus kakodemon-focus
-
-define-command -params 1 kakodemon-layout %{
+define-command -docstring "
+kakodemon-layout <layout>: select layouting algorithm for Kakodemon panes
+" -params 1 kakodemon-layout %{
     nop %sh{
         [ -z "$kak_client_env_KAKOD_ID" ] && exit
 
@@ -69,3 +74,17 @@ define-command -params 1 kakodemon-layout %{
 }
 
 complete-command -menu kakodemon-layout shell-script-candidates %{ printf 'tall\nwide\nfull\n' }
+
+alias global new kakodemon-new-client
+alias global focus kakodemon-focus
+
+}
+
+hook -group windowing global ClientCreate .* %{
+    evaluate-commands %sh{
+        [ -z "$kak_client_env_KAKOD_ID" ] && exit
+
+        printf "%s\n" "require-module kakodemon"
+        printf "%s\n" "set-option global windowing_module kakodemon"
+    }
+}
