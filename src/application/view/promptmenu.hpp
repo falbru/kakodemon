@@ -23,8 +23,12 @@ class PromptMenuView
     void handleMouseScroll(MenuViewState &state, int scroll_amount, const domain::Menu &menu);
     void ensureItemVisible(MenuViewState &state, int index);
 
-    ObserverId onMouseButton(std::function<void(int)> callback);
-    void removeObserver(ObserverId id);
+    domain::ObserverId onMouseButton(std::function<void(int)> callback);
+    void removeObserver(domain::ObserverId id);
+
+    void setX(float x);
+    void setY(float y);
+    void resetPosition();
 
     float x() const;
     float y() const;
@@ -37,11 +41,11 @@ class PromptMenuView
     float scrolledItemsHeight() const;
 
   private:
-    const float Y = 60.0f;
     const float WIDTH = 600.0f;
     const int MAX_VISIBLE_ITEMS = 25;
 
-    float m_x;
+    float m_x, m_y;
+    bool m_override_position;
     float m_height;
 
     KakouneContentView *m_kakoune_content_view;
@@ -50,7 +54,7 @@ class PromptMenuView
     std::unique_ptr<Input> m_input;
     std::unique_ptr<ScrolledMenuItems> m_scrolled_menu_items;
 
-    ObserverList<int> m_mouse_button_observers;
+    domain::ObserverList<int> m_mouse_button_observers;
 
     std::optional<int> findItemAtPosition(float x, float y, const MenuViewState &state, const domain::Menu &menu);
 };

@@ -1,6 +1,8 @@
 #ifndef OPENGL_WINDOW_HPP_INCLUDED
 #define OPENGL_WINDOW_HPP_INCLUDED
 
+#include "domain/eventfilters.hpp"
+#include "domain/mouse.hpp"
 #include "domain/observerlist.hpp"
 #include "domain/ports/window.hpp"
 #include "opengl.hpp"
@@ -29,14 +31,17 @@ class GLFWWindow : public domain::Window
     float getWidth() override;
     float getHeight() override;
 
-    ObserverId onResize(std::function<void(int, int)> callback) override;
-    ObserverId onKeyInput(std::function<void(domain::KeyEvent)> callback) override;
-    ObserverId onMouseMove(std::function<void(float, float)> callback) override;
-    ObserverId onMouseButton(std::function<void(domain::MouseButtonEvent)> callback) override;
-    ObserverId onMouseScroll(std::function<void(double)> callback) override;
-    ObserverId onClose(std::function<void()> callback) override;
-    ObserverId onMaximizedChanged(std::function<void(bool)> callback) override;
-    void removeObserver(ObserverId id) override;
+    domain::EventFilterId installEventFilter(std::function<bool(const domain::WindowEvent &)> event_filter) override;
+    void removeEventFilter(domain::EventFilterId id) override;
+
+    domain::ObserverId onResize(std::function<void(const domain::ResizeEvent &)> callback) override;
+    domain::ObserverId onKeyInput(std::function<void(const domain::KeyEvent &)> callback) override;
+    domain::ObserverId onMouseMove(std::function<void(const domain::MouseMoveEvent &)> callback) override;
+    domain::ObserverId onMouseButton(std::function<void(const domain::MouseButtonEvent &)> callback) override;
+    domain::ObserverId onMouseScroll(std::function<void(const domain::MouseScrollEvent &)> callback) override;
+    domain::ObserverId onClose(std::function<void(const domain::CloseEvent &)> callback) override;
+    domain::ObserverId onMaximizedChanged(std::function<void(const domain::MaximizedChangedEvent &)> callback) override;
+    void removeObserver(domain::ObserverId id) override;
 
   private:
     void onGLFWKeyInput(int key, int scancode, int action, int mods);
@@ -54,19 +59,21 @@ class GLFWWindow : public domain::Window
     GLFWwindow *m_window = nullptr;
     GLFWcursor *m_cursor_ibeam = nullptr;
     GLFWcursor *m_cursor_pointer = nullptr;
+    GLFWcursor *m_cursor_crosshair = nullptr;
 
     float m_cursor_x = 0.0f;
     float m_cursor_y = 0.0f;
 
     domain::RGBAColor m_clear_color = {};
 
-    ObserverList<int, int> m_resize_observers;
-    ObserverList<domain::KeyEvent> m_key_input_observers;
-    ObserverList<float, float> m_mouse_move_observers;
-    ObserverList<domain::MouseButtonEvent> m_mouse_button_observers;
-    ObserverList<double> m_mouse_scroll_observers;
-    ObserverList<> m_close_observers;
-    ObserverList<bool> m_maximized_changed_observers;
+    domain::EventFilters<domain::WindowEvent> m_event_filters;
+    domain::ObserverList<const domain::ResizeEvent &> m_resize_observers;
+    domain::ObserverList<const domain::KeyEvent &> m_key_input_observers;
+    domain::ObserverList<const domain::MouseMoveEvent &> m_mouse_move_observers;
+    domain::ObserverList<const domain::MouseButtonEvent &> m_mouse_button_observers;
+    domain::ObserverList<const domain::MouseScrollEvent &> m_mouse_scroll_observers;
+    domain::ObserverList<const domain::CloseEvent &> m_close_observers;
+    domain::ObserverList<const domain::MaximizedChangedEvent &> m_maximized_changed_observers;
 };
 
 } // namespace opengl

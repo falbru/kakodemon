@@ -174,8 +174,8 @@ class KakouneClientProcess
 
     void pollForRequests();
     void setRequestCallback(const std::function<void(const IncomingRequest &)> &callback);
-    ObserverId onExit(const std::function<void()> &callback);
-    void removeObserver(ObserverId id);
+    domain::ObserverId onExit(const std::function<void()> &callback);
+    void removeObserver(domain::ObserverId id);
 
     void sendRequest(const OutgoingRequest &request);
 
@@ -187,7 +187,7 @@ class KakouneClientProcess
     void registerProcess(pid_t pid);
     pid_t m_client_pid;
 
-    ObserverList<> m_exit_observers;
+    domain::ObserverList<> m_exit_observers;
 
     std::optional<IncomingRequest> parseRequest(std::string request);
 

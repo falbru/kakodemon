@@ -30,10 +30,10 @@ void KakouneClient::setUIOptions(domain::UIOptions ui_options) {
     m_ui_options_observers.notify(m_ui_options);
 }
 
-ObserverId KakouneClient::onUIOptionsChanged(std::function<void(const domain::UIOptions &)> callback) {
+domain::ObserverId KakouneClient::onUIOptionsChanged(std::function<void(const domain::UIOptions &)> callback) {
     return m_ui_options_observers.addObserver(std::move(callback));
 }
 
-void KakouneClient::removeUIOptionsObserver(ObserverId id) {
+void KakouneClient::removeUIOptionsObserver(domain::ObserverId id) {
     m_ui_options_observers.removeObserver(id);
 }

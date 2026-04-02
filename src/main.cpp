@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
         case ParseResult::SendCommand:
         {
             NamedPipeCommandInterface interface(parsed_args.command_request.pipe_id, PipeMode::Send);
-            Command cmd;
+            domain::Command cmd;
             cmd.name = parsed_args.command_request.command;
             cmd.args = parsed_args.command_request.args;
             if (!interface.sendCommand(cmd)) {

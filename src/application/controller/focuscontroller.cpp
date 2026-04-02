@@ -3,6 +3,7 @@
 #include "application/model/focusedclientstack.hpp"
 #include "application/model/kakouneclient.hpp"
 #include "application/view/multistyledmenu.hpp"
+#include "domain/mouse.hpp"
 
 void FocusController::init(FocusedClientStack *focused_client_stack, ClientManager *client_manager,
                            PaneLayout *layout_controller, domain::Window *window, MultiStyledMenuView* menu_view) {
@@ -19,11 +20,11 @@ void FocusController::init(FocusedClientStack *focused_client_stack, ClientManag
         m_focused_client_stack->remove(client);
     });
 
-    window->onMouseMove([this](float x, float y) {
-        onMouseMove(x, y);
+    window->onMouseMove([this](const domain::MouseMoveEvent& event) {
+        onMouseMove(event.x, event.y);
     });
 
-    window->onMouseButton([this](domain::MouseButtonEvent event) {
+    window->onMouseButton([this](const domain::MouseButtonEvent& event) {
         onMouseButton(event);
     });
 }

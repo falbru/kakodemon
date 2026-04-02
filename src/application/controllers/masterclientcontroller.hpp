@@ -18,7 +18,7 @@ class MasterClientController
   private:
     domain::KakouneSession *m_session = nullptr;
     PaneLayout *m_pane_layout = nullptr;
-    ObserverId m_arrange_observer;
+    domain::ObserverId m_arrange_observer;
     std::vector<std::string> m_cached_master_names;
 
     std::vector<std::string> getMasterClientNames() const;

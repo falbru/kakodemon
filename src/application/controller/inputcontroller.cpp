@@ -19,7 +19,7 @@ void InputController::init(FocusedClientStack *focused_client_stack, ClientManag
     m_pane_layout = pane_layout;
     m_window = window;
 
-    window->onKeyInput([this](domain::KeyEvent event) {
+    window->onKeyInput([this](const domain::KeyEvent& event) {
         onKeyInput(event);
     });
 }

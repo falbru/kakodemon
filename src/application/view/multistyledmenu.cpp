@@ -1,4 +1,5 @@
 #include "multistyledmenu.hpp"
+#include "domain/geometry.hpp"
 
 MultiStyledMenuView::MultiStyledMenuView() {}
 
@@ -102,22 +103,46 @@ void MultiStyledMenuView::ensureItemVisible(MultiStyledMenuState &state, int ind
     }
 }
 
-ObserverId MultiStyledMenuView::onMouseButton(std::function<void(int)> callback)
+domain::ObserverId MultiStyledMenuView::onMouseButton(std::function<void(int)> callback)
 {
     return m_mouse_button_observers.addObserver(std::move(callback));
 }
 
-void MultiStyledMenuView::removeObserver(ObserverId id)
+void MultiStyledMenuView::removeMouseButtonObserver(domain::ObserverId id)
 {
     m_mouse_button_observers.removeObserver(id);
 }
 
+domain::ObserverId MultiStyledMenuView::onVisibilityChanged(std::function<void(bool)> callback) {
+    return m_visibility_changed_observers.addObserver(callback);
+}
+
+
+void MultiStyledMenuView::removeVisibilityChanged(domain::ObserverId id) {
+    m_visibility_changed_observers.removeObserver(id);
+}
+
 void MultiStyledMenuView::setVisible(bool visible) {
-    m_visible = visible;
+    if (visible != m_visible) {
+        m_visible = visible;
+        m_visibility_changed_observers.notify(m_visible);
+    }
 }
 
 bool MultiStyledMenuView::isVisible() {
     return m_visible;
+}
+
+void MultiStyledMenuView::setX(float x) {
+    m_prompt_menu->setX(x); // Only support moving the prompt menu
+}
+
+void MultiStyledMenuView::setY(float y) {
+    m_prompt_menu->setY(y); // Only support moving the prompt menu
+}
+
+void MultiStyledMenuView::resetPosition() {
+    m_prompt_menu->resetPosition();
 }
 
 float MultiStyledMenuView::x() const
@@ -166,4 +191,13 @@ float MultiStyledMenuView::height() const
         case domain::MenuStyle::SEARCH: return m_search_menu->height();
     }
     return 0;
+}
+
+domain::Rectangle MultiStyledMenuView::bounds() const {
+    return domain::Rectangle{
+        static_cast<int>(x()),
+        static_cast<int>(y()),
+        static_cast<int>(width()),
+        static_cast<int>(height()),
+    };
 }

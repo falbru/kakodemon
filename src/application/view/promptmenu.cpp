@@ -7,7 +7,7 @@
 #include "widgets/scrolledmenuitems.hpp"
 #include <cmath>
 
-PromptMenuView::PromptMenuView()
+PromptMenuView::PromptMenuView() : m_override_position(false)
 {
 }
 
@@ -24,7 +24,12 @@ void PromptMenuView::render(const RenderContext& render_context, MenuViewState &
 {
     domain::Font* font = render_context.ui_options.font_menu;
 
-    m_x = round((render_context.screen_width - WIDTH) / 2);
+
+    if (!m_override_position) {
+        m_x = round((render_context.screen_width - WIDTH) / 2);
+        m_y = 60;
+    }
+
     m_height = 2 * BORDER_THICKNESS + 4 * SPACING_MEDIUM + m_input->height(font);
 
     float items_size = menu.hasItems() ? std::min(MAX_VISIBLE_ITEMS, (int)menu.getItems().items.size()) : 0;
@@ -33,7 +38,7 @@ void PromptMenuView::render(const RenderContext& render_context, MenuViewState &
         m_height += BORDER_THICKNESS + font->getLineHeight() * items_size;
     }
 
-    LayoutManager layout(m_x, Y, WIDTH, m_height);
+    LayoutManager layout(m_x, m_y, WIDTH, m_height);
 
     m_renderer->renderRoundedRectWithShadow(
         getRGBAColor(render_context.ui_options.color_border, default_border_color), layout.current().x,
@@ -65,12 +70,26 @@ void PromptMenuView::render(const RenderContext& render_context, MenuViewState &
     }
 }
 
+void PromptMenuView::setX(float x) {
+    m_x = x;
+    m_override_position = true;
+}
+
+void PromptMenuView::setY(float y) {
+    m_y = y;
+    m_override_position = true;
+}
+
+void PromptMenuView::resetPosition() {
+    m_override_position = false;
+}
+
 float PromptMenuView::x() const {
     return m_x;
 }
 
 float PromptMenuView::y() const {
-    return Y;
+    return m_y;
 }
 
 float PromptMenuView::width() const {
@@ -130,11 +149,11 @@ bool PromptMenuView::handleMouseButton(domain::MouseButtonEvent event, MenuViewS
     return false;
 }
 
-ObserverId PromptMenuView::onMouseButton(std::function<void(int)> callback) {
+domain::ObserverId PromptMenuView::onMouseButton(std::function<void(int)> callback) {
     return m_mouse_button_observers.addObserver(std::move(callback));
 }
 
-void PromptMenuView::removeObserver(ObserverId id) {
+void PromptMenuView::removeObserver(domain::ObserverId id) {
     m_mouse_button_observers.removeObserver(id);
 }
 

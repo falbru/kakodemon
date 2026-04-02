@@ -10,7 +10,8 @@ enum class Cursor
 {
     DEFAULT,
     IBEAM,
-    POINTER
+    POINTER,
+    CROSSHAIR,
 };
 
 enum class MouseButton
@@ -33,6 +34,17 @@ struct MouseButtonEvent
     int modifiers;
     float x;
     float y;
+};
+
+struct MouseMoveEvent
+{
+    float x;
+    float y;
+};
+
+struct MouseScrollEvent
+{
+    double scroll_amount;
 };
 
 struct MouseMoveResult

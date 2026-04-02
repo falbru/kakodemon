@@ -10,6 +10,7 @@
 #include "application/controller/focuscontroller.hpp"
 #include "application/controller/inputcontroller.hpp"
 #include "application/controller/layoutcontroller.hpp"
+#include "application/controller/movablemenucontroller.hpp"
 #include "application/controllers/masterclientcontroller.hpp"
 #include "application/model/clientmanager.hpp"
 #include "application/model/focusedclientstack.hpp"
@@ -50,7 +51,7 @@ class Application
     std::string m_kakodemon_id;
     ApplicationConfig m_app_config;
 
-    std::unique_ptr<CommandInterface> m_command_interface;
+    std::unique_ptr<domain::CommandInterface> m_command_interface;
 
     std::unique_ptr<domain::KakouneSession> m_kakoune_session;
     std::unique_ptr<ClientManager> m_client_manager;
@@ -63,6 +64,7 @@ class Application
     std::unique_ptr<LayoutController> m_layout_controller;
     std::unique_ptr<InputController> m_input_controller;
     std::unique_ptr<MasterClientController> m_master_client_controller;
+    std::unique_ptr<MovableMenuController> m_movable_menu_controller;
     std::unique_ptr<Scene> m_scene;
 
     std::unique_ptr<KakouneContentView> m_kakoune_content_view;

@@ -44,19 +44,19 @@ void ClientManager::removeClient(KakouneClient *client) {
     }
 }
 
-ObserverId ClientManager::onClientAdded(std::function<void(KakouneClient *)> callback) {
+domain::ObserverId ClientManager::onClientAdded(std::function<void(KakouneClient *)> callback) {
     return m_client_added_observers.addObserver(std::move(callback));
 }
 
-ObserverId ClientManager::onClientRemoved(std::function<void(KakouneClient *)> callback) {
+domain::ObserverId ClientManager::onClientRemoved(std::function<void(KakouneClient *)> callback) {
     return m_client_removed_observers.addObserver(std::move(callback));
 }
 
-ObserverId ClientManager::onClientRenamed(std::function<void(KakouneClient *)> callback) {
+domain::ObserverId ClientManager::onClientRenamed(std::function<void(KakouneClient *)> callback) {
     return m_client_renamed_observers.addObserver(std::move(callback));
 }
 
-void ClientManager::removeObserver(ObserverId id) {
+void ClientManager::removeObserver(domain::ObserverId id) {
     m_client_added_observers.removeObserver(id);
     m_client_removed_observers.removeObserver(id);
     m_client_renamed_observers.removeObserver(id);

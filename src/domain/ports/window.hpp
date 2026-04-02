@@ -5,12 +5,31 @@
 #include <string>
 
 #include "domain/color.hpp"
+#include "domain/eventfilters.hpp"
 #include "domain/keys.hpp"
 #include "domain/mouse.hpp"
-#include "domain/observerid.hpp"
+#include "domain/observerlist.hpp"
 
 namespace domain
 {
+
+struct ResizeEvent
+{
+    int width;
+    int height;
+};
+
+struct CloseEvent
+{
+};
+
+struct MaximizedChangedEvent
+{
+    bool maximized;
+};
+
+using WindowEvent = std::variant<ResizeEvent, KeyEvent, MouseMoveEvent, MouseButtonEvent, MouseScrollEvent, CloseEvent,
+                                 MaximizedChangedEvent>;
 
 class Window
 {
@@ -35,13 +54,16 @@ class Window
     virtual float getWidth() = 0;
     virtual float getHeight() = 0;
 
-    virtual ObserverId onResize(std::function<void(int, int)> callback) = 0;
-    virtual ObserverId onKeyInput(std::function<void(KeyEvent)> callback) = 0;
-    virtual ObserverId onMouseMove(std::function<void(float, float)> callback) = 0;
-    virtual ObserverId onMouseButton(std::function<void(MouseButtonEvent)> callback) = 0;
-    virtual ObserverId onMouseScroll(std::function<void(double)> callback) = 0;
-    virtual ObserverId onClose(std::function<void()> callback) = 0;
-    virtual ObserverId onMaximizedChanged(std::function<void(bool)> callback) = 0;
+    virtual EventFilterId installEventFilter(std::function<bool(const WindowEvent &)>) = 0;
+    virtual void removeEventFilter(domain::EventFilterId id) = 0;
+
+    virtual ObserverId onResize(std::function<void(const ResizeEvent &)> callback) = 0;
+    virtual ObserverId onKeyInput(std::function<void(const KeyEvent &)> callback) = 0;
+    virtual ObserverId onMouseMove(std::function<void(const MouseMoveEvent &)> callback) = 0;
+    virtual ObserverId onMouseButton(std::function<void(const MouseButtonEvent &)> callback) = 0;
+    virtual ObserverId onMouseScroll(std::function<void(const MouseScrollEvent &)> callback) = 0;
+    virtual ObserverId onClose(std::function<void(const CloseEvent &)> callback) = 0;
+    virtual ObserverId onMaximizedChanged(std::function<void(const MaximizedChangedEvent &)> callback) = 0;
     virtual void removeObserver(ObserverId id) = 0;
 
   private:

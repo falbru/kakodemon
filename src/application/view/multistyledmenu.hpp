@@ -30,16 +30,24 @@ class MultiStyledMenuView
     void handleMouseScroll(MultiStyledMenuState &state, int scroll_amount, const domain::Menu &menu);
     void ensureItemVisible(MultiStyledMenuState &state, int index, const domain::Menu &menu);
 
-    ObserverId onMouseButton(std::function<void(int)> callback);
-    void removeObserver(ObserverId id);
+    domain::ObserverId onMouseButton(std::function<void(int)> callback);
+    void removeMouseButtonObserver(domain::ObserverId id);
+
+    domain::ObserverId onVisibilityChanged(std::function<void(bool)> callback);
+    void removeVisibilityChanged(domain::ObserverId id);
 
     void setVisible(bool visible);
     bool isVisible();
+
+    void setX(float x);
+    void setY(float y);
+    void resetPosition();
 
     float x() const;
     float y() const;
     float width() const;
     float height() const;
+    domain::Rectangle bounds() const;
 
   private:
     std::unique_ptr<InlineMenuView> m_inline_menu;
@@ -50,7 +58,8 @@ class MultiStyledMenuView
 
     domain::MenuStyle m_last_style = domain::MenuStyle::PROMPT;
 
-    ObserverList<int> m_mouse_button_observers;
+    domain::ObserverList<int> m_mouse_button_observers;
+    domain::ObserverList<bool> m_visibility_changed_observers;
 
     void forwardMouseButton(int item_index);
 };

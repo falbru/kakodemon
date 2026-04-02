@@ -51,11 +51,11 @@ void NamedPipeCommandInterface::init() {
     }
 }
 
-ObserverId NamedPipeCommandInterface::onCommandReceived(std::function<void(const Command &)> callback) {
+domain::ObserverId NamedPipeCommandInterface::onCommandReceived(std::function<void(const domain::Command &)> callback) {
     return m_command_observers.addObserver(std::move(callback));
 }
 
-void NamedPipeCommandInterface::removeCommandObserver(ObserverId id) {
+void NamedPipeCommandInterface::removeCommandObserver(domain::ObserverId id) {
     m_command_observers.removeObserver(id);
 }
 
@@ -135,7 +135,7 @@ void NamedPipeCommandInterface::readLoop() {
             }
             try {
                 nlohmann::json json = nlohmann::json::parse(line);
-                Command cmd;
+                domain::Command cmd;
                 cmd.name = json.at("command").get<std::string>();
                 if (json.contains("args")) {
                     cmd.args = json.at("args").get<std::vector<std::string>>();
@@ -154,18 +154,18 @@ void NamedPipeCommandInterface::readLoop() {
     close(fd);
 }
 
-std::vector<Command> NamedPipeCommandInterface::getPendingCommands() {
+std::vector<domain::Command> NamedPipeCommandInterface::getPendingCommands() {
     if (m_mode == PipeMode::Send) {
         return {};
     }
 
     std::lock_guard<std::mutex> lock(m_commands_mutex);
-    std::vector<Command> commands = std::move(m_pending_commands);
+    std::vector<domain::Command> commands = std::move(m_pending_commands);
     m_pending_commands.clear();
     return commands;
 }
 
-bool NamedPipeCommandInterface::sendCommand(const Command& command) {
+bool NamedPipeCommandInterface::sendCommand(const domain::Command& command) {
     if (m_mode == PipeMode::Receive) {
         return false;
     }

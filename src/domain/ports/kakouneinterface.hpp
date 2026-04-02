@@ -8,7 +8,7 @@
 #include "domain/menu.hpp"
 #include "domain/modeline.hpp"
 #include "domain/mouse.hpp"
-#include "domain/observerid.hpp"
+#include "domain/observerlist.hpp"
 #include "domain/ports/kakounesession.hpp"
 #include "domain/uioptions.hpp"
 

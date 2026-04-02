@@ -32,9 +32,9 @@ class JsonRpcKakouneInterface : public domain::KakouneInterface
     void releaseMouseButton(domain::MouseButton button, int line, int column) override;
     void selectMenuItem(int index) override;
 
-    ObserverId onRefresh(const std::function<void(bool)> &callback) override;
-    ObserverId onExit(const std::function<void()> &callback) override;
-    void removeObserver(ObserverId id) override;
+    domain::ObserverId onRefresh(const std::function<void(bool)> &callback) override;
+    domain::ObserverId onExit(const std::function<void()> &callback) override;
+    void removeObserver(domain::ObserverId id) override;
 
   private:
     std::unique_ptr<KakouneClientProcess> m_process;

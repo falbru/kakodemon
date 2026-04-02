@@ -60,6 +60,7 @@ set(SRC
     src/application/controller/focuscontroller.cpp
     src/application/controller/inputcontroller.cpp
     src/application/controller/layoutcontroller.cpp
+    src/application/controller/movablemenucontroller.cpp
     src/application/controllers/masterclientcontroller.cpp
     src/application/model/clientmanager.cpp
     src/application/model/focusedclientstack.cpp

@@ -163,12 +163,12 @@ void KakouneClientProcess::setRequestCallback(const std::function<void(const Inc
     m_request_callback = callback;
 }
 
-ObserverId KakouneClientProcess::onExit(const std::function<void()>& callback)
+domain::ObserverId KakouneClientProcess::onExit(const std::function<void()>& callback)
 {
     return m_exit_observers.addObserver(callback);
 }
 
-void KakouneClientProcess::removeObserver(ObserverId id)
+void KakouneClientProcess::removeObserver(domain::ObserverId id)
 {
     m_exit_observers.removeObserver(id);
 }

@@ -143,7 +143,7 @@ TEST_CASE("FocusedClientStack - removeObserver stops notifications", "[focusedcl
 {
     FocusedClientStack stack;
     int call_count = 0;
-    ObserverId id = stack.onFocusChanged([&](KakouneClient*, KakouneClient*) { call_count++; });
+    domain::ObserverId id = stack.onFocusChanged([&](KakouneClient*, KakouneClient*) { call_count++; });
 
     stack.focus(A);
     REQUIRE(call_count == 1);

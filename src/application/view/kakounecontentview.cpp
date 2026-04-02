@@ -40,25 +40,25 @@ void KakouneContentView::handleMouseScroll(KakouneClient *client, float x, float
     m_mouse_scroll_observers.notify(client, coord, amount);
 }
 
-ObserverId KakouneContentView::onMouseButton(
+domain::ObserverId KakouneContentView::onMouseButton(
     std::function<void(KakouneClient *, domain::MouseButtonEvent, domain::Coord)> callback)
 {
     return m_mouse_button_observers.addObserver(std::move(callback));
 }
 
-ObserverId KakouneContentView::onMouseMove(
+domain::ObserverId KakouneContentView::onMouseMove(
     std::function<void(KakouneClient *, domain::Coord)> callback)
 {
     return m_mouse_move_observers.addObserver(std::move(callback));
 }
 
-ObserverId KakouneContentView::onMouseScroll(
+domain::ObserverId KakouneContentView::onMouseScroll(
     std::function<void(KakouneClient *, domain::Coord, int)> callback)
 {
     return m_mouse_scroll_observers.addObserver(std::move(callback));
 }
 
-void KakouneContentView::removeObserver(ObserverId id)
+void KakouneContentView::removeObserver(domain::ObserverId id)
 {
     m_mouse_button_observers.removeObserver(id);
     m_mouse_move_observers.removeObserver(id);

@@ -27,8 +27,8 @@ class InlineMenuView
     void handleMouseScroll(MenuViewState &state, int scroll_amount, const domain::Menu &menu);
     void ensureItemVisible(MenuViewState &state, int index);
 
-    ObserverId onMouseButton(std::function<void(int)> callback);
-    void removeObserver(ObserverId id);
+    domain::ObserverId onMouseButton(std::function<void(int)> callback);
+    void removeObserver(domain::ObserverId id);
 
     float x() const;
     float y() const;
@@ -54,7 +54,7 @@ class InlineMenuView
 
     std::unique_ptr<ScrolledMenuItems> m_scrolled_menu_items;
 
-    ObserverList<int> m_mouse_button_observers;
+    domain::ObserverList<int> m_mouse_button_observers;
 
     std::optional<int> findItemAtPosition(float x, float y, const MenuViewState &state, const domain::Menu &menu);
 };

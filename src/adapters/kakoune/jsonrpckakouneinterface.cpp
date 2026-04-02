@@ -297,15 +297,15 @@ std::string JsonRpcKakouneInterface::getMouseButtonString(domain::MouseButton bu
     }
 }
 
-ObserverId JsonRpcKakouneInterface::onRefresh(const std::function<void(bool)>& callback) {
+domain::ObserverId JsonRpcKakouneInterface::onRefresh(const std::function<void(bool)>& callback) {
     return m_frame_state_manager->onRefresh(callback);
 }
 
-ObserverId JsonRpcKakouneInterface::onExit(const std::function<void()>& callback) {
+domain::ObserverId JsonRpcKakouneInterface::onExit(const std::function<void()>& callback) {
     return m_process->onExit(callback);
 }
 
-void JsonRpcKakouneInterface::removeObserver(ObserverId id) {
+void JsonRpcKakouneInterface::removeObserver(domain::ObserverId id) {
     m_frame_state_manager->removeObserver(id);
     m_process->removeObserver(id);
 }

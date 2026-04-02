@@ -29,23 +29,23 @@ void Scene::init(ClientManager *client_manager, FocusedClientStack *focused_clie
         }
     });
 
-    window->onMouseMove([this](float x, float y) {
-        m_mouse_x = x;
-        m_mouse_y = y;
-        domain::MouseMoveResult result = onMouseMove(x, y);
+    window->onMouseMove([this](const domain::MouseMoveEvent& event) {
+        m_mouse_x = event.x;
+        m_mouse_y = event.y;
+        domain::MouseMoveResult result = onMouseMove(event.x, event.y);
         if (result.cursor.has_value()) {
             m_window->setCursor(result.cursor.value());
             m_window->setNeedsRerender();
         }
     });
 
-    window->onMouseButton([this](domain::MouseButtonEvent event) {
+    window->onMouseButton([this](const domain::MouseButtonEvent& event) {
         onMouseButton(event);
         m_window->setNeedsRerender();
     });
 
-    window->onMouseScroll([this](double offset) {
-        onMouseScroll(offset);
+    window->onMouseScroll([this](const domain::MouseScrollEvent& event) {
+        onMouseScroll(event.scroll_amount);
         m_window->setNeedsRerender();
     });
 }

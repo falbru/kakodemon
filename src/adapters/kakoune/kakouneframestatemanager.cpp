@@ -129,10 +129,10 @@ std::optional<std::pair<FrameState, FrameEvents>> KakouneFrameStateManager::getN
     return std::make_pair(state, events);
 }
 
-ObserverId KakouneFrameStateManager::onRefresh(std::function<void(bool)> callback) {
+domain::ObserverId KakouneFrameStateManager::onRefresh(std::function<void(bool)> callback) {
     return m_refresh_observers.addObserver(std::move(callback));
 }
 
-void KakouneFrameStateManager::removeObserver(ObserverId id) {
+void KakouneFrameStateManager::removeObserver(domain::ObserverId id) {
     m_refresh_observers.removeObserver(id);
 }

@@ -13,13 +13,13 @@ class CommandController
   public:
     CommandController();
 
-    void init(CommandInterface *command_interface, ClientManager *client_manager,
+    void init(domain::CommandInterface *command_interface, ClientManager *client_manager,
               domain::KakouneSession *kakoune_session, domain::Window *window, PaneLayout *pane_layout,
               FocusedClientStack *focused_client_stack);
     void update();
 
   private:
-    CommandInterface *m_command_interface;
+    domain::CommandInterface *m_command_interface;
     domain::KakouneSession *m_kakoune_session;
     ClientManager *m_client_manager;
     domain::Window *m_window;

@@ -27,10 +27,10 @@ void FocusedClientStack::remove(KakouneClient *client) {
     }
 }
 
-ObserverId FocusedClientStack::onFocusChanged(std::function<void(KakouneClient *, KakouneClient *)> callback) {
+domain::ObserverId FocusedClientStack::onFocusChanged(std::function<void(KakouneClient *, KakouneClient *)> callback) {
     return m_focus_changed_observers.addObserver(std::move(callback));
 }
 
-void FocusedClientStack::removeObserver(ObserverId id) {
+void FocusedClientStack::removeObserver(domain::ObserverId id) {
     m_focus_changed_observers.removeObserver(id);
 }

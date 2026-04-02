@@ -30,6 +30,7 @@ struct Rectangle
     int height;
 
     bool intersects(const Rectangle &Rectangle) const;
+    bool contains(int x, int y) const;
 };
 
 } // namespace domain

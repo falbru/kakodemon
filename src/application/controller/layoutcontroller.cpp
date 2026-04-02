@@ -3,6 +3,7 @@
 #include "application/model/kakouneclient.hpp"
 #include "application/model/panelayout.hpp"
 #include "domain/geometry.hpp"
+#include "domain/ports/window.hpp"
 
 LayoutController::LayoutController() {
 
@@ -22,8 +23,8 @@ void LayoutController::init(PaneLayout* pane_layout, ClientManager* client_manag
         m_pane_layout->arrange();
     });
 
-    window->onResize([this, window](int width, int height) {
-        m_pane_layout->setBounds(domain::Rectangle{0, 0, width, height});
+    window->onResize([this, window](const domain::ResizeEvent& event) {
+        m_pane_layout->setBounds(domain::Rectangle{0, 0, event.width, event.height});
         m_pane_layout->arrange();
         window->setNeedsRerender();
     });

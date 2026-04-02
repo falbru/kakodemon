@@ -210,15 +210,15 @@ const std::vector<Pane>& PaneLayout::getPanes() const {
     return m_panes;
 }
 
-ObserverId PaneLayout::onArrange(std::function<void(const std::vector<Pane>&)> callback) {
+domain::ObserverId PaneLayout::onArrange(std::function<void(const std::vector<Pane>&)> callback) {
     return m_arrange_observers.addObserver(std::move(callback));
 }
 
-ObserverId PaneLayout::onNumMastersChanged(std::function<void(int)> callback) {
+domain::ObserverId PaneLayout::onNumMastersChanged(std::function<void(int)> callback) {
     return m_num_masters_changed_observers.addObserver(std::move(callback));
 }
 
-void PaneLayout::removeObserver(ObserverId id) {
+void PaneLayout::removeObserver(domain::ObserverId id) {
     m_arrange_observers.removeObserver(id);
     m_num_masters_changed_observers.removeObserver(id);
 }

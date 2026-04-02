@@ -128,11 +128,11 @@ bool InlineMenuView::handleMouseButton(domain::MouseButtonEvent event, MenuViewS
     return false;
 }
 
-ObserverId InlineMenuView::onMouseButton(std::function<void(int)> callback) {
+domain::ObserverId InlineMenuView::onMouseButton(std::function<void(int)> callback) {
     return m_mouse_button_observers.addObserver(std::move(callback));
 }
 
-void InlineMenuView::removeObserver(ObserverId id) {
+void InlineMenuView::removeObserver(domain::ObserverId id) {
     m_mouse_button_observers.removeObserver(id);
 }
 

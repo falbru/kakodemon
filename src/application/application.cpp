@@ -5,6 +5,7 @@
 #include "application/cliconfig.hpp"
 #include "application/controller/commandcontroller.hpp"
 #include "application/controller/layoutcontroller.hpp"
+#include "application/controller/movablemenucontroller.hpp"
 #include "application/model/clientmanager.hpp"
 #include "application/model/focusedclientstack.hpp"
 #include "application/model/kakouneclient.hpp"
@@ -54,13 +55,13 @@ void Application::init(const CliConfig &cli_config, const ApplicationConfig &app
 
     m_window->init(m_app_config.maximized);
     m_renderer->init(m_window->getWidth(), m_window->getHeight());
-    m_window->onResize([this](int width, int height) { m_renderer->onWindowResize(width, height); });
+    m_window->onResize([this](const domain::ResizeEvent& event) { m_renderer->onWindowResize(event.width, event. height); });
 
     m_kakodemon_id = generateId();
     setenv("KAKOD_ID", m_kakodemon_id.c_str(), 1);
 
     m_command_interface = std::make_unique<NamedPipeCommandInterface>(m_kakodemon_id, PipeMode::Receive);
-    m_command_interface->onCommandReceived([this](const Command&) {
+    m_command_interface->onCommandReceived([this](const domain::Command&) {
         m_window->wakeEventLoop();
     });
     m_command_interface->init();
@@ -91,10 +92,10 @@ void Application::init(const CliConfig &cli_config, const ApplicationConfig &app
         }
     });
 
-    m_window->onClose([this]() { m_running = false; });
+    m_window->onClose([this](const domain::CloseEvent&) { m_running = false; });
 
-    m_window->onMaximizedChanged([this](bool maximized) {
-        m_app_config.maximized = maximized;
+    m_window->onMaximizedChanged([this](const domain::MaximizedChangedEvent& event) {
+        m_app_config.maximized = event.maximized;
         saveApplicationConfig(m_app_config);
     });
 
@@ -106,6 +107,7 @@ void Application::init(const CliConfig &cli_config, const ApplicationConfig &app
     m_input_controller = std::make_unique<InputController>();
     m_layout_controller = std::make_unique<LayoutController>();
     m_master_client_controller = std::make_unique<MasterClientController>();
+    m_movable_menu_controller = std::make_unique<MovableMenuController>();
     m_scene = std::make_unique<Scene>();
 
     m_kakoune_content_view = std::make_unique<KakouneContentView>();
@@ -130,6 +132,7 @@ void Application::init(const CliConfig &cli_config, const ApplicationConfig &app
     m_input_controller->init(m_focused_client_stack.get(), m_client_manager.get(), m_window.get(), m_pane_layout.get());
     m_focus_controller->init(m_focused_client_stack.get(), m_client_manager.get(), m_pane_layout.get(), m_window.get(), m_multi_styled_menu.get());
     m_editor_controller->init(m_client_manager.get(), m_focused_client_stack.get(), m_pane_layout.get(), m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager.get(), m_window.get(), m_multi_styled_menu.get());
+    m_movable_menu_controller->init(m_multi_styled_menu.get(), m_window.get());
     m_scene->init(m_client_manager.get(), m_focused_client_stack.get(), m_pane_layout.get(), m_kakoune_content_view.get(),
                   m_status_bar.get(), m_multi_styled_menu.get(), m_info_box.get(), m_font_manager.get(), m_window.get(),
                   m_pane_border_view.get());

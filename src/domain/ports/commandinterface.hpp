@@ -1,10 +1,13 @@
 #ifndef DOMAIN_COMMANDINTERFACE_HPP_INCLUDED
 #define DOMAIN_COMMANDINTERFACE_HPP_INCLUDED
 
-#include "domain/observerid.hpp"
+#include "domain/observerlist.hpp"
 #include <functional>
 #include <string>
 #include <vector>
+
+namespace domain
+{
 
 struct Command
 {
@@ -26,5 +29,7 @@ class CommandInterface
     virtual ObserverId onCommandReceived(std::function<void(const Command &)> callback) = 0;
     virtual void removeCommandObserver(ObserverId id) = 0;
 };
+
+} // namespace domain
 
 #endif

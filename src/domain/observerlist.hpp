@@ -1,9 +1,13 @@
 #ifndef DOMAIN_OBSERVERLIST_HPP_INCLUDED
 #define DOMAIN_OBSERVERLIST_HPP_INCLUDED
 
-#include "domain/observerid.hpp"
 #include <functional>
 #include <map>
+
+namespace domain
+{
+
+using ObserverId = int;
 
 template <typename... Args> class ObserverList
 {
@@ -33,5 +37,7 @@ template <typename... Args> class ObserverList
     ObserverId m_next_id = 0;
     std::map<ObserverId, std::function<void(Args...)>> m_observers;
 };
+
+} // namespace domain
 
 #endif

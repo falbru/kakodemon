@@ -17,8 +17,8 @@ class KakouneClient
     const domain::UIOptions &uiOptions() const;
     void setUIOptions(domain::UIOptions ui_options);
 
-    ObserverId onUIOptionsChanged(std::function<void(const domain::UIOptions &)> callback);
-    void removeUIOptionsObserver(ObserverId id);
+    domain::ObserverId onUIOptionsChanged(std::function<void(const domain::UIOptions &)> callback);
+    void removeUIOptionsObserver(domain::ObserverId id);
 
     domain::KakouneState state;
     domain::KakouneSession *session;
@@ -32,7 +32,7 @@ class KakouneClient
 
   private:
     domain::UIOptions m_ui_options;
-    ObserverList<const domain::UIOptions &> m_ui_options_observers;
+    domain::ObserverList<const domain::UIOptions &> m_ui_options_observers;
 };
 
 #endif

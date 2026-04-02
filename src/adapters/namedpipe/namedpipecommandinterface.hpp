@@ -15,7 +15,7 @@ enum class PipeMode
     Both
 };
 
-class NamedPipeCommandInterface : public CommandInterface
+class NamedPipeCommandInterface : public domain::CommandInterface
 {
   public:
     NamedPipeCommandInterface(const std::string &pipe_id, PipeMode mode);
@@ -23,12 +23,12 @@ class NamedPipeCommandInterface : public CommandInterface
 
     void init() override;
 
-    std::vector<Command> getPendingCommands() override;
+    std::vector<domain::Command> getPendingCommands() override;
 
-    bool sendCommand(const Command &command) override;
+    bool sendCommand(const domain::Command &command) override;
 
-    ObserverId onCommandReceived(std::function<void(const Command &)> callback) override;
-    void removeCommandObserver(ObserverId id) override;
+    domain::ObserverId onCommandReceived(std::function<void(const domain::Command &)> callback) override;
+    void removeCommandObserver(domain::ObserverId id) override;
 
   private:
     std::string m_pipe_path;
@@ -38,9 +38,9 @@ class NamedPipeCommandInterface : public CommandInterface
     std::atomic<bool> m_ready;
     std::thread m_read_thread;
     std::mutex m_commands_mutex;
-    std::vector<Command> m_pending_commands;
+    std::vector<domain::Command> m_pending_commands;
 
-    ObserverList<const Command &> m_command_observers;
+    domain::ObserverList<const domain::Command &> m_command_observers;
 
     void readLoop();
 };

@@ -35,8 +35,8 @@ class KakouneFrameStateManager
     void start();
     void stop();
 
-    ObserverId onRefresh(std::function<void(bool)> callback);
-    void removeObserver(ObserverId id);
+    domain::ObserverId onRefresh(std::function<void(bool)> callback);
+    void removeObserver(domain::ObserverId id);
 
     std::optional<FrameState> getNextFrameState();
     FrameEvents popEvents();
@@ -58,7 +58,7 @@ class KakouneFrameStateManager
     std::thread m_polling_thread;
     std::mutex m_state_mutex;
 
-    ObserverList<bool> m_refresh_observers;
+    domain::ObserverList<bool> m_refresh_observers;
 };
 
 #endif

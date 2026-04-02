@@ -14,12 +14,12 @@ class FocusedClientStack
     void focus(KakouneClient *client);
     void remove(KakouneClient *client);
 
-    ObserverId onFocusChanged(std::function<void(KakouneClient *previous, KakouneClient *next)> callback);
-    void removeObserver(ObserverId id);
+    domain::ObserverId onFocusChanged(std::function<void(KakouneClient *previous, KakouneClient *next)> callback);
+    void removeObserver(domain::ObserverId id);
 
   private:
     std::vector<KakouneClient *> m_stack;
-    ObserverList<KakouneClient *, KakouneClient *> m_focus_changed_observers;
+    domain::ObserverList<KakouneClient *, KakouneClient *> m_focus_changed_observers;
 };
 
 #endif
