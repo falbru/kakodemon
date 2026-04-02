@@ -1,6 +1,8 @@
 #include "inputcontroller.hpp"
+#include "application/model/panelayout.hpp"
 #include "domain/keys.hpp"
 #include "domain/utf8string.hpp"
+#include "spdlog/spdlog.h"
 #include <algorithm>
 #include <string>
 #include <variant>
@@ -32,12 +34,24 @@ void InputController::onKeyInput(const domain::KeyEvent& event) {
 }
 
 bool InputController::tryHandleGlobalKeybinding(const domain::KeyEvent &event) {
-    if (!std::holds_alternative<domain::Codepoint>(event.key)) {
+    bool ctrl_shift = (event.modifiers & (domain::CONTROL | domain::SHIFT)) == (domain::CONTROL | domain::SHIFT);
+    if (!ctrl_shift) {
         return false;
     }
 
-    bool ctrl_shift = (event.modifiers & (domain::CONTROL | domain::SHIFT)) == (domain::CONTROL | domain::SHIFT);
-    if (!ctrl_shift) {
+    if (std::holds_alternative<domain::SpecialKey>(event.key)) {
+        domain::SpecialKey sk = std::get<domain::SpecialKey>(event.key);
+
+        if (sk == domain::SpecialKey::RETURN) {
+            if (m_pane_layout->getLayoutType() == LayoutType::FULL) {
+                m_pane_layout->setLayoutType(m_pane_layout->getPreviousLayoutType());
+            }else {
+                m_pane_layout->setLayoutType(LayoutType::FULL);
+            }
+            m_pane_layout->arrange();
+            return true;
+        }
+
         return false;
     }
 

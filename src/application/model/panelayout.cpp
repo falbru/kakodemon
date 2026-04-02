@@ -183,7 +183,16 @@ void PaneLayout::arrangeFull() {
 }
 
 void PaneLayout::setLayoutType(LayoutType layout_type) {
+    if (layout_type == m_layout_type) {
+        return;
+    }
+
+    m_previous_layout_type = m_layout_type;
     m_layout_type = layout_type;
+}
+
+LayoutType PaneLayout::getPreviousLayoutType() {
+    return m_previous_layout_type;
 }
 
 LayoutType PaneLayout::getLayoutType() const {

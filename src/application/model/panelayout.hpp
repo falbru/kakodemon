@@ -30,6 +30,7 @@ class PaneLayout
     void arrange();
     void setBounds(const domain::Rectangle &bounds);
     void setLayoutType(LayoutType layout_type);
+    LayoutType getPreviousLayoutType();
     LayoutType getLayoutType() const;
     void setNumMasters(int num_masters);
     int getNumMasters() const;
@@ -51,6 +52,7 @@ class PaneLayout
 
     std::vector<Pane> m_panes;
     LayoutType m_layout_type = LayoutType::TALL;
+    LayoutType m_previous_layout_type = LayoutType::TALL;
     int m_num_masters = 1;
     float m_master_ratio = 0.6f;
 
