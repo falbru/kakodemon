@@ -46,6 +46,7 @@ class KakouneInterface
 
     virtual void pressKeys(const std::vector<std::string> &keys) = 0;
     virtual void resize(int rows, int columns) = 0;
+    virtual void resizeCached(int rows, int columns) = 0;
     virtual void scroll(int amount, int line, int column) = 0;
     virtual void moveMouse(int line, int column) = 0;
     virtual void pressMouseButton(MouseButton button, int line, int column) = 0;

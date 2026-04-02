@@ -247,6 +247,14 @@ void JsonRpcKakouneInterface::resize(int rows, int columns) {
     });
 }
 
+void JsonRpcKakouneInterface::resizeCached(int rows, int columns) {
+    if (m_cached_rows == rows && m_cached_columns == columns) return;
+
+    m_cached_rows = rows;
+    m_cached_columns = columns;
+    resize(m_cached_rows, m_cached_columns);
+}
+
 void JsonRpcKakouneInterface::scroll(int amount, int line, int column) {
     m_process->sendRequest(OutgoingRequest{
         OutgoingRequestType::SCROLL,

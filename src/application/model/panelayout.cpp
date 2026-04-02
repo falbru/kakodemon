@@ -1,14 +1,22 @@
 #include "panelayout.hpp"
 #include "application/model/clientmanager.hpp"
+#include "application/model/focusedclientstack.hpp"
 #include "application/model/kakouneclient.hpp"
 #include <algorithm>
 
-void PaneLayout::init(ClientManager* client_manager) {
+void PaneLayout::init(ClientManager* client_manager, FocusedClientStack* focused_client_stack) {
     m_panes.clear();
 
     m_client_manager = client_manager;
     m_client_manager->onClientAdded([=](KakouneClient*) {
         arrange();
+    });
+
+    m_focused_client_stack = focused_client_stack;
+    m_focused_client_stack->onFocusChanged([=](KakouneClient*,KakouneClient*) {
+        if (m_layout_type == LayoutType::FULL) {
+            arrange();
+        }
     });
 }
 
@@ -23,10 +31,16 @@ void PaneLayout::arrange() {
         m_panes.push_back({client.get(), {0, 0, 0, 0}});
     }
 
-    if (m_layout_type == LayoutType::WIDE) {
-        arrangeWide();
-    } else {
-        arrangeTall();
+    switch(m_layout_type) {
+        case LayoutType::WIDE:
+            arrangeWide();
+            break;
+        case LayoutType::TALL:
+            arrangeTall();
+            break;
+        case LayoutType::FULL:
+            arrangeFull();
+            break;
     }
 
     m_arrange_observers.notify(m_panes);
@@ -40,7 +54,7 @@ void PaneLayout::arrangeTall() {
         int total_height = m_bounds.height - static_cast<int>(BORDER_WIDTH) * (master_count - 1);
         int base_pane_height = total_height / master_count;
         int remainder = total_height % master_count;
-        
+
         int y_pos = m_bounds.y;
         for (size_t i = 0; i < master_count; ++i) {
             int current_height = base_pane_height + (i < remainder ? 1 : 0);
@@ -63,7 +77,7 @@ void PaneLayout::arrangeTall() {
         int total_height = m_bounds.height - static_cast<int>(BORDER_WIDTH) * (master_count - 1);
         int base_pane_height = total_height / master_count;
         int remainder = total_height % master_count;
-        
+
         int y_pos = m_bounds.y;
         for (size_t i = 0; i < master_count; ++i) {
             int current_height = base_pane_height + (i < remainder ? 1 : 0);
@@ -81,7 +95,7 @@ void PaneLayout::arrangeTall() {
         int total_height = m_bounds.height - static_cast<int>(BORDER_WIDTH) * (stack_count - 1);
         int base_pane_height = total_height / stack_count;
         int remainder = total_height % stack_count;
-        
+
         int y_pos = m_bounds.y;
         for (size_t i = 0; i < stack_count; ++i) {
             int current_height = base_pane_height + (i < remainder ? 1 : 0);
@@ -104,7 +118,7 @@ void PaneLayout::arrangeWide() {
         int total_width = m_bounds.width - static_cast<int>(BORDER_WIDTH) * (master_count - 1);
         int base_pane_width = total_width / master_count;
         int remainder = total_width % master_count;
-        
+
         int x_pos = m_bounds.x;
         for (size_t i = 0; i < master_count; ++i) {
             int current_width = base_pane_width + (i < remainder ? 1 : 0);
@@ -127,7 +141,7 @@ void PaneLayout::arrangeWide() {
         int total_width = m_bounds.width - static_cast<int>(BORDER_WIDTH) * (master_count - 1);
         int base_pane_width = total_width / master_count;
         int remainder = total_width % master_count;
-        
+
         int x_pos = m_bounds.x;
         for (size_t i = 0; i < master_count; ++i) {
             int current_width = base_pane_width + (i < remainder ? 1 : 0);
@@ -145,7 +159,7 @@ void PaneLayout::arrangeWide() {
         int total_width = m_bounds.width - static_cast<int>(BORDER_WIDTH) * (stack_count - 1);
         int base_pane_width = total_width / stack_count;
         int remainder = total_width % stack_count;
-        
+
         int x_pos = m_bounds.x;
         for (size_t i = 0; i < stack_count; ++i) {
             int current_width = base_pane_width + (i < remainder ? 1 : 0);
@@ -158,6 +172,14 @@ void PaneLayout::arrangeWide() {
             x_pos += current_width + static_cast<int>(BORDER_WIDTH);
         }
     }
+}
+
+void PaneLayout::arrangeFull() {
+    m_panes.clear();
+    m_panes.push_back(Pane{
+        m_focused_client_stack->focused(),
+        m_bounds
+    });
 }
 
 void PaneLayout::setLayoutType(LayoutType layout_type) {

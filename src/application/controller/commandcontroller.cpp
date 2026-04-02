@@ -32,6 +32,8 @@ void CommandController::update()
                 m_pane_layout->setLayoutType(LayoutType::TALL);
             } else if (command.args[0] == "wide") {
                 m_pane_layout->setLayoutType(LayoutType::WIDE);
+            } else if (command.args[0] == "full") {
+                m_pane_layout->setLayoutType(LayoutType::FULL);
             }
             m_pane_layout->arrange();
             m_window->setNeedsRerender();

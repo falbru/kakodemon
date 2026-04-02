@@ -98,6 +98,6 @@ void EditorController::resizeClientsToPaneLayout(const std::vector<Pane> &panes)
 
         int rows = static_cast<int>((pane.bounds.height - status_bar_height) / cell_height);
         int columns = static_cast<int>(pane.bounds.width / cell_width);
-        pane.client->interface->resize(rows, columns);
+        pane.client->interface->resizeCached(rows, columns);
     }
 }

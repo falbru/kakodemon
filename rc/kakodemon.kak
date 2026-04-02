@@ -68,4 +68,4 @@ define-command -params 1 kakodemon-layout %{
     }
 }
 
-complete-command -menu kakodemon-layout shell-script-candidates %{ printf 'tall\nwide\n' }
+complete-command -menu kakodemon-layout shell-script-candidates %{ printf 'tall\nwide\nfull\n' }

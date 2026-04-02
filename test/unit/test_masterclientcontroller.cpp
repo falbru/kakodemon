@@ -1,3 +1,4 @@
+#include "application/model/focusedclientstack.hpp"
 #include "catch2/catch_test_macros.hpp"
 #include "application/controllers/masterclientcontroller.hpp"
 #include "mock_kakounesession.hpp"
@@ -8,6 +9,7 @@
 TEST_CASE("MasterClientController updates master clients correctly", "[MasterClientController]") {
     MockKakouneSession session;
     ClientManager client_manager(&session);
+    FocusedClientStack focused_client_stack;
     PaneLayout pane_layout;
 
     MasterClientController controller;
@@ -21,7 +23,7 @@ TEST_CASE("MasterClientController updates master clients correctly", "[MasterCli
         auto client1 = client_manager.createClient(std::nullopt, {});
         client1->client_name = "editor1";
 
-        pane_layout.init(&client_manager);
+        pane_layout.init(&client_manager, &focused_client_stack);
         pane_layout.setBounds({0, 0, 100, 100});
         pane_layout.arrange();
 
@@ -39,7 +41,7 @@ TEST_CASE("MasterClientController updates master clients correctly", "[MasterCli
         auto client3 = client_manager.createClient(std::nullopt, {});
         client3->client_name = "editor3";
 
-        pane_layout.init(&client_manager);
+        pane_layout.init(&client_manager, &focused_client_stack);
         pane_layout.setNumMasters(2);
         pane_layout.setBounds({0, 0, 100, 100});
         pane_layout.arrange();
@@ -55,7 +57,7 @@ TEST_CASE("MasterClientController updates master clients correctly", "[MasterCli
         auto client2 = client_manager.createClient(std::nullopt, {});
         client2->client_name = "editor2";
 
-        pane_layout.init(&client_manager);
+        pane_layout.init(&client_manager, &focused_client_stack);
         pane_layout.setNumMasters(1);
         pane_layout.setBounds({0, 0, 100, 100});
         pane_layout.arrange();
@@ -76,7 +78,7 @@ TEST_CASE("MasterClientController updates master clients correctly", "[MasterCli
         auto client2 = client_manager.createClient(std::nullopt, {});
         client2->client_name = "editor2";
 
-        pane_layout.init(&client_manager);
+        pane_layout.init(&client_manager, &focused_client_stack);
         pane_layout.setNumMasters(2);
         pane_layout.setBounds({0, 0, 100, 100});
         pane_layout.arrange();
@@ -94,7 +96,7 @@ TEST_CASE("MasterClientController updates master clients correctly", "[MasterCli
         auto client1 = client_manager.createClient(std::nullopt, {});
         client1->client_name = "editor1";
 
-        pane_layout.init(&client_manager);
+        pane_layout.init(&client_manager, &focused_client_stack);
         pane_layout.setBounds({0, 0, 100, 100});
         pane_layout.arrange();
 
@@ -111,7 +113,7 @@ TEST_CASE("MasterClientController updates master clients correctly", "[MasterCli
         auto client1 = client_manager.createClient(std::nullopt, {});
         client1->client_name = "editor1";
 
-        pane_layout.init(&client_manager);
+        pane_layout.init(&client_manager, &focused_client_stack);
         pane_layout.setBounds({0, 0, 100, 100});
         pane_layout.arrange();
 
