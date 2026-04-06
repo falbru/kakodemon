@@ -37,7 +37,7 @@ void opengl::GLFWWindow::init(bool maximized) {
         return;
     }
 
-    glfwSetWindowSizeLimits(m_window, 636, 424, GLFW_DONT_CARE, GLFW_DONT_CARE);
+    glfwSetWindowSizeLimits(m_window, 1080, 810, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
     glfwMakeContextCurrent(m_window);
     glfwSwapInterval(0);
