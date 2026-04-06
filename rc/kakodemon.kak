@@ -48,6 +48,26 @@ kakodemon-new-client [<commands>]: create a new Kakoune client in Kakodemon
 
 complete-command -menu kakodemon-new-client command
 
+define-command kakodemon-terminal-window -params 1.. -docstring '
+kakodemon-terminal-window <program> [<arguments>]: create a new terminal as a desktop window
+The program passed as argument will be executed in the new terminal' \
+%{
+    evaluate-commands -save-regs 'a' %{
+        set-register a %arg{@}
+        evaluate-commands %sh{
+            if [ -z "${kak_opt_termcmd}" ]; then
+                echo "fail 'termcmd option is not set'"
+                exit
+            fi
+            termcmd=$kak_opt_termcmd
+            args=$kak_quoted_reg_a
+            unset kak_opt_termcmd kak_quoted_reg_a
+            setsid ${termcmd} "$args" < /dev/null > /dev/null 2>&1 &
+        }
+    }
+}
+complete-command kakodemon-terminal-window shell
+
 define-command -docstring "
 kakodemon-focus [<kakoune_client>]: focus a given client's pane in Kakodemon
 If no client is passed, then the current client is used
