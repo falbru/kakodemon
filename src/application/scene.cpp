@@ -62,8 +62,8 @@ void Scene::render()
             m_font_manager,
             client->state.default_face,
             client->uiOptions(),
-            static_cast<float>(bounds.width),
-            static_cast<float>(bounds.height),
+            static_cast<float>(bounds.width()),
+            static_cast<float>(bounds.height()),
         };
 
         m_content_view->render(render_context, client->state.content, client->state.default_face, bounds);
@@ -137,7 +137,7 @@ domain::MouseMoveResult Scene::onMouseMove(float x, float y)
     Pane *hover_pane = m_pane_layout->findPaneAt(x, y);
     if (hover_pane) {
         float status_bar_height = m_status_bar_view->height(hover_pane->client->uiOptions().font_statusbar);
-        if (y - hover_pane->bounds.y >= hover_pane->bounds.height - status_bar_height) {
+        if (y - hover_pane->bounds.top() >= hover_pane->bounds.height() - status_bar_height) {
             return domain::MouseMoveResult{domain::Cursor::DEFAULT};
         }
     }
@@ -166,7 +166,7 @@ void Scene::onMouseButton(domain::MouseButtonEvent event)
         if (!pane) return;
 
         float status_bar_height = m_status_bar_view->height(pane->client->uiOptions().font_statusbar);
-        if (event.y - pane->bounds.y >= pane->bounds.height - status_bar_height) return;
+        if (event.y - pane->bounds.top() >= pane->bounds.height() - status_bar_height) return;
 
         m_content_view->handleMouseButton(pane->client, event, pane->bounds);
         m_active_mouse_client = pane->client;

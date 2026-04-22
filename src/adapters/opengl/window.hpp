@@ -53,8 +53,8 @@ class GLFWWindow : public domain::Window
     std::optional<domain::KeyEvent> glfwSpecialKeyToKeyEvent(int key, int mods);
     domain::KeyEvent glfwCharToKeyEvent(unsigned int codepoint, int mods);
 
-    static constexpr int DEFAULT_WINDOW_WIDTH = 640;
-    static constexpr int DEFAULT_WINDOW_HEIGHT = 480;
+    static constexpr int DEFAULT_WINDOW_WIDTH = 1080;
+    static constexpr int DEFAULT_WINDOW_HEIGHT = 810;
 
     GLFWwindow *m_window = nullptr;
     GLFWcursor *m_cursor_ibeam = nullptr;

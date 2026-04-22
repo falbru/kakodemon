@@ -10,6 +10,8 @@ add_executable(tests
     unit/test_line.cpp
     unit/test_color.cpp
     unit/test_masterclientcontroller.cpp
+    unit/test_rectangle.cpp
+    unit/test_infobox.cpp
     integration/test_fontconfigresolver.cpp
     integration/test_localsession.cpp
     integration/test_kakouneclientprocess.cpp
@@ -36,6 +38,20 @@ add_executable(tests
     ${CMAKE_SOURCE_DIR}/src/application/model/focusedclientstack.cpp
     ${CMAKE_SOURCE_DIR}/src/application/model/kakouneclient.cpp
     ${CMAKE_SOURCE_DIR}/src/application/model/panelayout.cpp
+    ${CMAKE_SOURCE_DIR}/src/application/view/infobox.cpp
+    ${CMAKE_SOURCE_DIR}/src/application/view/widgets/scrollbar.cpp
+    ${CMAKE_SOURCE_DIR}/src/application/view/widgets/input.cpp
+    ${CMAKE_SOURCE_DIR}/src/application/view/widgets/scrolledmenuitems.cpp
+    ${CMAKE_SOURCE_DIR}/src/application/view/statusbar.cpp
+    ${CMAKE_SOURCE_DIR}/src/application/view/kakounecontentview.cpp
+    ${CMAKE_SOURCE_DIR}/src/application/view/rendercontext.cpp
+    ${CMAKE_SOURCE_DIR}/src/application/view/glyphsequence.cpp
+    ${CMAKE_SOURCE_DIR}/src/domain/ports/renderer.cpp
+    ${CMAKE_SOURCE_DIR}/src/application/view/layoutmanager.cpp
+    ${CMAKE_SOURCE_DIR}/src/application/view/multistyledmenu.cpp
+    ${CMAKE_SOURCE_DIR}/src/application/view/inlinemenu.cpp
+    ${CMAKE_SOURCE_DIR}/src/application/view/promptmenu.cpp
+    ${CMAKE_SOURCE_DIR}/src/application/view/searchmenu.cpp
     ${CMAKE_SOURCE_DIR}/src/application/controllers/masterclientcontroller.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/alignment.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/atom.cpp

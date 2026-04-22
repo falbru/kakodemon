@@ -14,29 +14,29 @@ void KakouneContentView::init(domain::Renderer *renderer)
 void KakouneContentView::render(const RenderContext &render_context, const domain::Lines &lines,
                                  const domain::Face &default_face, const domain::Rectangle &bounds)
 {
-    m_renderer->addBounds(bounds.x, bounds.y, bounds.width, bounds.height);
+    m_renderer->addBounds(bounds.left(), bounds.top(), bounds.width(), bounds.height());
     m_renderer->renderLines(render_context.textConfig(render_context.ui_options.font_content), lines, default_face,
-                             bounds.x, bounds.y);
+                             bounds.left(), bounds.top());
     m_renderer->popBounds();
 }
 
 void KakouneContentView::handleMouseButton(KakouneClient *client, domain::MouseButtonEvent event,
                                         domain::Rectangle bounds)
 {
-    domain::Coord coord = pixelToCoord(client->uiOptions().font_content, event.x, event.y, bounds.x, bounds.y);
+    domain::Coord coord = pixelToCoord(client->uiOptions().font_content, event.x, event.y, bounds.left(), bounds.top());
     m_mouse_button_observers.notify(client, event, coord);
 }
 
 void KakouneContentView::handleMouseMove(KakouneClient *client, float x, float y, domain::Rectangle bounds)
 {
-    domain::Coord coord = pixelToCoord(client->uiOptions().font_content, x, y, bounds.x, bounds.y);
+    domain::Coord coord = pixelToCoord(client->uiOptions().font_content, x, y, bounds.left(), bounds.top());
     m_mouse_move_observers.notify(client, coord);
 }
 
 void KakouneContentView::handleMouseScroll(KakouneClient *client, float x, float y, domain::Rectangle bounds,
                                         int amount)
 {
-    domain::Coord coord = pixelToCoord(client->uiOptions().font_content, x, y, bounds.x, bounds.y);
+    domain::Coord coord = pixelToCoord(client->uiOptions().font_content, x, y, bounds.left(), bounds.top());
     m_mouse_scroll_observers.notify(client, coord, amount);
 }
 

@@ -96,8 +96,8 @@ void EditorController::resizeClientsToPaneLayout(const std::vector<Pane> &panes)
         float cell_height = m_kakoune_content_view->getCellHeight(pane.client->uiOptions().font_content);
         float status_bar_height = m_status_bar_view->height(pane.client->uiOptions().font_statusbar);
 
-        int rows = static_cast<int>((pane.bounds.height - status_bar_height) / cell_height);
-        int columns = static_cast<int>(pane.bounds.width / cell_width);
+        int rows = static_cast<int>((pane.bounds.height() - status_bar_height) / cell_height);
+        int columns = static_cast<int>(pane.bounds.width() / cell_width);
         pane.client->interface->resizeCached(rows, columns);
     }
 }

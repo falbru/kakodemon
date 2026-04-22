@@ -65,7 +65,7 @@ void opengl::Renderer::onWindowResize(int width, int height) {
 void opengl::Renderer::addBounds(int x, int y, int width, int height) {
     glEnable(GL_SCISSOR_TEST);
     domain::Rectangle r{x, static_cast<int>(m_screen_height) - height - y, width, height};
-    glScissor(r.x, r.y, r.width, r.height);
+    glScissor(r.left(), r.top(), r.width(), r.height());
     m_bounds.push(r);
 }
 
@@ -75,7 +75,7 @@ void opengl::Renderer::popBounds() {
         glDisable(GL_SCISSOR_TEST);
     }else {
         auto r = m_bounds.top();
-        glScissor(r.x, r.y, r.width, r.height);
+        glScissor(r.left(), r.top(), r.width(), r.height());
     }
 }
 

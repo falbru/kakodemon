@@ -89,7 +89,7 @@ domain::KakouneState JsonRpcKakouneInterface::convertFrameStateToKakouneState(co
     }
 
     domain::CursorPosition cursor_position;
-    if (menu.has_value()) {
+    if (menu.has_value() && frame_state.draw_status.cursor_pos >= 0) {
         cursor_position = domain::StatusLinePosition{ frame_state.draw_status.cursor_pos };
     }else {
         cursor_position = domain::BufferContentPosition{ domain::Coord{ frame_state.draw.cursor_pos.line, frame_state.draw.cursor_pos.column } };

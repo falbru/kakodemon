@@ -41,7 +41,7 @@ void InlineMenuView::render(const RenderContext &render_context, MenuViewState &
     auto anchor = menu.getItems().anchor;
 
     auto menu_position = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, anchor,
-                                                               content_bounds.x, content_bounds.y);
+                                                               content_bounds.left(), content_bounds.top());
 
     auto menu_item_width = 0.0f;
     for (const auto& item : menu.getItems().items) {

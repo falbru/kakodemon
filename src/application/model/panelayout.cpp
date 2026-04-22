@@ -51,17 +51,17 @@ void PaneLayout::arrangeTall() {
     size_t stack_count = m_panes.size() - master_count;
 
     if (stack_count == 0) {
-        int total_height = m_bounds.height - static_cast<int>(BORDER_WIDTH) * (master_count - 1);
+        int total_height = m_bounds.height() - static_cast<int>(BORDER_WIDTH) * (master_count - 1);
         int base_pane_height = total_height / master_count;
         int remainder = total_height % master_count;
 
-        int y_pos = m_bounds.y;
+        int y_pos = m_bounds.top();
         for (size_t i = 0; i < master_count; ++i) {
             int current_height = base_pane_height + (i < remainder ? 1 : 0);
             m_panes[i].bounds = {
-                m_bounds.x,
+                m_bounds.left(),
                 y_pos,
-                m_bounds.width,
+                m_bounds.width(),
                 current_height
             };
             y_pos += current_height + static_cast<int>(BORDER_WIDTH);
@@ -69,20 +69,20 @@ void PaneLayout::arrangeTall() {
         return;
     }
 
-    float master_width = m_bounds.width * m_master_ratio;
-    float stack_width = m_bounds.width - master_width - BORDER_WIDTH;
-    float stack_x = m_bounds.x + master_width + BORDER_WIDTH;
+    float master_width = m_bounds.width() * m_master_ratio;
+    float stack_width = m_bounds.width() - master_width - BORDER_WIDTH;
+    float stack_x = m_bounds.left() + master_width + BORDER_WIDTH;
 
     {
-        int total_height = m_bounds.height - static_cast<int>(BORDER_WIDTH) * (master_count - 1);
+        int total_height = m_bounds.height() - static_cast<int>(BORDER_WIDTH) * (master_count - 1);
         int base_pane_height = total_height / master_count;
         int remainder = total_height % master_count;
 
-        int y_pos = m_bounds.y;
+        int y_pos = m_bounds.top();
         for (size_t i = 0; i < master_count; ++i) {
             int current_height = base_pane_height + (i < remainder ? 1 : 0);
             m_panes[i].bounds = {
-                m_bounds.x,
+                m_bounds.left(),
                 y_pos,
                 static_cast<int>(master_width),
                 current_height
@@ -92,11 +92,11 @@ void PaneLayout::arrangeTall() {
     }
 
     {
-        int total_height = m_bounds.height - static_cast<int>(BORDER_WIDTH) * (stack_count - 1);
+        int total_height = m_bounds.height() - static_cast<int>(BORDER_WIDTH) * (stack_count - 1);
         int base_pane_height = total_height / stack_count;
         int remainder = total_height % stack_count;
 
-        int y_pos = m_bounds.y;
+        int y_pos = m_bounds.top();
         for (size_t i = 0; i < stack_count; ++i) {
             int current_height = base_pane_height + (i < remainder ? 1 : 0);
             m_panes[master_count + i].bounds = {
@@ -115,39 +115,39 @@ void PaneLayout::arrangeWide() {
     size_t stack_count = m_panes.size() - master_count;
 
     if (stack_count == 0) {
-        int total_width = m_bounds.width - static_cast<int>(BORDER_WIDTH) * (master_count - 1);
+        int total_width = m_bounds.width() - static_cast<int>(BORDER_WIDTH) * (master_count - 1);
         int base_pane_width = total_width / master_count;
         int remainder = total_width % master_count;
 
-        int x_pos = m_bounds.x;
+        int x_pos = m_bounds.left();
         for (size_t i = 0; i < master_count; ++i) {
             int current_width = base_pane_width + (i < remainder ? 1 : 0);
             m_panes[i].bounds = {
                 x_pos,
-                m_bounds.y,
+                m_bounds.top(),
                 current_width,
-                m_bounds.height
+                m_bounds.height()
             };
             x_pos += current_width + static_cast<int>(BORDER_WIDTH);
         }
         return;
     }
 
-    float master_height = m_bounds.height * m_master_ratio;
-    float stack_height = m_bounds.height - master_height - BORDER_WIDTH;
-    float stack_y = m_bounds.y + master_height + BORDER_WIDTH;
+    float master_height = m_bounds.height() * m_master_ratio;
+    float stack_height = m_bounds.height() - master_height - BORDER_WIDTH;
+    float stack_y = m_bounds.top() + master_height + BORDER_WIDTH;
 
     {
-        int total_width = m_bounds.width - static_cast<int>(BORDER_WIDTH) * (master_count - 1);
+        int total_width = m_bounds.width() - static_cast<int>(BORDER_WIDTH) * (master_count - 1);
         int base_pane_width = total_width / master_count;
         int remainder = total_width % master_count;
 
-        int x_pos = m_bounds.x;
+        int x_pos = m_bounds.left();
         for (size_t i = 0; i < master_count; ++i) {
             int current_width = base_pane_width + (i < remainder ? 1 : 0);
             m_panes[i].bounds = {
                 x_pos,
-                m_bounds.y,
+                m_bounds.top(),
                 current_width,
                 static_cast<int>(master_height)
             };
@@ -156,11 +156,11 @@ void PaneLayout::arrangeWide() {
     }
 
     {
-        int total_width = m_bounds.width - static_cast<int>(BORDER_WIDTH) * (stack_count - 1);
+        int total_width = m_bounds.width() - static_cast<int>(BORDER_WIDTH) * (stack_count - 1);
         int base_pane_width = total_width / stack_count;
         int remainder = total_width % stack_count;
 
-        int x_pos = m_bounds.x;
+        int x_pos = m_bounds.left();
         for (size_t i = 0; i < stack_count; ++i) {
             int current_width = base_pane_width + (i < remainder ? 1 : 0);
             m_panes[master_count + i].bounds = {
@@ -216,10 +216,9 @@ float PaneLayout::getMasterRatio() const {
     return m_master_ratio;
 }
 
-Pane* PaneLayout::findPaneAt(float x, float y) {
+Pane* PaneLayout::findPaneAt(int x, int y) {
     for (auto& pane : m_panes) {
-        if (x >= pane.bounds.x && x < pane.bounds.x + pane.bounds.width &&
-            y >= pane.bounds.y && y < pane.bounds.y + pane.bounds.height) {
+        if (pane.bounds.contains(x, y)) {
             return &pane;
         }
     }

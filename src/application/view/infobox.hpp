@@ -9,7 +9,6 @@
 #include "domain/editor.hpp"
 #include "domain/geometry.hpp"
 #include "domain/infobox.hpp"
-#include "domain/lines.hpp"
 #include <memory>
 
 enum class PlacementDirection
@@ -18,23 +17,23 @@ enum class PlacementDirection
     BELOW,
     LEFT,
     RIGHT,
-    CENTER,
-    LEFT_WRAPPED,
-    RIGHT_WRAPPED,
-    FULL
 };
 
-enum class CrossAxisAlignment
+struct AnchorPlacement
 {
-    START,
-    CENTER,
-    END
+    domain::Rectangle anchor;
+    std::vector<PlacementDirection> preferred_directions;
 };
 
-struct Placement
+struct FixedPlacement
 {
-    domain::Lines content;
-    domain::Rectangle bounds;
+    domain::Rectangle placement;
+};
+
+struct PlacementConfig
+{
+    std::variant<AnchorPlacement, FixedPlacement> placement;
+    bool absolute_position;
 };
 
 class InfoBoxView
@@ -43,18 +42,6 @@ class InfoBoxView
     InfoBoxView();
     void init(domain::Renderer *renderer, MultiStyledMenuView *multi_styled_menu,
               KakouneContentView *kakoune_content_view, StatusBarView *status_bar_view);
-
-    std::pair<float, float> calculateInfoBoxPosition(const domain::Rectangle &anchor, float info_box_width,
-                                                     float info_box_height, float viewport_width, float viewport_height,
-                                                     PlacementDirection direction, CrossAxisAlignment alignment) const;
-
-    std::optional<Placement> tryPlaceInfoBox(PlacementDirection direction, CrossAxisAlignment alignment,
-                                             const domain::Lines &content, const domain::Line &title,
-                                             const domain::Rectangle &anchor, float layout_width, float layout_height,
-                                             domain::Font *font, domain::FontManager *font_manager,
-                                             const domain::Rectangle &menu_rectangle,
-                                             const domain::CursorPosition &cursor_position, domain::Font *font_content,
-                                             const domain::Rectangle &content_bounds);
 
     void render(const RenderContext &render_context, InfoBoxViewState &state, const domain::InfoBox &info_box,
                 const domain::CursorPosition &cursor_position, const domain::Rectangle &content_bounds);
@@ -67,9 +54,29 @@ class InfoBoxView
     float height() const;
 
   private:
-    const float MIN_WIDTH = 150.0f;
-    const float MAX_WIDTH = 1000.0f;
-    const float MAX_HEIGHT = 600.0f;
+    PlacementConfig placementConfigByInfoBoxStyle(const RenderContext &render_context, InfoBoxViewState &state,
+                                                  const domain::InfoBox &info_box,
+                                                  const domain::CursorPosition &cursor_position,
+                                                  const domain::Rectangle &content_bounds, int info_box_width,
+                                                  int info_box_height);
+    std::optional<domain::Rectangle> placeInfoBox(const RenderContext &render_context, InfoBoxViewState &state,
+                                                  const domain::InfoBox &info_box,
+                                                  const domain::CursorPosition &cursor_position,
+                                                  const domain::Rectangle &content_bounds, int info_box_width,
+                                                  int info_box_height);
+    std::optional<domain::Rectangle> placeWithoutOverlap(const domain::Rectangle &bounds,
+                                                         const domain::IVec2 &fitted_rectangle_size,
+                                                         const domain::Rectangle &anchor,
+                                                         const std::vector<PlacementDirection> &preferred_directions,
+                                                         const std::vector<domain::Rectangle> &obstacles);
+    std::vector<domain::Rectangle> findNonOverlappingPlacements(const domain::Rectangle &bounds,
+                                                                const domain::IVec2 &fitted_rectangle_size,
+                                                                const domain::IVec2 &start_position,
+                                                                const std::vector<domain::Rectangle> &obstacles);
+
+    const int MIN_WIDTH = 150;
+    const int MAX_WIDTH = 1000;
+    const int MAX_HEIGHT = 600;
     domain::Renderer *m_renderer;
     KakouneContentView *m_kakoune_content_view;
     MultiStyledMenuView *m_multi_styled_menu;

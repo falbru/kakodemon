@@ -37,7 +37,7 @@ class PaneLayout
     void setMasterRatio(float master_ratio);
     float getMasterRatio() const;
 
-    Pane *findPaneAt(float x, float y);
+    Pane *findPaneAt(int x, int y);
     Pane *findPaneForClient(KakouneClient *client);
     const std::vector<Pane> &getPanes() const;
 
