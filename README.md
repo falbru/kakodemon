@@ -32,7 +32,7 @@ sudo install -D ./kakod /usr/local/bin
 You can then run the application with the command `kakod`
 
 > **Warning**<br>
-Kakodemon requires a version of Kakoune that has not yet released. Ensure that you've built kakoune with the commit `3dd6f30` or newer.
+Make sure Kakoune version>=2026.04.12 is installed on your system!
 
 ## Configuration
 
