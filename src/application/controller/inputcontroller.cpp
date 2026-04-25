@@ -153,7 +153,19 @@ std::string InputController::keyEventToKakouneKey(const domain::KeyEvent& event)
         {domain::SpecialKey::END,       "end"},
         {domain::SpecialKey::PAGE_UP,   "pageup"},
         {domain::SpecialKey::PAGE_DOWN, "pagedown"},
-        {domain::SpecialKey::INSERT,    "ins"}
+        {domain::SpecialKey::INSERT,    "ins"},
+        {domain::SpecialKey::F1,        "F1"},
+        {domain::SpecialKey::F2,        "F2"},
+        {domain::SpecialKey::F3,        "F3"},
+        {domain::SpecialKey::F4,        "F4"},
+        {domain::SpecialKey::F5,        "F5"},
+        {domain::SpecialKey::F6,        "F6"},
+        {domain::SpecialKey::F7,        "F7"},
+        {domain::SpecialKey::F8,        "F8"},
+        {domain::SpecialKey::F9,        "F9"},
+        {domain::SpecialKey::F10,       "F10"},
+        {domain::SpecialKey::F11,       "F11"},
+        {domain::SpecialKey::F12,       "F12"},
     };
 
     std::string key_name;

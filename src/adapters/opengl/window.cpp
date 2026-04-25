@@ -207,7 +207,19 @@ std::optional<domain::KeyEvent> opengl::GLFWWindow::glfwSpecialKeyToKeyEvent(int
         {GLFW_KEY_END,       domain::SpecialKey::END},
         {GLFW_KEY_PAGE_UP,   domain::SpecialKey::PAGE_UP},
         {GLFW_KEY_PAGE_DOWN, domain::SpecialKey::PAGE_DOWN},
-        {GLFW_KEY_INSERT,    domain::SpecialKey::INSERT}
+        {GLFW_KEY_INSERT,    domain::SpecialKey::INSERT},
+        {GLFW_KEY_F1,        domain::SpecialKey::F1},
+        {GLFW_KEY_F2,        domain::SpecialKey::F2},
+        {GLFW_KEY_F3,        domain::SpecialKey::F3},
+        {GLFW_KEY_F4,        domain::SpecialKey::F4},
+        {GLFW_KEY_F5,        domain::SpecialKey::F5},
+        {GLFW_KEY_F6,        domain::SpecialKey::F6},
+        {GLFW_KEY_F7,        domain::SpecialKey::F7},
+        {GLFW_KEY_F8,        domain::SpecialKey::F8},
+        {GLFW_KEY_F9,        domain::SpecialKey::F9},
+        {GLFW_KEY_F10,        domain::SpecialKey::F10},
+        {GLFW_KEY_F11,        domain::SpecialKey::F11},
+        {GLFW_KEY_F12,        domain::SpecialKey::F12},
     };
 
     auto it = glfw_special_keys.find(key);
