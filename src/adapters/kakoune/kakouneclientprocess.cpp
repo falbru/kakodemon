@@ -1,5 +1,6 @@
 #include "kakouneclientprocess.hpp"
 
+#include <csignal>
 #include <cstdlib>
 #include <cerrno>
 #include <cstring>
@@ -49,7 +50,7 @@ void KakouneClientProcess::start()
 
 std::map<pid_t, KakouneClientProcess*> KakouneClientProcess::pid_to_instances = std::map<pid_t, KakouneClientProcess*>();
 
-void KakouneClientProcess::handleSIGCHLD(int sig) {
+void KakouneClientProcess::handleTerminationSignal(int sig) {
     int status;
     pid_t pid;
     while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
@@ -73,18 +74,29 @@ void KakouneClientProcess::processPendingExits() {
     }
 }
 
-void KakouneClientProcess::registerProcess(pid_t pid) {
+void KakouneClientProcess::setupSignalHandlers() {
+    static bool initialized = false;
+    if (initialized) return;
+    initialized = true;
+
     struct sigaction sa;
 
-    sa.sa_handler = handleSIGCHLD;
+    sa.sa_handler = handleTerminationSignal;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_RESTART;
     if (sigaction(SIGCHLD, &sa, NULL) == -1) {
         throw std::runtime_error("failed to setup SIGCHLD signal");
     }
 
-    m_client_pid = pid;
+    if (sigaction(SIGPIPE, &sa, NULL) == -1) {
+        throw std::runtime_error("failed to setup SIGPIPE signal");
+    }
+}
 
+void KakouneClientProcess::registerProcess(pid_t pid) {
+    setupSignalHandlers();
+
+    m_client_pid = pid;
     pid_to_instances.emplace(pid, this);
 }
 

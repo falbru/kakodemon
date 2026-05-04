@@ -182,8 +182,9 @@ class KakouneClientProcess
     static void processPendingExits();
 
   private:
-    static void handleSIGCHLD(int sig);
+    static void handleTerminationSignal(int sig);
     static std::map<pid_t, KakouneClientProcess *> pid_to_instances;
+    void setupSignalHandlers();
     void registerProcess(pid_t pid);
     pid_t m_client_pid;
 
