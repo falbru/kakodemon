@@ -2,7 +2,19 @@
 
 Kakodemon is an OpenGL-based GUI for Kakoune written in C++
 
-<img width="1920" height="1131" alt="Screenshot From 2026-01-13" src="https://github.com/user-attachments/assets/8fb194ef-3f7e-4cf0-be51-002af1493bcd" />
+<img width="1337" height="991" alt="Screenshot of Kakodemon" src="https://github.com/user-attachments/assets/9cb69cb7-08a2-4fe6-bcc2-d3492c3b9dee" />
+
+## Usage
+- Create new splits with `:kakodemon-new-client <commands>` (aliased to `:new`)
+- Focus splits with `:kakodemon-focus <kakoune_client>` (aliased to `:focus`)
+- Cycle between splits using the keybindings `<c-s-j>` and `<c-s-k>`
+- Adjust the master ratio with `<c-s-h>` and `<c-s-l>`
+- Adjust the number of masters with `<c-s-i>` and `<c-s-d>`
+- Toggle full layout with `<c-s-ret>`
+- Set the layout with `:kakodemon-layout <layout>`. Possible options are:
+    - `tall`: the master is to the left, and the stack is stacked vertically to the right
+    - `wide`: the master is on the top, and the stack is stacked horizontally below
+    - `full`: the focused split takes up the entire window
 
 ## Install from source
 
