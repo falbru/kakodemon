@@ -1,6 +1,6 @@
 # Kakodemon
 
-Kakodemon is an OpenGL-based GUI for Kakoune written in C++
+> Kakodemon is an OpenGL-based GUI for Kakoune written in C++
 
 <img width="1337" height="991" alt="Screenshot of Kakodemon" src="https://github.com/user-attachments/assets/9cb69cb7-08a2-4fe6-bcc2-d3492c3b9dee" />
 
@@ -24,7 +24,7 @@ Kakodemon is an OpenGL-based GUI for Kakoune written in C++
 sudo apt install -y git build-essential cmake libwayland-dev libxkbcommon-dev xorg-dev libfreetype-dev libfontconfig-dev
 ```
 
-2. Clone the repository
+2. Clone the repository (ensure the `rc/` folder is sourced by Kakoune)
 
 ```sh
 git clone https://github.com/falbru/kakodemon ~/.config/kak/autoload/
@@ -43,8 +43,8 @@ sudo install -D ./kakod /usr/local/bin
 
 You can then run the application with the command `kakod`
 
-> **Warning**<br>
-Make sure Kakoune version>=2026.04.12 is installed on your system!
+> [!IMPORTANT]
+> Make sure Kakoune version>=2026.04.12 is installed on your system!
 
 ## Configuration
 
