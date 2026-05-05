@@ -2,18 +2,6 @@ provide-module kakodemon %{
 
 declare-option str-list kakodemon_masters
 
-hook -group kakodemon global ClientCreate .* %{
-    nop %sh{
-        [ -z "$kak_client_env_KAKOD_ID" ] && exit
-        [ -z "$kak_client_env_KAKOD_CLIENT_ID" ] && exit
-
-        export KAKOD_ID=$kak_client_env_KAKOD_ID
-
-        kakod -p rename-session $kak_session
-        kakod -p rename-client $kak_client_env_KAKOD_CLIENT_ID $kak_client
-    }
-}
-
 hook -group kakodemon global ClientRenamed .* %{
     nop %sh{
         [ -z "$kak_client_env_KAKOD_ID" ] && exit
@@ -106,5 +94,11 @@ hook -group windowing global ClientCreate .* %{
 
         printf "%s\n" "require-module kakodemon"
         printf "%s\n" "set-option global windowing_module kakodemon"
+
+        [ -z "$kak_client_env_KAKOD_CLIENT_ID" ] && exit
+
+        export KAKOD_ID=$kak_client_env_KAKOD_ID
+        kakod -p rename-session $kak_session
+        kakod -p rename-client $kak_client_env_KAKOD_CLIENT_ID $kak_client
     }
 }
