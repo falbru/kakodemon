@@ -5,6 +5,7 @@ void kakoune::to_json(nlohmann::json &j, const Attribute &a)
 {
     switch (a) {
         case UNDERLINE:        j = "underline"; break;
+        case STRIKETHROUGH:    j = "strikethrough"; break;
         case CURLY_UNDERLINE:  j = "curly_underline"; break;
         case DOUBLE_UNDERLINE: j = "double_underline"; break;
         case REVERSE:          j = "reverse"; break;
@@ -23,6 +24,7 @@ void kakoune::from_json(const nlohmann::json &j, Attribute &a)
     std::string attr_str = j.get<std::string>();
 
     if (attr_str == "underline")             a = UNDERLINE;
+    else if (attr_str == "strikethrough")    a = STRIKETHROUGH;
     else if (attr_str == "curly_underline")  a = CURLY_UNDERLINE;
     else if (attr_str == "double_underline") a = DOUBLE_UNDERLINE;
     else if (attr_str == "reverse")          a = REVERSE;

@@ -11,6 +11,7 @@ namespace kakoune
 enum Attribute
 {
     UNDERLINE,
+    STRIKETHROUGH,
     CURLY_UNDERLINE,
     DOUBLE_UNDERLINE,
     REVERSE,
