@@ -159,7 +159,7 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
 {
     domain::Font *font = render_context.ui_options.font_infobox;
 
-    auto glyph_lines = domain::GlyphLinesBuilder::build(info_box.content, render_context.ui_options.font_infobox);
+    auto glyph_lines = domain::GlyphLinesBuilder::build(info_box.content, render_context.ui_options.font_infobox, render_context.font_manager);
     glyph_lines.wrap(MAX_WIDTH, domain::WrapMode::WORD);
 
     int info_box_width = static_cast<int>(std::max(glyph_lines.width(), domain::GlyphLinesBuilder::build(info_box.title, render_context.ui_options.font_infobox).width())) + SPACING_MEDIUM * 2 + BORDER_THICKNESS * 2;
