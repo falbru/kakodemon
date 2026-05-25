@@ -348,6 +348,11 @@ domain::ObserverId opengl::GLFWWindow::onMaximizedChanged(std::function<void(con
     return m_maximized_changed_observers.addObserver(std::move(callback));
 }
 
+std::string opengl::GLFWWindow::getClipboard() const {
+    const char* clipboard = glfwGetClipboardString(m_window);
+    return std::string(clipboard);
+}
+
 void opengl::GLFWWindow::removeObserver(domain::ObserverId id) {
     m_resize_observers.removeObserver(id);
     m_key_input_observers.removeObserver(id);

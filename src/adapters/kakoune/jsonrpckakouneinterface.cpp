@@ -240,6 +240,13 @@ void JsonRpcKakouneInterface::pressKeys(const std::vector<std::string>& keys) {
     });
 }
 
+void JsonRpcKakouneInterface::paste(const std::string content) {
+    m_process->sendRequest(OutgoingRequest{
+        OutgoingRequestType::PASTE,
+        PasteRequestData{content}
+    });
+}
+
 void JsonRpcKakouneInterface::resize(int rows, int columns) {
     m_process->sendRequest(OutgoingRequest{
         OutgoingRequestType::RESIZE,

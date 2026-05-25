@@ -43,6 +43,8 @@ class GLFWWindow : public domain::Window
     domain::ObserverId onMaximizedChanged(std::function<void(const domain::MaximizedChangedEvent &)> callback) override;
     void removeObserver(domain::ObserverId id) override;
 
+    std::string getClipboard() const override;
+
   private:
     void onGLFWKeyInput(int key, int scancode, int action, int mods);
     void onGLFWCharacterInsert(unsigned int codepoint, int mods);

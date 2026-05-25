@@ -236,6 +236,11 @@ void KakouneClientProcess::sendRequest(const OutgoingRequest &request)
         data["method"] = "keys";
         data["params"] = std::get<KeysRequestData>(request.data).keys;
     }
+    else if (request.type == OutgoingRequestType::PASTE)
+    {
+        data["method"] = "paste";
+        data["params"] = {std::get<PasteRequestData>(request.data).content};
+    }
     else if (request.type == OutgoingRequestType::RESIZE)
     {
         auto resize_data = std::get<ResizeRequestData>(request.data);

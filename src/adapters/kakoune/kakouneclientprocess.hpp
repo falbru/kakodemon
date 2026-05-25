@@ -101,6 +101,7 @@ struct IncomingRequest
 enum class OutgoingRequestType
 {
     KEYS,
+    PASTE,
     RESIZE,
     MOUSE_MOVE,
     MOUSE_PRESS,
@@ -112,6 +113,11 @@ enum class OutgoingRequestType
 struct KeysRequestData
 {
     std::vector<std::string> keys;
+};
+
+struct PasteRequestData
+{
+    std::string content;
 };
 
 struct ResizeRequestData
@@ -153,7 +159,7 @@ struct ScrollRequestData
 };
 
 using OutgoingRequestData =
-    std::variant<KeysRequestData, ResizeRequestData, MouseMoveRequestData, MousePressRequestData,
+    std::variant<KeysRequestData, PasteRequestData, ResizeRequestData, MouseMoveRequestData, MousePressRequestData,
                  MouseReleaseRequestData, MenuSelectRequestData, ScrollRequestData>;
 
 struct OutgoingRequest

@@ -66,6 +66,8 @@ class Window
     virtual ObserverId onMaximizedChanged(std::function<void(const MaximizedChangedEvent &)> callback) = 0;
     virtual void removeObserver(ObserverId id) = 0;
 
+    virtual std::string getClipboard() const = 0;
+
   private:
     bool m_needs_rerender = true;
 };

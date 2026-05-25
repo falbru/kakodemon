@@ -45,6 +45,7 @@ class KakouneInterface
     virtual std::optional<std::pair<KakouneState, FrameEvents>> getNextKakouneStateAndEvents() = 0;
 
     virtual void pressKeys(const std::vector<std::string> &keys) = 0;
+    virtual void paste(const std::string content) = 0;
     virtual void resize(int rows, int columns) = 0;
     virtual void resizeCached(int rows, int columns) = 0;
     virtual void scroll(int amount, int line, int column) = 0;

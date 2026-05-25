@@ -25,6 +25,7 @@ class JsonRpcKakouneInterface : public domain::KakouneInterface
     std::optional<std::pair<domain::KakouneState, domain::FrameEvents>> getNextKakouneStateAndEvents() override;
 
     void pressKeys(const std::vector<std::string> &keys) override;
+    void paste(const std::string content) override;
     void resize(int rows, int columns) override;
     void resizeCached(int rows, int columns) override;
     void scroll(int amount, int line, int column) override;

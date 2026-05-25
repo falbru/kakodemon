@@ -90,6 +90,10 @@ bool InputController::tryHandleGlobalKeybinding(const domain::KeyEvent &event) {
         m_window->setNeedsRerender();
         return true;
     }
+    if (key == "v" || key == "V") {
+        m_focused_client_stack->focused()->interface->paste(m_window->getClipboard());
+        return true;
+    }
     return false;
 }
 
