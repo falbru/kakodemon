@@ -44,7 +44,8 @@ class InfoBoxView
               KakouneContentView *kakoune_content_view, StatusBarView *status_bar_view);
 
     void render(const RenderContext &render_context, InfoBoxViewState &state, const domain::InfoBox &info_box,
-                const domain::CursorPosition &cursor_position, const domain::Rectangle &content_bounds);
+                const domain::CursorPosition &cursor_position, const domain::IVec2 &cursor_origin,
+                const domain::Rectangle &content_bounds);
 
     void handleMouseScroll(InfoBoxViewState &state, int scroll_amount);
 
@@ -57,11 +58,12 @@ class InfoBoxView
     PlacementConfig placementConfigByInfoBoxStyle(const RenderContext &render_context, InfoBoxViewState &state,
                                                   const domain::InfoBox &info_box,
                                                   const domain::CursorPosition &cursor_position,
-                                                  const domain::Rectangle &content_bounds, int info_box_width,
+                                                  const domain::IVec2 &cursor_origin, int info_box_width,
                                                   int info_box_height);
     std::optional<domain::Rectangle> placeInfoBox(const RenderContext &render_context, InfoBoxViewState &state,
                                                   const domain::InfoBox &info_box,
                                                   const domain::CursorPosition &cursor_position,
+                                                  const domain::IVec2 &cursor_origin,
                                                   const domain::Rectangle &content_bounds, int info_box_width,
                                                   int info_box_height);
     std::optional<domain::Rectangle> placeWithoutOverlap(const domain::Rectangle &bounds,

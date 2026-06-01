@@ -104,7 +104,7 @@ void Scene::render()
         Pane *pane = m_pane_layout->findPaneForClient(focused);
         if (pane) {
             m_info_box_view->render(focused_context, focused->info_box_state, *focused->state.info_box,
-                                    focused->state.cursor_position, domain::Rectangle{0, 0, static_cast<int>(m_window->getWidth()), static_cast<int>(m_window->getHeight())});
+                                    focused->state.cursor_position, domain::IVec2{pane->bounds.left(), pane->bounds.top()}, domain::Rectangle{0, 0, static_cast<int>(m_window->getWidth()), static_cast<int>(m_window->getHeight())});
         }
     }
 }

@@ -31,7 +31,7 @@ void InfoBoxView::init(domain::Renderer *renderer, MultiStyledMenuView *multi_st
 PlacementConfig InfoBoxView::placementConfigByInfoBoxStyle(const RenderContext &render_context, InfoBoxViewState &state,
                                                            const domain::InfoBox &info_box,
                                                            const domain::CursorPosition &cursor_position,
-                                                           const domain::Rectangle &content_bounds, int info_box_width,
+                                                           const domain::IVec2 &cursor_origin, int info_box_width,
                                                            int info_box_height)
 {
     domain::Rectangle anchor;
@@ -60,7 +60,7 @@ PlacementConfig InfoBoxView::placementConfigByInfoBoxStyle(const RenderContext &
 
     case domain::InfoStyle::INLINE: {
         auto pos = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, info_box.anchor,
-                                                         content_bounds.left(), content_bounds.top());
+                                                         cursor_origin.x, cursor_origin.y);
         return {AnchorPlacement{
                     {static_cast<int>(pos.first), static_cast<int>(pos.second),
                      static_cast<int>(m_kakoune_content_view->getCellWidth(render_context.ui_options.font_content)),
@@ -72,7 +72,7 @@ PlacementConfig InfoBoxView::placementConfigByInfoBoxStyle(const RenderContext &
 
     case domain::InfoStyle::INLINE_ABOVE: {
         auto pos = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, info_box.anchor,
-                                                         content_bounds.left(), content_bounds.top());
+                                                         cursor_origin.x, cursor_origin.y);
 
         return {AnchorPlacement{
                     {static_cast<int>(pos.first), static_cast<int>(pos.second),
@@ -85,7 +85,7 @@ PlacementConfig InfoBoxView::placementConfigByInfoBoxStyle(const RenderContext &
 
     case domain::InfoStyle::INLINE_BELOW: {
         auto pos = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, info_box.anchor,
-                                                         content_bounds.left(), content_bounds.top());
+                                                         cursor_origin.x, cursor_origin.y);
         return {AnchorPlacement{
                     {static_cast<int>(pos.first), static_cast<int>(pos.second), 0,
                      static_cast<int>(m_kakoune_content_view->getCellHeight(render_context.ui_options.font_content))},
@@ -113,11 +113,12 @@ PlacementConfig InfoBoxView::placementConfigByInfoBoxStyle(const RenderContext &
 std::optional<domain::Rectangle> InfoBoxView::placeInfoBox(const RenderContext &render_context, InfoBoxViewState &state,
                                                            const domain::InfoBox &info_box,
                                                            const domain::CursorPosition &cursor_position,
-                                                           const domain::Rectangle &content_bounds, int info_box_width,
+                                                           const domain::IVec2& cursor_origin,
+                                                           const domain::Rectangle &bounds, int info_box_width,
                                                            int info_box_height)
 {
     auto placement_config = placementConfigByInfoBoxStyle(render_context, state, info_box, cursor_position,
-                                                          content_bounds, info_box_width, info_box_height);
+                                                          cursor_origin, info_box_width, info_box_height);
 
     if (std::holds_alternative<FixedPlacement>(placement_config.placement))
     {
@@ -141,13 +142,13 @@ std::optional<domain::Rectangle> InfoBoxView::placeInfoBox(const RenderContext &
     {
         std::pair<float, float> pos = m_kakoune_content_view->coordToPixels(
             render_context.ui_options.font_content, std::get<domain::BufferContentPosition>(cursor_position).coord,
-            content_bounds.left(), content_bounds.top());
+            cursor_origin.x, cursor_origin.y);
 
-        cursor_line = domain::Rectangle(0, pos.second, 1000,
+        cursor_line = domain::Rectangle(cursor_origin.x, cursor_origin.y + pos.second, 1000,
                                         m_kakoune_content_view->getCellHeight(render_context.ui_options.font_content));
     }
 
-    return placeWithoutOverlap(content_bounds, domain::IVec2{info_box_width, info_box_height}, anchor, preferred_directions,
+    return placeWithoutOverlap(bounds, domain::IVec2{info_box_width, info_box_height}, anchor, preferred_directions,
                            {
                                m_multi_styled_menu->isVisible() ? menu_rectangle : domain::Rectangle(),
                                cursor_line.value_or(domain::Rectangle()),
@@ -155,7 +156,7 @@ std::optional<domain::Rectangle> InfoBoxView::placeInfoBox(const RenderContext &
 }
 
 void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &state, const domain::InfoBox &info_box,
-                         const domain::CursorPosition &cursor_position, const domain::Rectangle &content_bounds)
+                         const domain::CursorPosition &cursor_position, const domain::IVec2& cursor_origin, const domain::Rectangle &bounds)
 {
     domain::Font *font = render_context.ui_options.font_infobox;
 
@@ -170,7 +171,7 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
     }
     info_box_height = std::min(info_box_height, MAX_HEIGHT);
 
-    auto placement = placeInfoBox(render_context, state, info_box, cursor_position, content_bounds, info_box_width, info_box_height);
+    auto placement = placeInfoBox(render_context, state, info_box, cursor_position, cursor_origin, bounds, info_box_width, info_box_height);
     if (!placement)
     {
         return;
