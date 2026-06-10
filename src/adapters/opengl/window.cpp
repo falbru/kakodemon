@@ -3,6 +3,8 @@
 #include "domain/eventfilters.hpp"
 #include "domain/mouse.hpp"
 #include "domain/ports/window.hpp"
+#include <stdexcept>
+#include <string>
 
 opengl::GLFWWindow::GLFWWindow() {
 }
@@ -16,7 +18,9 @@ opengl::GLFWWindow::~GLFWWindow() {
 
 void opengl::GLFWWindow::init(bool maximized) {
     if (!glfwInit()) {
-        return;
+        const char* error_desc;
+        glfwGetError(&error_desc);
+        throw std::runtime_error(std::string("GLFW initialization failed: ") + (error_desc ? error_desc : "unknown error"));
     }
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -33,8 +37,10 @@ void opengl::GLFWWindow::init(bool maximized) {
     m_window = glfwCreateWindow(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, "Kakodemon", NULL, NULL);
     if (!m_window)
     {
+        const char* error_desc;
+        glfwGetError(&error_desc);
         glfwTerminate();
-        return;
+        throw std::runtime_error(std::string("GLFW window creation failed: ") + (error_desc ? error_desc : "unknown error"));
     }
 
     glfwSetWindowSizeLimits(m_window, 636, 424, GLFW_DONT_CARE, GLFW_DONT_CARE);
@@ -44,7 +50,7 @@ void opengl::GLFWWindow::init(bool maximized) {
     glfwSetWindowUserPointer(m_window, this);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        return;
+        throw std::runtime_error("Failed to load OpenGL functions with GLAD");
     }
 
     int framebuffer_width, framebuffer_height;
