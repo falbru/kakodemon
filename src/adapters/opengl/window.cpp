@@ -46,7 +46,6 @@ void opengl::GLFWWindow::init(bool maximized) {
     glfwSetWindowSizeLimits(m_window, 636, 424, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
     glfwMakeContextCurrent(m_window);
-    glfwSwapInterval(0);
     glfwSetWindowUserPointer(m_window, this);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
