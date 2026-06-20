@@ -35,18 +35,15 @@ void Scene::init(ClientManager *client_manager, FocusedClientStack *focused_clie
         domain::MouseMoveResult result = onMouseMove(event.x, event.y);
         if (result.cursor.has_value()) {
             m_window->setCursor(result.cursor.value());
-            m_window->setNeedsRerender();
         }
     });
 
     window->onMouseButton([this](const domain::MouseButtonEvent& event) {
         onMouseButton(event);
-        m_window->setNeedsRerender();
     });
 
     window->onMouseScroll([this](const domain::MouseScrollEvent& event) {
         onMouseScroll(event.scroll_amount);
-        m_window->setNeedsRerender();
     });
 }
 
@@ -194,6 +191,8 @@ void Scene::onMouseScroll(double offset)
     }
 
     if (scroll_amount == 0) return;
+
+    m_window->setNeedsRerender();
 
     if (hitTestMenu(m_mouse_x, m_mouse_y)) {
         m_multi_styled_menu->handleMouseScroll(m_focused_client_stack->focused()->menu_state, -scroll_amount, *m_focused_client_stack->focused()->state.menu);
