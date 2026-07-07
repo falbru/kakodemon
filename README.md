@@ -27,7 +27,7 @@ sudo apt install -y git build-essential cmake libwayland-dev libxkbcommon-dev xo
 2. Clone the repository (ensure the `rc/` folder is sourced by Kakoune)
 
 ```sh
-git clone https://github.com/falbru/kakodemon ~/.config/kak/autoload/
+git clone https://github.com/falbru/kakodemon ~/.config/kak/autoload/kakodemon
 ```
 
 3. Build and install the project
