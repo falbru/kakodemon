@@ -34,6 +34,7 @@ git clone https://github.com/falbru/kakodemon ~/.config/kak/autoload/kakodemon
 
 ```sh
 cd ~/.config/kak/autoload/kakodemon
+git submodule update --init
 mkdir build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
