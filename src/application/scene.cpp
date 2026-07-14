@@ -30,16 +30,25 @@ void Scene::init(ClientManager *client_manager, FocusedClientStack *focused_clie
     });
 
     window->onMouseMove([this](const domain::MouseMoveEvent& event) {
-        m_mouse_x = event.x;
-        m_mouse_y = event.y;
-        domain::MouseMoveResult result = onMouseMove(event.x, event.y);
+        float scale_x = m_window->getContentScaleX();
+        float scale_y = m_window->getContentScaleY();
+        float x = event.x * scale_x;
+        float y = event.y * scale_y;
+        m_mouse_x = x;
+        m_mouse_y = y;
+        domain::MouseMoveResult result = onMouseMove(x, y);
         if (result.cursor.has_value()) {
             m_window->setCursor(result.cursor.value());
         }
     });
 
     window->onMouseButton([this](const domain::MouseButtonEvent& event) {
-        onMouseButton(event);
+        float scale_x = m_window->getContentScaleX();
+        float scale_y = m_window->getContentScaleY();
+        domain::MouseButtonEvent scaledMouseEvent = event;
+        scaledMouseEvent.x = event.x * scale_x;
+        scaledMouseEvent.y = event.y * scale_y;
+        onMouseButton(scaledMouseEvent);
     });
 
     window->onMouseScroll([this](const domain::MouseScrollEvent& event) {

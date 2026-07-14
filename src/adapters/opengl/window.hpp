@@ -30,6 +30,8 @@ class GLFWWindow : public domain::Window
     void setCursor(domain::Cursor cursor) override;
     float getWidth() override;
     float getHeight() override;
+    float getContentScaleX() const override;
+    float getContentScaleY() const override;
 
     domain::EventFilterId installEventFilter(std::function<bool(const domain::WindowEvent &)> event_filter) override;
     void removeEventFilter(domain::EventFilterId id) override;
@@ -50,6 +52,7 @@ class GLFWWindow : public domain::Window
     void onGLFWCharacterInsert(unsigned int codepoint, int mods);
     void onGLFWMouseMove(float cursor_x, float cursor_y);
     void onGLFWMouseButton(int button, int action, int mods);
+    void onGLFWWindowContentScale(float xscale, float yscale);
 
     int toDomainModifiers(int mods);
     std::optional<domain::KeyEvent> glfwSpecialKeyToKeyEvent(int key, int mods);
@@ -65,6 +68,9 @@ class GLFWWindow : public domain::Window
 
     float m_cursor_x = 0.0f;
     float m_cursor_y = 0.0f;
+
+    float m_scaling_factor_x = 1.0f;
+    float m_scaling_factor_y = 1.0f;
 
     domain::RGBAColor m_clear_color = {};
 

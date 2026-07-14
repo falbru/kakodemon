@@ -8,6 +8,7 @@
 #include "domain/mouse.hpp"
 #include "domain/observerlist.hpp"
 #include "domain/ports/renderer.hpp"
+#include "domain/ports/window.hpp"
 #include <functional>
 
 class KakouneContentView
@@ -15,7 +16,7 @@ class KakouneContentView
   public:
     KakouneContentView();
 
-    void init(domain::Renderer *renderer);
+    void init(domain::Renderer *renderer, domain::Window *window);
 
     void render(const RenderContext &render_context, const domain::Lines &lines, const domain::Face &default_face,
                 const domain::Rectangle &bounds);
@@ -39,6 +40,7 @@ class KakouneContentView
 
   private:
     domain::Renderer *m_renderer;
+    domain::Window *m_window = nullptr;
 
     domain::ObserverList<KakouneClient *, domain::MouseButtonEvent, domain::Coord> m_mouse_button_observers;
     domain::ObserverList<KakouneClient *, domain::Coord> m_mouse_move_observers;

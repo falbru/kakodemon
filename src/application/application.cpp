@@ -116,7 +116,7 @@ void Application::init(const CliConfig &cli_config, const ApplicationConfig &app
     m_info_box = std::make_unique<InfoBoxView>();
     m_pane_border_view = std::make_unique<PaneBorderView>();
 
-    m_kakoune_content_view->init(m_renderer.get());
+    m_kakoune_content_view->init(m_renderer.get(), m_window.get());
     m_status_bar->init(m_renderer.get());
     m_multi_styled_menu->init(m_renderer.get(), m_kakoune_content_view.get());
     m_info_box->init(m_renderer.get(), m_multi_styled_menu.get(), m_kakoune_content_view.get(), m_status_bar.get());

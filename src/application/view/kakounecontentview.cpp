@@ -6,9 +6,10 @@ KakouneContentView::KakouneContentView()
 {
 }
 
-void KakouneContentView::init(domain::Renderer *renderer)
+void KakouneContentView::init(domain::Renderer *renderer, domain::Window *window)
 {
     m_renderer = renderer;
+    m_window = window;
 }
 
 void KakouneContentView::render(const RenderContext &render_context, const domain::Lines &lines,

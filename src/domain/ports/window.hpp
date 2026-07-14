@@ -54,6 +54,9 @@ class Window
     virtual float getWidth() = 0;
     virtual float getHeight() = 0;
 
+    virtual float getContentScaleX() const = 0;
+    virtual float getContentScaleY() const = 0;
+
     virtual EventFilterId installEventFilter(std::function<bool(const WindowEvent &)>) = 0;
     virtual void removeEventFilter(domain::EventFilterId id) = 0;
 

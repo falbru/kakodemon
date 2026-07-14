@@ -56,6 +56,8 @@ void opengl::GLFWWindow::init(bool maximized) {
     glfwGetFramebufferSize(m_window, &framebuffer_width, &framebuffer_height);
     glViewport(0, 0, framebuffer_width, framebuffer_height);
 
+    glfwGetWindowContentScale(m_window, &m_scaling_factor_x, &m_scaling_factor_y);
+
     glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int width, int height) {
         GLFWWindow* self = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
 
@@ -112,6 +114,11 @@ void opengl::GLFWWindow::init(bool maximized) {
         if (!self->m_event_filters.isFiltered(event)) {
             self->m_close_observers.notify(event);
         }
+    });
+
+    glfwSetWindowContentScaleCallback(m_window, [](GLFWwindow* window, float xscale, float yscale) {
+        GLFWWindow* self = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
+        self->onGLFWWindowContentScale(xscale, yscale);
     });
 
     m_cursor_ibeam = glfwCreateStandardCursor(GLFW_IBEAM_CURSOR);
@@ -173,6 +180,19 @@ float opengl::GLFWWindow::getHeight() {
     int width, height;
     glfwGetFramebufferSize(m_window, &width, &height);
     return height;
+}
+
+float opengl::GLFWWindow::getContentScaleX() const {
+    return m_scaling_factor_x;
+}
+
+float opengl::GLFWWindow::getContentScaleY() const {
+    return m_scaling_factor_y;
+}
+
+void opengl::GLFWWindow::onGLFWWindowContentScale(float xscale, float yscale) {
+    m_scaling_factor_x = xscale;
+    m_scaling_factor_y = yscale;
 }
 
 void opengl::GLFWWindow::onGLFWKeyInput(int key, int scancode, int action, int mods)
