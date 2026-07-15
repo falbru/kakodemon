@@ -7,11 +7,12 @@
 #include <iostream>
 #include <memory>
 
-void print_help(const char* program_name)
+void printHelp(const char* program_name)
 {
     std::cout << "Usage: " << program_name << " [OPTIONS] [file]... [+<line>[:<col>]|+:]\n\n"
               << "Options:\n"
               << "  -c <session>      Connect to remote Kakoune session\n"
+              << "  -C <session>      Connect to remote Kakoune session, create local session if it does not exist\n"
               << "  -s <session>      Set session name\n"
               << "  -e <command>      Execute command on client initialisation\n"
               << "  -p <command>      Send command to a running instance (uses KAKOD_ID env)\n"
@@ -24,7 +25,7 @@ void print_help(const char* program_name)
               << "  [+:]              Edit file at last position\n";
 }
 
-void print_version()
+void printVersion()
 {
     std::cout << "kakodemon " << KAKODEMON_VERSION << "\n";
 }
@@ -36,10 +37,10 @@ int main(int argc, char* argv[])
     switch (parsed_args.result)
     {
         case ParseResult::ShowVersion:
-            print_version();
+            printVersion();
             return 0;
         case ParseResult::ShowHelp:
-            print_help(argv[0]);
+            printHelp(argv[0]);
             return 0;
         case ParseResult::SendCommand:
         {

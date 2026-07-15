@@ -142,9 +142,9 @@ TEST_CASE("CLI Parser - Conflicting -c and -n flags", "[cliparser]")
 
 TEST_CASE("CLI Parser - Random session ID is unique", "[cliparser]")
 {
-    std::string id1 = generate_random_session_id();
-    std::string id2 = generate_random_session_id();
-    std::string id3 = generate_random_session_id();
+    std::string id1 = generateRandomSessionId();
+    std::string id2 = generateRandomSessionId();
+    std::string id3 = generateRandomSessionId();
 
     REQUIRE(id1.find("kakod-") == 0);
     REQUIRE(id2.find("kakod-") == 0);

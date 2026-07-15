@@ -16,6 +16,8 @@ class KakouneSession
     virtual void sendCommand(const std::string &command) = 0;
 };
 
+bool kakouneSessionExists(const std::string &session_id);
+
 } // namespace domain
 
 #endif

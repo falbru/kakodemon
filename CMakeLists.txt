@@ -97,6 +97,7 @@ set(SRC
     src/domain/modeline.cpp
     src/domain/ports/font.cpp
     src/domain/ports/kakouneinterface.cpp
+    src/domain/ports/kakounesession.cpp
     src/domain/ports/renderer.cpp
     src/domain/ports/window.cpp
     src/domain/statusline.cpp

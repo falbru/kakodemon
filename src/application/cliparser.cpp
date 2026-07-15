@@ -1,11 +1,13 @@
 #include "cliparser.hpp"
+#include "domain/ports/kakounesession.hpp"
 #include <cstdlib>
 #include <getopt.h>
 #include <random>
 #include <sstream>
 #include <iomanip>
+#include <stdexcept>
 
-std::string generate_random_session_id()
+std::string generateRandomSessionId()
 {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -36,15 +38,30 @@ ParsedCliArgs parseCliArgs(int argc, char* argv[])
 
     int opt;
     int option_index = 0;
-    while ((opt = getopt_long(argc, argv, "c:s:e:pn", long_options, &option_index)) != -1)
+    while ((opt = getopt_long(argc, argv, "c:C:s:e:pn", long_options, &option_index)) != -1)
     {
         switch (opt)
         {
             case 'c':
+                if (!domain::kakouneSessionExists(std::string(optarg))) {
+                    throw std::runtime_error("kakoune session does not exist");
+                }
+
                 result.config.session_type = SessionType::Remote;
                 result.config.session_id = optarg;
                 remote_session_set = true;
                 break;
+            case 'C': {
+                    if (domain::kakouneSessionExists(std::string(optarg))) {
+                        result.config.session_type = SessionType::Remote;
+                        result.config.session_id = optarg;
+                        remote_session_set = true;
+                    } else {
+                        result.config.session_id = optarg;
+                        local_session_set = true;
+                    }
+                    break;
+                }
             case 's':
                 result.config.session_id = optarg;
                 local_session_set = true;
@@ -115,7 +132,7 @@ ParsedCliArgs parseCliArgs(int argc, char* argv[])
 
     if (result.config.session_id.empty())
     {
-        result.config.session_id = generate_random_session_id();
+        result.config.session_id = generateRandomSessionId();
     }
 
     for (int i = optind; i < argc; i++)

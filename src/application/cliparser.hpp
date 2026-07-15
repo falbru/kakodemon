@@ -29,4 +29,4 @@ struct ParsedCliArgs
 
 ParsedCliArgs parseCliArgs(int argc, char *argv[]);
 
-std::string generate_random_session_id();
+std::string generateRandomSessionId();
