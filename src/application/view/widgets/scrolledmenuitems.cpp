@@ -30,7 +30,7 @@ void ScrolledMenuItems::render(domain::Renderer* renderer, const RenderContext &
         float item_secondary_width = 0;
         if (item.getAtoms().size() > 1)
         {
-            item_secondary_width = GlyphSequence(font, render_context.font_manager, item.at(1).getContents().trim(domain::TrimDirection::Left)).width();
+            item_secondary_width = GlyphSequence(font, render_context.font_manager, item.at(item.getAtoms().size()-1).getContents().trim(domain::TrimDirection::Left)).width();
         }
 
         if (item_value_glyphs.width() + item_secondary_width > items_layout.current().width)
@@ -39,7 +39,7 @@ void ScrolledMenuItems::render(domain::Renderer* renderer, const RenderContext &
         }
 
         auto item_value = domain::Line{{domain::Atom(item_value_glyphs.toUTF8String(), item.at(0).getFace())}};
-        auto item_secondary = item.size() > 1 ? domain::Line{{item.at(1)}} : domain::Line();
+        auto item_secondary = item.size() > 1 ? domain::Line{{item.at(item.size()-1)}} : domain::Line();
 
         if (i == selected_index)
         {
