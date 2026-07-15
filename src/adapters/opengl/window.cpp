@@ -260,10 +260,10 @@ std::optional<domain::KeyEvent> opengl::GLFWWindow::glfwSpecialKeyToKeyEvent(int
 }
 
 void opengl::GLFWWindow::onGLFWMouseMove(float cursor_x, float cursor_y) {
-    m_cursor_x = cursor_x;
-    m_cursor_y = cursor_y;
+    m_cursor_x = cursor_x * m_scaling_factor_x;
+    m_cursor_y = cursor_y * m_scaling_factor_y;
 
-    domain::MouseMoveEvent event{cursor_x, cursor_y};
+    domain::MouseMoveEvent event{m_cursor_x, m_cursor_y};
     if (!m_event_filters.isFiltered(event)) {
         m_mouse_move_observers.notify(event);
     }
