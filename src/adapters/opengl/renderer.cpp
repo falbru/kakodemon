@@ -157,6 +157,8 @@ void opengl::Renderer::renderLines(const domain::TextRenderConfig& config, const
 void opengl::Renderer::_renderLine(const domain::TextRenderConfig& config, const domain::Line &line, const domain::Face &default_face, float x, float y, const domain::Alignment &alignment, RenderPass pass) const {
     opengl::Font* font = dynamic_cast<opengl::Font*>(config.font);
 
+    const domain::Face resolved_default_face = domain::Face(default_face.getBg(config.default_face, config.color_overrides), default_face.getFg(config.default_face, config.color_overrides));
+
     float start_x = x;
     float start_y = y + font->getLineHeight();
 
@@ -184,7 +186,7 @@ void opengl::Renderer::_renderLine(const domain::TextRenderConfig& config, const
             float width = atom.width();
 
             // Background color
-            _renderRect(atom.getFace().getBg(default_face, config.color_overrides), x_it, y_it - height, width, height);
+            _renderRect(atom.getFace().getBg(resolved_default_face, config.color_overrides), x_it, y_it - height, width, height);
 
             x_it += width;
         }
@@ -196,7 +198,7 @@ void opengl::Renderer::_renderLine(const domain::TextRenderConfig& config, const
         float y_it = start_y + font->getDescender();
         for (const auto& atom : glyph_line.getGlyphAtoms())
         {
-            domain::RGBAColor color = atom.getFace().getFg(default_face, config.color_overrides);
+            domain::RGBAColor color = atom.getFace().getFg(resolved_default_face, config.color_overrides);
             m_shader_program->setVector4f("textColor", color.r, color.g, color.b, color.a);
 
             float atom_x = x_it;
@@ -235,7 +237,7 @@ void opengl::Renderer::_renderLine(const domain::TextRenderConfig& config, const
             }
 
             if (atom.getFace().hasAttribute(domain::Attribute::Underline) && font->getUnderlineThickness() > 0) {
-                _renderRect(atom.getFace().getFg(default_face, config.color_overrides), atom_x, y_it + font->getUnderlineOffset(), x_it - atom_x, font->getUnderlineThickness());
+                _renderRect(atom.getFace().getFg(resolved_default_face, config.color_overrides), atom_x, y_it + font->getUnderlineOffset(), x_it - atom_x, font->getUnderlineThickness());
             }
         }
     }
