@@ -27,14 +27,13 @@ sudo apt install -y git build-essential cmake libwayland-dev libxkbcommon-dev xo
 2. Clone the repository (ensure the `rc/` folder is sourced by Kakoune)
 
 ```sh
-git clone https://github.com/falbru/kakodemon ~/.config/kak/autoload/kakodemon
+git clone --recurse-submodules https://github.com/falbru/kakodemon ~/.config/kak/autoload/kakodemon
 ```
 
 3. Build and install the project
 
 ```sh
 cd ~/.config/kak/autoload/kakodemon
-git submodule update --init
 mkdir build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
