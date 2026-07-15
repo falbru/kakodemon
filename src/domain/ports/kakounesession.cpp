@@ -7,7 +7,6 @@ bool domain::kakouneSessionExists(const std::string& session_id)
     FILE* pipe = popen("kak -l", "r");
     if (!pipe)
     {
-        pclose(pipe);
         return false;
     }
 
