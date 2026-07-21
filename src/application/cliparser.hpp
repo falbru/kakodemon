@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cliconfig.hpp"
+#include <functional>
 #include <string>
 
 enum class ParseResult
@@ -14,7 +15,6 @@ enum class ParseResult
 
 struct CommandRequest
 {
-    std::string pipe_id;
     std::string command;
     std::vector<std::string> args;
 };
@@ -27,6 +27,20 @@ struct ParsedCliArgs
     std::string error_message;
 };
 
-ParsedCliArgs parseCliArgs(int argc, char *argv[]);
+struct ValidatorDependencies
+{
+    std::function<bool(const std::string &)> kakouneSessionExists;
+};
+
+class CliParser
+{
+  public:
+    CliParser(ValidatorDependencies dependencies);
+
+    ParsedCliArgs parseAndValidate(int argc, char *argv[]);
+
+  private:
+    ValidatorDependencies m_validator_depencies;
+};
 
 std::string generateRandomSessionId();

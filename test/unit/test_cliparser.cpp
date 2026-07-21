@@ -1,5 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
+#include "application/cliconfig.hpp"
 #include "application/cliparser.hpp"
+#include <string>
 #include <vector>
 
 struct ArgvHelper
@@ -21,10 +23,16 @@ struct ArgvHelper
     int argc() { return static_cast<int>(storage.size()); }
 };
 
+CliParser cliParserWithExistingKakouneSession(bool existingKakouneSession) {
+    return CliParser(ValidatorDependencies{ .kakouneSessionExists = [existingKakouneSession](const std::string& session_id) {
+        return existingKakouneSession;
+    }});
+}
+
 TEST_CASE("CLI Parser - No arguments creates local session with random ID", "[cliparser]")
 {
     ArgvHelper args({"kakod"});
-    ParsedCliArgs result = parseCliArgs(args.argc(), args.argv());
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(false).parseAndValidate(args.argc(), args.argv());
 
     REQUIRE(result.result == ParseResult::Success);
     REQUIRE(result.config.session_type == SessionType::Local);
@@ -35,7 +43,7 @@ TEST_CASE("CLI Parser - No arguments creates local session with random ID", "[cl
 TEST_CASE("CLI Parser - Set session name with -s", "[cliparser]")
 {
     ArgvHelper args({"kakod", "-s", "my-session"});
-    ParsedCliArgs result = parseCliArgs(args.argc(), args.argv());
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(false).parseAndValidate(args.argc(), args.argv());
 
     REQUIRE(result.result == ParseResult::Success);
     REQUIRE(result.config.session_type == SessionType::Local);
@@ -43,10 +51,19 @@ TEST_CASE("CLI Parser - Set session name with -s", "[cliparser]")
     REQUIRE(!result.config.startup_command.has_value());
 }
 
+TEST_CASE("CLI Parser - Fail to set session name with -s to a session name already in use", "[cliparser]")
+{
+    ArgvHelper args({"kakod", "-s", "my-session"});
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(true).parseAndValidate(args.argc(), args.argv());
+
+    REQUIRE(result.result == ParseResult::Error);
+    REQUIRE(result.error_message.find("already in use") != std::string::npos);
+}
+
 TEST_CASE("CLI Parser - Connect to remote session with -c", "[cliparser]")
 {
     ArgvHelper args({"kakod", "-c", "remote-session"});
-    ParsedCliArgs result = parseCliArgs(args.argc(), args.argv());
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(true).parseAndValidate(args.argc(), args.argv());
 
     REQUIRE(result.result == ParseResult::Success);
     REQUIRE(result.config.session_type == SessionType::Remote);
@@ -54,10 +71,41 @@ TEST_CASE("CLI Parser - Connect to remote session with -c", "[cliparser]")
     REQUIRE(!result.config.startup_command.has_value());
 }
 
+TEST_CASE("CLI Parser - Fail to connect to remote session that does not exist with -c", "[cliparser]")
+{
+    ArgvHelper args({"kakod", "-c", "non-existent-remote-session"});
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(false).parseAndValidate(args.argc(), args.argv());
+
+    REQUIRE(result.result == ParseResult::Error);
+    REQUIRE(result.error_message.find("does not exist") != std::string::npos);
+}
+
+TEST_CASE("CLI Parser - Connect to remote session with -C", "[cliparser]")
+{
+    ArgvHelper args({"kakod", "-c", "remote-session"});
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(true).parseAndValidate(args.argc(), args.argv());
+
+    REQUIRE(result.result == ParseResult::Success);
+    REQUIRE(result.config.session_type == SessionType::Remote);
+    REQUIRE(result.config.session_id == "remote-session");
+    REQUIRE(!result.config.startup_command.has_value());
+}
+
+TEST_CASE("CLI Parser - Create local session with -C", "[cliparser]")
+{
+    ArgvHelper args({"kakod", "-C", "local-session"});
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(false).parseAndValidate(args.argc(), args.argv());
+
+    REQUIRE(result.result == ParseResult::Success);
+    REQUIRE(result.config.session_type == SessionType::Local);
+    REQUIRE(result.config.session_id == "local-session");
+    REQUIRE(!result.config.startup_command.has_value());
+}
+
 TEST_CASE("CLI Parser - Set startup command with -e", "[cliparser]")
 {
     ArgvHelper args({"kakod", "-e", "echo hello"});
-    ParsedCliArgs result = parseCliArgs(args.argc(), args.argv());
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(false).parseAndValidate(args.argc(), args.argv());
 
     REQUIRE(result.result == ParseResult::Success);
     REQUIRE(result.config.startup_command.has_value());
@@ -67,7 +115,7 @@ TEST_CASE("CLI Parser - Set startup command with -e", "[cliparser]")
 TEST_CASE("CLI Parser - Startup command with local session", "[cliparser]")
 {
     ArgvHelper args({"kakod", "-s", "my-session", "-e", "edit file.txt"});
-    ParsedCliArgs result = parseCliArgs(args.argc(), args.argv());
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(false).parseAndValidate(args.argc(), args.argv());
 
     REQUIRE(result.result == ParseResult::Success);
     REQUIRE(result.config.session_type == SessionType::Local);
@@ -79,7 +127,7 @@ TEST_CASE("CLI Parser - Startup command with local session", "[cliparser]")
 TEST_CASE("CLI Parser - Startup command with remote session", "[cliparser]")
 {
     ArgvHelper args({"kakod", "-c", "remote", "-e", "buffer next"});
-    ParsedCliArgs result = parseCliArgs(args.argc(), args.argv());
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(true).parseAndValidate(args.argc(), args.argv());
 
     REQUIRE(result.result == ParseResult::Success);
     REQUIRE(result.config.session_type == SessionType::Remote);
@@ -91,7 +139,7 @@ TEST_CASE("CLI Parser - Startup command with remote session", "[cliparser]")
 TEST_CASE("CLI Parser - No config flag", "[cliparser]")
 {
     ArgvHelper args({"kakod", "-n"});
-    ParsedCliArgs result = parseCliArgs(args.argc(), args.argv());
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(false).parseAndValidate(args.argc(), args.argv());
 
     REQUIRE(result.result == ParseResult::Success);
     REQUIRE(result.config.no_config == true);
@@ -100,7 +148,7 @@ TEST_CASE("CLI Parser - No config flag", "[cliparser]")
 TEST_CASE("CLI Parser - Defaults to load config", "[cliparser]")
 {
     ArgvHelper args({"kakod"});
-    ParsedCliArgs result = parseCliArgs(args.argc(), args.argv());
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(false).parseAndValidate(args.argc(), args.argv());
 
     REQUIRE(result.result == ParseResult::Success);
     REQUIRE(result.config.no_config == false);
@@ -109,7 +157,7 @@ TEST_CASE("CLI Parser - Defaults to load config", "[cliparser]")
 TEST_CASE("CLI Parser - Version flag", "[cliparser]")
 {
     ArgvHelper args({"kakod", "--version"});
-    ParsedCliArgs result = parseCliArgs(args.argc(), args.argv());
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(false).parseAndValidate(args.argc(), args.argv());
 
     REQUIRE(result.result == ParseResult::ShowVersion);
 }
@@ -117,7 +165,7 @@ TEST_CASE("CLI Parser - Version flag", "[cliparser]")
 TEST_CASE("CLI Parser - Help flag", "[cliparser]")
 {
     ArgvHelper args({"kakod", "--help"});
-    ParsedCliArgs result = parseCliArgs(args.argc(), args.argv());
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(false).parseAndValidate(args.argc(), args.argv());
 
     REQUIRE(result.result == ParseResult::ShowHelp);
 }
@@ -125,7 +173,25 @@ TEST_CASE("CLI Parser - Help flag", "[cliparser]")
 TEST_CASE("CLI Parser - Conflicting -c and -s flags", "[cliparser]")
 {
     ArgvHelper args({"kakod", "-c", "remote", "-s", "local"});
-    ParsedCliArgs result = parseCliArgs(args.argc(), args.argv());
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(false).parseAndValidate(args.argc(), args.argv());
+
+    REQUIRE(result.result == ParseResult::Error);
+    REQUIRE(result.error_message.find("not compatible") != std::string::npos);
+}
+
+TEST_CASE("CLI Parser - Conflicting -c and -C flags", "[cliparser]")
+{
+    ArgvHelper args({"kakod", "-c", "remote", "-C", "local"});
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(false).parseAndValidate(args.argc(), args.argv());
+
+    REQUIRE(result.result == ParseResult::Error);
+    REQUIRE(result.error_message.find("not compatible") != std::string::npos);
+}
+
+TEST_CASE("CLI Parser - Conflicting -s and -C flags", "[cliparser]")
+{
+    ArgvHelper args({"kakod", "-s", "local", "-C", "local"});
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(false).parseAndValidate(args.argc(), args.argv());
 
     REQUIRE(result.result == ParseResult::Error);
     REQUIRE(result.error_message.find("not compatible") != std::string::npos);
@@ -134,10 +200,21 @@ TEST_CASE("CLI Parser - Conflicting -c and -s flags", "[cliparser]")
 TEST_CASE("CLI Parser - Conflicting -c and -n flags", "[cliparser]")
 {
     ArgvHelper args({"kakod", "-c", "remote", "-n"});
-    ParsedCliArgs result = parseCliArgs(args.argc(), args.argv());
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(false).parseAndValidate(args.argc(), args.argv());
 
     REQUIRE(result.result == ParseResult::Error);
-    REQUIRE(result.error_message.find("not compatible") != std::string::npos);
+    REQUIRE(result.error_message.find("incompatible") != std::string::npos);
+}
+
+TEST_CASE("CLI Parser - Success -C and -n flags (if creating local session)", "[cliparser]")
+{
+    ArgvHelper args({"kakod", "-C", "local-session", "-n"});
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(false).parseAndValidate(args.argc(), args.argv());
+
+    REQUIRE(result.result == ParseResult::Success);
+    REQUIRE(result.config.session_type == SessionType::Local);
+    REQUIRE(result.config.session_id == "local-session");
+    REQUIRE(result.config.no_config == true);
 }
 
 TEST_CASE("CLI Parser - Random session ID is unique", "[cliparser]")
@@ -158,7 +235,7 @@ TEST_CASE("CLI Parser - Random session ID is unique", "[cliparser]")
 TEST_CASE("CLI Parser - Multiple options in different order", "[cliparser]")
 {
     ArgvHelper args({"kakod", "-e", "nop", "-s", "test-session"});
-    ParsedCliArgs result = parseCliArgs(args.argc(), args.argv());
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(false).parseAndValidate(args.argc(), args.argv());
 
     REQUIRE(result.result == ParseResult::Success);
     REQUIRE(result.config.session_type == SessionType::Local);
@@ -169,7 +246,7 @@ TEST_CASE("CLI Parser - Multiple options in different order", "[cliparser]")
 TEST_CASE("CLI Parser - Single file argument", "[cliparser]")
 {
     ArgvHelper args({"kakod", "file.txt"});
-    ParsedCliArgs result = parseCliArgs(args.argc(), args.argv());
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(false).parseAndValidate(args.argc(), args.argv());
 
     REQUIRE(result.result == ParseResult::Success);
     REQUIRE(result.config.file_arguments.size() == 1);
@@ -179,7 +256,7 @@ TEST_CASE("CLI Parser - Single file argument", "[cliparser]")
 TEST_CASE("CLI Parser - Multiple file arguments", "[cliparser]")
 {
     ArgvHelper args({"kakod", "file1.txt", "file2.cpp", "file3.h"});
-    ParsedCliArgs result = parseCliArgs(args.argc(), args.argv());
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(false).parseAndValidate(args.argc(), args.argv());
 
     REQUIRE(result.result == ParseResult::Success);
     REQUIRE(result.config.file_arguments.size() == 3);
@@ -191,7 +268,7 @@ TEST_CASE("CLI Parser - Multiple file arguments", "[cliparser]")
 TEST_CASE("CLI Parser - File with line number", "[cliparser]")
 {
     ArgvHelper args({"kakod", "file.txt", "+42"});
-    ParsedCliArgs result = parseCliArgs(args.argc(), args.argv());
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(false).parseAndValidate(args.argc(), args.argv());
 
     REQUIRE(result.result == ParseResult::Success);
     REQUIRE(result.config.file_arguments.size() == 2);
@@ -202,7 +279,7 @@ TEST_CASE("CLI Parser - File with line number", "[cliparser]")
 TEST_CASE("CLI Parser - File with line and column", "[cliparser]")
 {
     ArgvHelper args({"kakod", "file.txt", "+42:10"});
-    ParsedCliArgs result = parseCliArgs(args.argc(), args.argv());
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(false).parseAndValidate(args.argc(), args.argv());
 
     REQUIRE(result.result == ParseResult::Success);
     REQUIRE(result.config.file_arguments.size() == 2);
@@ -213,7 +290,7 @@ TEST_CASE("CLI Parser - File with line and column", "[cliparser]")
 TEST_CASE("CLI Parser - File with last position marker", "[cliparser]")
 {
     ArgvHelper args({"kakod", "file.txt", "+:"});
-    ParsedCliArgs result = parseCliArgs(args.argc(), args.argv());
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(false).parseAndValidate(args.argc(), args.argv());
 
     REQUIRE(result.result == ParseResult::Success);
     REQUIRE(result.config.file_arguments.size() == 2);
@@ -224,7 +301,7 @@ TEST_CASE("CLI Parser - File with last position marker", "[cliparser]")
 TEST_CASE("CLI Parser - Multiple options and file arguments", "[cliparser]")
 {
     ArgvHelper args({"kakod", "-s", "my-session", "-e", "nop", "file1.txt", "file2.cpp"});
-    ParsedCliArgs result = parseCliArgs(args.argc(), args.argv());
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(false).parseAndValidate(args.argc(), args.argv());
 
     REQUIRE(result.result == ParseResult::Success);
     REQUIRE(result.config.session_type == SessionType::Local);

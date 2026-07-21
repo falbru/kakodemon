@@ -4,6 +4,7 @@
 #include "application/cliparser.hpp"
 #include "adapters/namedpipe/namedpipecommandinterface.hpp"
 #include "config.hpp"
+#include "domain/ports/kakounesession.hpp"
 #include <iostream>
 #include <memory>
 
@@ -32,7 +33,8 @@ void printVersion()
 
 int main(int argc, char* argv[])
 {
-    ParsedCliArgs parsed_args = parseCliArgs(argc, argv);
+    CliParser parser(ValidatorDependencies{ .kakouneSessionExists = domain::kakouneSessionExists });
+    ParsedCliArgs parsed_args = parser.parseAndValidate(argc, argv);
 
     switch (parsed_args.result)
     {
@@ -44,7 +46,14 @@ int main(int argc, char* argv[])
             return 0;
         case ParseResult::SendCommand:
         {
-            NamedPipeCommandInterface interface(parsed_args.command_request.pipe_id, PipeMode::Send);
+            const char* pipe_id = std::getenv("KAKOD_ID");
+            if (!pipe_id)
+            {
+                std::cerr << "Error: KAKOD_ID environment variable not set\n";
+                return 1;
+            }
+
+            NamedPipeCommandInterface interface(std::string(pipe_id), PipeMode::Send);
             domain::Command cmd;
             cmd.name = parsed_args.command_request.command;
             cmd.args = parsed_args.command_request.args;
@@ -55,7 +64,7 @@ int main(int argc, char* argv[])
             return 0;
         }
         case ParseResult::Error:
-            std::cerr << parsed_args.error_message << "\n";
+            std::cerr << "Error: " << parsed_args.error_message << "\n";
             return 1;
         case ParseResult::Success:
             break;

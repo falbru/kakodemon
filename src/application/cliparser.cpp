@@ -1,11 +1,9 @@
 #include "cliparser.hpp"
-#include "domain/ports/kakounesession.hpp"
-#include <cstdlib>
+#include "application/cliconfig.hpp"
 #include <getopt.h>
 #include <random>
 #include <sstream>
 #include <iomanip>
-#include <stdexcept>
 
 std::string generateRandomSessionId()
 {
@@ -18,15 +16,18 @@ std::string generateRandomSessionId()
     return ss.str();
 }
 
-ParsedCliArgs parseCliArgs(int argc, char* argv[])
+CliParser::CliParser(ValidatorDependencies dependencies) : m_validator_depencies(dependencies) { }
+
+ParsedCliArgs CliParser::parseAndValidate(int argc, char* argv[])
 {
     ParsedCliArgs result;
     result.result = ParseResult::Success;
+    result.config.session_type = SessionType::Local;
     result.config.no_config = false;
 
-    bool remote_session_set = false;
-    bool local_session_set = false;
     bool send_command = false;
+
+    int set_option_session_type_count = 0;
 
     static struct option long_options[] = {
         {"version", no_argument, 0, 'v'},
@@ -43,28 +44,24 @@ ParsedCliArgs parseCliArgs(int argc, char* argv[])
         switch (opt)
         {
             case 'c':
-                if (!domain::kakouneSessionExists(std::string(optarg))) {
-                    throw std::runtime_error("kakoune session does not exist");
-                }
-
                 result.config.session_type = SessionType::Remote;
                 result.config.session_id = optarg;
-                remote_session_set = true;
+                set_option_session_type_count++;
                 break;
             case 'C': {
-                    if (domain::kakouneSessionExists(std::string(optarg))) {
+                    if (m_validator_depencies.kakouneSessionExists(std::string(optarg))) {
                         result.config.session_type = SessionType::Remote;
                         result.config.session_id = optarg;
-                        remote_session_set = true;
                     } else {
+                        result.config.session_type = SessionType::Local;
                         result.config.session_id = optarg;
-                        local_session_set = true;
                     }
+                    set_option_session_type_count++;
                     break;
                 }
             case 's':
                 result.config.session_id = optarg;
-                local_session_set = true;
+                set_option_session_type_count++;
                 break;
             case 'e':
                 result.config.startup_command = optarg;
@@ -90,19 +87,10 @@ ParsedCliArgs parseCliArgs(int argc, char* argv[])
 
     if (send_command)
     {
-        const char* id_env = std::getenv("KAKOD_ID");
-        if (!id_env)
-        {
-            result.result = ParseResult::Error;
-            result.error_message = "Error: KAKOD_ID environment variable not set";
-            return result;
-        }
-        result.command_request.pipe_id = id_env;
-
         if (optind >= argc)
         {
             result.result = ParseResult::Error;
-            result.error_message = "Error: -p requires a command";
+            result.error_message = "-p requires a command";
             return result;
         }
 
@@ -116,23 +104,35 @@ ParsedCliArgs parseCliArgs(int argc, char* argv[])
         return result;
     }
 
-    if (remote_session_set && local_session_set)
+    if (set_option_session_type_count > 1)
     {
         result.result = ParseResult::Error;
-        result.error_message = "Error: -c and -s options are not compatible";
+        result.error_message = "-c, -C and -s options are not compatible";
         return result;
     }
 
-    if (remote_session_set && result.config.no_config)
+    if (result.config.session_type == SessionType::Remote && result.config.no_config)
     {
         result.result = ParseResult::Error;
-        result.error_message = "Error: -c and -n options are not compatible";
+        result.error_message = "-n incompatible with connecting to an existing session";
         return result;
     }
 
     if (result.config.session_id.empty())
     {
         result.config.session_id = generateRandomSessionId();
+    }
+
+    if (result.config.session_type == SessionType::Remote && !m_validator_depencies.kakouneSessionExists(result.config.session_id)) {
+        result.result = ParseResult::Error;
+        result.error_message = "Kakoune session does not exist";
+        return result;
+    }
+
+    if (result.config.session_type == SessionType::Local && m_validator_depencies.kakouneSessionExists(result.config.session_id)) {
+        result.result = ParseResult::Error;
+        result.error_message = "Kakoune session name already in use";
+        return result;
     }
 
     for (int i = optind; i < argc; i++)
