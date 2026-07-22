@@ -170,6 +170,14 @@ TEST_CASE("CLI Parser - Help flag", "[cliparser]")
     REQUIRE(result.result == ParseResult::ShowHelp);
 }
 
+TEST_CASE("CLI Parser - Init flag", "[cliparser]")
+{
+    ArgvHelper args({"kakod", "--init"});
+    ParsedCliArgs result = cliParserWithExistingKakouneSession(false).parseAndValidate(args.argc(), args.argv());
+
+    REQUIRE(result.result == ParseResult::ShowKakodemonIntegrationScript);
+}
+
 TEST_CASE("CLI Parser - Conflicting -c and -s flags", "[cliparser]")
 {
     ArgvHelper args({"kakod", "-c", "remote", "-s", "local"});

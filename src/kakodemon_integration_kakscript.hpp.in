@@ -1,0 +1,3 @@
+#include <string>
+
+std::string kakodemon_integration_kakscript = R"(@KAKODEMON_PLUGIN_KAKSCRIPT@)";

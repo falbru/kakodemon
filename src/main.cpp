@@ -5,6 +5,7 @@
 #include "adapters/namedpipe/namedpipecommandinterface.hpp"
 #include "config.hpp"
 #include "domain/ports/kakounesession.hpp"
+#include "kakodemon_integration_kakscript.hpp"
 #include <iostream>
 #include <memory>
 
@@ -19,6 +20,7 @@ void printHelp(const char* program_name)
               << "  -p <command>      Send command to a running instance (uses KAKOD_ID env)\n"
               << "  -n                Do not source kakrc files on startup\n"
               << "  --version         Print version and exit\n"
+              << "  --init            Print the Kakodemon integration script and exit\n"
               << "  --help            Print this help message and exit\n\n"
               << "File arguments:\n"
               << "  [file]...         Files to edit\n"
@@ -29,6 +31,11 @@ void printHelp(const char* program_name)
 void printVersion()
 {
     std::cout << "kakodemon " << KAKODEMON_VERSION << "\n";
+}
+
+void printKakodemonPluginScript()
+{
+    std::cout << kakodemon_integration_kakscript;
 }
 
 int main(int argc, char* argv[])
@@ -43,6 +50,9 @@ int main(int argc, char* argv[])
             return 0;
         case ParseResult::ShowHelp:
             printHelp(argv[0]);
+            return 0;
+        case ParseResult::ShowKakodemonIntegrationScript:
+            printKakodemonPluginScript();
             return 0;
         case ParseResult::SendCommand:
         {

@@ -6,6 +6,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 configure_file(src/config.hpp.in config.hpp)
 
+file(READ rc/kakodemon.kak KAKODEMON_PLUGIN_KAKSCRIPT)
+configure_file(src/kakodemon_integration_kakscript.hpp.in kakodemon_integration_kakscript.hpp @ONLY)
+
 option(BUILD_TESTS "Build the test suite" OFF)
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "GLFW lib only")

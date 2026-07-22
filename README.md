@@ -24,10 +24,10 @@
 sudo apt install -y git build-essential cmake libwayland-dev libxkbcommon-dev xorg-dev libfreetype-dev libfontconfig-dev
 ```
 
-2. Clone the repository (ensure the `rc/` folder is sourced by Kakoune)
+2. Clone the repository
 
 ```sh
-git clone --recurse-submodules https://github.com/falbru/kakodemon ~/.config/kak/autoload/kakodemon
+git clone --recurse-submodules https://github.com/falbru/kakodemon
 ```
 
 3. Build and install the project
@@ -39,6 +39,12 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make
 sudo install -D ./kakod /usr/local/bin
+```
+
+4. Add the following line to your `kakrc`
+
+```kak
+eval %sh{ kakod --init }
 ```
 
 You can then run the application with the command `kakod`

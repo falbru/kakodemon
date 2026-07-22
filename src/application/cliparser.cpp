@@ -32,6 +32,7 @@ ParsedCliArgs CliParser::parseAndValidate(int argc, char* argv[])
     static struct option long_options[] = {
         {"version", no_argument, 0, 'v'},
         {"help", no_argument, 0, 'h'},
+        {"init", no_argument, 0, 'i'},
         {0, 0, 0, 0}
     };
 
@@ -77,6 +78,9 @@ ParsedCliArgs CliParser::parseAndValidate(int argc, char* argv[])
                 return result;
             case 'h':
                 result.result = ParseResult::ShowHelp;
+                return result;
+            case 'i':
+                result.result = ParseResult::ShowKakodemonIntegrationScript;
                 return result;
             default:
                 result.result = ParseResult::Error;

@@ -10,6 +10,7 @@ enum class ParseResult
     ShowHelp,
     ShowVersion,
     SendCommand,
+    ShowKakodemonIntegrationScript,
     Error
 };
 
