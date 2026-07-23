@@ -32,8 +32,9 @@ git clone --recurse-submodules https://github.com/falbru/kakodemon
 
 3. Build and install the project
 
+`cd` into the newly cloned kakodemon project, then:
+
 ```sh
-cd ~/.config/kak/autoload/kakodemon
 mkdir build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
