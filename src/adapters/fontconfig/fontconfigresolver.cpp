@@ -3,6 +3,7 @@
 #include "spdlog/spdlog.h"
 #include "fontconfigresolver.hpp"
 #include <fontconfig/fontconfig.h>
+#include <fontconfig/fcfreetype.h>
 #include <optional>
 #include <string>
 
