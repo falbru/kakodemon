@@ -121,6 +121,24 @@ void opengl::GLFWWindow::init(bool maximized) {
         self->onGLFWWindowContentScale(xscale, yscale);
     });
 
+    // Some window managers (e.g. dwm) do not save and restore the window contents when
+    // a window is off-screen, so it is neccessary to re-draw the window contents once
+    // the window is visible again.
+    glfwSetWindowRefreshCallback(m_window, [](GLFWwindow *window) {
+        GLFWWindow *self = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
+
+        int width, height;
+        glfwGetWindowSize(window, &width, &height);
+
+        // Instead of defining a separate observer list specifically for this
+        // rare event, we simply treat it as a resize event to the size that
+        // the window already was.
+        domain::ResizeEvent event{width, height};
+        if (!self->m_event_filters.isFiltered(event)) {
+            self->m_resize_observers.notify(event);
+        }
+    });
+
     m_cursor_ibeam = glfwCreateStandardCursor(GLFW_IBEAM_CURSOR);
     m_cursor_pointer = glfwCreateStandardCursor(GLFW_POINTING_HAND_CURSOR);
     m_cursor_crosshair = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
