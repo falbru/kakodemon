@@ -76,7 +76,7 @@ add_executable(tests
 )
 
 target_include_directories(tests PRIVATE mocks/ ${CMAKE_SOURCE_DIR}/src/ ${CMAKE_BINARY_DIR})
-target_link_libraries(tests PRIVATE Catch2::Catch2WithMain trompeloeil::trompeloeil nlohmann_json::nlohmann_json spdlog::spdlog Fontconfig::Fontconfig)
+target_link_libraries(tests PRIVATE Catch2::Catch2WithMain trompeloeil::trompeloeil nlohmann_json::nlohmann_json spdlog::spdlog Freetype::Freetype Fontconfig::Fontconfig)
 
 include(CTest)
 include(Catch)
