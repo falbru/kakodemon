@@ -1,0 +1,63 @@
+version: "2.1"
+
+jobs:
+  build-format-lint:
+    docker:
+      - image: ubuntu:26.04
+    steps:
+      - checkout
+
+      - run:
+          name: Install dependencies
+          command: |
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get update
+            apt-get install -y git ca-certificates wget cmake build-essential libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libwayland-dev libxkbcommon-dev libfreetype-dev libfontconfig-dev clang-format clang-tidy
+
+      - run:
+          name: Initialize submodules
+          command: git submodule update --init --recursive
+
+      - run:
+          name: Install Kakoune v2026.04.12
+          command: |
+            wget https://github.com/mawww/kakoune/releases/download/v2026.04.12/kakoune-v2026.04.12-linux.tar.bz2
+            tar -xf ./kakoune-v2026.04.12-linux.tar.bz2
+            cp ./kakoune-v2026.04.12-linux/bin/kak /usr/local/bin/
+            cp -r ./kakoune-v2026.04.12-linux/share/* /usr/local/share/
+
+      - run:
+          name: Copy Kakoune configuration
+          command: |
+            mkdir -p ~/.config/kak/autoload
+            cp -r rc/* ~/.config/kak/autoload/
+
+      - run:
+          name: Configure CMake
+          command: |
+            cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_TESTS=ON
+
+      - run:
+          name: Build with CMake
+          command: |
+            cmake --build build --config Release
+
+      - run:
+          name: Run tests
+          command: |
+            cd build && ctest --output-on-failure
+
+      - run:
+          name: Run clang-format check
+          command: |
+            find src/ test/ -name '*.cpp' -o -name '*.hpp' -exec clang-format --style=Microsoft --dry-run --Werror {} \;
+
+      - run:
+          name: Run clang-tidy
+          command: |
+            find src/ test/ -name '*.cpp' -o -name '*.hpp' -exec clang-tidy -p build {} \;
+
+workflows:
+  ci:
+    jobs:
+      - build-format-lint
