@@ -1,6 +1,6 @@
 #include "application/model/focusedclientstack.hpp"
 #include "catch2/catch_test_macros.hpp"
-#include "application/controllers/masterclientcontroller.hpp"
+#include "application/controller/masterclientcontroller.hpp"
 #include "mock_kakounesession.hpp"
 #include "application/model/clientmanager.hpp"
 #include "application/model/panelayout.hpp"

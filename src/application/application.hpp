@@ -11,7 +11,7 @@
 #include "application/controller/inputcontroller.hpp"
 #include "application/controller/layoutcontroller.hpp"
 #include "application/controller/movablemenucontroller.hpp"
-#include "application/controllers/masterclientcontroller.hpp"
+#include "application/controller/masterclientcontroller.hpp"
 #include "application/model/clientmanager.hpp"
 #include "application/model/focusedclientstack.hpp"
 #include "application/model/kakouneclient.hpp"

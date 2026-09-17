@@ -52,7 +52,7 @@ add_executable(tests
     ${CMAKE_SOURCE_DIR}/src/application/view/inlinemenu.cpp
     ${CMAKE_SOURCE_DIR}/src/application/view/promptmenu.cpp
     ${CMAKE_SOURCE_DIR}/src/application/view/searchmenu.cpp
-    ${CMAKE_SOURCE_DIR}/src/application/controllers/masterclientcontroller.cpp
+    ${CMAKE_SOURCE_DIR}/src/application/controller/masterclientcontroller.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/alignment.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/atom.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/color.cpp
