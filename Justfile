@@ -21,6 +21,9 @@ run ARGS="": build
 run-rel ARGS="": build-rel
     ./{{REL_DIR}}/kakod {{ARGS}}
 
+install-rel: build-rel
+    install -D ./{{REL_DIR}}/kakod /usr/local/bin
+
 test-all: build
     cd {{BUILD_DIR}} && ctest --output-on-failure -j $(nproc)
 
