@@ -50,7 +50,7 @@ jobs:
       - run:
           name: Run clang-format check
           command: |
-            find src/ test/ -name '*.cpp' -o -name '*.hpp' -exec clang-format --style=Microsoft --dry-run --Werror {} \;
+            find src/ test/ -name '*.cpp' -o -name '*.hpp' | xargs clang-format --style=Microsoft --dry-run --Werror
 
       - run:
           name: Run clang-tidy
