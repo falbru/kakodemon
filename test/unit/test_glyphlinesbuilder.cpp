@@ -1,12 +1,13 @@
 #include <catch2/catch_test_macros.hpp>
 
+#include "domain/codepointstring.hpp"
 #include "domain/color.hpp"
 #include "domain/glyphlinesbuilder.hpp"
 #include "domain/lines.hpp"
-#include "domain/codepointstring.hpp"
 #include "mock_font.hpp"
 
-TEST_CASE("GlyphLinesBuilder builds GlyphAtom from Atom", "[GlyphLinesBuilder]") {
+TEST_CASE("GlyphLinesBuilder builds GlyphAtom from Atom", "[GlyphLinesBuilder]")
+{
     FontMock font;
 
     domain::Atom atom(domain::CodepointString("hello"), domain::Face(domain::DefaultColor(), domain::DefaultColor()));
@@ -20,14 +21,14 @@ TEST_CASE("GlyphLinesBuilder builds GlyphAtom from Atom", "[GlyphLinesBuilder]")
     REQUIRE(glyph_atom.width() == 50.0f);
 }
 
-TEST_CASE("GlyphLinesBuilder builds GlyphLine from Line", "[GlyphLinesBuilder]") {
+TEST_CASE("GlyphLinesBuilder builds GlyphLine from Line", "[GlyphLinesBuilder]")
+{
     FontMock font;
 
-    domain::Line line({
-        domain::Atom(domain::CodepointString("hello"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString(" "), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("world"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+    domain::Line line(
+        {domain::Atom(domain::CodepointString("hello"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+         domain::Atom(domain::CodepointString(" "), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+         domain::Atom(domain::CodepointString("world"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::GlyphLine glyph_line = domain::GlyphLinesBuilder::build(line, &font);
 
@@ -35,13 +36,14 @@ TEST_CASE("GlyphLinesBuilder builds GlyphLine from Line", "[GlyphLinesBuilder]")
     REQUIRE(glyph_line.width() == 110.0f);
 }
 
-TEST_CASE("GlyphLinesBuilder builds GlyphLines from Lines", "[GlyphLinesBuilder]") {
+TEST_CASE("GlyphLinesBuilder builds GlyphLines from Lines", "[GlyphLinesBuilder]")
+{
     FontMock font;
 
-    domain::Lines lines({
-        domain::Line({domain::Atom(domain::CodepointString("line1"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))}),
-        domain::Line({domain::Atom(domain::CodepointString("line2"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))})
-    });
+    domain::Lines lines({domain::Line({domain::Atom(domain::CodepointString("line1"),
+                                                    domain::Face(domain::DefaultColor(), domain::DefaultColor()))}),
+                         domain::Line({domain::Atom(domain::CodepointString("line2"),
+                                                    domain::Face(domain::DefaultColor(), domain::DefaultColor()))})});
 
     domain::GlyphLines glyph_lines = domain::GlyphLinesBuilder::build(lines, &font);
 
@@ -50,7 +52,8 @@ TEST_CASE("GlyphLinesBuilder builds GlyphLines from Lines", "[GlyphLinesBuilder]
     REQUIRE(glyph_lines.height() == 48.0f);
 }
 
-TEST_CASE("GlyphLinesBuilder handles empty Atom", "[GlyphLinesBuilder]") {
+TEST_CASE("GlyphLinesBuilder handles empty Atom", "[GlyphLinesBuilder]")
+{
     FontMock font;
 
     domain::Atom atom(domain::CodepointString(""), domain::Face(domain::DefaultColor(), domain::DefaultColor()));
@@ -61,7 +64,8 @@ TEST_CASE("GlyphLinesBuilder handles empty Atom", "[GlyphLinesBuilder]") {
     REQUIRE(glyph_atom.width() == 0.0f);
 }
 
-TEST_CASE("GlyphLinesBuilder handles empty Line", "[GlyphLinesBuilder]") {
+TEST_CASE("GlyphLinesBuilder handles empty Line", "[GlyphLinesBuilder]")
+{
     FontMock font;
 
     domain::Line line;
@@ -72,7 +76,8 @@ TEST_CASE("GlyphLinesBuilder handles empty Line", "[GlyphLinesBuilder]") {
     REQUIRE(glyph_line.width() == 0.0f);
 }
 
-TEST_CASE("GlyphLinesBuilder handles empty Lines", "[GlyphLinesBuilder]") {
+TEST_CASE("GlyphLinesBuilder handles empty Lines", "[GlyphLinesBuilder]")
+{
     FontMock font;
 
     domain::Lines lines;
@@ -84,12 +89,12 @@ TEST_CASE("GlyphLinesBuilder handles empty Lines", "[GlyphLinesBuilder]") {
     REQUIRE(glyph_lines.height() == 0.0f);
 }
 
-TEST_CASE("GlyphLinesBuilder can convert back to domain types", "[GlyphLinesBuilder]") {
+TEST_CASE("GlyphLinesBuilder can convert back to domain types", "[GlyphLinesBuilder]")
+{
     FontMock font;
 
-    domain::Lines original_lines({
-        domain::Line({domain::Atom(domain::CodepointString("test"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))})
-    });
+    domain::Lines original_lines({domain::Line({domain::Atom(
+        domain::CodepointString("test"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))})});
 
     domain::GlyphLines glyph_lines = domain::GlyphLinesBuilder::build(original_lines, &font);
     domain::Lines converted_lines = glyph_lines.toLines();

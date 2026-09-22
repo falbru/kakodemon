@@ -1,22 +1,24 @@
 #include <catch2/catch_test_macros.hpp>
-#include <thread>
 #include <chrono>
-#include <unistd.h>
 #include <sys/wait.h>
+#include <thread>
+#include <unistd.h>
 
+#include "adapters/kakoune/jsonrpckakouneinterface.hpp"
 #include "adapters/kakoune/localsession.hpp"
 #include "adapters/kakoune/remotesession.hpp"
-#include "adapters/kakoune/jsonrpckakouneinterface.hpp"
 #include "application/model/kakouneclient.hpp"
 
-TEST_CASE("LocalSession starts a Kakoune session", "[integration][localsession]") {
+TEST_CASE("LocalSession starts a Kakoune session", "[integration][localsession]")
+{
     std::string session_id = "test_session_" + std::to_string(getpid());
 
     auto session = std::make_unique<LocalSession>(session_id);
 
     REQUIRE_NOTHROW(session->start());
 
-    SECTION("returns correct session id") {
+    SECTION("returns correct session id")
+    {
         REQUIRE(session->getSessionId() == session_id);
     }
 
@@ -25,10 +27,13 @@ TEST_CASE("LocalSession starts a Kakoune session", "[integration][localsession]"
     REQUIRE(WEXITSTATUS(result) == 0);
 }
 
-TEST_CASE("KakouneClient can connect immediately after LocalSession starts", "[integration][localsession][kakouneclient]") {
+TEST_CASE("KakouneClient can connect immediately after LocalSession starts",
+          "[integration][localsession][kakouneclient]")
+{
     std::string session_id = "test_client_session_" + std::to_string(getpid());
 
-    SECTION("KakouneClient initializes successfully with LocalSession") {
+    SECTION("KakouneClient initializes successfully with LocalSession")
+    {
         auto session = std::make_unique<LocalSession>(session_id);
         session->start();
 
@@ -39,13 +44,13 @@ TEST_CASE("KakouneClient can connect immediately after LocalSession starts", "[i
         auto remote_session = std::make_unique<RemoteSession>(session_id);
         auto interface = std::make_unique<kakoune::JsonRpcKakouneInterface>(*remote_session, 0, std::nullopt);
 
-        REQUIRE_NOTHROW([&]() {
-            auto client = std::make_unique<KakouneClient>(remote_session.get(), std::move(interface));
-        }());
+        REQUIRE_NOTHROW(
+            [&]() { auto client = std::make_unique<KakouneClient>(remote_session.get(), std::move(interface)); }());
     }
 }
 
-TEST_CASE("LocalSession destructor kills the Kakoune session", "[integration][localsession]") {
+TEST_CASE("LocalSession destructor kills the Kakoune session", "[integration][localsession]")
+{
     std::string session_id = "test_cleanup_session_" + std::to_string(getpid());
 
     {
@@ -64,7 +69,8 @@ TEST_CASE("LocalSession destructor kills the Kakoune session", "[integration][lo
     REQUIRE(WEXITSTATUS(result) != 0);
 }
 
-TEST_CASE("Multiple LocalSessions can coexist", "[integration][localsession]") {
+TEST_CASE("Multiple LocalSessions can coexist", "[integration][localsession]")
+{
     std::string session_id1 = "test_multi_session1_" + std::to_string(getpid());
     std::string session_id2 = "test_multi_session2_" + std::to_string(getpid());
 
@@ -84,7 +90,8 @@ TEST_CASE("Multiple LocalSessions can coexist", "[integration][localsession]") {
     REQUIRE(WEXITSTATUS(result2) == 0);
 }
 
-TEST_CASE("RemoteSession connects to existing session", "[integration][remotesession]") {
+TEST_CASE("RemoteSession connects to existing session", "[integration][remotesession]")
+{
     std::string session_id = "test_remote_session_" + std::to_string(getpid());
 
     auto local_session = std::make_unique<LocalSession>(session_id);
@@ -92,7 +99,8 @@ TEST_CASE("RemoteSession connects to existing session", "[integration][remoteses
 
     auto remote_session = std::make_unique<RemoteSession>(session_id);
 
-    SECTION("returns corrects session_id") {
+    SECTION("returns corrects session_id")
+    {
         REQUIRE(remote_session->getSessionId() == session_id);
     }
 
@@ -101,7 +109,8 @@ TEST_CASE("RemoteSession connects to existing session", "[integration][remoteses
     }());
 }
 
-TEST_CASE("LocalSession destructor kills renamed session", "[integration][localsession]") {
+TEST_CASE("LocalSession destructor kills renamed session", "[integration][localsession]")
+{
     std::string original_session_id = "test_rename_session_" + std::to_string(getpid());
     std::string new_session_id = "test_renamed_session_" + std::to_string(getpid());
 

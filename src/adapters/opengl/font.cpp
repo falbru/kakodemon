@@ -2,20 +2,26 @@
 #include "domain/codepointstring.hpp"
 #include "domain/ports/fontengine.hpp"
 
-opengl::Font::Font(domain::FontEngine* font_engine)
-    : m_font_engine(font_engine) {
+opengl::Font::Font(domain::FontEngine *font_engine) : m_font_engine(font_engine)
+{
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-    if(auto fallback_rasterized_glyph = m_font_engine->rasterizeFallbackGlyph()) {
+    if (auto fallback_rasterized_glyph = m_font_engine->rasterizeFallbackGlyph())
+    {
         unsigned int texture;
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
-        if (fallback_rasterized_glyph->format == domain::PixelFormat::GRAYSCALE) {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, fallback_rasterized_glyph->width, fallback_rasterized_glyph->height, 0, GL_RED, GL_UNSIGNED_BYTE, fallback_rasterized_glyph->bitmap);
+        if (fallback_rasterized_glyph->format == domain::PixelFormat::GRAYSCALE)
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, fallback_rasterized_glyph->width, fallback_rasterized_glyph->height,
+                         0, GL_RED, GL_UNSIGNED_BYTE, fallback_rasterized_glyph->bitmap);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        }else {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fallback_rasterized_glyph->width, fallback_rasterized_glyph->height, 0, GL_BGRA, GL_UNSIGNED_BYTE, fallback_rasterized_glyph->bitmap);
+        }
+        else
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fallback_rasterized_glyph->width, fallback_rasterized_glyph->height,
+                         0, GL_BGRA, GL_UNSIGNED_BYTE, fallback_rasterized_glyph->bitmap);
             glGenerateMipmap(GL_TEXTURE_2D);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -27,51 +33,67 @@ opengl::Font::Font(domain::FontEngine* font_engine)
     }
 }
 
-opengl::Font::~Font() {
-    for (auto& pair : m_glyphs) {
+opengl::Font::~Font()
+{
+    for (auto &pair : m_glyphs)
+    {
         glDeleteTextures(1, &pair.second.texture_id);
     }
 
-    if (fallback_glyph.has_value()) {
+    if (fallback_glyph.has_value())
+    {
         glDeleteTextures(1, &fallback_glyph->texture_id);
     }
 }
 
-bool opengl::Font::hasGlyph(domain::Codepoint c) const {
+bool opengl::Font::hasGlyph(domain::Codepoint c) const
+{
     return m_glyphs.find(c) != m_glyphs.end();
 }
 
-const domain::GlyphMetrics &opengl::Font::getGlyphMetrics(domain::Codepoint c) const {
+const domain::GlyphMetrics &opengl::Font::getGlyphMetrics(domain::Codepoint c) const
+{
     return m_glyphs.at(c).metrics;
 }
 
-const domain::GlyphMetrics &opengl::Font::getFallbackGlyphMetrics() const {
+const domain::GlyphMetrics &opengl::Font::getFallbackGlyphMetrics() const
+{
     return fallback_glyph->metrics;
 }
 
-const opengl::Glyph &opengl::Font::getGlyph(domain::Codepoint c) const {
+const opengl::Glyph &opengl::Font::getGlyph(domain::Codepoint c) const
+{
     return m_glyphs.at(c);
 }
 
-bool opengl::Font::loadGlyph(domain::Codepoint c) {
-    if (hasGlyph(c)) {
+bool opengl::Font::loadGlyph(domain::Codepoint c)
+{
+    if (hasGlyph(c))
+    {
         return true;
     }
 
-    if (m_failed_glyphs.find(c) != m_failed_glyphs.end()) {
+    if (m_failed_glyphs.find(c) != m_failed_glyphs.end())
+    {
         return false;
     }
 
-    if (auto rasterized_glyph = m_font_engine->rasterizeGlyph(c)) {
+    if (auto rasterized_glyph = m_font_engine->rasterizeGlyph(c))
+    {
         unsigned int texture;
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
-        if (rasterized_glyph->format == domain::PixelFormat::GRAYSCALE) {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, rasterized_glyph->width, rasterized_glyph->height, 0, GL_RED, GL_UNSIGNED_BYTE, rasterized_glyph->bitmap);
+        if (rasterized_glyph->format == domain::PixelFormat::GRAYSCALE)
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, rasterized_glyph->width, rasterized_glyph->height, 0, GL_RED,
+                         GL_UNSIGNED_BYTE, rasterized_glyph->bitmap);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        }else {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, rasterized_glyph->width, rasterized_glyph->height, 0, GL_BGRA, GL_UNSIGNED_BYTE, rasterized_glyph->bitmap);
+        }
+        else
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, rasterized_glyph->width, rasterized_glyph->height, 0, GL_BGRA,
+                         GL_UNSIGNED_BYTE, rasterized_glyph->bitmap);
             glGenerateMipmap(GL_TEXTURE_2D);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -90,26 +112,32 @@ bool opengl::Font::loadGlyph(domain::Codepoint c) {
     return false;
 }
 
-float opengl::Font::getAscender() const {
+float opengl::Font::getAscender() const
+{
     return m_font_engine->getAscender();
 }
 
-float opengl::Font::getDescender() const {
+float opengl::Font::getDescender() const
+{
     return m_font_engine->getDescender();
 }
 
-float opengl::Font::getLineHeight() const {
+float opengl::Font::getLineHeight() const
+{
     return m_font_engine->getLineHeight();
 }
 
-float opengl::Font::getUnderlineOffset() const {
+float opengl::Font::getUnderlineOffset() const
+{
     return m_font_engine->getUnderlineOffset();
 }
 
-float opengl::Font::getUnderlineThickness() const {
+float opengl::Font::getUnderlineThickness() const
+{
     return m_font_engine->getUnderlineThickness();
 }
 
-int opengl::Font::getSize() const {
+int opengl::Font::getSize() const
+{
     return m_font_engine->getSize();
 }

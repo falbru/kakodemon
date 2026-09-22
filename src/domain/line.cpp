@@ -1,48 +1,56 @@
 #include "line.hpp"
 #include "domain/codepointstring.hpp"
 
-namespace domain {
+namespace domain
+{
 
-Line::Line() {
-
+Line::Line()
+{
 }
 
-Line::Line(std::vector<Atom> atoms) : m_atoms(atoms) {
-
+Line::Line(std::vector<Atom> atoms) : m_atoms(atoms)
+{
 }
 
-const Atom& Line::at(int index) const {
+const Atom &Line::at(int index) const
+{
     return m_atoms[index];
 }
 
-Line Line::slice(int start_index, int length) {
-    if (length <= 0) {
+Line Line::slice(int start_index, int length)
+{
+    if (length <= 0)
+    {
         return Line();
     }
 
     int i = 0;
     int size_it = 0;
 
-    while (i < m_atoms.size() && size_it + m_atoms[i].size() <= start_index) {
+    while (i < m_atoms.size() && size_it + m_atoms[i].size() <= start_index)
+    {
         size_it += m_atoms[i].size();
         i++;
     }
 
-    if (i == m_atoms.size()) {
+    if (i == m_atoms.size())
+    {
         return Line();
     }
 
     int start_atom_index = i;
     int start_atom_start_index = start_index - size_it;
 
-    if (m_atoms[start_atom_index].size() - start_atom_start_index >= length) {
+    if (m_atoms[start_atom_index].size() - start_atom_start_index >= length)
+    {
         return Line({m_atoms[start_atom_index].slice(start_atom_start_index, length)});
     }
 
     int remaining_length = length - (m_atoms[start_atom_index].size() - start_atom_start_index);
 
     i = start_atom_index + 1;
-    while (i < m_atoms.size() && remaining_length > m_atoms[i].size()) {
+    while (i < m_atoms.size() && remaining_length > m_atoms[i].size())
+    {
         remaining_length -= m_atoms[i].size();
         i++;
     }
@@ -53,13 +61,13 @@ Line Line::slice(int start_index, int length) {
     Atom start_atom = m_atoms[start_atom_index].slice(start_atom_start_index);
     line_atoms.push_back(start_atom);
 
-    if (i > start_atom_index + 1) {
-        line_atoms.insert(line_atoms.end(),
-                          m_atoms.begin() + start_atom_index + 1,
-                          m_atoms.begin() + i);
+    if (i > start_atom_index + 1)
+    {
+        line_atoms.insert(line_atoms.end(), m_atoms.begin() + start_atom_index + 1, m_atoms.begin() + i);
     }
 
-    if (i < m_atoms.size() && remaining_length > 0) {
+    if (i < m_atoms.size() && remaining_length > 0)
+    {
         auto end_atom = m_atoms[i].slice(0, remaining_length);
         line_atoms.push_back(end_atom);
     }
@@ -67,46 +75,58 @@ Line Line::slice(int start_index, int length) {
     return Line(line_atoms);
 }
 
-const std::vector<Atom>& Line::getAtoms() const {
+const std::vector<Atom> &Line::getAtoms() const
+{
     return m_atoms;
 }
 
-unsigned int Line::size() const {
+unsigned int Line::size() const
+{
     return m_atoms.size();
 }
 
-unsigned int Line::length() const {
+unsigned int Line::length() const
+{
     int length = 0;
-    for (int i = 0; i < m_atoms.size(); i++) {
+    for (int i = 0; i < m_atoms.size(); i++)
+    {
         length += m_atoms[i].size();
     }
     return length;
 }
 
-CodepointString Line::toCodepointString() const {
+CodepointString Line::toCodepointString() const
+{
     CodepointString string;
     size_t total_size = 0;
-    for (int i = 0; i < m_atoms.size(); i++) {
+    for (int i = 0; i < m_atoms.size(); i++)
+    {
         total_size += m_atoms[i].size();
     }
     string.reserve(total_size);
-    for (int i = 0; i < m_atoms.size(); i++) {
+    for (int i = 0; i < m_atoms.size(); i++)
+    {
         string += m_atoms[i].toCodepointString();
     }
     return string;
 }
 
-Line Line::trim(TrimDirection direction) const {
-    if (m_atoms.empty()) {
+Line Line::trim(TrimDirection direction) const
+{
+    if (m_atoms.empty())
+    {
         return Line();
     }
 
     std::vector<Atom> result = m_atoms;
 
-    if (direction == TrimDirection::Left || direction == TrimDirection::Both) {
-        while (!result.empty()) {
+    if (direction == TrimDirection::Left || direction == TrimDirection::Both)
+    {
+        while (!result.empty())
+        {
             Atom trimmed = result[0].trim(TrimDirection::Left);
-            if (trimmed.size() > 0) {
+            if (trimmed.size() > 0)
+            {
                 result[0] = trimmed;
                 break;
             }
@@ -114,10 +134,13 @@ Line Line::trim(TrimDirection direction) const {
         }
     }
 
-    if (direction == TrimDirection::Right || direction == TrimDirection::Both) {
-        while (!result.empty()) {
+    if (direction == TrimDirection::Right || direction == TrimDirection::Both)
+    {
+        while (!result.empty())
+        {
             Atom trimmed = result.back().trim(TrimDirection::Right);
-            if (trimmed.size() > 0) {
+            if (trimmed.size() > 0)
+            {
                 result.back() = trimmed;
                 break;
             }
@@ -128,4 +151,4 @@ Line Line::trim(TrimDirection direction) const {
     return Line(result);
 }
 
-};
+}; // namespace domain

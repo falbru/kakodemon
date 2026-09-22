@@ -5,25 +5,22 @@
 #include "domain/geometry.hpp"
 #include "domain/ports/window.hpp"
 
-LayoutController::LayoutController() {
-
+LayoutController::LayoutController()
+{
 }
 
-void LayoutController::init(PaneLayout* pane_layout, ClientManager* client_manager, domain::Window* window) {
+void LayoutController::init(PaneLayout *pane_layout, ClientManager *client_manager, domain::Window *window)
+{
     m_pane_layout = pane_layout;
 
-    client_manager->onClientAdded([=](KakouneClient* client) {
-        client->onUIOptionsChanged([=](const domain::UIOptions&) {
-            m_pane_layout->arrange();
-        });
+    client_manager->onClientAdded([=](KakouneClient *client) {
+        client->onUIOptionsChanged([=](const domain::UIOptions &) { m_pane_layout->arrange(); });
         m_pane_layout->arrange();
     });
 
-    client_manager->onClientRemoved([=](KakouneClient*) {
-        m_pane_layout->arrange();
-    });
+    client_manager->onClientRemoved([=](KakouneClient *) { m_pane_layout->arrange(); });
 
-    window->onResize([this, window](const domain::ResizeEvent& event) {
+    window->onResize([this, window](const domain::ResizeEvent &event) {
         m_pane_layout->setBounds(domain::Rectangle{0, 0, event.width, event.height});
         m_pane_layout->arrange();
         window->setNeedsRerender();

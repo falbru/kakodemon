@@ -1,8 +1,8 @@
 #include "kakouneclientprocess.hpp"
 
+#include <cerrno>
 #include <csignal>
 #include <cstdlib>
-#include <cerrno>
 #include <cstring>
 #include <optional>
 #include <stdexcept>
@@ -16,11 +16,12 @@
 #include "coord.hpp"
 #include "face.hpp"
 #include "infostyle.hpp"
-#include "menustyle.hpp"
 #include "line.hpp"
+#include "menustyle.hpp"
 #include "spdlog/spdlog.h"
 
-KakouneClientProcess::KakouneClientProcess(int client_id, const std::string &session_name) : m_client_id(client_id), m_session_name(session_name)
+KakouneClientProcess::KakouneClientProcess(int client_id, const std::string &session_name)
+    : m_client_id(client_id), m_session_name(session_name)
 {
 }
 
@@ -35,9 +36,11 @@ KakouneClientProcess::~KakouneClientProcess()
         close(m_stdin_pipefd[1]);
     }
 
-    if (m_client_pid > 0) {
+    if (m_client_pid > 0)
+    {
         auto proc = pid_to_instances.find(m_client_pid);
-        if (proc != pid_to_instances.end()) {
+        if (proc != pid_to_instances.end())
+        {
             pid_to_instances.erase(proc);
         }
     }
@@ -48,35 +51,45 @@ void KakouneClientProcess::start()
     start(std::nullopt);
 }
 
-std::map<pid_t, KakouneClientProcess*> KakouneClientProcess::pid_to_instances = std::map<pid_t, KakouneClientProcess*>();
+std::map<pid_t, KakouneClientProcess *> KakouneClientProcess::pid_to_instances =
+    std::map<pid_t, KakouneClientProcess *>();
 
-void KakouneClientProcess::handleTerminationSignal(int sig) {
+void KakouneClientProcess::handleTerminationSignal(int sig)
+{
     int status;
     pid_t pid;
-    while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
+    while ((pid = waitpid(-1, &status, WNOHANG)) > 0)
+    {
         auto proc = pid_to_instances.find(pid);
-        if (proc != pid_to_instances.end()) {
+        if (proc != pid_to_instances.end())
+        {
             proc->second->m_exited = true;
         }
     }
 }
 
-void KakouneClientProcess::processPendingExits() {
-    std::vector<KakouneClientProcess*> exited_processes;
-    for (auto& [pid, proc] : pid_to_instances) {
-        if (proc->m_exited) {
+void KakouneClientProcess::processPendingExits()
+{
+    std::vector<KakouneClientProcess *> exited_processes;
+    for (auto &[pid, proc] : pid_to_instances)
+    {
+        if (proc->m_exited)
+        {
             exited_processes.push_back(proc);
         }
     }
-    for (auto* proc : exited_processes) {
+    for (auto *proc : exited_processes)
+    {
         proc->m_exited = false;
         proc->m_exit_observers.notify();
     }
 }
 
-void KakouneClientProcess::setupSignalHandlers() {
+void KakouneClientProcess::setupSignalHandlers()
+{
     static bool initialized = false;
-    if (initialized) return;
+    if (initialized)
+        return;
     initialized = true;
 
     struct sigaction sa;
@@ -84,16 +97,19 @@ void KakouneClientProcess::setupSignalHandlers() {
     sa.sa_handler = handleTerminationSignal;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_RESTART;
-    if (sigaction(SIGCHLD, &sa, NULL) == -1) {
+    if (sigaction(SIGCHLD, &sa, NULL) == -1)
+    {
         throw std::runtime_error("failed to setup SIGCHLD signal");
     }
 
-    if (sigaction(SIGPIPE, &sa, NULL) == -1) {
+    if (sigaction(SIGPIPE, &sa, NULL) == -1)
+    {
         throw std::runtime_error("failed to setup SIGPIPE signal");
     }
 }
 
-void KakouneClientProcess::registerProcess(pid_t pid) {
+void KakouneClientProcess::registerProcess(pid_t pid)
+{
     setupSignalHandlers();
 
     m_client_pid = pid;
@@ -105,7 +121,8 @@ void KakouneClientProcess::start(std::optional<std::string> startup_command)
     start(startup_command, {});
 }
 
-void KakouneClientProcess::start(std::optional<std::string> startup_command, const std::vector<std::string>& file_arguments)
+void KakouneClientProcess::start(std::optional<std::string> startup_command,
+                                 const std::vector<std::string> &file_arguments)
 {
     if (pipe(m_stdout_pipefd) != 0)
     {
@@ -135,25 +152,27 @@ void KakouneClientProcess::start(std::optional<std::string> startup_command, con
 
         setenv("KAKOD_CLIENT_ID", std::to_string(m_client_id).c_str(), 1);
 
-        std::vector<const char*> args;
+        std::vector<const char *> args;
         args.push_back("kak");
         args.push_back("-ui");
         args.push_back("json");
         args.push_back("-c");
         args.push_back(m_session_name.c_str());
 
-        if (startup_command.has_value()) {
+        if (startup_command.has_value())
+        {
             args.push_back("-e");
             args.push_back(startup_command->c_str());
         }
 
-        for (const auto& file_arg : file_arguments) {
+        for (const auto &file_arg : file_arguments)
+        {
             args.push_back(file_arg.c_str());
         }
 
         args.push_back(nullptr);
 
-        execvp("kak", const_cast<char* const*>(args.data()));
+        execvp("kak", const_cast<char *const *>(args.data()));
 
         perror("execv");
         _exit(1);
@@ -170,12 +189,12 @@ void KakouneClientProcess::start(std::optional<std::string> startup_command, con
     }
 }
 
-void KakouneClientProcess::setRequestCallback(const std::function<void(const IncomingRequest &)>& callback)
+void KakouneClientProcess::setRequestCallback(const std::function<void(const IncomingRequest &)> &callback)
 {
     m_request_callback = callback;
 }
 
-domain::ObserverId KakouneClientProcess::onExit(const std::function<void()>& callback)
+domain::ObserverId KakouneClientProcess::onExit(const std::function<void()> &callback)
 {
     return m_exit_observers.addObserver(callback);
 }
@@ -311,13 +330,16 @@ std::optional<IncomingRequest> KakouneClientProcess::parseRequest(std::string re
     if (method == "draw")
     {
         parsed_request.type = IncomingRequestType::DRAW;
-        parsed_request.data = DrawRequestData{params[0].get<std::vector<kakoune::Line>>(), params[1].get<kakoune::Coord>(), params[2].get<kakoune::Face>()};
+        parsed_request.data = DrawRequestData{params[0].get<std::vector<kakoune::Line>>(),
+                                              params[1].get<kakoune::Coord>(), params[2].get<kakoune::Face>()};
         return parsed_request;
     }
     if (method == "draw_status")
     {
         parsed_request.type = IncomingRequestType::DRAW_STATUS;
-        parsed_request.data = DrawStatusRequestData{params[0].get<kakoune::Line>(), params[1].get<kakoune::Line>(), params[2].get<int>(), params[3].get<kakoune::Line>(), params[4].get<kakoune::Face>(), params[5].get<kakoune::StatusStyle>()};
+        parsed_request.data = DrawStatusRequestData{
+            params[0].get<kakoune::Line>(), params[1].get<kakoune::Line>(), params[2].get<int>(),
+            params[3].get<kakoune::Line>(), params[4].get<kakoune::Face>(), params[5].get<kakoune::StatusStyle>()};
         return parsed_request;
     }
     if (method == "refresh")
@@ -371,4 +393,3 @@ std::optional<IncomingRequest> KakouneClientProcess::parseRequest(std::string re
 
     return std::nullopt;
 }
-

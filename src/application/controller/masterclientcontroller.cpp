@@ -3,19 +3,18 @@
 #include <algorithm>
 #include <sstream>
 
-void MasterClientController::init(domain::KakouneSession* session, PaneLayout* pane_layout)
+void MasterClientController::init(domain::KakouneSession *session, PaneLayout *pane_layout)
 {
     m_session = session;
     m_pane_layout = pane_layout;
 
-    m_arrange_observer = m_pane_layout->onArrange([this](const std::vector<Pane>& panes) {
-        updateMasterClients();
-    });
+    m_arrange_observer = m_pane_layout->onArrange([this](const std::vector<Pane> &panes) { updateMasterClients(); });
 }
 
 MasterClientController::~MasterClientController()
 {
-    if (m_pane_layout) {
+    if (m_pane_layout)
+    {
         m_pane_layout->removeObserver(m_arrange_observer);
     }
 }
@@ -23,7 +22,7 @@ MasterClientController::~MasterClientController()
 std::vector<std::string> MasterClientController::getMasterClientNames() const
 {
     std::vector<std::string> master_names;
-    const auto& panes = m_pane_layout->getPanes();
+    const auto &panes = m_pane_layout->getPanes();
     int num_masters = m_pane_layout->getNumMasters();
 
     for (int i = 0; i < std::min(num_masters, static_cast<int>(panes.size())); ++i)
@@ -53,7 +52,8 @@ void MasterClientController::updateMasterClients()
 
     for (size_t i = 0; i < master_names.size(); ++i)
     {
-        if (i > 0) command_stream << " ";
+        if (i > 0)
+            command_stream << " ";
         command_stream << master_names[i];
     }
 

@@ -13,16 +13,16 @@ void KakouneContentView::init(domain::Renderer *renderer, domain::Window *window
 }
 
 void KakouneContentView::render(const RenderContext &render_context, const domain::Lines &lines,
-                                 const domain::Face &default_face, const domain::Rectangle &bounds)
+                                const domain::Face &default_face, const domain::Rectangle &bounds)
 {
     m_renderer->addBounds(bounds.left(), bounds.top(), bounds.width(), bounds.height());
     m_renderer->renderLines(render_context.textConfig(render_context.ui_options.font_content), lines, default_face,
-                             bounds.left(), bounds.top());
+                            bounds.left(), bounds.top());
     m_renderer->popBounds();
 }
 
 void KakouneContentView::handleMouseButton(KakouneClient *client, domain::MouseButtonEvent event,
-                                        domain::Rectangle bounds)
+                                           domain::Rectangle bounds)
 {
     domain::Coord coord = pixelToCoord(client->uiOptions().font_content, event.x, event.y, bounds.left(), bounds.top());
     m_mouse_button_observers.notify(client, event, coord);
@@ -35,7 +35,7 @@ void KakouneContentView::handleMouseMove(KakouneClient *client, float x, float y
 }
 
 void KakouneContentView::handleMouseScroll(KakouneClient *client, float x, float y, domain::Rectangle bounds,
-                                        int amount)
+                                           int amount)
 {
     domain::Coord coord = pixelToCoord(client->uiOptions().font_content, x, y, bounds.left(), bounds.top());
     m_mouse_scroll_observers.notify(client, coord, amount);
@@ -47,14 +47,12 @@ domain::ObserverId KakouneContentView::onMouseButton(
     return m_mouse_button_observers.addObserver(std::move(callback));
 }
 
-domain::ObserverId KakouneContentView::onMouseMove(
-    std::function<void(KakouneClient *, domain::Coord)> callback)
+domain::ObserverId KakouneContentView::onMouseMove(std::function<void(KakouneClient *, domain::Coord)> callback)
 {
     return m_mouse_move_observers.addObserver(std::move(callback));
 }
 
-domain::ObserverId KakouneContentView::onMouseScroll(
-    std::function<void(KakouneClient *, domain::Coord, int)> callback)
+domain::ObserverId KakouneContentView::onMouseScroll(std::function<void(KakouneClient *, domain::Coord, int)> callback)
 {
     return m_mouse_scroll_observers.addObserver(std::move(callback));
 }
@@ -77,7 +75,7 @@ float KakouneContentView::getCellHeight(domain::Font *font) const
 }
 
 std::pair<float, float> KakouneContentView::coordToPixels(domain::Font *font, const domain::Coord &coord,
-                                                            float origin_x, float origin_y) const
+                                                          float origin_x, float origin_y) const
 {
     float x = origin_x + getCellWidth(font) * coord.column;
     float y = origin_y + getCellHeight(font) * coord.line;
@@ -85,7 +83,7 @@ std::pair<float, float> KakouneContentView::coordToPixels(domain::Font *font, co
 }
 
 domain::Coord KakouneContentView::pixelToCoord(domain::Font *font, float x, float y, float origin_x,
-                                                float origin_y) const
+                                               float origin_y) const
 {
     int column = static_cast<int>((x - origin_x) / getCellWidth(font));
     int line = static_cast<int>((y - origin_y) / getCellHeight(font));

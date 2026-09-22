@@ -2,31 +2,36 @@
 
 #include "domain/codepointstring.hpp"
 
-TEST_CASE("CodepointString handles empty string", "[CodepointString]") {
+TEST_CASE("CodepointString handles empty string", "[CodepointString]")
+{
     domain::CodepointString empty("");
     REQUIRE(empty.toString() == "");
     REQUIRE(empty.size() == 0);
 }
 
-TEST_CASE("CodepointString handles basic ASCII string", "[CodepointString]") {
+TEST_CASE("CodepointString handles basic ASCII string", "[CodepointString]")
+{
     domain::CodepointString empty("SENTENCE");
     REQUIRE(empty.toString() == "SENTENCE");
     REQUIRE(empty.size() == 8);
 }
 
-TEST_CASE("CodepointString handles multi-byte UTF-8 characters", "[CodepointString]") {
+TEST_CASE("CodepointString handles multi-byte UTF-8 characters", "[CodepointString]")
+{
     domain::CodepointString unicode("Hello 世界 🌍");
     REQUIRE(unicode.toString() == "Hello 世界 🌍");
 }
 
-TEST_CASE("CodepointString size counts codepoints not bytes", "[CodepointString][size]") {
+TEST_CASE("CodepointString size counts codepoints not bytes", "[CodepointString][size]")
+{
     domain::CodepointString ascii("ABC");
     domain::CodepointString unicode("世界");
     REQUIRE(ascii.size() == 3);
     REQUIRE(unicode.size() == 2);
 }
 
-TEST_CASE("CodepointString at accesses character by index", "[CodepointString][at]") {
+TEST_CASE("CodepointString at accesses character by index", "[CodepointString][at]")
+{
     domain::CodepointString ascii("ABC");
 
     REQUIRE(ascii.at(0) == 'A');
@@ -34,7 +39,8 @@ TEST_CASE("CodepointString at accesses character by index", "[CodepointString][a
     REQUIRE(ascii.at(2) == 'C');
 }
 
-TEST_CASE("CodepointString addCodepoint appends to end", "[CodepointString][addCodepoint]") {
+TEST_CASE("CodepointString addCodepoint appends to end", "[CodepointString][addCodepoint]")
+{
     domain::CodepointString ascii("ABC");
 
     REQUIRE(ascii.size() == 3);
@@ -45,7 +51,8 @@ TEST_CASE("CodepointString addCodepoint appends to end", "[CodepointString][addC
     REQUIRE(ascii.at(3) == 'D');
 }
 
-TEST_CASE("CodepointString insertCodepoint adds at position", "[CodepointString][insertCodepoint]") {
+TEST_CASE("CodepointString insertCodepoint adds at position", "[CodepointString][insertCodepoint]")
+{
     domain::CodepointString ascii("ABC");
 
     REQUIRE(ascii.size() == 3);
@@ -56,7 +63,8 @@ TEST_CASE("CodepointString insertCodepoint adds at position", "[CodepointString]
     REQUIRE(ascii.at(0) == 'D');
 }
 
-TEST_CASE("CodepointString substring extracts from start to end", "[CodepointString][substring]") {
+TEST_CASE("CodepointString substring extracts from start to end", "[CodepointString][substring]")
+{
     domain::CodepointString ascii("ABCDEF");
 
     domain::CodepointString substr = ascii.substring(2);
@@ -70,7 +78,8 @@ TEST_CASE("CodepointString substring extracts from start to end", "[CodepointStr
     REQUIRE(substr.toString() == "DEF");
 }
 
-TEST_CASE("CodepointString substring at boundary returns empty", "[CodepointString][substring]") {
+TEST_CASE("CodepointString substring at boundary returns empty", "[CodepointString][substring]")
+{
     domain::CodepointString ascii("ABC");
 
     domain::CodepointString substr = ascii.substring(3);
@@ -78,7 +87,8 @@ TEST_CASE("CodepointString substring at boundary returns empty", "[CodepointStri
     REQUIRE(substr.size() == 0);
 }
 
-TEST_CASE("CodepointString substring with zero length returns empty", "[CodepointString][substring]") {
+TEST_CASE("CodepointString substring with zero length returns empty", "[CodepointString][substring]")
+{
     domain::CodepointString ascii("ABCDEF");
 
     domain::CodepointString substr = ascii.substring(3, 0);
@@ -86,7 +96,8 @@ TEST_CASE("CodepointString substring with zero length returns empty", "[Codepoin
     REQUIRE(substr.size() == 0);
 }
 
-TEST_CASE("CodepointString substring with start and length", "[CodepointString][substring]") {
+TEST_CASE("CodepointString substring with start and length", "[CodepointString][substring]")
+{
     domain::CodepointString ascii("ABCDEF");
 
     domain::CodepointString substr = ascii.substring(3, 1);
@@ -105,7 +116,8 @@ TEST_CASE("CodepointString substring with start and length", "[CodepointString][
     REQUIRE(substr.toString() == "DEF");
 }
 
-TEST_CASE("CodepointString trim removes whitespace from both ends", "[CodepointString][trim]") {
+TEST_CASE("CodepointString trim removes whitespace from both ends", "[CodepointString][trim]")
+{
     domain::CodepointString ascii("     ABC     ");
 
     domain::CodepointString trim = ascii.trim(domain::TrimDirection::Both);
@@ -114,7 +126,8 @@ TEST_CASE("CodepointString trim removes whitespace from both ends", "[CodepointS
     REQUIRE(trim.toString() == "ABC");
 }
 
-TEST_CASE("CodepointString trim removes whitespace from right only", "[CodepointString][trim]") {
+TEST_CASE("CodepointString trim removes whitespace from right only", "[CodepointString][trim]")
+{
     domain::CodepointString ascii("     ABC     ");
 
     domain::CodepointString trim = ascii.trim(domain::TrimDirection::Right);
@@ -123,7 +136,8 @@ TEST_CASE("CodepointString trim removes whitespace from right only", "[Codepoint
     REQUIRE(trim.toString() == "     ABC");
 }
 
-TEST_CASE("CodepointString trim removes whitespace from left only", "[CodepointString][trim]") {
+TEST_CASE("CodepointString trim removes whitespace from left only", "[CodepointString][trim]")
+{
     domain::CodepointString ascii("     ABC     ");
 
     domain::CodepointString trim = ascii.trim(domain::TrimDirection::Left);
@@ -132,13 +146,15 @@ TEST_CASE("CodepointString trim removes whitespace from left only", "[CodepointS
     REQUIRE(trim.toString() == "ABC     ");
 }
 
-TEST_CASE("CodepointString converts to std::string correctly", "[CodepointString][toString]") {
+TEST_CASE("CodepointString converts to std::string correctly", "[CodepointString][toString]")
+{
     domain::CodepointString test("THIS IS A TEST");
 
     REQUIRE(test.toString() == "THIS IS A TEST");
 }
 
-TEST_CASE("CodepointString concatenates with += operator", "[CodepointString][operator]") {
+TEST_CASE("CodepointString concatenates with += operator", "[CodepointString][operator]")
+{
     domain::CodepointString test;
     test += domain::CodepointString("THIS ");
     test += domain::CodepointString("IS ");
@@ -148,7 +164,8 @@ TEST_CASE("CodepointString concatenates with += operator", "[CodepointString][op
     REQUIRE(test.toString() == "THIS IS A TEST");
 }
 
-TEST_CASE("CodepointString compares equal with == operator", "[CodepointString][operator]") {
+TEST_CASE("CodepointString compares equal with == operator", "[CodepointString][operator]")
+{
     domain::CodepointString test1("THIS IS A TEST");
     domain::CodepointString test2("THIS IS A TEST");
 
@@ -156,12 +173,14 @@ TEST_CASE("CodepointString compares equal with == operator", "[CodepointString][
     REQUIRE(test1.toString() == test2.toString());
     REQUIRE(test1.size() == test2.size());
 
-    for (int i = 0; i < test1.size(); i++) {
+    for (int i = 0; i < test1.size(); i++)
+    {
         REQUIRE(test1.at(i) == test2.at(i));
     }
 }
 
-TEST_CASE("CodepointString compares unequal strings correctly with != operator", "[CodepointString][operator]") {
+TEST_CASE("CodepointString compares unequal strings correctly with != operator", "[CodepointString][operator]")
+{
     domain::CodepointString test1("THIS IS A TEST");
     domain::CodepointString test2("THIS IS DIFFERENT");
     REQUIRE(test1 != test2);

@@ -1,9 +1,9 @@
 #include "cliparser.hpp"
 #include "application/cliconfig.hpp"
 #include <getopt.h>
+#include <iomanip>
 #include <random>
 #include <sstream>
-#include <iomanip>
 
 std::string generateRandomSessionId()
 {
@@ -16,9 +16,11 @@ std::string generateRandomSessionId()
     return ss.str();
 }
 
-CliParser::CliParser(ValidatorDependencies dependencies) : m_validator_depencies(dependencies) { }
+CliParser::CliParser(ValidatorDependencies dependencies) : m_validator_depencies(dependencies)
+{
+}
 
-ParsedCliArgs CliParser::parseAndValidate(int argc, char* argv[])
+ParsedCliArgs CliParser::parseAndValidate(int argc, char *argv[])
 {
     ParsedCliArgs result;
     result.result = ParseResult::Success;
@@ -30,11 +32,7 @@ ParsedCliArgs CliParser::parseAndValidate(int argc, char* argv[])
     int set_option_session_type_count = 0;
 
     static struct option long_options[] = {
-        {"version", no_argument, 0, 'v'},
-        {"help", no_argument, 0, 'h'},
-        {"init", no_argument, 0, 'i'},
-        {0, 0, 0, 0}
-    };
+        {"version", no_argument, 0, 'v'}, {"help", no_argument, 0, 'h'}, {"init", no_argument, 0, 'i'}, {0, 0, 0, 0}};
 
     optind = 1;
 
@@ -44,48 +42,51 @@ ParsedCliArgs CliParser::parseAndValidate(int argc, char* argv[])
     {
         switch (opt)
         {
-            case 'c':
+        case 'c':
+            result.config.session_type = SessionType::Remote;
+            result.config.session_id = optarg;
+            set_option_session_type_count++;
+            break;
+        case 'C': {
+            if (m_validator_depencies.kakouneSessionExists(std::string(optarg)))
+            {
                 result.config.session_type = SessionType::Remote;
                 result.config.session_id = optarg;
-                set_option_session_type_count++;
-                break;
-            case 'C': {
-                    if (m_validator_depencies.kakouneSessionExists(std::string(optarg))) {
-                        result.config.session_type = SessionType::Remote;
-                        result.config.session_id = optarg;
-                    } else {
-                        result.config.session_type = SessionType::Local;
-                        result.config.session_id = optarg;
-                    }
-                    set_option_session_type_count++;
-                    break;
-                }
-            case 's':
+            }
+            else
+            {
+                result.config.session_type = SessionType::Local;
                 result.config.session_id = optarg;
-                set_option_session_type_count++;
-                break;
-            case 'e':
-                result.config.startup_command = optarg;
-                break;
-            case 'p':
-                send_command = true;
-                break;
-            case 'n':
-                result.config.no_config = true;
-                break;
-            case 'v':
-                result.result = ParseResult::ShowVersion;
-                return result;
-            case 'h':
-                result.result = ParseResult::ShowHelp;
-                return result;
-            case 'i':
-                result.result = ParseResult::ShowKakodemonIntegrationScript;
-                return result;
-            default:
-                result.result = ParseResult::Error;
-                result.error_message = "Invalid option";
-                return result;
+            }
+            set_option_session_type_count++;
+            break;
+        }
+        case 's':
+            result.config.session_id = optarg;
+            set_option_session_type_count++;
+            break;
+        case 'e':
+            result.config.startup_command = optarg;
+            break;
+        case 'p':
+            send_command = true;
+            break;
+        case 'n':
+            result.config.no_config = true;
+            break;
+        case 'v':
+            result.result = ParseResult::ShowVersion;
+            return result;
+        case 'h':
+            result.result = ParseResult::ShowHelp;
+            return result;
+        case 'i':
+            result.result = ParseResult::ShowKakodemonIntegrationScript;
+            return result;
+        default:
+            result.result = ParseResult::Error;
+            result.error_message = "Invalid option";
+            return result;
         }
     }
 
@@ -127,13 +128,17 @@ ParsedCliArgs CliParser::parseAndValidate(int argc, char* argv[])
         result.config.session_id = generateRandomSessionId();
     }
 
-    if (result.config.session_type == SessionType::Remote && !m_validator_depencies.kakouneSessionExists(result.config.session_id)) {
+    if (result.config.session_type == SessionType::Remote &&
+        !m_validator_depencies.kakouneSessionExists(result.config.session_id))
+    {
         result.result = ParseResult::Error;
         result.error_message = "Kakoune session does not exist";
         return result;
     }
 
-    if (result.config.session_type == SessionType::Local && m_validator_depencies.kakouneSessionExists(result.config.session_id)) {
+    if (result.config.session_type == SessionType::Local &&
+        m_validator_depencies.kakouneSessionExists(result.config.session_id))
+    {
         result.result = ParseResult::Error;
         result.error_message = "Kakoune session name already in use";
         return result;

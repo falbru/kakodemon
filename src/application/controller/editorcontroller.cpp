@@ -9,9 +9,9 @@ EditorController::EditorController()
 }
 
 void EditorController::init(ClientManager *client_manager, FocusedClientStack *focused_client_stack,
-                             PaneLayout *pane_layout, KakouneContentView *kakoune_content_view,
-                             StatusBarView *status_bar_view, domain::FontManager *font_manager,
-                             domain::Window *window, MultiStyledMenuView *multi_styled_menu)
+                            PaneLayout *pane_layout, KakouneContentView *kakoune_content_view,
+                            StatusBarView *status_bar_view, domain::FontManager *font_manager, domain::Window *window,
+                            MultiStyledMenuView *multi_styled_menu)
 {
     m_client_manager = client_manager;
     m_focused_client_stack = focused_client_stack;
@@ -23,27 +23,30 @@ void EditorController::init(ClientManager *client_manager, FocusedClientStack *f
     m_multi_styled_menu = multi_styled_menu;
 
     m_focused_client_stack->onFocusChanged([](KakouneClient *previous, KakouneClient *next) {
-        if (previous) {
+        if (previous)
+        {
             previous->interface->pressKeys({"<focus_out>"});
         }
-        if (next) {
+        if (next)
+        {
             next->interface->pressKeys({"<focus_in>"});
         }
     });
 
-    m_pane_layout->onArrange([this](const std::vector<Pane> &panes) {
-        resizeClientsToPaneLayout(panes);
-    });
+    m_pane_layout->onArrange([this](const std::vector<Pane> &panes) { resizeClientsToPaneLayout(panes); });
 
     m_kakoune_content_view->onMouseButton(
         [this](KakouneClient *client, domain::MouseButtonEvent event, domain::Coord coord) {
             coord.line = std::max(0, coord.line);
             coord.column = std::max(0, coord.column);
 
-            if (event.action == domain::MouseButtonAction::PRESS) {
+            if (event.action == domain::MouseButtonAction::PRESS)
+            {
                 m_mouse_button_pressed[event.button] = true;
                 client->interface->pressMouseButton(event.button, coord.line, coord.column);
-            } else {
+            }
+            else
+            {
                 m_mouse_button_pressed[event.button] = false;
                 client->interface->releaseMouseButton(event.button, coord.line, coord.column);
             }
@@ -53,8 +56,10 @@ void EditorController::init(ClientManager *client_manager, FocusedClientStack *f
         coord.line = std::max(0, coord.line);
         coord.column = std::max(0, coord.column);
 
-        for (const auto &[button, pressed] : m_mouse_button_pressed) {
-            if (pressed) {
+        for (const auto &[button, pressed] : m_mouse_button_pressed)
+        {
+            if (pressed)
+            {
                 client->interface->moveMouse(coord.line, coord.column);
                 return;
             }
@@ -68,9 +73,11 @@ void EditorController::init(ClientManager *client_manager, FocusedClientStack *f
 
 void EditorController::update()
 {
-    for (auto &client : m_client_manager->clients()) {
+    for (auto &client : m_client_manager->clients())
+    {
         auto result = client->interface->getNextKakouneStateAndEvents();
-        if (result.has_value()) {
+        if (result.has_value())
+        {
             m_window->setNeedsRerender();
 
             client->state = result->first;
@@ -78,12 +85,15 @@ void EditorController::update()
 
             domain::FrameEvents events = result->second;
 
-            if (events.ui_options_updated) {
+            if (events.ui_options_updated)
+            {
                 client->setUIOptions(client->interface->getUIOptions(m_font_manager));
             }
 
-            if (events.menu_select && client->state.menu.has_value() && client->state.menu->hasItems()) {
-                m_multi_styled_menu->ensureItemVisible(client->menu_state, client->state.menu->getItems().selected_index, *client->state.menu);
+            if (events.menu_select && client->state.menu.has_value() && client->state.menu->hasItems())
+            {
+                m_multi_styled_menu->ensureItemVisible(
+                    client->menu_state, client->state.menu->getItems().selected_index, *client->state.menu);
             }
         }
     }
@@ -91,7 +101,8 @@ void EditorController::update()
 
 void EditorController::resizeClientsToPaneLayout(const std::vector<Pane> &panes)
 {
-    for (const auto &pane : m_pane_layout->getPanes()) {
+    for (const auto &pane : m_pane_layout->getPanes())
+    {
         float cell_width = m_kakoune_content_view->getCellWidth(pane.client->uiOptions().font_content);
         float cell_height = m_kakoune_content_view->getCellHeight(pane.client->uiOptions().font_content);
         float status_bar_height = m_status_bar_view->height(pane.client->uiOptions().font_statusbar);

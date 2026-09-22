@@ -7,7 +7,8 @@
 
 #include "spdlog/spdlog.h"
 
-LocalSession::LocalSession(const std::string &session_id) : m_session_id(session_id), m_daemon_pid(-1), m_session_started(false)
+LocalSession::LocalSession(const std::string &session_id)
+    : m_session_id(session_id), m_daemon_pid(-1), m_session_started(false)
 {
 }
 
@@ -49,7 +50,7 @@ LocalSession::~LocalSession()
         else
         {
             close(pipefd[0]);
-            const char* kill_cmd = "kill!\n";
+            const char *kill_cmd = "kill!\n";
             write(pipefd[1], kill_cmd, 6);
             close(pipefd[1]);
 
@@ -59,7 +60,7 @@ LocalSession::~LocalSession()
     }
 }
 
-void LocalSession::start(const std::vector<std::string>& file_arguments, bool no_config)
+void LocalSession::start(const std::vector<std::string> &file_arguments, bool no_config)
 {
     m_fifo_path = "/tmp/kakodemon_" + m_session_id + "_" + std::to_string(getpid()) + ".fifo";
 
@@ -80,7 +81,7 @@ void LocalSession::start(const std::vector<std::string>& file_arguments, bool no
     if (pid == 0)
     {
         std::string init_command = "nop %sh{ echo > '" + m_fifo_path + "'}";
-        std::vector<const char*> args;
+        std::vector<const char *> args;
         args.push_back("kak");
         args.push_back("-d");
         args.push_back("-s");
@@ -90,16 +91,18 @@ void LocalSession::start(const std::vector<std::string>& file_arguments, bool no
         args.push_back("-E");
         args.push_back(init_command.c_str());
 
-        if (no_config) {
+        if (no_config)
+        {
             args.push_back("-n");
         }
 
-        for (const auto& file : file_arguments) {
+        for (const auto &file : file_arguments)
+        {
             args.push_back(file.c_str());
         }
         args.push_back(nullptr);
 
-        execvp("kak", const_cast<char**>(args.data()));
+        execvp("kak", const_cast<char **>(args.data()));
         perror("execlp");
         _exit(1);
     }
@@ -139,15 +142,17 @@ std::string LocalSession::getSessionId() const
     return m_session_id;
 }
 
-void LocalSession::setSessionId(const std::string& session_id)
+void LocalSession::setSessionId(const std::string &session_id)
 {
     m_session_id = session_id;
 }
 
-void LocalSession::sendCommand(const std::string& command) {
+void LocalSession::sendCommand(const std::string &command)
+{
     std::string full_command = "kak -p " + m_session_id;
-    FILE* pipe = popen(full_command.c_str(), "w");
-    if (!pipe) {
+    FILE *pipe = popen(full_command.c_str(), "w");
+    if (!pipe)
+    {
         return;
     }
     fwrite(command.c_str(), 1, command.size(), pipe);

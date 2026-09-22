@@ -1,6 +1,6 @@
-#include <catch2/catch_test_macros.hpp>
 #include "adapters/fontconfig/fontconfigresolver.hpp"
 #include "domain/ports/fontresolver.hpp"
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("FontconfigResolver can be constructed", "[FontconfigResolver]")
 {
@@ -190,7 +190,6 @@ TEST_CASE("FontconfigResolver handles heart emoji", "[FontconfigResolver]")
     REQUIRE(result.has_value());
     REQUIRE(!result->path.empty());
 }
-
 
 TEST_CASE("FontconfigResolver handles rapid successive calls", "[FontconfigResolver]")
 {

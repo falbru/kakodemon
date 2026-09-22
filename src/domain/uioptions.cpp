@@ -6,13 +6,9 @@ namespace domain
 
 bool UIOptions::operator==(const UIOptions &other) const
 {
-    return font == other.font &&
-           font_menu == other.font_menu &&
-           font_infobox == other.font_infobox &&
-           font_statusbar == other.font_statusbar &&
-           font_content == other.font_content &&
-           color_border == other.color_border &&
-           color_overrides == other.color_overrides;
+    return font == other.font && font_menu == other.font_menu && font_infobox == other.font_infobox &&
+           font_statusbar == other.font_statusbar && font_content == other.font_content &&
+           color_border == other.color_border && color_overrides == other.color_overrides;
 }
 
 UIOptions getDefaultUIOptions(FontManager *font_manager)

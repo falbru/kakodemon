@@ -1,9 +1,9 @@
-#include <catch2/catch_test_macros.hpp>
 #include "application/model/focusedclientstack.hpp"
+#include <catch2/catch_test_macros.hpp>
 
-static KakouneClient* const A = reinterpret_cast<KakouneClient*>(0x1);
-static KakouneClient* const B = reinterpret_cast<KakouneClient*>(0x2);
-static KakouneClient* const C = reinterpret_cast<KakouneClient*>(0x3);
+static KakouneClient *const A = reinterpret_cast<KakouneClient *>(0x1);
+static KakouneClient *const B = reinterpret_cast<KakouneClient *>(0x2);
+static KakouneClient *const C = reinterpret_cast<KakouneClient *>(0x3);
 
 TEST_CASE("FocusedClientStack - focused() returns nullptr when empty", "[focusedclientstack]")
 {
@@ -93,9 +93,9 @@ TEST_CASE("FocusedClientStack - stack order preserved across multiple focuses", 
 TEST_CASE("FocusedClientStack - onFocusChanged fires when focus changes", "[focusedclientstack]")
 {
     FocusedClientStack stack;
-    KakouneClient* notified_previous = reinterpret_cast<KakouneClient*>(0xFF);
-    KakouneClient* notified_next = nullptr;
-    stack.onFocusChanged([&](KakouneClient* previous, KakouneClient* next) {
+    KakouneClient *notified_previous = reinterpret_cast<KakouneClient *>(0xFF);
+    KakouneClient *notified_next = nullptr;
+    stack.onFocusChanged([&](KakouneClient *previous, KakouneClient *next) {
         notified_previous = previous;
         notified_next = next;
     });
@@ -112,9 +112,9 @@ TEST_CASE("FocusedClientStack - onFocusChanged fires when focus changes", "[focu
 TEST_CASE("FocusedClientStack - onFocusChanged fires with nullptr when last client removed", "[focusedclientstack]")
 {
     FocusedClientStack stack;
-    KakouneClient* notified_previous = nullptr;
-    KakouneClient* notified_next = reinterpret_cast<KakouneClient*>(0xFF);
-    stack.onFocusChanged([&](KakouneClient* previous, KakouneClient* next) {
+    KakouneClient *notified_previous = nullptr;
+    KakouneClient *notified_next = reinterpret_cast<KakouneClient *>(0xFF);
+    stack.onFocusChanged([&](KakouneClient *previous, KakouneClient *next) {
         notified_previous = previous;
         notified_next = next;
     });
@@ -132,7 +132,7 @@ TEST_CASE("FocusedClientStack - onFocusChanged does not fire when non-focused cl
     stack.focus(B);
 
     int call_count = 0;
-    stack.onFocusChanged([&](KakouneClient*, KakouneClient*) { call_count++; });
+    stack.onFocusChanged([&](KakouneClient *, KakouneClient *) { call_count++; });
 
     stack.remove(A);
     REQUIRE(call_count == 0);
@@ -143,7 +143,7 @@ TEST_CASE("FocusedClientStack - removeObserver stops notifications", "[focusedcl
 {
     FocusedClientStack stack;
     int call_count = 0;
-    domain::ObserverId id = stack.onFocusChanged([&](KakouneClient*, KakouneClient*) { call_count++; });
+    domain::ObserverId id = stack.onFocusChanged([&](KakouneClient *, KakouneClient *) { call_count++; });
 
     stack.focus(A);
     REQUIRE(call_count == 1);

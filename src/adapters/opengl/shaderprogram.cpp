@@ -101,10 +101,12 @@ void main()
 }
 )";
 
-opengl::ShaderProgram::ShaderProgram() {
+opengl::ShaderProgram::ShaderProgram()
+{
 }
 
-void opengl::ShaderProgram::compile() {
+void opengl::ShaderProgram::compile()
+{
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);
@@ -147,33 +149,41 @@ void opengl::ShaderProgram::compile() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void opengl::ShaderProgram::use() {
+void opengl::ShaderProgram::use()
+{
     glUseProgram(m_shader_program);
 }
 
-void opengl::ShaderProgram::setRenderType(opengl::RenderType type) {
+void opengl::ShaderProgram::setRenderType(opengl::RenderType type)
+{
     setInt("renderType", (int)type);
 
-    if (type == RenderType::ColoredText) {
+    if (type == RenderType::ColoredText)
+    {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    }else {
+    }
+    else
+    {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 }
 
-void opengl::ShaderProgram::setFloat(const std::string &name, float value) {
+void opengl::ShaderProgram::setFloat(const std::string &name, float value)
+{
     glUniform1f(glGetUniformLocation(m_shader_program, name.c_str()), value);
 }
 
-void opengl::ShaderProgram::setInt(const std::string& name, int value) {
+void opengl::ShaderProgram::setInt(const std::string &name, int value)
+{
     glUniform1i(glGetUniformLocation(m_shader_program, name.c_str()), value);
 }
 
-void opengl::ShaderProgram::setVector4f(const std::string& name, float x, float y, float z, float w) {
+void opengl::ShaderProgram::setVector4f(const std::string &name, float x, float y, float z, float w)
+{
     glUniform4f(glGetUniformLocation(m_shader_program, name.c_str()), x, y, z, w);
 }
 
-void opengl::ShaderProgram::setMatrix4(const std::string& name, const glm::mat4& mat)
+void opengl::ShaderProgram::setMatrix4(const std::string &name, const glm::mat4 &mat)
 {
     glUniformMatrix4fv(glGetUniformLocation(m_shader_program, "projection"), 1, GL_FALSE, glm::value_ptr(mat));
 }

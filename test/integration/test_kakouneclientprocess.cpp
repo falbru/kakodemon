@@ -1,16 +1,17 @@
 #include <catch2/catch_test_macros.hpp>
-#include <thread>
 #include <chrono>
-#include <unistd.h>
-#include <sys/wait.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <poll.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <thread>
+#include <unistd.h>
 
 #include "adapters/kakoune/kakouneclientprocess.hpp"
 #include "adapters/kakoune/localsession.hpp"
 
-TEST_CASE("KakouneClientProcess executes startup_command", "[integration][kakouneclientprocess]") {
+TEST_CASE("KakouneClientProcess executes startup_command", "[integration][kakouneclientprocess]")
+{
     std::string session_id = "test_startup_cmd_" + std::to_string(getpid());
 
     auto session = std::make_unique<LocalSession>(session_id);
@@ -44,7 +45,8 @@ TEST_CASE("KakouneClientProcess executes startup_command", "[integration][kakoun
     REQUIRE(result.find("test") != std::string::npos);
 }
 
-TEST_CASE("KakouneClientProcess starts without startup_command", "[integration][kakouneclientprocess]") {
+TEST_CASE("KakouneClientProcess starts without startup_command", "[integration][kakouneclientprocess]")
+{
     std::string session_id = "test_no_startup_" + std::to_string(getpid());
 
     auto session = std::make_unique<LocalSession>(session_id);

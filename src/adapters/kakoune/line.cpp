@@ -1,6 +1,6 @@
 #include "line.hpp"
-#include "domain/atom.hpp"
 #include "atom.hpp"
+#include "domain/atom.hpp"
 
 void kakoune::to_json(nlohmann::json &j, const Line &l)
 {
@@ -12,42 +12,47 @@ void kakoune::from_json(const nlohmann::json &j, Line &l)
     l.atoms = j.get<std::vector<Atom>>();
 }
 
-int kakoune::Line::size() const {
+int kakoune::Line::size() const
+{
     return atoms.size();
 }
 
-domain::CodepointString kakoune::Line::toCodepointString() const {
+domain::CodepointString kakoune::Line::toCodepointString() const
+{
     domain::CodepointString string;
     size_t total_size = 0;
-    for (int i = 0; i < atoms.size(); i++) {
+    for (int i = 0; i < atoms.size(); i++)
+    {
         total_size += atoms[i].contents.size();
     }
     string.reserve(total_size);
-    for (int i = 0; i < atoms.size(); i++) {
+    for (int i = 0; i < atoms.size(); i++)
+    {
         string += atoms[i].contents;
     }
     return string;
 }
 
-domain::Line kakoune::toDomain(Line line) {
+domain::Line kakoune::toDomain(Line line)
+{
     std::vector<domain::Atom> domain_atoms;
     domain_atoms.reserve(line.size());
 
-    for (int i = 0; i < line.size(); i++) {
+    for (int i = 0; i < line.size(); i++)
+    {
         domain_atoms.push_back(toDomain(line.atoms[i]));
     }
 
-    return domain::Line{
-        domain_atoms
-    };
-
+    return domain::Line{domain_atoms};
 }
 
-std::vector<domain::Line> kakoune::toDomain(std::vector<Line> lines) {
+std::vector<domain::Line> kakoune::toDomain(std::vector<Line> lines)
+{
     std::vector<domain::Line> domain_lines;
     domain_lines.reserve(lines.size());
 
-    for (int i = 0; i < lines.size(); i++) {
+    for (int i = 0; i < lines.size(); i++)
+    {
         domain_lines.push_back(toDomain(lines[i]));
     }
 

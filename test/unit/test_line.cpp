@@ -1,13 +1,13 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "domain/line.hpp"
 #include "domain/atom.hpp"
 #include "domain/codepointstring.hpp"
+#include "domain/line.hpp"
 
-TEST_CASE("Line slice with single atom returns correct substring", "[Line][slice]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString("ABCDEFGHIJ"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line slice with single atom returns correct substring", "[Line][slice]")
+{
+    domain::Line line({domain::Atom(domain::CodepointString("ABCDEFGHIJ"),
+                                    domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line sliced = line.slice(0, 5);
 
@@ -15,10 +15,10 @@ TEST_CASE("Line slice with single atom returns correct substring", "[Line][slice
     REQUIRE(sliced.toCodepointString().toString() == "ABCDE");
 }
 
-TEST_CASE("Line slice with single atom from middle", "[Line][slice]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString("ABCDEFGHIJ"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line slice with single atom from middle", "[Line][slice]")
+{
+    domain::Line line({domain::Atom(domain::CodepointString("ABCDEFGHIJ"),
+                                    domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line sliced = line.slice(3, 4);
 
@@ -26,12 +26,12 @@ TEST_CASE("Line slice with single atom from middle", "[Line][slice]") {
     REQUIRE(sliced.toCodepointString().toString() == "DEFG");
 }
 
-TEST_CASE("Line slice with multiple atoms returns correct substring", "[Line][slice]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString("ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("FGHIJ"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("KLMNO"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line slice with multiple atoms returns correct substring", "[Line][slice]")
+{
+    domain::Line line(
+        {domain::Atom(domain::CodepointString("ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+         domain::Atom(domain::CodepointString("FGHIJ"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+         domain::Atom(domain::CodepointString("KLMNO"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line sliced = line.slice(0, 10);
 
@@ -39,12 +39,12 @@ TEST_CASE("Line slice with multiple atoms returns correct substring", "[Line][sl
     REQUIRE(sliced.toCodepointString().toString() == "ABCDEFGHIJ");
 }
 
-TEST_CASE("Line slice spanning multiple atoms", "[Line][slice]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString("ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("FGHIJ"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("KLMNO"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line slice spanning multiple atoms", "[Line][slice]")
+{
+    domain::Line line(
+        {domain::Atom(domain::CodepointString("ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+         domain::Atom(domain::CodepointString("FGHIJ"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+         domain::Atom(domain::CodepointString("KLMNO"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line sliced = line.slice(3, 7);
 
@@ -52,12 +52,12 @@ TEST_CASE("Line slice spanning multiple atoms", "[Line][slice]") {
     REQUIRE(sliced.toCodepointString().toString() == "DEFGHIJ");
 }
 
-TEST_CASE("Line slice starting in middle of second atom", "[Line][slice]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString("ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("FGHIJ"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("KLMNO"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line slice starting in middle of second atom", "[Line][slice]")
+{
+    domain::Line line(
+        {domain::Atom(domain::CodepointString("ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+         domain::Atom(domain::CodepointString("FGHIJ"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+         domain::Atom(domain::CodepointString("KLMNO"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line sliced = line.slice(7, 5);
 
@@ -65,10 +65,10 @@ TEST_CASE("Line slice starting in middle of second atom", "[Line][slice]") {
     REQUIRE(sliced.toCodepointString().toString() == "HIJKL");
 }
 
-TEST_CASE("Line slice with zero length returns empty line", "[Line][slice]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString("ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line slice with zero length returns empty line", "[Line][slice]")
+{
+    domain::Line line(
+        {domain::Atom(domain::CodepointString("ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line sliced = line.slice(2, 0);
 
@@ -76,10 +76,10 @@ TEST_CASE("Line slice with zero length returns empty line", "[Line][slice]") {
     REQUIRE(sliced.size() == 0);
 }
 
-TEST_CASE("Line slice with negative length returns empty line", "[Line][slice]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString("ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line slice with negative length returns empty line", "[Line][slice]")
+{
+    domain::Line line(
+        {domain::Atom(domain::CodepointString("ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line sliced = line.slice(2, -5);
 
@@ -87,10 +87,10 @@ TEST_CASE("Line slice with negative length returns empty line", "[Line][slice]")
     REQUIRE(sliced.size() == 0);
 }
 
-TEST_CASE("Line slice starting beyond end returns empty line", "[Line][slice]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString("ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line slice starting beyond end returns empty line", "[Line][slice]")
+{
+    domain::Line line(
+        {domain::Atom(domain::CodepointString("ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line sliced = line.slice(10, 5);
 
@@ -98,11 +98,11 @@ TEST_CASE("Line slice starting beyond end returns empty line", "[Line][slice]") 
     REQUIRE(sliced.size() == 0);
 }
 
-TEST_CASE("Line slice with length extending beyond content stops at end", "[Line][slice]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString("ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("FGHIJ"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line slice with length extending beyond content stops at end", "[Line][slice]")
+{
+    domain::Line line(
+        {domain::Atom(domain::CodepointString("ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+         domain::Atom(domain::CodepointString("FGHIJ"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line sliced = line.slice(7, 100);
 
@@ -110,11 +110,11 @@ TEST_CASE("Line slice with length extending beyond content stops at end", "[Line
     REQUIRE(sliced.toCodepointString().toString() == "HIJ");
 }
 
-TEST_CASE("Line slice entire line returns complete copy", "[Line][slice]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString("ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("FGHIJ"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line slice entire line returns complete copy", "[Line][slice]")
+{
+    domain::Line line(
+        {domain::Atom(domain::CodepointString("ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+         domain::Atom(domain::CodepointString("FGHIJ"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line sliced = line.slice(0, 10);
 
@@ -122,10 +122,10 @@ TEST_CASE("Line slice entire line returns complete copy", "[Line][slice]") {
     REQUIRE(sliced.toCodepointString().toString() == "ABCDEFGHIJ");
 }
 
-TEST_CASE("Line slice with single character", "[Line][slice]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString("ABCDEFGHIJ"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line slice with single character", "[Line][slice]")
+{
+    domain::Line line({domain::Atom(domain::CodepointString("ABCDEFGHIJ"),
+                                    domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line sliced = line.slice(5, 1);
 
@@ -133,11 +133,11 @@ TEST_CASE("Line slice with single character", "[Line][slice]") {
     REQUIRE(sliced.toCodepointString().toString() == "F");
 }
 
-TEST_CASE("Line slice at exact atom boundary", "[Line][slice]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString("ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("FGHIJ"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line slice at exact atom boundary", "[Line][slice]")
+{
+    domain::Line line(
+        {domain::Atom(domain::CodepointString("ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+         domain::Atom(domain::CodepointString("FGHIJ"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line sliced = line.slice(5, 3);
 
@@ -145,7 +145,8 @@ TEST_CASE("Line slice at exact atom boundary", "[Line][slice]") {
     REQUIRE(sliced.toCodepointString().toString() == "FGH");
 }
 
-TEST_CASE("Line slice from empty line returns empty", "[Line][slice]") {
+TEST_CASE("Line slice from empty line returns empty", "[Line][slice]")
+{
     domain::Line line;
 
     domain::Line sliced = line.slice(0, 5);
@@ -154,13 +155,16 @@ TEST_CASE("Line slice from empty line returns empty", "[Line][slice]") {
     REQUIRE(sliced.size() == 0);
 }
 
-TEST_CASE("Line slice does not include characters beyond requested length", "[Line][slice]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString("0123456789"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("ABCDEFGHIJ"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("KLMNOPQRST"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("UVWXYZ"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line slice does not include characters beyond requested length", "[Line][slice]")
+{
+    domain::Line line({domain::Atom(domain::CodepointString("0123456789"),
+                                    domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+                       domain::Atom(domain::CodepointString("ABCDEFGHIJ"),
+                                    domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+                       domain::Atom(domain::CodepointString("KLMNOPQRST"),
+                                    domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+                       domain::Atom(domain::CodepointString("UVWXYZ"),
+                                    domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     REQUIRE(line.length() == 36);
 
@@ -170,10 +174,12 @@ TEST_CASE("Line slice does not include characters beyond requested length", "[Li
     REQUIRE(sliced.toCodepointString().toString() == "0123456789");
 }
 
-TEST_CASE("Line slice with cursor position scenario", "[Line][slice]") {
-    domain::Line content_line({
-        domain::Atom(domain::CodepointString("This is a test input with many characters to test scrolling in the input widget component"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line slice with cursor position scenario", "[Line][slice]")
+{
+    domain::Line content_line(
+        {domain::Atom(domain::CodepointString(
+                          "This is a test input with many characters to test scrolling in the input widget component"),
+                      domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     REQUIRE(content_line.length() == 89);
 
@@ -186,10 +192,10 @@ TEST_CASE("Line slice with cursor position scenario", "[Line][slice]") {
     REQUIRE(up_to_cursor_plus_one.toCodepointString().toString() == "This is a test input with many characters");
 }
 
-TEST_CASE("Line trim left removes leading whitespace", "[Line][trim]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString("   ABC"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line trim left removes leading whitespace", "[Line][trim]")
+{
+    domain::Line line({domain::Atom(domain::CodepointString("   ABC"),
+                                    domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line trimmed = line.trim(domain::TrimDirection::Left);
 
@@ -197,10 +203,10 @@ TEST_CASE("Line trim left removes leading whitespace", "[Line][trim]") {
     REQUIRE(trimmed.length() == 3);
 }
 
-TEST_CASE("Line trim right removes trailing whitespace", "[Line][trim]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString("ABC   "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line trim right removes trailing whitespace", "[Line][trim]")
+{
+    domain::Line line({domain::Atom(domain::CodepointString("ABC   "),
+                                    domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line trimmed = line.trim(domain::TrimDirection::Right);
 
@@ -208,10 +214,10 @@ TEST_CASE("Line trim right removes trailing whitespace", "[Line][trim]") {
     REQUIRE(trimmed.length() == 3);
 }
 
-TEST_CASE("Line trim doesn't removes trailing whitespace on the right if TrimDirection is left", "[Line][trim]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString(" ABC "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line trim doesn't removes trailing whitespace on the right if TrimDirection is left", "[Line][trim]")
+{
+    domain::Line line(
+        {domain::Atom(domain::CodepointString(" ABC "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line trimmed = line.trim(domain::TrimDirection::Left);
 
@@ -219,10 +225,10 @@ TEST_CASE("Line trim doesn't removes trailing whitespace on the right if TrimDir
     REQUIRE(trimmed.length() == 4);
 }
 
-TEST_CASE("Line trim doesn't removes trailing whitespace on the left if TrimDirection is right", "[Line][trim]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString(" ABC "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line trim doesn't removes trailing whitespace on the left if TrimDirection is right", "[Line][trim]")
+{
+    domain::Line line(
+        {domain::Atom(domain::CodepointString(" ABC "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line trimmed = line.trim(domain::TrimDirection::Right);
 
@@ -230,10 +236,10 @@ TEST_CASE("Line trim doesn't removes trailing whitespace on the left if TrimDire
     REQUIRE(trimmed.length() == 4);
 }
 
-TEST_CASE("Line trim both removes leading and trailing whitespace", "[Line][trim]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString("   ABC   "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line trim both removes leading and trailing whitespace", "[Line][trim]")
+{
+    domain::Line line({domain::Atom(domain::CodepointString("   ABC   "),
+                                    domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line trimmed = line.trim(domain::TrimDirection::Both);
 
@@ -241,11 +247,11 @@ TEST_CASE("Line trim both removes leading and trailing whitespace", "[Line][trim
     REQUIRE(trimmed.length() == 3);
 }
 
-TEST_CASE("Line trim removes empty atom when first atom becomes empty", "[Line][trim]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString("   "), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("ABC"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line trim removes empty atom when first atom becomes empty", "[Line][trim]")
+{
+    domain::Line line(
+        {domain::Atom(domain::CodepointString("   "), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+         domain::Atom(domain::CodepointString("ABC"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line trimmed = line.trim(domain::TrimDirection::Left);
 
@@ -253,11 +259,11 @@ TEST_CASE("Line trim removes empty atom when first atom becomes empty", "[Line][
     REQUIRE(trimmed.toCodepointString().toString() == "ABC");
 }
 
-TEST_CASE("Line trim removes empty atom when last atom becomes empty", "[Line][trim]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString("ABC"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("   "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line trim removes empty atom when last atom becomes empty", "[Line][trim]")
+{
+    domain::Line line(
+        {domain::Atom(domain::CodepointString("ABC"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+         domain::Atom(domain::CodepointString("   "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line trimmed = line.trim(domain::TrimDirection::Right);
 
@@ -265,12 +271,12 @@ TEST_CASE("Line trim removes empty atom when last atom becomes empty", "[Line][t
     REQUIRE(trimmed.toCodepointString().toString() == "ABC");
 }
 
-TEST_CASE("Line trim both removes empty atoms from both ends", "[Line][trim]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString("   "), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("ABC"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("   "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line trim both removes empty atoms from both ends", "[Line][trim]")
+{
+    domain::Line line(
+        {domain::Atom(domain::CodepointString("   "), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+         domain::Atom(domain::CodepointString("ABC"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+         domain::Atom(domain::CodepointString("   "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line trimmed = line.trim(domain::TrimDirection::Both);
 
@@ -278,12 +284,12 @@ TEST_CASE("Line trim both removes empty atoms from both ends", "[Line][trim]") {
     REQUIRE(trimmed.toCodepointString().toString() == "ABC");
 }
 
-TEST_CASE("Line trim both removes multiple empty atoms from left", "[Line][trim]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString(" "), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("  "), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("ABC"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line trim both removes multiple empty atoms from left", "[Line][trim]")
+{
+    domain::Line line(
+        {domain::Atom(domain::CodepointString(" "), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+         domain::Atom(domain::CodepointString("  "), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+         domain::Atom(domain::CodepointString("ABC"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line trimmed = line.trim(domain::TrimDirection::Left);
 
@@ -291,12 +297,12 @@ TEST_CASE("Line trim both removes multiple empty atoms from left", "[Line][trim]
     REQUIRE(trimmed.toCodepointString().toString() == "ABC");
 }
 
-TEST_CASE("Line trim both removes multiple empty atoms from right", "[Line][trim]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString("ABC"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("  "), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString(" "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line trim both removes multiple empty atoms from right", "[Line][trim]")
+{
+    domain::Line line(
+        {domain::Atom(domain::CodepointString("ABC"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+         domain::Atom(domain::CodepointString("  "), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+         domain::Atom(domain::CodepointString(" "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line trimmed = line.trim(domain::TrimDirection::Right);
 
@@ -304,11 +310,11 @@ TEST_CASE("Line trim both removes multiple empty atoms from right", "[Line][trim
     REQUIRE(trimmed.toCodepointString().toString() == "ABC");
 }
 
-TEST_CASE("Line trim both removes all atoms if all are whitespace", "[Line][trim]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString("   "), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("  "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line trim both removes all atoms if all are whitespace", "[Line][trim]")
+{
+    domain::Line line(
+        {domain::Atom(domain::CodepointString("   "), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+         domain::Atom(domain::CodepointString("  "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line trimmed = line.trim(domain::TrimDirection::Both);
 
@@ -316,7 +322,8 @@ TEST_CASE("Line trim both removes all atoms if all are whitespace", "[Line][trim
     REQUIRE(trimmed.length() == 0);
 }
 
-TEST_CASE("Line trim on empty line returns empty line", "[Line][trim]") {
+TEST_CASE("Line trim on empty line returns empty line", "[Line][trim]")
+{
     domain::Line line;
 
     domain::Line trimmed = line.trim(domain::TrimDirection::Both);
@@ -325,12 +332,12 @@ TEST_CASE("Line trim on empty line returns empty line", "[Line][trim]") {
     REQUIRE(trimmed.length() == 0);
 }
 
-TEST_CASE("Line trim with multiple atoms only trims first and last", "[Line][trim]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString("  A"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("B C"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("D  "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line trim with multiple atoms only trims first and last", "[Line][trim]")
+{
+    domain::Line line(
+        {domain::Atom(domain::CodepointString("  A"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+         domain::Atom(domain::CodepointString("B C"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+         domain::Atom(domain::CodepointString("D  "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line trimmed = line.trim(domain::TrimDirection::Both);
 
@@ -341,11 +348,11 @@ TEST_CASE("Line trim with multiple atoms only trims first and last", "[Line][tri
     REQUIRE(trimmed.toCodepointString().toString() == "AB CD");
 }
 
-TEST_CASE("Line trim left with non-whitespace first atom", "[Line][trim]") {
-    domain::Line line({
-        domain::Atom(domain::CodepointString("ABC"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-        domain::Atom(domain::CodepointString("DEF"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
-    });
+TEST_CASE("Line trim left with non-whitespace first atom", "[Line][trim]")
+{
+    domain::Line line(
+        {domain::Atom(domain::CodepointString("ABC"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+         domain::Atom(domain::CodepointString("DEF"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))});
 
     domain::Line trimmed = line.trim(domain::TrimDirection::Left);
 

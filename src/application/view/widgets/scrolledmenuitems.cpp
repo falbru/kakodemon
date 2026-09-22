@@ -1,10 +1,10 @@
+#include "scrolledmenuitems.hpp"
 #include "../styling.hpp"
 #include "domain/atom.hpp"
+#include "domain/codepointstring.hpp"
 #include "domain/glyphatom.hpp"
 #include "domain/glyphline.hpp"
 #include "domain/glyphlinesbuilder.hpp"
-#include "domain/codepointstring.hpp"
-#include "scrolledmenuitems.hpp"
 #include <optional>
 
 ScrolledMenuItems::ScrolledMenuItems(int max_visible_items) : m_max_visible_items(max_visible_items)
@@ -43,13 +43,14 @@ void ScrolledMenuItems::render(domain::Renderer *renderer, const RenderContext &
             continue;
         }
 
-        auto item_left =
-            domain::GlyphLinesBuilder::build(domain::Line({item.at(0)}).trim(domain::TrimDirection::Right), font, render_context.font_manager);
+        auto item_left = domain::GlyphLinesBuilder::build(domain::Line({item.at(0)}).trim(domain::TrimDirection::Right),
+                                                          font, render_context.font_manager);
 
         std::optional<domain::GlyphLine> item_right =
             item.getAtoms().size() > 1
                 ? std::make_optional(domain::GlyphLinesBuilder::build(
-                      domain::Line({item.at(item.getAtoms().size() - 1)}).trim(domain::TrimDirection::Left), font, render_context.font_manager))
+                      domain::Line({item.at(item.getAtoms().size() - 1)}).trim(domain::TrimDirection::Left), font,
+                      render_context.font_manager))
                 : std::nullopt;
 
         float item_right_width = item_right.has_value() ? item_right.value().width() : 0;

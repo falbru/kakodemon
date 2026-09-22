@@ -1,7 +1,8 @@
 #include "domain/geometry.hpp"
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("Empty rectangle constructor", "[rectangle]") {
+TEST_CASE("Empty rectangle constructor", "[rectangle]")
+{
     domain::Rectangle rectangle;
 
     REQUIRE(rectangle.left() == 0);
@@ -10,7 +11,8 @@ TEST_CASE("Empty rectangle constructor", "[rectangle]") {
     REQUIRE(rectangle.height() == 0);
 }
 
-TEST_CASE("Rectangle constructor", "[rectangle]") {
+TEST_CASE("Rectangle constructor", "[rectangle]")
+{
     domain::Rectangle rectangle(2, 5, 10, 13);
 
     REQUIRE(rectangle.left() == 2);
@@ -21,8 +23,10 @@ TEST_CASE("Rectangle constructor", "[rectangle]") {
     REQUIRE(rectangle.height() == 13);
 }
 
-TEST_CASE("Rectangle intersection", "[rectangle]") {
-    SECTION("non-overlapping rectangles") {
+TEST_CASE("Rectangle intersection", "[rectangle]")
+{
+    SECTION("non-overlapping rectangles")
+    {
         domain::Rectangle a(0, 0, 5, 5);
         domain::Rectangle b(10, 10, 5, 5);
 
@@ -30,7 +34,8 @@ TEST_CASE("Rectangle intersection", "[rectangle]") {
         REQUIRE(!a.intersection(b).has_value());
     }
 
-    SECTION("overlapping rectangles") {
+    SECTION("overlapping rectangles")
+    {
         domain::Rectangle a(0, 0, 5, 5);
         domain::Rectangle b(2, 2, 5, 5);
 
@@ -45,7 +50,8 @@ TEST_CASE("Rectangle intersection", "[rectangle]") {
         REQUIRE(intersection->height() == 3);
     }
 
-    SECTION("zero-width rectangle") {
+    SECTION("zero-width rectangle")
+    {
         domain::Rectangle a(0, 0, 5, 5);
         domain::Rectangle b(2, 2, 0, 5);
 

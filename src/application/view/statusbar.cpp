@@ -5,37 +5,48 @@
 #include "domain/modeline.hpp"
 #include <variant>
 
-StatusBarView::StatusBarView() {
-
+StatusBarView::StatusBarView()
+{
 }
 
-void StatusBarView::init(domain::Renderer* renderer) {
+void StatusBarView::init(domain::Renderer *renderer)
+{
     m_renderer = renderer;
 }
 
-void StatusBarView::render(const RenderContext &render_context, InputViewState &state, const domain::ModeLine& mode_line, domain::CursorPosition cursor_position, const domain::Rectangle &bounds) {
+void StatusBarView::render(const RenderContext &render_context, InputViewState &state,
+                           const domain::ModeLine &mode_line, domain::CursorPosition cursor_position,
+                           const domain::Rectangle &bounds)
+{
     float bar_height = this->height(render_context.ui_options.font_statusbar);
 
     LayoutManager layout(bounds.left(), bounds.top() + bounds.height() - bar_height, bounds.width(), bar_height);
 
     m_renderer->addBounds(bounds.left(), bounds.top(), bounds.width(), bounds.height());
-    m_renderer->renderRect(mode_line.getDefaultFace().getBg(render_context.ui_options.color_overrides), layout.current().x, layout.current().y, layout.current().width, layout.current().height);
+    m_renderer->renderRect(mode_line.getDefaultFace().getBg(render_context.ui_options.color_overrides),
+                           layout.current().x, layout.current().y, layout.current().width, layout.current().height);
 
     layout.pad(SPACING_SMALL);
 
-    m_renderer->renderLine(render_context.textConfig(render_context.ui_options.font_statusbar), mode_line.getModeLine(), mode_line.getDefaultFace(), layout.current().x + layout.current().width, layout.current().y, domain::Alignment::topRight());
+    m_renderer->renderLine(render_context.textConfig(render_context.ui_options.font_statusbar), mode_line.getModeLine(),
+                           mode_line.getDefaultFace(), layout.current().x + layout.current().width, layout.current().y,
+                           domain::Alignment::topRight());
 
-    if (mode_line.getStatusLine().has_value()) {
+    if (mode_line.getStatusLine().has_value())
+    {
         int cursor_column = 0;
 
         if (std::holds_alternative<domain::StatusLinePosition>(cursor_position))
             cursor_column = std::get<domain::StatusLinePosition>(cursor_position).column;
 
-        m_input_widget.render(m_renderer, render_context, render_context.ui_options.font_statusbar, mode_line.getStatusLine().value(), mode_line.getDefaultFace(), cursor_column, state, layout);
+        m_input_widget.render(m_renderer, render_context, render_context.ui_options.font_statusbar,
+                              mode_line.getStatusLine().value(), mode_line.getDefaultFace(), cursor_column, state,
+                              layout);
     }
     m_renderer->popBounds();
 }
 
-float StatusBarView::height(domain::Font* font) {
+float StatusBarView::height(domain::Font *font)
+{
     return SPACING_SMALL * 2 + font->getLineHeight();
 }

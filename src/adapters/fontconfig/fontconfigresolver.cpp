@@ -1,9 +1,9 @@
-#include "domain/ports/fontresolver.hpp"
-#include "domain/codepointstring.hpp"
-#include "spdlog/spdlog.h"
 #include "fontconfigresolver.hpp"
-#include <fontconfig/fontconfig.h>
+#include "domain/codepointstring.hpp"
+#include "domain/ports/fontresolver.hpp"
+#include "spdlog/spdlog.h"
 #include <fontconfig/fcfreetype.h>
+#include <fontconfig/fontconfig.h>
 #include <optional>
 #include <string>
 
@@ -31,7 +31,7 @@ domain::FontMatch FontconfigResolver::resolveDefault(int size)
         return domain::FontMatch{"", 0, 0};
     }
 
-    FcPatternAddString(pat, FC_FAMILY, reinterpret_cast<const FcChar8*>("monospace"));
+    FcPatternAddString(pat, FC_FAMILY, reinterpret_cast<const FcChar8 *>("monospace"));
     FcPatternAddDouble(pat, FC_SIZE, static_cast<double>(size));
     FcPatternAddInteger(pat, FC_SPACING, FC_MONO);
 
@@ -48,7 +48,7 @@ domain::FontMatch FontconfigResolver::resolveDefault(int size)
         FcChar8 *file = nullptr;
         if (FcPatternGetString(font, FC_FILE, 0, &file) == FcResultMatch)
         {
-            match.path = reinterpret_cast<char*>(file);
+            match.path = reinterpret_cast<char *>(file);
             spdlog::debug("Resolved default font to: {}", match.path);
         }
 
@@ -72,7 +72,7 @@ domain::FontMatch FontconfigResolver::resolveDefault(int size)
     return match;
 }
 
-domain::FontMatch FontconfigResolver::resolve(const std::string& pattern)
+domain::FontMatch FontconfigResolver::resolve(const std::string &pattern)
 {
     FcConfig *config = FcConfigGetCurrent();
 
@@ -97,7 +97,7 @@ domain::FontMatch FontconfigResolver::resolve(const std::string& pattern)
                 family_name = pattern;
             }
         }
-        catch (const std::exception&)
+        catch (const std::exception &)
         {
             family_name = pattern;
         }
@@ -113,7 +113,7 @@ domain::FontMatch FontconfigResolver::resolve(const std::string& pattern)
         fc_pattern += ":size=" + std::to_string(size.value());
     }
 
-    FcPattern *pat = FcNameParse(reinterpret_cast<const FcChar8*>(fc_pattern.c_str()));
+    FcPattern *pat = FcNameParse(reinterpret_cast<const FcChar8 *>(fc_pattern.c_str()));
     if (!pat)
     {
         spdlog::error("Failed to parse font pattern: {}", pattern);
@@ -135,7 +135,7 @@ domain::FontMatch FontconfigResolver::resolve(const std::string& pattern)
         FcChar8 *file = nullptr;
         if (FcPatternGetString(font, FC_FILE, 0, &file) == FcResultMatch)
         {
-            match.path = reinterpret_cast<char*>(file);
+            match.path = reinterpret_cast<char *>(file);
             spdlog::debug("Resolved font pattern '{}' to: {}", pattern, match.path);
         }
 
@@ -167,14 +167,13 @@ domain::FontMatch FontconfigResolver::resolve(const std::string& pattern)
     return match;
 }
 
-std::optional<domain::FontMatch> FontconfigResolver::resolveStyleVariant(const domain::FontMatch &base_font, domain::FontStyle style)
+std::optional<domain::FontMatch> FontconfigResolver::resolveStyleVariant(const domain::FontMatch &base_font,
+                                                                         domain::FontStyle style)
 {
     FcConfig *config = FcConfigGetCurrent();
 
-    FcPattern *base_pattern = FcFreeTypeQuery(
-        reinterpret_cast<const FcChar8*>(base_font.path.c_str()),
-        0, nullptr, nullptr
-    );
+    FcPattern *base_pattern =
+        FcFreeTypeQuery(reinterpret_cast<const FcChar8 *>(base_font.path.c_str()), 0, nullptr, nullptr);
 
     if (!base_pattern)
     {
@@ -206,22 +205,22 @@ std::optional<domain::FontMatch> FontconfigResolver::resolveStyleVariant(const d
 
     switch (style)
     {
-        case domain::FontStyle::Normal:
-            weight = FC_WEIGHT_REGULAR;
-            slant = FC_SLANT_ROMAN;
-            break;
-        case domain::FontStyle::Bold:
-            weight = FC_WEIGHT_BOLD;
-            slant = FC_SLANT_ROMAN;
-            break;
-        case domain::FontStyle::Italic:
-            weight = FC_WEIGHT_REGULAR;
-            slant = FC_SLANT_ITALIC;
-            break;
-        case domain::FontStyle::BoldItalic:
-            weight = FC_WEIGHT_BOLD;
-            slant = FC_SLANT_ITALIC;
-            break;
+    case domain::FontStyle::Normal:
+        weight = FC_WEIGHT_REGULAR;
+        slant = FC_SLANT_ROMAN;
+        break;
+    case domain::FontStyle::Bold:
+        weight = FC_WEIGHT_BOLD;
+        slant = FC_SLANT_ROMAN;
+        break;
+    case domain::FontStyle::Italic:
+        weight = FC_WEIGHT_REGULAR;
+        slant = FC_SLANT_ITALIC;
+        break;
+    case domain::FontStyle::BoldItalic:
+        weight = FC_WEIGHT_BOLD;
+        slant = FC_SLANT_ITALIC;
+        break;
     }
 
     FcPatternAddInteger(pat, FC_WEIGHT, weight);
@@ -241,7 +240,7 @@ std::optional<domain::FontMatch> FontconfigResolver::resolveStyleVariant(const d
         if (FcPatternGetString(font, FC_FILE, 0, &file) == FcResultMatch)
         {
             domain::FontMatch font_match;
-            font_match.path = reinterpret_cast<char*>(file);
+            font_match.path = reinterpret_cast<char *>(file);
             font_match.size = base_font.size;
 
             int face_index = 0;
@@ -254,7 +253,8 @@ std::optional<domain::FontMatch> FontconfigResolver::resolveStyleVariant(const d
                 font_match.face_index = 0;
             }
 
-            spdlog::debug("Resolved style variant for '{}' to: {} (face index: {})", base_font.path, font_match.path, font_match.face_index);
+            spdlog::debug("Resolved style variant for '{}' to: {} (face index: {})", base_font.path, font_match.path,
+                          font_match.face_index);
             match = font_match;
         }
 
@@ -282,7 +282,7 @@ std::optional<domain::FontMatch> FontconfigResolver::resolveForCodepoint(domain:
         return std::nullopt;
     }
 
-    FcCharSet* charset = FcCharSetCreate();
+    FcCharSet *charset = FcCharSetCreate();
     FcCharSetAddChar(charset, codepoint);
     FcPatternAddCharSet(pat, FC_CHARSET, charset);
 
@@ -305,7 +305,7 @@ std::optional<domain::FontMatch> FontconfigResolver::resolveForCodepoint(domain:
         if (FcPatternGetString(font, FC_FILE, 0, &file) == FcResultMatch)
         {
             domain::FontMatch fontMatch;
-            fontMatch.path = reinterpret_cast<char*>(file);
+            fontMatch.path = reinterpret_cast<char *>(file);
 
             double size = 0;
             if (FcPatternGetDouble(font, FC_SIZE, 0, &size) == FcResultMatch)

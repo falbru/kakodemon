@@ -1,16 +1,17 @@
 #include "glyphlinesbuilder.hpp"
-#include "domain/face.hpp"
 #include "domain/codepointstring.hpp"
+#include "domain/face.hpp"
 
 namespace domain
 {
 
-GlyphLines GlyphLinesBuilder::build(const Lines& lines, Font* font, FontManager* font_manager)
+GlyphLines GlyphLinesBuilder::build(const Lines &lines, Font *font, FontManager *font_manager)
 {
     std::vector<GlyphLine> glyph_lines;
     glyph_lines.reserve(lines.size());
 
-    for (int i = 0; i < lines.size(); i++) {
+    for (int i = 0; i < lines.size(); i++)
+    {
         glyph_lines.push_back(build(lines.getLines()[i], font, font_manager));
     }
 
@@ -18,39 +19,47 @@ GlyphLines GlyphLinesBuilder::build(const Lines& lines, Font* font, FontManager*
     return GlyphLines(glyph_lines, line_height);
 }
 
-GlyphLine GlyphLinesBuilder::build(const Line& line, Font* font, FontManager* font_manager)
+GlyphLine GlyphLinesBuilder::build(const Line &line, Font *font, FontManager *font_manager)
 {
     std::vector<GlyphAtom> glyph_atoms;
     glyph_atoms.reserve(line.size());
 
     auto line_atoms = line.getAtoms();
-    for (int i = 0; i < line.size(); i++) {
+    for (int i = 0; i < line.size(); i++)
+    {
         glyph_atoms.push_back(build(line_atoms[i], font, font_manager));
     }
 
     return GlyphLine(glyph_atoms);
 }
 
-GlyphAtom GlyphLinesBuilder::build(const Atom& atom, Font* font, FontManager* font_manager)
+GlyphAtom GlyphLinesBuilder::build(const Atom &atom, Font *font, FontManager *font_manager)
 {
     auto contents = atom.getContents();
 
     bool has_bold = atom.getFace().hasAttribute(Attribute::Bold);
     bool has_italic = atom.getFace().hasAttribute(Attribute::Italic);
 
-    Font* active_font = font;
-    if (has_bold || has_italic) {
+    Font *active_font = font;
+    if (has_bold || has_italic)
+    {
         FontStyle style;
-        if (has_bold && has_italic) {
+        if (has_bold && has_italic)
+        {
             style = FontStyle::BoldItalic;
-        } else if (has_bold) {
+        }
+        else if (has_bold)
+        {
             style = FontStyle::Bold;
-        } else {
+        }
+        else
+        {
             style = FontStyle::Italic;
         }
 
-        Font* variant_font = font_manager->getFontStyleVariant(font, style);
-        if (variant_font != nullptr) {
+        Font *variant_font = font_manager->getFontStyleVariant(font, style);
+        if (variant_font != nullptr)
+        {
             active_font = variant_font;
         }
     }
@@ -59,33 +68,44 @@ GlyphAtom GlyphLinesBuilder::build(const Atom& atom, Font* font, FontManager* fo
     return GlyphAtom(runs, atom.getFace());
 }
 
-std::vector<GlyphRun> GlyphLinesBuilder::buildGlyphRuns(const CodepointString& contents, Font* font, FontManager* font_manager)
+std::vector<GlyphRun> GlyphLinesBuilder::buildGlyphRuns(const CodepointString &contents, Font *font,
+                                                        FontManager *font_manager)
 {
     std::vector<GlyphRun> runs;
 
-    if (contents.size() == 0) {
+    if (contents.size() == 0)
+    {
         return runs;
     }
 
     std::vector<GlyphMetrics> current_glyphs;
-    Font* current_font = nullptr;
+    Font *current_font = nullptr;
 
     Codepoint cp;
-    for (int i = 0; i < contents.size(); i++) {
-        if (contents.at(i) == '\n') {
+    for (int i = 0; i < contents.size(); i++)
+    {
+        if (contents.at(i) == '\n')
+        {
             cp = ' ';
-        }else if (isControlCharacter(contents.at(i))) {
+        }
+        else if (isControlCharacter(contents.at(i)))
+        {
             continue;
-        }else {
+        }
+        else
+        {
             cp = contents.at(i);
         }
 
         auto glyph_with_font = font_manager->getGlyphWithFont(cp, font);
 
-        if (current_font == nullptr || current_font == glyph_with_font.font) {
+        if (current_font == nullptr || current_font == glyph_with_font.font)
+        {
             current_font = glyph_with_font.font;
             current_glyphs.push_back(glyph_with_font.glyph);
-        } else {
+        }
+        else
+        {
             runs.push_back(GlyphRun{current_glyphs, current_font});
             current_glyphs.clear();
             current_font = glyph_with_font.font;
@@ -93,37 +113,41 @@ std::vector<GlyphRun> GlyphLinesBuilder::buildGlyphRuns(const CodepointString& c
         }
     }
 
-    if (!current_glyphs.empty()) {
+    if (!current_glyphs.empty())
+    {
         runs.push_back(GlyphRun{current_glyphs, current_font});
     }
 
     return runs;
 }
 
-std::vector<GlyphRun> GlyphLinesBuilder::buildGlyphRuns(const CodepointString& contents, Font* font)
+std::vector<GlyphRun> GlyphLinesBuilder::buildGlyphRuns(const CodepointString &contents, Font *font)
 {
     std::vector<GlyphMetrics> glyphs;
     glyphs.reserve(contents.size());
 
-    for (int i = 0; i < contents.size(); i++) {
+    for (int i = 0; i < contents.size(); i++)
+    {
         font->loadGlyph(contents.at(i));
-        const GlyphMetrics& glyph = font->getGlyphMetrics(contents.at(i));
+        const GlyphMetrics &glyph = font->getGlyphMetrics(contents.at(i));
         glyphs.push_back(glyph);
     }
 
     std::vector<GlyphRun> runs;
-    if (!glyphs.empty()) {
+    if (!glyphs.empty())
+    {
         runs.push_back(GlyphRun{glyphs, font});
     }
     return runs;
 }
 
-GlyphLines GlyphLinesBuilder::build(const Lines& lines, Font* font)
+GlyphLines GlyphLinesBuilder::build(const Lines &lines, Font *font)
 {
     std::vector<GlyphLine> glyph_lines;
     glyph_lines.reserve(lines.size());
 
-    for (int i = 0; i < lines.size(); i++) {
+    for (int i = 0; i < lines.size(); i++)
+    {
         glyph_lines.push_back(build(lines.getLines()[i], font));
     }
 
@@ -131,20 +155,21 @@ GlyphLines GlyphLinesBuilder::build(const Lines& lines, Font* font)
     return GlyphLines(glyph_lines, line_height);
 }
 
-GlyphLine GlyphLinesBuilder::build(const Line& line, Font* font)
+GlyphLine GlyphLinesBuilder::build(const Line &line, Font *font)
 {
     std::vector<GlyphAtom> glyph_atoms;
     glyph_atoms.reserve(line.size());
 
     auto line_atoms = line.getAtoms();
-    for (int i = 0; i < line.size(); i++) {
+    for (int i = 0; i < line.size(); i++)
+    {
         glyph_atoms.push_back(build(line_atoms[i], font));
     }
 
     return GlyphLine(glyph_atoms);
 }
 
-GlyphAtom GlyphLinesBuilder::build(const Atom& atom, Font* font)
+GlyphAtom GlyphLinesBuilder::build(const Atom &atom, Font *font)
 {
     auto contents = atom.getContents();
     auto runs = buildGlyphRuns(contents, font);

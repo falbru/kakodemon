@@ -1,3 +1,4 @@
+#include "domain/infobox.hpp"
 #include "application/view/rendercontext.hpp"
 #include "application/view/styling.hpp"
 #include "domain/editor.hpp"
@@ -5,7 +6,6 @@
 #include "domain/glyphline.hpp"
 #include "domain/glyphlines.hpp"
 #include "domain/glyphlinesbuilder.hpp"
-#include "domain/infobox.hpp"
 #include "infobox.hpp"
 #include <algorithm>
 #include <cstddef>
@@ -42,18 +42,20 @@ PlacementConfig InfoBoxView::placementConfigByInfoBoxStyle(const RenderContext &
     case domain::InfoStyle::PROMPT:
         if (m_multi_styled_menu->isVisible())
         {
-            return {
-                AnchorPlacement{{static_cast<int>(m_multi_styled_menu->x()), static_cast<int>(m_multi_styled_menu->y()) - SPACING_MEDIUM,
-                                 static_cast<int>(m_multi_styled_menu->width()),
-                                 static_cast<int>(m_multi_styled_menu->height()) + SPACING_MEDIUM * 2},
-                                {PlacementDirection::BELOW}},
-                true};
+            return {AnchorPlacement{{static_cast<int>(m_multi_styled_menu->x()),
+                                     static_cast<int>(m_multi_styled_menu->y()) - SPACING_MEDIUM,
+                                     static_cast<int>(m_multi_styled_menu->width()),
+                                     static_cast<int>(m_multi_styled_menu->height()) + SPACING_MEDIUM * 2},
+                                    {PlacementDirection::BELOW}},
+                    true};
         }
         else
         {
             return {
                 FixedPlacement{{static_cast<int>(render_context.screen_width - info_box_width),
-                                static_cast<int>(render_context.screen_height - m_status_bar_view->height(render_context.ui_options.font_statusbar) - info_box_height),
+                                static_cast<int>(render_context.screen_height -
+                                                 m_status_bar_view->height(render_context.ui_options.font_statusbar) -
+                                                 info_box_height),
                                 info_box_width, info_box_height}},
                 true};
         }
@@ -113,7 +115,7 @@ PlacementConfig InfoBoxView::placementConfigByInfoBoxStyle(const RenderContext &
 std::optional<domain::Rectangle> InfoBoxView::placeInfoBox(const RenderContext &render_context, InfoBoxViewState &state,
                                                            const domain::InfoBox &info_box,
                                                            const domain::CursorPosition &cursor_position,
-                                                           const domain::IVec2& cursor_origin,
+                                                           const domain::IVec2 &cursor_origin,
                                                            const domain::Rectangle &bounds, int info_box_width,
                                                            int info_box_height)
 {
@@ -149,29 +151,37 @@ std::optional<domain::Rectangle> InfoBoxView::placeInfoBox(const RenderContext &
     }
 
     return placeWithoutOverlap(bounds, domain::IVec2{info_box_width, info_box_height}, anchor, preferred_directions,
-                           {
-                               m_multi_styled_menu->isVisible() ? menu_rectangle : domain::Rectangle(),
-                               cursor_line.value_or(domain::Rectangle()),
-                           });
+                               {
+                                   m_multi_styled_menu->isVisible() ? menu_rectangle : domain::Rectangle(),
+                                   cursor_line.value_or(domain::Rectangle()),
+                               });
 }
 
 void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &state, const domain::InfoBox &info_box,
-                         const domain::CursorPosition &cursor_position, const domain::IVec2& cursor_origin, const domain::Rectangle &bounds)
+                         const domain::CursorPosition &cursor_position, const domain::IVec2 &cursor_origin,
+                         const domain::Rectangle &bounds)
 {
     domain::Font *font = render_context.ui_options.font_infobox;
 
-    auto glyph_lines = domain::GlyphLinesBuilder::build(info_box.content, render_context.ui_options.font_infobox, render_context.font_manager);
+    auto glyph_lines = domain::GlyphLinesBuilder::build(info_box.content, render_context.ui_options.font_infobox,
+                                                        render_context.font_manager);
     glyph_lines.wrap(MAX_WIDTH, domain::WrapMode::WORD);
 
-    int info_box_width = static_cast<int>(std::max(glyph_lines.width(), domain::GlyphLinesBuilder::build(info_box.title, render_context.ui_options.font_infobox).width())) + SPACING_MEDIUM * 2 + BORDER_THICKNESS * 2;
+    int info_box_width =
+        static_cast<int>(std::max(
+            glyph_lines.width(),
+            domain::GlyphLinesBuilder::build(info_box.title, render_context.ui_options.font_infobox).width())) +
+        SPACING_MEDIUM * 2 + BORDER_THICKNESS * 2;
 
     int info_box_height = (int)(glyph_lines.height() + SPACING_MEDIUM * 2 + BORDER_THICKNESS * 2);
-    if (info_box.title.size() > 0) {
+    if (info_box.title.size() > 0)
+    {
         info_box_height += font->getLineHeight() + BORDER_THICKNESS + SPACING_SMALL + SPACING_MEDIUM;
     }
     info_box_height = std::min(info_box_height, MAX_HEIGHT);
 
-    auto placement = placeInfoBox(render_context, state, info_box, cursor_position, cursor_origin, bounds, info_box_width, info_box_height);
+    auto placement = placeInfoBox(render_context, state, info_box, cursor_position, cursor_origin, bounds,
+                                  info_box_width, info_box_height);
     if (!placement)
     {
         return;
@@ -327,10 +337,9 @@ std::optional<domain::Rectangle> InfoBoxView::placeWithoutOverlap(
 const int MIN_PLACEMENT_WIDTH = 50;
 const int MIN_PLACEMENT_HEIGHT = 50;
 
-std::vector<domain::Rectangle> InfoBoxView::findNonOverlappingPlacements(const domain::Rectangle &bounds,
-                                                                const domain::IVec2 &fitted_rectangle_size,
-                                                                const domain::IVec2 &start_position,
-                                                                const std::vector<domain::Rectangle> &obstacles)
+std::vector<domain::Rectangle> InfoBoxView::findNonOverlappingPlacements(
+    const domain::Rectangle &bounds, const domain::IVec2 &fitted_rectangle_size, const domain::IVec2 &start_position,
+    const std::vector<domain::Rectangle> &obstacles)
 {
     std::vector<domain::Rectangle> valid_placements;
     std::queue<domain::Rectangle> placements;

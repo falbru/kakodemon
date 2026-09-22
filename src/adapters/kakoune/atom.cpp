@@ -13,6 +13,7 @@ void kakoune::from_json(const nlohmann::json &j, Atom &a)
     a.contents = domain::CodepointString(tmp);
 }
 
-domain::Atom kakoune::toDomain(kakoune::Atom atom) {
+domain::Atom kakoune::toDomain(kakoune::Atom atom)
+{
     return domain::Atom(atom.contents, toDomain(atom.face));
 }

@@ -1,12 +1,13 @@
-#include "application/model/focusedclientstack.hpp"
-#include "catch2/catch_test_macros.hpp"
 #include "application/controller/masterclientcontroller.hpp"
-#include "mock_kakounesession.hpp"
 #include "application/model/clientmanager.hpp"
-#include "application/model/panelayout.hpp"
+#include "application/model/focusedclientstack.hpp"
 #include "application/model/kakouneclient.hpp"
+#include "application/model/panelayout.hpp"
+#include "catch2/catch_test_macros.hpp"
+#include "mock_kakounesession.hpp"
 
-TEST_CASE("MasterClientController updates master clients correctly", "[MasterClientController]") {
+TEST_CASE("MasterClientController updates master clients correctly", "[MasterClientController]")
+{
     MockKakouneSession session;
     ClientManager client_manager(&session);
     FocusedClientStack focused_client_stack;
@@ -15,11 +16,13 @@ TEST_CASE("MasterClientController updates master clients correctly", "[MasterCli
     MasterClientController controller;
     controller.init(&session, &pane_layout);
 
-    SECTION("Initial state with no clients") {
+    SECTION("Initial state with no clients")
+    {
         REQUIRE(session.commands_sent.empty());
     }
 
-    SECTION("Adding clients updates master list") {
+    SECTION("Adding clients updates master list")
+    {
         auto client1 = client_manager.createClient(std::nullopt, {});
         client1->client_name = "editor1";
 
@@ -31,7 +34,8 @@ TEST_CASE("MasterClientController updates master clients correctly", "[MasterCli
         REQUIRE(session.commands_sent[0] == "set-option global kakodemon_masters editor1");
     }
 
-    SECTION("Multiple masters are handled correctly") {
+    SECTION("Multiple masters are handled correctly")
+    {
         auto client1 = client_manager.createClient(std::nullopt, {});
         client1->client_name = "editor1";
 
@@ -50,7 +54,8 @@ TEST_CASE("MasterClientController updates master clients correctly", "[MasterCli
         REQUIRE(session.commands_sent[0] == "set-option global kakodemon_masters editor1 editor2");
     }
 
-    SECTION("Changing number of masters updates the list") {
+    SECTION("Changing number of masters updates the list")
+    {
         auto client1 = client_manager.createClient(std::nullopt, {});
         client1->client_name = "editor1";
 
@@ -71,7 +76,8 @@ TEST_CASE("MasterClientController updates master clients correctly", "[MasterCli
         REQUIRE(session.commands_sent[0] == "set-option global kakodemon_masters editor1 editor2");
     }
 
-    SECTION("Removing clients updates the list") {
+    SECTION("Removing clients updates the list")
+    {
         auto client1 = client_manager.createClient(std::nullopt, {});
         client1->client_name = "editor1";
 
@@ -92,7 +98,8 @@ TEST_CASE("MasterClientController updates master clients correctly", "[MasterCli
         REQUIRE(session.commands_sent[0] == "set-option global kakodemon_masters editor2");
     }
 
-    SECTION("Renaming clients updates the list") {
+    SECTION("Renaming clients updates the list")
+    {
         auto client1 = client_manager.createClient(std::nullopt, {});
         client1->client_name = "editor1";
 
@@ -109,7 +116,8 @@ TEST_CASE("MasterClientController updates master clients correctly", "[MasterCli
         REQUIRE(session.commands_sent[0] == "set-option global kakodemon_masters renamed_editor");
     }
 
-    SECTION("Caching prevents redundant commands when master list doesn't change") {
+    SECTION("Caching prevents redundant commands when master list doesn't change")
+    {
         auto client1 = client_manager.createClient(std::nullopt, {});
         client1->client_name = "editor1";
 

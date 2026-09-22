@@ -1,6 +1,6 @@
+#include <atomic>
 #include <catch2/benchmark/catch_benchmark.hpp>
 #include <catch2/catch_test_macros.hpp>
-#include <atomic>
 #include <condition_variable>
 #include <mutex>
 #include <thread>
@@ -37,7 +37,8 @@ TEST_CASE("Benchmark: JsonRpcKakouneInterface request-response latency", "[!benc
 
     waitForRefresh(mtx, cv, refreshed);
 
-    BENCHMARK("pressKeys to onRefresh") {
+    BENCHMARK("pressKeys to onRefresh")
+    {
         {
             std::lock_guard<std::mutex> lock(mtx);
             refreshed = false;
@@ -46,7 +47,8 @@ TEST_CASE("Benchmark: JsonRpcKakouneInterface request-response latency", "[!benc
         waitForRefresh(mtx, cv, refreshed);
     };
 
-    BENCHMARK("10 pressKeys sent before collecting response") {
+    BENCHMARK("10 pressKeys sent before collecting response")
+    {
         {
             std::lock_guard<std::mutex> lock(mtx);
             refreshed = false;
@@ -72,7 +74,8 @@ TEST_CASE("Benchmark: KakouneClientProcess request callback latency", "[!benchma
     bool refreshed = false;
 
     process->setRequestCallback([&](const IncomingRequest &request) {
-        if (request.type == IncomingRequestType::REFRESH) {
+        if (request.type == IncomingRequestType::REFRESH)
+        {
             std::lock_guard<std::mutex> lock(mtx);
             refreshed = true;
             cv.notify_one();
@@ -89,18 +92,21 @@ TEST_CASE("Benchmark: KakouneClientProcess request callback latency", "[!benchma
 
     waitForRefresh(mtx, cv, refreshed);
 
-    BENCHMARK("sendRequest to REFRESH callback") {
+    BENCHMARK("sendRequest to REFRESH callback")
+    {
         process->sendRequest(OutgoingRequest{OutgoingRequestType::KEYS, KeysRequestData{{"a"}}});
         waitForRefresh(mtx, cv, refreshed);
     };
 
-    BENCHMARK("10 sendRequests sent before collecting responses") {
+    BENCHMARK("10 sendRequests sent before collecting responses")
+    {
         {
             std::lock_guard<std::mutex> lock(mtx);
             refreshed = false;
         }
 
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < 10; ++i)
+        {
             process->sendRequest(OutgoingRequest{OutgoingRequestType::KEYS, KeysRequestData{{"a"}}});
         }
 

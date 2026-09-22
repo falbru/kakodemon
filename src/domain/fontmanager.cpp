@@ -1,12 +1,11 @@
 #include "domain/fontmanager.hpp"
 
-namespace domain {
+namespace domain
+{
 
-FontManager::FontManager(std::unique_ptr<FontResolver> resolver,
-                                 FontEngineFactory engine_factory,
-                                 FontFactory font_factory)
-    : m_resolver(std::move(resolver)),
-      m_engine_factory(std::move(engine_factory)),
+FontManager::FontManager(std::unique_ptr<FontResolver> resolver, FontEngineFactory engine_factory,
+                         FontFactory font_factory)
+    : m_resolver(std::move(resolver)), m_engine_factory(std::move(engine_factory)),
       m_font_factory(std::move(font_factory))
 {
 }
@@ -93,28 +92,32 @@ Font *FontManager::getFontForCodepoint(Codepoint c, Font *primary_font)
     return font;
 }
 
-const GlyphMetrics& FontManager::getGlyph(Codepoint c, Font* primary_font)
+const GlyphMetrics &FontManager::getGlyph(Codepoint c, Font *primary_font)
 {
-    if (primary_font->loadGlyph(c)) {
+    if (primary_font->loadGlyph(c))
+    {
         return primary_font->getGlyphMetrics(c);
     }
 
     auto fallback_font = getFontForCodepoint(c, primary_font);
-    if (fallback_font == nullptr || !fallback_font->loadGlyph(c)) {
+    if (fallback_font == nullptr || !fallback_font->loadGlyph(c))
+    {
         return primary_font->getFallbackGlyphMetrics();
     }
 
     return fallback_font->getGlyphMetrics(c);
 }
 
-GlyphWithFont FontManager::getGlyphWithFont(Codepoint c, Font* primary_font)
+GlyphWithFont FontManager::getGlyphWithFont(Codepoint c, Font *primary_font)
 {
-    if (primary_font->loadGlyph(c)) {
+    if (primary_font->loadGlyph(c))
+    {
         return GlyphWithFont{primary_font->getGlyphMetrics(c), primary_font};
     }
 
     auto fallback_font = getFontForCodepoint(c, primary_font);
-    if (fallback_font == nullptr || !fallback_font->loadGlyph(c)) {
+    if (fallback_font == nullptr || !fallback_font->loadGlyph(c))
+    {
         return GlyphWithFont{primary_font->getFallbackGlyphMetrics(), primary_font};
     }
 
@@ -152,4 +155,4 @@ Font *FontManager::getFontStyleVariant(Font *base_font, FontStyle style)
     return variant_font;
 }
 
-}
+} // namespace domain

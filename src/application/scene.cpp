@@ -5,13 +5,14 @@
 #include "domain/geometry.hpp"
 #include "domain/mouse.hpp"
 
-Scene::Scene() {}
+Scene::Scene()
+{
+}
 
 void Scene::init(ClientManager *client_manager, FocusedClientStack *focused_client_stack, PaneLayout *pane_layout,
                  KakouneContentView *content_view, StatusBarView *status_bar_view,
-                 MultiStyledMenuView *multi_styled_menu, InfoBoxView *info_box_view,
-                 domain::FontManager *font_manager, domain::Window *window,
-                 PaneBorderView *pane_border_view)
+                 MultiStyledMenuView *multi_styled_menu, InfoBoxView *info_box_view, domain::FontManager *font_manager,
+                 domain::Window *window, PaneBorderView *pane_border_view)
 {
     m_pane_border_view = pane_border_view;
     m_focused_client_stack = focused_client_stack;
@@ -24,34 +25,34 @@ void Scene::init(ClientManager *client_manager, FocusedClientStack *focused_clie
     m_window = window;
 
     client_manager->onClientRemoved([this](KakouneClient *client) {
-        if (m_active_mouse_client == client) {
+        if (m_active_mouse_client == client)
+        {
             m_active_mouse_client = nullptr;
         }
     });
 
-    window->onMouseMove([this](const domain::MouseMoveEvent& event) {
+    window->onMouseMove([this](const domain::MouseMoveEvent &event) {
         m_mouse_x = event.x;
         m_mouse_y = event.y;
         domain::MouseMoveResult result = onMouseMove(event.x, event.y);
-        if (result.cursor.has_value()) {
+        if (result.cursor.has_value())
+        {
             m_window->setCursor(result.cursor.value());
         }
     });
 
-    window->onMouseButton([this](const domain::MouseButtonEvent& event) {
-        onMouseButton(event);
-    });
+    window->onMouseButton([this](const domain::MouseButtonEvent &event) { onMouseButton(event); });
 
-    window->onMouseScroll([this](const domain::MouseScrollEvent& event) {
-        onMouseScroll(event.scroll_amount);
-    });
+    window->onMouseScroll([this](const domain::MouseScrollEvent &event) { onMouseScroll(event.scroll_amount); });
 }
 
 void Scene::render()
 {
-    m_pane_border_view->render(m_pane_layout->getPanes(), m_pane_layout->getLayoutType(), m_pane_layout->getNumMasters());
+    m_pane_border_view->render(m_pane_layout->getPanes(), m_pane_layout->getLayoutType(),
+                               m_pane_layout->getNumMasters());
 
-    for (const auto &pane : m_pane_layout->getPanes()) {
+    for (const auto &pane : m_pane_layout->getPanes())
+    {
         auto *client = pane.client;
         const auto &bounds = pane.bounds;
 
@@ -68,7 +69,8 @@ void Scene::render()
                                   client->state.cursor_position, bounds);
     }
 
-    if (!m_focused_client_stack->focused()) return;
+    if (!m_focused_client_stack->focused())
+        return;
     auto *focused = m_focused_client_stack->focused();
 
     RenderContext focused_context = {
@@ -79,68 +81,89 @@ void Scene::render()
         static_cast<float>(m_window->getHeight()),
     };
 
-    if (focused->state.menu.has_value()) {
+    if (focused->state.menu.has_value())
+    {
         int cursor_column = -1;
-        if (std::holds_alternative<domain::StatusLinePosition>(focused->state.cursor_position)) {
+        if (std::holds_alternative<domain::StatusLinePosition>(focused->state.cursor_position))
+        {
             cursor_column = std::get<domain::StatusLinePosition>(focused->state.cursor_position).column;
         }
 
         Pane *pane = m_pane_layout->findPaneForClient(focused);
-        std::optional<domain::Rectangle> content_bounds = pane ? std::optional<domain::Rectangle>(pane->bounds) : std::nullopt;
+        std::optional<domain::Rectangle> content_bounds =
+            pane ? std::optional<domain::Rectangle>(pane->bounds) : std::nullopt;
 
         m_multi_styled_menu->setVisible(true);
-        m_multi_styled_menu->render(focused_context, focused->menu_state, *focused->state.menu,
-                                    cursor_column, content_bounds);
-    }else {
+        m_multi_styled_menu->render(focused_context, focused->menu_state, *focused->state.menu, cursor_column,
+                                    content_bounds);
+    }
+    else
+    {
         m_multi_styled_menu->setVisible(false);
     }
 
     if (focused->state.info_box.has_value() &&
-        (focused->state.info_box->title.size() > 0 || focused->state.info_box->content.size() > 0)) // TODO if content and title size == 0, it should just be a nullopt
+        (focused->state.info_box->title.size() > 0 ||
+         focused->state.info_box->content.size() >
+             0)) // TODO if content and title size == 0, it should just be a nullopt
     {
         Pane *pane = m_pane_layout->findPaneForClient(focused);
-        if (pane) {
+        if (pane)
+        {
             m_info_box_view->render(focused_context, focused->info_box_state, *focused->state.info_box,
-                                    focused->state.cursor_position, domain::IVec2{pane->bounds.left(), pane->bounds.top()}, domain::Rectangle{0, 0, static_cast<int>(m_window->getWidth()), static_cast<int>(m_window->getHeight())});
+                                    focused->state.cursor_position,
+                                    domain::IVec2{pane->bounds.left(), pane->bounds.top()},
+                                    domain::Rectangle{0, 0, static_cast<int>(m_window->getWidth()),
+                                                      static_cast<int>(m_window->getHeight())});
         }
     }
 }
 
 bool Scene::hitTestMenu(float x, float y) const
 {
-    if (!m_focused_client_stack->focused() || !m_focused_client_stack->focused()->state.menu.has_value()) return false;
+    if (!m_focused_client_stack->focused() || !m_focused_client_stack->focused()->state.menu.has_value())
+        return false;
     return x >= m_multi_styled_menu->x() && x <= m_multi_styled_menu->x() + m_multi_styled_menu->width() &&
            y >= m_multi_styled_menu->y() && y <= m_multi_styled_menu->y() + m_multi_styled_menu->height();
 }
 
 bool Scene::hitTestInfoBox(float x, float y) const
 {
-    if (!m_focused_client_stack->focused() || !m_focused_client_stack->focused()->state.info_box.has_value()) return false;
+    if (!m_focused_client_stack->focused() || !m_focused_client_stack->focused()->state.info_box.has_value())
+        return false;
     if (m_focused_client_stack->focused()->state.info_box->title.size() == 0 &&
-        m_focused_client_stack->focused()->state.info_box->content.size() == 0) return false;
+        m_focused_client_stack->focused()->state.info_box->content.size() == 0)
+        return false;
     return x >= m_info_box_view->x() && x <= m_info_box_view->x() + m_info_box_view->width() &&
            y >= m_info_box_view->y() && y <= m_info_box_view->y() + m_info_box_view->height();
 }
 
 domain::MouseMoveResult Scene::onMouseMove(float x, float y)
 {
-    if (m_focused_client_stack->focused() && m_focused_client_stack->focused()->state.menu.has_value()) {
-        domain::MouseMoveResult menu_result = m_multi_styled_menu->handleMouseMove(x, y, *m_focused_client_stack->focused()->state.menu);
-        if (menu_result.cursor.has_value()) return menu_result;
+    if (m_focused_client_stack->focused() && m_focused_client_stack->focused()->state.menu.has_value())
+    {
+        domain::MouseMoveResult menu_result =
+            m_multi_styled_menu->handleMouseMove(x, y, *m_focused_client_stack->focused()->state.menu);
+        if (menu_result.cursor.has_value())
+            return menu_result;
     }
 
-    if (hitTestInfoBox(x, y)) return domain::MouseMoveResult{domain::Cursor::DEFAULT};
+    if (hitTestInfoBox(x, y))
+        return domain::MouseMoveResult{domain::Cursor::DEFAULT};
 
     Pane *hover_pane = m_pane_layout->findPaneAt(x, y);
-    if (hover_pane) {
+    if (hover_pane)
+    {
         float status_bar_height = m_status_bar_view->height(hover_pane->client->uiOptions().font_statusbar);
-        if (y - hover_pane->bounds.top() >= hover_pane->bounds.height() - status_bar_height) {
+        if (y - hover_pane->bounds.top() >= hover_pane->bounds.height() - status_bar_height)
+        {
             return domain::MouseMoveResult{domain::Cursor::DEFAULT};
         }
     }
 
-    Pane* pane = m_active_mouse_client ? m_pane_layout->findPaneForClient(m_active_mouse_client) : hover_pane;
-    if (pane) {
+    Pane *pane = m_active_mouse_client ? m_pane_layout->findPaneForClient(m_active_mouse_client) : hover_pane;
+    if (pane)
+    {
         m_content_view->handleMouseMove(pane->client, x, y, pane->bounds);
     }
 
@@ -149,28 +172,42 @@ domain::MouseMoveResult Scene::onMouseMove(float x, float y)
 
 void Scene::onMouseButton(domain::MouseButtonEvent event)
 {
-    if (event.action == domain::MouseButtonAction::PRESS) {
-        if (m_focused_client_stack->focused() && m_focused_client_stack->focused()->state.menu && m_focused_client_stack->focused()->state.menu->hasItems()) {
-            if (event.button == domain::MouseButton::LEFT) {
-                bool handled = m_multi_styled_menu->handleMouseButton(event, m_focused_client_stack->focused()->menu_state, *m_focused_client_stack->focused()->state.menu);
-                if (handled) return;
+    if (event.action == domain::MouseButtonAction::PRESS)
+    {
+        if (m_focused_client_stack->focused() && m_focused_client_stack->focused()->state.menu &&
+            m_focused_client_stack->focused()->state.menu->hasItems())
+        {
+            if (event.button == domain::MouseButton::LEFT)
+            {
+                bool handled =
+                    m_multi_styled_menu->handleMouseButton(event, m_focused_client_stack->focused()->menu_state,
+                                                           *m_focused_client_stack->focused()->state.menu);
+                if (handled)
+                    return;
             }
         }
 
-        if (hitTestInfoBox(event.x, event.y)) return;
+        if (hitTestInfoBox(event.x, event.y))
+            return;
 
         Pane *pane = m_pane_layout->findPaneAt(event.x, event.y);
-        if (!pane) return;
+        if (!pane)
+            return;
 
         float status_bar_height = m_status_bar_view->height(pane->client->uiOptions().font_statusbar);
-        if (event.y - pane->bounds.top() >= pane->bounds.height() - status_bar_height) return;
+        if (event.y - pane->bounds.top() >= pane->bounds.height() - status_bar_height)
+            return;
 
         m_content_view->handleMouseButton(pane->client, event, pane->bounds);
         m_active_mouse_client = pane->client;
-    } else {
-        if (m_active_mouse_client && !hitTestMenu(event.x, event.y)) {
+    }
+    else
+    {
+        if (m_active_mouse_client && !hitTestMenu(event.x, event.y))
+        {
             Pane *pane = m_pane_layout->findPaneForClient(m_active_mouse_client);
-            if (pane) {
+            if (pane)
+            {
                 m_content_view->handleMouseButton(m_active_mouse_client, event, pane->bounds);
             }
         }
@@ -182,34 +219,50 @@ void Scene::onMouseScroll(double offset)
     m_scroll_accumulator += offset * m_scroll_speed;
 
     int scroll_amount = 0;
-    if (m_scroll_accumulator >= 1.0) {
+    if (m_scroll_accumulator >= 1.0)
+    {
         scroll_amount = static_cast<int>(m_scroll_accumulator);
         m_scroll_accumulator -= scroll_amount;
-    } else if (m_scroll_accumulator <= -1.0) {
+    }
+    else if (m_scroll_accumulator <= -1.0)
+    {
         scroll_amount = static_cast<int>(m_scroll_accumulator);
         m_scroll_accumulator -= scroll_amount;
     }
 
-    if (scroll_amount == 0) return;
+    if (scroll_amount == 0)
+        return;
 
     m_window->setNeedsRerender();
 
-    if (hitTestMenu(m_mouse_x, m_mouse_y)) {
-        m_multi_styled_menu->handleMouseScroll(m_focused_client_stack->focused()->menu_state, -scroll_amount, *m_focused_client_stack->focused()->state.menu);
+    if (hitTestMenu(m_mouse_x, m_mouse_y))
+    {
+        m_multi_styled_menu->handleMouseScroll(m_focused_client_stack->focused()->menu_state, -scroll_amount,
+                                               *m_focused_client_stack->focused()->state.menu);
         return;
     }
 
-    if (hitTestInfoBox(m_mouse_x, m_mouse_y)) {
+    if (hitTestInfoBox(m_mouse_x, m_mouse_y))
+    {
         m_info_box_view->handleMouseScroll(m_focused_client_stack->focused()->info_box_state, -scroll_amount);
         return;
     }
 
-    if (!m_focused_client_stack->focused()) return;
+    if (!m_focused_client_stack->focused())
+        return;
     Pane *pane = m_pane_layout->findPaneForClient(m_focused_client_stack->focused());
-    if (!pane) return;
+    if (!pane)
+        return;
 
-    m_content_view->handleMouseScroll(m_focused_client_stack->focused(), m_mouse_x, m_mouse_y, pane->bounds, -scroll_amount);
+    m_content_view->handleMouseScroll(m_focused_client_stack->focused(), m_mouse_x, m_mouse_y, pane->bounds,
+                                      -scroll_amount);
 }
 
-void Scene::setScrollSpeed(double speed) { m_scroll_speed = speed; }
-double Scene::getScrollSpeed() const { return m_scroll_speed; }
+void Scene::setScrollSpeed(double speed)
+{
+    m_scroll_speed = speed;
+}
+double Scene::getScrollSpeed() const
+{
+    return m_scroll_speed;
+}

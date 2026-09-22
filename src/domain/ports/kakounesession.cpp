@@ -2,9 +2,9 @@
 
 #include "kakounesession.hpp"
 
-bool domain::kakouneSessionExists(const std::string& session_id)
+bool domain::kakouneSessionExists(const std::string &session_id)
 {
-    FILE* pipe = popen("kak -l", "r");
+    FILE *pipe = popen("kak -l", "r");
     if (!pipe)
     {
         return false;

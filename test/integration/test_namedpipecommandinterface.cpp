@@ -1,12 +1,13 @@
-#include <catch2/catch_test_macros.hpp>
-#include <thread>
-#include <chrono>
 #include <atomic>
+#include <catch2/catch_test_macros.hpp>
+#include <chrono>
+#include <thread>
 #include <unistd.h>
 
 #include "adapters/namedpipe/namedpipecommandinterface.hpp"
 
-TEST_CASE("NamedPipeCommandInterface receives commands", "[integration][namedpipe]") {
+TEST_CASE("NamedPipeCommandInterface receives commands", "[integration][namedpipe]")
+{
     std::string pipe_id = "test_pipe_" + std::to_string(getpid());
 
     auto receiver = std::make_unique<NamedPipeCommandInterface>(pipe_id, PipeMode::Receive);
@@ -14,7 +15,8 @@ TEST_CASE("NamedPipeCommandInterface receives commands", "[integration][namedpip
 
     auto sender = std::make_unique<NamedPipeCommandInterface>(pipe_id, PipeMode::Send);
 
-    SECTION("receives single command without args") {
+    SECTION("receives single command without args")
+    {
         domain::Command cmd;
         cmd.name = "test-command";
 
@@ -28,7 +30,8 @@ TEST_CASE("NamedPipeCommandInterface receives commands", "[integration][namedpip
         REQUIRE(commands[0].args.empty());
     }
 
-    SECTION("receives command with args") {
+    SECTION("receives command with args")
+    {
         domain::Command cmd;
         cmd.name = "test-command";
         cmd.args = {"arg1", "arg2", "arg3"};
@@ -46,7 +49,8 @@ TEST_CASE("NamedPipeCommandInterface receives commands", "[integration][namedpip
         REQUIRE(commands[0].args[2] == "arg3");
     }
 
-    SECTION("receives multiple commands") {
+    SECTION("receives multiple commands")
+    {
         domain::Command cmd1;
         cmd1.name = "first-command";
 
@@ -66,7 +70,8 @@ TEST_CASE("NamedPipeCommandInterface receives commands", "[integration][namedpip
         REQUIRE(commands[1].args.size() == 1);
     }
 
-    SECTION("getPendingCommands clears the queue") {
+    SECTION("getPendingCommands clears the queue")
+    {
         domain::Command cmd;
         cmd.name = "test-command";
 
@@ -82,7 +87,8 @@ TEST_CASE("NamedPipeCommandInterface receives commands", "[integration][namedpip
     }
 }
 
-TEST_CASE("NamedPipeCommandInterface observer is notified", "[integration][namedpipe]") {
+TEST_CASE("NamedPipeCommandInterface observer is notified", "[integration][namedpipe]")
+{
     std::string pipe_id = "test_pipe_callback_" + std::to_string(getpid());
 
     auto receiver = std::make_unique<NamedPipeCommandInterface>(pipe_id, PipeMode::Receive);
@@ -91,7 +97,7 @@ TEST_CASE("NamedPipeCommandInterface observer is notified", "[integration][named
     std::string received_command_name;
     std::vector<std::string> received_args;
 
-    receiver->onCommandReceived([&](const domain::Command& cmd) {
+    receiver->onCommandReceived([&](const domain::Command &cmd) {
         callback_count++;
         received_command_name = cmd.name;
         received_args = cmd.args;
@@ -116,7 +122,8 @@ TEST_CASE("NamedPipeCommandInterface observer is notified", "[integration][named
     REQUIRE(received_args[1] == "arg2");
 }
 
-TEST_CASE("NamedPipeCommandInterface multiple observers", "[integration][namedpipe]") {
+TEST_CASE("NamedPipeCommandInterface multiple observers", "[integration][namedpipe]")
+{
     std::string pipe_id = "test_pipe_multi_observers_" + std::to_string(getpid());
 
     auto receiver = std::make_unique<NamedPipeCommandInterface>(pipe_id, PipeMode::Receive);
@@ -124,13 +131,9 @@ TEST_CASE("NamedPipeCommandInterface multiple observers", "[integration][namedpi
     std::atomic<int> observer1_count{0};
     std::atomic<int> observer2_count{0};
 
-    receiver->onCommandReceived([&](const domain::Command&) {
-        observer1_count++;
-    });
+    receiver->onCommandReceived([&](const domain::Command &) { observer1_count++; });
 
-    receiver->onCommandReceived([&](const domain::Command&) {
-        observer2_count++;
-    });
+    receiver->onCommandReceived([&](const domain::Command &) { observer2_count++; });
 
     receiver->init();
 
@@ -147,16 +150,15 @@ TEST_CASE("NamedPipeCommandInterface multiple observers", "[integration][namedpi
     REQUIRE(observer2_count.load() == 1);
 }
 
-TEST_CASE("NamedPipeCommandInterface remove observer", "[integration][namedpipe]") {
+TEST_CASE("NamedPipeCommandInterface remove observer", "[integration][namedpipe]")
+{
     std::string pipe_id = "test_pipe_remove_observer_" + std::to_string(getpid());
 
     auto receiver = std::make_unique<NamedPipeCommandInterface>(pipe_id, PipeMode::Receive);
 
     std::atomic<int> callback_count{0};
 
-    domain::ObserverId observer_id = receiver->onCommandReceived([&](const domain::Command&) {
-        callback_count++;
-    });
+    domain::ObserverId observer_id = receiver->onCommandReceived([&](const domain::Command &) { callback_count++; });
 
     receiver->init();
 
@@ -179,16 +181,19 @@ TEST_CASE("NamedPipeCommandInterface remove observer", "[integration][namedpipe]
     REQUIRE(callback_count.load() == 1);
 }
 
-TEST_CASE("NamedPipeCommandInterface mode restrictions", "[integration][namedpipe]") {
+TEST_CASE("NamedPipeCommandInterface mode restrictions", "[integration][namedpipe]")
+{
     std::string pipe_id = "test_pipe_modes_" + std::to_string(getpid());
 
-    SECTION("Send mode cannot receive commands") {
+    SECTION("Send mode cannot receive commands")
+    {
         auto sender = std::make_unique<NamedPipeCommandInterface>(pipe_id, PipeMode::Send);
         auto commands = sender->getPendingCommands();
         REQUIRE(commands.empty());
     }
 
-    SECTION("Receive mode cannot send commands") {
+    SECTION("Receive mode cannot send commands")
+    {
         auto receiver = std::make_unique<NamedPipeCommandInterface>(pipe_id, PipeMode::Receive);
         receiver->init();
 
@@ -199,7 +204,8 @@ TEST_CASE("NamedPipeCommandInterface mode restrictions", "[integration][namedpip
     }
 }
 
-TEST_CASE("NamedPipeCommandInterface send to non-existent pipe fails", "[integration][namedpipe]") {
+TEST_CASE("NamedPipeCommandInterface send to non-existent pipe fails", "[integration][namedpipe]")
+{
     std::string pipe_id = "nonexistent_pipe_" + std::to_string(getpid());
 
     auto sender = std::make_unique<NamedPipeCommandInterface>(pipe_id, PipeMode::Send);
@@ -210,7 +216,8 @@ TEST_CASE("NamedPipeCommandInterface send to non-existent pipe fails", "[integra
     REQUIRE_FALSE(sender->sendCommand(cmd));
 }
 
-TEST_CASE("NamedPipeCommandInterface pipe cleanup on destruction", "[integration][namedpipe]") {
+TEST_CASE("NamedPipeCommandInterface pipe cleanup on destruction", "[integration][namedpipe]")
+{
     std::string pipe_id = "test_pipe_cleanup_" + std::to_string(getpid());
     std::string pipe_path = "/tmp/kakod-" + pipe_id;
 
@@ -224,7 +231,8 @@ TEST_CASE("NamedPipeCommandInterface pipe cleanup on destruction", "[integration
     REQUIRE(access(pipe_path.c_str(), F_OK) != 0);
 }
 
-TEST_CASE("NamedPipeCommandInterface ping command round-trip", "[integration][namedpipe]") {
+TEST_CASE("NamedPipeCommandInterface ping command round-trip", "[integration][namedpipe]")
+{
     std::string pipe_id = "test_pipe_ping_" + std::to_string(getpid());
 
     auto receiver = std::make_unique<NamedPipeCommandInterface>(pipe_id, PipeMode::Receive);
@@ -244,7 +252,8 @@ TEST_CASE("NamedPipeCommandInterface ping command round-trip", "[integration][na
     REQUIRE(commands[0].name == "ping");
 }
 
-TEST_CASE("NamedPipeCommandInterface Both mode can send and receive", "[integration][namedpipe]") {
+TEST_CASE("NamedPipeCommandInterface Both mode can send and receive", "[integration][namedpipe]")
+{
     std::string pipe_id_a = "test_pipe_both_a_" + std::to_string(getpid());
     std::string pipe_id_b = "test_pipe_both_b_" + std::to_string(getpid());
 

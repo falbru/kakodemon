@@ -1,7 +1,8 @@
 #include "codepointstring.hpp"
 #include <sstream>
 
-namespace domain {
+namespace domain
+{
 
 CodepointString::CodepointString()
 {
@@ -14,7 +15,8 @@ CodepointString::CodepointString(std::vector<Codepoint> codepoints) : m_codepoin
 // Use kakoune's utf8 encoding and decoding for reference:
 // https://github.com/mawww/kakoune/blob/e3263887653ce5ec817c1aad51389c9600dfeabe/src/utf8.hh
 
-std::string codePointToString(Codepoint codepoint) {
+std::string codePointToString(Codepoint codepoint)
+{
     std::string result;
 
     if (codepoint <= 0x7F)
@@ -196,16 +198,20 @@ CodepointString CodepointString::substring(size_t start) const
     return substring(start, m_codepoints.size() - start);
 }
 
-CodepointString& CodepointString::operator+=(const CodepointString& string) {
+CodepointString &CodepointString::operator+=(const CodepointString &string)
+{
     m_codepoints.reserve(m_codepoints.size() + string.m_codepoints.size());
     m_codepoints.insert(m_codepoints.end(), string.m_codepoints.begin(), string.m_codepoints.end());
     return *this;
 }
 
-bool CodepointString::operator==(const CodepointString& other) const {
-    if (size() != other.size()) return false;
+bool CodepointString::operator==(const CodepointString &other) const
+{
+    if (size() != other.size())
+        return false;
 
-    for (int i = 0; i < size(); i++) {
+    for (int i = 0; i < size(); i++)
+    {
         if (at(i) != other.at(i))
             return false;
     }
@@ -213,17 +219,20 @@ bool CodepointString::operator==(const CodepointString& other) const {
     return true;
 }
 
-bool CodepointString::operator!=(const CodepointString& other) const {
+bool CodepointString::operator!=(const CodepointString &other) const
+{
     return !(*this == other);
 }
 
-std::ostream& operator<<(std::ostream& os, const CodepointString& str) {
+std::ostream &operator<<(std::ostream &os, const CodepointString &str)
+{
     os << str.toString();
     return os;
 }
 
-std::string to_string(const CodepointString& str) {
+std::string to_string(const CodepointString &str)
+{
     return str.toString();
 }
 
-}
+} // namespace domain

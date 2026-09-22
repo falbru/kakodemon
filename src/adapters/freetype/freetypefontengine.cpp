@@ -4,12 +4,14 @@
 #include <freetype/freetype.h>
 #include <string>
 
-FreeTypeFontEngine::FreeTypeFontEngine(std::shared_ptr<FreeTypeLibrary> library, const std::string &path, int size, int face_index)
+FreeTypeFontEngine::FreeTypeFontEngine(std::shared_ptr<FreeTypeLibrary> library, const std::string &path, int size,
+                                       int face_index)
     : m_library(library), m_requested_size(size), m_scale(1.0f)
 {
     if (FT_New_Face(m_library->get(), path.c_str(), face_index, &m_face))
     {
-        throw std::runtime_error("FreeType: Failed to load font for path '" + path + "' with face index " + std::to_string(face_index));
+        throw std::runtime_error("FreeType: Failed to load font for path '" + path + "' with face index " +
+                                 std::to_string(face_index));
     }
 
     if (FT_Set_Pixel_Sizes(m_face, 0, size))
@@ -17,7 +19,8 @@ FreeTypeFontEngine::FreeTypeFontEngine(std::shared_ptr<FreeTypeLibrary> library,
         FT_Select_Size(m_face, 0);
     }
 
-    if (m_face->face_flags & FT_FACE_FLAG_COLOR && m_face->size->metrics.y_ppem > 0) {
+    if (m_face->face_flags & FT_FACE_FLAG_COLOR && m_face->size->metrics.y_ppem > 0)
+    {
         m_scale = static_cast<float>(m_requested_size) / m_face->size->metrics.y_ppem;
     }
 
@@ -33,17 +36,21 @@ FreeTypeFontEngine::~FreeTypeFontEngine()
     FT_Done_Face(m_face);
 }
 
-bool FreeTypeFontEngine::hasGlyph(domain::Codepoint c) const {
+bool FreeTypeFontEngine::hasGlyph(domain::Codepoint c) const
+{
     return m_glyphs.find(c) != m_glyphs.end();
 }
 
-std::optional<domain::RasterizedGlyph> FreeTypeFontEngine::rasterizeGlyph(domain::Codepoint c) {
-    if (hasGlyph(c)) {
+std::optional<domain::RasterizedGlyph> FreeTypeFontEngine::rasterizeGlyph(domain::Codepoint c)
+{
+    if (hasGlyph(c))
+    {
         return m_glyphs.at(c);
     }
 
     FT_UInt glyph_index = FT_Get_Char_Index(m_face, c);
-    if (glyph_index == 0) {
+    if (glyph_index == 0)
+    {
         spdlog::debug("FreeType: Glyph does not exist for codepoint {} (U+{:04X})", c, c);
         return std::nullopt;
     }
@@ -51,7 +58,8 @@ std::optional<domain::RasterizedGlyph> FreeTypeFontEngine::rasterizeGlyph(domain
     domain::PixelFormat format = domain::PixelFormat::GRAYSCALE;
 
     int load_flags = FT_LOAD_DEFAULT;
-    if (m_face->face_flags & FT_FACE_FLAG_COLOR) {
+    if (m_face->face_flags & FT_FACE_FLAG_COLOR)
+    {
         load_flags = FT_LOAD_COLOR;
         format = domain::PixelFormat::BGRA;
     }
@@ -67,39 +75,37 @@ std::optional<domain::RasterizedGlyph> FreeTypeFontEngine::rasterizeGlyph(domain
         return std::nullopt;
     }
 
-    domain::RasterizedGlyph glyph = {
-        .metrics = {
-            .codepoint = c,
-            .size = {
-                static_cast<unsigned int>(m_face->glyph->bitmap.width * m_scale),
-                static_cast<unsigned int>(m_face->glyph->bitmap.rows * m_scale)
-            },
-            .bearing = {
-                static_cast<int>(m_face->glyph->bitmap_left * m_scale),
-                static_cast<int>(m_face->glyph->bitmap_top * m_scale)
-            },
-            .advance = static_cast<long>(m_face->glyph->advance.x * m_scale / 64.0),
-        },
-        .width = m_face->glyph->bitmap.width,
-        .height = m_face->glyph->bitmap.rows,
-        .bitmap = m_face->glyph->bitmap.buffer,
-        .format = format
-    };
+    domain::RasterizedGlyph glyph = {.metrics =
+                                         {
+                                             .codepoint = c,
+                                             .size = {static_cast<unsigned int>(m_face->glyph->bitmap.width * m_scale),
+                                                      static_cast<unsigned int>(m_face->glyph->bitmap.rows * m_scale)},
+                                             .bearing = {static_cast<int>(m_face->glyph->bitmap_left * m_scale),
+                                                         static_cast<int>(m_face->glyph->bitmap_top * m_scale)},
+                                             .advance = static_cast<long>(m_face->glyph->advance.x * m_scale / 64.0),
+                                         },
+                                     .width = m_face->glyph->bitmap.width,
+                                     .height = m_face->glyph->bitmap.rows,
+                                     .bitmap = m_face->glyph->bitmap.buffer,
+                                     .format = format};
 
     m_glyphs.insert({c, glyph});
 
     return glyph;
 }
 
-std::optional<domain::RasterizedGlyph> FreeTypeFontEngine::rasterizeFallbackGlyph() {
-    if (fallback_glyph.has_value()) {
+std::optional<domain::RasterizedGlyph> FreeTypeFontEngine::rasterizeFallbackGlyph()
+{
+    if (fallback_glyph.has_value())
+    {
         return fallback_glyph.value();
     }
 
     domain::PixelFormat format = domain::PixelFormat::GRAYSCALE;
 
     int load_flags = FT_LOAD_DEFAULT;
-    if (m_face->face_flags & FT_FACE_FLAG_COLOR) {
+    if (m_face->face_flags & FT_FACE_FLAG_COLOR)
+    {
         load_flags = FT_LOAD_COLOR;
         format = domain::PixelFormat::BGRA;
     }
@@ -113,55 +119,57 @@ std::optional<domain::RasterizedGlyph> FreeTypeFontEngine::rasterizeFallbackGlyp
         return std::nullopt;
     }
 
-    domain::RasterizedGlyph glyph = {
-        .metrics = {
-            .codepoint = 0,
-            .size = {
-                static_cast<unsigned int>(m_face->glyph->bitmap.width * m_scale),
-                static_cast<unsigned int>(m_face->glyph->bitmap.rows * m_scale)
-            },
-            .bearing = {
-                static_cast<int>(m_face->glyph->bitmap_left * m_scale),
-                static_cast<int>(m_face->glyph->bitmap_top * m_scale)
-            },
-            .advance = static_cast<long>(m_face->glyph->advance.x * m_scale / 64.0),
-        },
-        .width = m_face->glyph->bitmap.width,
-        .height = m_face->glyph->bitmap.rows,
-        .bitmap = m_face->glyph->bitmap.buffer,
-        .format = format
-    };
+    domain::RasterizedGlyph glyph = {.metrics =
+                                         {
+                                             .codepoint = 0,
+                                             .size = {static_cast<unsigned int>(m_face->glyph->bitmap.width * m_scale),
+                                                      static_cast<unsigned int>(m_face->glyph->bitmap.rows * m_scale)},
+                                             .bearing = {static_cast<int>(m_face->glyph->bitmap_left * m_scale),
+                                                         static_cast<int>(m_face->glyph->bitmap_top * m_scale)},
+                                             .advance = static_cast<long>(m_face->glyph->advance.x * m_scale / 64.0),
+                                         },
+                                     .width = m_face->glyph->bitmap.width,
+                                     .height = m_face->glyph->bitmap.rows,
+                                     .bitmap = m_face->glyph->bitmap.buffer,
+                                     .format = format};
 
     fallback_glyph = glyph;
 
     return glyph;
 }
 
-float FreeTypeFontEngine::getAscender() const {
+float FreeTypeFontEngine::getAscender() const
+{
     return m_ascender;
 }
 
-float FreeTypeFontEngine::getDescender() const {
+float FreeTypeFontEngine::getDescender() const
+{
     return m_descender;
 }
 
-float FreeTypeFontEngine::getLineHeight() const {
+float FreeTypeFontEngine::getLineHeight() const
+{
     return m_line_height;
 }
 
-float FreeTypeFontEngine::getUnderlineOffset() const {
+float FreeTypeFontEngine::getUnderlineOffset() const
+{
     return m_underline_offset;
 }
 
-float FreeTypeFontEngine::getUnderlineThickness() const {
+float FreeTypeFontEngine::getUnderlineThickness() const
+{
     return m_underline_thickness;
 }
 
-int FreeTypeFontEngine::getSize() const {
+int FreeTypeFontEngine::getSize() const
+{
     return m_requested_size;
 }
 
-FontEngineFactory FreeTypeFontEngine::createFactory(std::shared_ptr<FreeTypeLibrary> library) {
+FontEngineFactory FreeTypeFontEngine::createFactory(std::shared_ptr<FreeTypeLibrary> library)
+{
     return [library](const domain::FontMatch &match) -> std::unique_ptr<domain::FontEngine> {
         return std::make_unique<FreeTypeFontEngine>(library, match.path, match.size, match.face_index);
     };

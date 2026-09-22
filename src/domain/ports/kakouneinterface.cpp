@@ -1,9 +1,10 @@
 #include "domain/ports/kakouneinterface.hpp"
 
-namespace domain {
+namespace domain
+{
 
-KakouneInterface::KakouneInterface(const KakouneSession& session) : m_session_id(session.getSessionId()) {
-
+KakouneInterface::KakouneInterface(const KakouneSession &session) : m_session_id(session.getSessionId())
+{
 }
 
-}
+} // namespace domain

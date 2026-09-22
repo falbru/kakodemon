@@ -1,34 +1,36 @@
 #include "application.hpp"
 #include "adapters/kakoune/kakouneclientprocess.hpp"
 #include "adapters/kakoune/localsession.hpp"
+#include "adapters/kakoune/remotesession.hpp"
 #include "adapters/namedpipe/namedpipecommandinterface.hpp"
 #include "application/cliconfig.hpp"
 #include "application/controller/commandcontroller.hpp"
+#include "application/controller/editorcontroller.hpp"
+#include "application/controller/inputcontroller.hpp"
 #include "application/controller/layoutcontroller.hpp"
 #include "application/controller/movablemenucontroller.hpp"
 #include "application/model/clientmanager.hpp"
 #include "application/model/focusedclientstack.hpp"
 #include "application/model/kakouneclient.hpp"
-#include "domain/ports/window.hpp"
-#include "application/controller/editorcontroller.hpp"
-#include "application/controller/inputcontroller.hpp"
+#include "application/view/infobox.hpp"
+#include "application/view/kakounecontentview.hpp"
+#include "application/view/multistyledmenu.hpp"
+#include "application/view/statusbar.hpp"
 #include "domain/fontmanager.hpp"
 #include "domain/ports/commandinterface.hpp"
 #include "domain/ports/renderer.hpp"
+#include "domain/ports/window.hpp"
 #include "domain/uioptions.hpp"
-#include "application/view/infobox.hpp"
-#include "application/view/multistyledmenu.hpp"
-#include "application/view/kakounecontentview.hpp"
-#include "application/view/statusbar.hpp"
-#include "adapters/kakoune/remotesession.hpp"
 #include <cstdlib>
 #include <memory>
 #include <optional>
 #include <random>
 
-namespace {
+namespace
+{
 
-std::string generateId(size_t length = 8) {
+std::string generateId(size_t length = 8)
+{
     static const char charset[] = "abcdefghijklmnopqrstuvwxyz0123456789";
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -36,15 +38,17 @@ std::string generateId(size_t length = 8) {
 
     std::string id;
     id.reserve(length);
-    for (size_t i = 0; i < length; ++i) {
+    for (size_t i = 0; i < length; ++i)
+    {
         id += charset[dist(gen)];
     }
     return id;
 }
 
-}
+} // namespace
 
-Application::Application(std::unique_ptr<domain::Window> window, std::unique_ptr<domain::Renderer> renderer, std::unique_ptr<domain::FontManager> font_manager)
+Application::Application(std::unique_ptr<domain::Window> window, std::unique_ptr<domain::Renderer> renderer,
+                         std::unique_ptr<domain::FontManager> font_manager)
     : m_window(std::move(window)), m_renderer(std::move(renderer)), m_font_manager(std::move(font_manager))
 {
 }
@@ -55,21 +59,22 @@ void Application::init(const CliConfig &cli_config, const ApplicationConfig &app
 
     m_window->init(m_app_config.maximized);
     m_renderer->init(m_window->getWidth(), m_window->getHeight());
-    m_window->onResize([this](const domain::ResizeEvent& event) { m_renderer->onWindowResize(event.width, event. height); });
+    m_window->onResize(
+        [this](const domain::ResizeEvent &event) { m_renderer->onWindowResize(event.width, event.height); });
 
     m_kakodemon_id = generateId();
     setenv("KAKOD_ID", m_kakodemon_id.c_str(), 1);
 
     m_command_interface = std::make_unique<NamedPipeCommandInterface>(m_kakodemon_id, PipeMode::Receive);
-    m_command_interface->onCommandReceived([this](const domain::Command&) {
-        m_window->wakeEventLoop();
-    });
+    m_command_interface->onCommandReceived([this](const domain::Command &) { m_window->wakeEventLoop(); });
     m_command_interface->init();
 
     if (cli_config.session_type == SessionType::Remote)
     {
         m_kakoune_session = std::make_unique<RemoteSession>(cli_config.session_id);
-    }else {
+    }
+    else
+    {
         auto local_session = std::make_unique<LocalSession>(cli_config.session_id);
         local_session->start(cli_config.file_arguments, cli_config.no_config);
         m_kakoune_session = std::move(local_session);
@@ -78,23 +83,22 @@ void Application::init(const CliConfig &cli_config, const ApplicationConfig &app
     m_client_manager = std::make_unique<ClientManager>(m_kakoune_session.get());
     m_focused_client_stack = std::make_unique<FocusedClientStack>();
 
-    m_client_manager->onClientAdded([this](KakouneClient* client) {
+    m_client_manager->onClientAdded([this](KakouneClient *client) {
         client->interface->onRefresh([this](bool) { m_window->wakeEventLoop(); });
-        client->interface->onExit([this, client]() {
-            m_client_manager->removeClient(client);
-        });
+        client->interface->onExit([this, client]() { m_client_manager->removeClient(client); });
     });
 
-    m_client_manager->onClientRemoved([this](KakouneClient*) {
-        if (m_client_manager->clients().empty()) {
+    m_client_manager->onClientRemoved([this](KakouneClient *) {
+        if (m_client_manager->clients().empty())
+        {
             m_running = false;
             m_window->wakeEventLoop();
         }
     });
 
-    m_window->onClose([this](const domain::CloseEvent&) { m_running = false; });
+    m_window->onClose([this](const domain::CloseEvent &) { m_running = false; });
 
-    m_window->onMaximizedChanged([this](const domain::MaximizedChangedEvent& event) {
+    m_window->onMaximizedChanged([this](const domain::MaximizedChangedEvent &event) {
         m_app_config.maximized = event.maximized;
         saveApplicationConfig(m_app_config);
     });
@@ -128,20 +132,26 @@ void Application::init(const CliConfig &cli_config, const ApplicationConfig &app
 
     m_pane_layout->init(m_client_manager.get(), m_focused_client_stack.get());
 
-    m_command_controller->init(m_command_interface.get(), m_client_manager.get(), m_kakoune_session.get(), m_window.get(), m_pane_layout.get(), m_focused_client_stack.get());
+    m_command_controller->init(m_command_interface.get(), m_client_manager.get(), m_kakoune_session.get(),
+                               m_window.get(), m_pane_layout.get(), m_focused_client_stack.get());
     m_input_controller->init(m_focused_client_stack.get(), m_client_manager.get(), m_window.get(), m_pane_layout.get());
-    m_focus_controller->init(m_focused_client_stack.get(), m_client_manager.get(), m_pane_layout.get(), m_window.get(), m_multi_styled_menu.get());
-    m_editor_controller->init(m_client_manager.get(), m_focused_client_stack.get(), m_pane_layout.get(), m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager.get(), m_window.get(), m_multi_styled_menu.get());
+    m_focus_controller->init(m_focused_client_stack.get(), m_client_manager.get(), m_pane_layout.get(), m_window.get(),
+                             m_multi_styled_menu.get());
+    m_editor_controller->init(m_client_manager.get(), m_focused_client_stack.get(), m_pane_layout.get(),
+                              m_kakoune_content_view.get(), m_status_bar.get(), m_font_manager.get(), m_window.get(),
+                              m_multi_styled_menu.get());
     m_movable_menu_controller->init(m_multi_styled_menu.get(), m_window.get());
-    m_scene->init(m_client_manager.get(), m_focused_client_stack.get(), m_pane_layout.get(), m_kakoune_content_view.get(),
-                  m_status_bar.get(), m_multi_styled_menu.get(), m_info_box.get(), m_font_manager.get(), m_window.get(),
-                  m_pane_border_view.get());
+    m_scene->init(m_client_manager.get(), m_focused_client_stack.get(), m_pane_layout.get(),
+                  m_kakoune_content_view.get(), m_status_bar.get(), m_multi_styled_menu.get(), m_info_box.get(),
+                  m_font_manager.get(), m_window.get(), m_pane_border_view.get());
     m_layout_controller->init(m_pane_layout.get(), m_client_manager.get(), m_window.get());
     m_master_client_controller->init(m_kakoune_session.get(), m_pane_layout.get());
 
     m_client_manager->setDefaultUIOptions(domain::getDefaultUIOptions(m_font_manager.get()));
 
-    m_client_manager->createClient(cli_config.startup_command, cli_config.session_type == SessionType::Remote ? cli_config.file_arguments : std::vector<std::string>{});
+    m_client_manager->createClient(cli_config.startup_command, cli_config.session_type == SessionType::Remote
+                                                                   ? cli_config.file_arguments
+                                                                   : std::vector<std::string>{});
 
     int initial_width = m_window->getWidth();
     int initial_height = m_window->getHeight();
@@ -153,13 +163,16 @@ Application::~Application()
 {
 }
 
-void Application::run() {
-    while (m_running) {
+void Application::run()
+{
+    while (m_running)
+    {
         m_window->waitEvents();
 
         updateControllers();
 
-        if (m_window->needsRerender()) {
+        if (m_window->needsRerender())
+        {
             m_window->renderBegin();
             renderControllers();
             m_window->renderEnd();
@@ -180,4 +193,3 @@ void Application::renderControllers()
 {
     m_scene->render();
 }
-

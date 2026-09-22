@@ -1,32 +1,40 @@
-#include <catch2/catch_test_macros.hpp>
 #include "application/cliconfig.hpp"
 #include "application/cliparser.hpp"
+#include <catch2/catch_test_macros.hpp>
 #include <string>
 #include <vector>
 
 struct ArgvHelper
 {
-    std::vector<char*> ptrs;
+    std::vector<char *> ptrs;
     std::vector<std::string> storage;
 
-    ArgvHelper(const std::vector<std::string>& args)
+    ArgvHelper(const std::vector<std::string> &args)
     {
         storage = args;
-        for (auto& arg : storage)
+        for (auto &arg : storage)
         {
             ptrs.push_back(&arg[0]);
         }
         ptrs.push_back(nullptr);
     }
 
-    char** argv() { return ptrs.data(); }
-    int argc() { return static_cast<int>(storage.size()); }
+    char **argv()
+    {
+        return ptrs.data();
+    }
+    int argc()
+    {
+        return static_cast<int>(storage.size());
+    }
 };
 
-CliParser cliParserWithExistingKakouneSession(bool existingKakouneSession) {
-    return CliParser(ValidatorDependencies{ .kakouneSessionExists = [existingKakouneSession](const std::string& session_id) {
-        return existingKakouneSession;
-    }});
+CliParser cliParserWithExistingKakouneSession(bool existingKakouneSession)
+{
+    return CliParser(
+        ValidatorDependencies{.kakouneSessionExists = [existingKakouneSession](const std::string &session_id) {
+            return existingKakouneSession;
+        }});
 }
 
 TEST_CASE("CLI Parser - No arguments creates local session with random ID", "[cliparser]")

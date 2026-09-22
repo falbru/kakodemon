@@ -5,14 +5,13 @@
 #include "adapters/opengl/renderer.hpp"
 #include "adapters/opengl/window.hpp"
 #include "application/application.hpp"
-#include "domain/ports/window.hpp"
 #include "domain/fontmanager.hpp"
 #include "domain/ports/renderer.hpp"
+#include "domain/ports/window.hpp"
 #include <memory>
 
 ApplicationBuilder::ApplicationBuilder()
-    : m_platform(PlatformType::OPENGL_GLFW),
-      m_font_resolver(FontResolverType::FONTCONFIG),
+    : m_platform(PlatformType::OPENGL_GLFW), m_font_resolver(FontResolverType::FONTCONFIG),
       m_font_engine(FontEngineType::FREETYPE)
 {
 }
@@ -50,7 +49,8 @@ std::unique_ptr<Application> ApplicationBuilder::build()
         break;
     }
 
-    auto font_manager = std::make_unique<domain::FontManager>(createFontResolver(), createFontEngineFactory(), font_factory);
+    auto font_manager =
+        std::make_unique<domain::FontManager>(createFontResolver(), createFontEngineFactory(), font_factory);
     return std::make_unique<Application>(std::move(window), std::move(renderer), std::move(font_manager));
 }
 
@@ -69,8 +69,7 @@ FontEngineFactory ApplicationBuilder::createFontEngineFactory()
 {
     switch (m_font_engine)
     {
-    case FontEngineType::FREETYPE:
-    {
+    case FontEngineType::FREETYPE: {
         auto freetype_library = std::make_shared<FreeTypeLibrary>();
         return FreeTypeFontEngine::createFactory(freetype_library);
     }
