@@ -21,10 +21,8 @@ test-all: build
 test TEST: build
     cd {{BUILD_DIR}} && ctest --output-on-failure -R "^{{TEST}}$"
 
-FORMAT_STYLE := "Microsoft"
-
 format:
-    find src/ test/ -name '*.cpp' -o -name '*.hpp' | xargs clang-format --style={{FORMAT_STYLE}} -i
+    find src/ test/ -name '*.cpp' -o -name '*.hpp' | xargs clang-format -i
 
 format-check:
-    find src/ test/ -name '*.cpp' -o -name '*.hpp' | xargs clang-format --style={{FORMAT_STYLE}} --dry-run --Werror
+    find src/ test/ -name '*.cpp' -o -name '*.hpp' | xargs clang-format --dry-run --Werror
