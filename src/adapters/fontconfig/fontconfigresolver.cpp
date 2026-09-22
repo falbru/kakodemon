@@ -2,8 +2,10 @@
 #include "domain/codepointstring.hpp"
 #include "domain/ports/fontresolver.hpp"
 #include "spdlog/spdlog.h"
-#include <fontconfig/fcfreetype.h>
+// clang-format off
 #include <fontconfig/fontconfig.h>
+#include <fontconfig/fcfreetype.h>
+// clang-format on
 #include <optional>
 #include <string>
 
