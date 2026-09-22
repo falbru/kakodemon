@@ -185,3 +185,170 @@ TEST_CASE("Line slice with cursor position scenario", "[Line][slice]") {
     REQUIRE(up_to_cursor_plus_one.length() == 41);
     REQUIRE(up_to_cursor_plus_one.toUTF8String().toString() == "This is a test input with many characters");
 }
+
+TEST_CASE("Line trim left removes leading whitespace", "[Line][trim]") {
+    domain::Line line({
+        domain::Atom(domain::UTF8String("   ABC"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
+    });
+
+    domain::Line trimmed = line.trim(domain::TrimDirection::Left);
+
+    REQUIRE(trimmed.toUTF8String().toString() == "ABC");
+    REQUIRE(trimmed.length() == 3);
+}
+
+TEST_CASE("Line trim right removes trailing whitespace", "[Line][trim]") {
+    domain::Line line({
+        domain::Atom(domain::UTF8String("ABC   "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
+    });
+
+    domain::Line trimmed = line.trim(domain::TrimDirection::Right);
+
+    REQUIRE(trimmed.toUTF8String().toString() == "ABC");
+    REQUIRE(trimmed.length() == 3);
+}
+
+TEST_CASE("Line trim doesn't removes trailing whitespace on the right if TrimDirection is left", "[Line][trim]") {
+    domain::Line line({
+        domain::Atom(domain::UTF8String(" ABC "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
+    });
+
+    domain::Line trimmed = line.trim(domain::TrimDirection::Left);
+
+    REQUIRE(trimmed.toUTF8String().toString() == "ABC ");
+    REQUIRE(trimmed.length() == 4);
+}
+
+TEST_CASE("Line trim doesn't removes trailing whitespace on the left if TrimDirection is right", "[Line][trim]") {
+    domain::Line line({
+        domain::Atom(domain::UTF8String(" ABC "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
+    });
+
+    domain::Line trimmed = line.trim(domain::TrimDirection::Right);
+
+    REQUIRE(trimmed.toUTF8String().toString() == " ABC");
+    REQUIRE(trimmed.length() == 4);
+}
+
+TEST_CASE("Line trim both removes leading and trailing whitespace", "[Line][trim]") {
+    domain::Line line({
+        domain::Atom(domain::UTF8String("   ABC   "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
+    });
+
+    domain::Line trimmed = line.trim(domain::TrimDirection::Both);
+
+    REQUIRE(trimmed.toUTF8String().toString() == "ABC");
+    REQUIRE(trimmed.length() == 3);
+}
+
+TEST_CASE("Line trim removes empty atom when first atom becomes empty", "[Line][trim]") {
+    domain::Line line({
+        domain::Atom(domain::UTF8String("   "), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+        domain::Atom(domain::UTF8String("ABC"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
+    });
+
+    domain::Line trimmed = line.trim(domain::TrimDirection::Left);
+
+    REQUIRE(trimmed.size() == 1);
+    REQUIRE(trimmed.toUTF8String().toString() == "ABC");
+}
+
+TEST_CASE("Line trim removes empty atom when last atom becomes empty", "[Line][trim]") {
+    domain::Line line({
+        domain::Atom(domain::UTF8String("ABC"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+        domain::Atom(domain::UTF8String("   "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
+    });
+
+    domain::Line trimmed = line.trim(domain::TrimDirection::Right);
+
+    REQUIRE(trimmed.size() == 1);
+    REQUIRE(trimmed.toUTF8String().toString() == "ABC");
+}
+
+TEST_CASE("Line trim both removes empty atoms from both ends", "[Line][trim]") {
+    domain::Line line({
+        domain::Atom(domain::UTF8String("   "), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+        domain::Atom(domain::UTF8String("ABC"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+        domain::Atom(domain::UTF8String("   "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
+    });
+
+    domain::Line trimmed = line.trim(domain::TrimDirection::Both);
+
+    REQUIRE(trimmed.size() == 1);
+    REQUIRE(trimmed.toUTF8String().toString() == "ABC");
+}
+
+TEST_CASE("Line trim both removes multiple empty atoms from left", "[Line][trim]") {
+    domain::Line line({
+        domain::Atom(domain::UTF8String(" "), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+        domain::Atom(domain::UTF8String("  "), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+        domain::Atom(domain::UTF8String("ABC"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
+    });
+
+    domain::Line trimmed = line.trim(domain::TrimDirection::Left);
+
+    REQUIRE(trimmed.size() == 1);
+    REQUIRE(trimmed.toUTF8String().toString() == "ABC");
+}
+
+TEST_CASE("Line trim both removes multiple empty atoms from right", "[Line][trim]") {
+    domain::Line line({
+        domain::Atom(domain::UTF8String("ABC"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+        domain::Atom(domain::UTF8String("  "), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+        domain::Atom(domain::UTF8String(" "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
+    });
+
+    domain::Line trimmed = line.trim(domain::TrimDirection::Right);
+
+    REQUIRE(trimmed.size() == 1);
+    REQUIRE(trimmed.toUTF8String().toString() == "ABC");
+}
+
+TEST_CASE("Line trim both removes all atoms if all are whitespace", "[Line][trim]") {
+    domain::Line line({
+        domain::Atom(domain::UTF8String("   "), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+        domain::Atom(domain::UTF8String("  "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
+    });
+
+    domain::Line trimmed = line.trim(domain::TrimDirection::Both);
+
+    REQUIRE(trimmed.size() == 0);
+    REQUIRE(trimmed.length() == 0);
+}
+
+TEST_CASE("Line trim on empty line returns empty line", "[Line][trim]") {
+    domain::Line line;
+
+    domain::Line trimmed = line.trim(domain::TrimDirection::Both);
+
+    REQUIRE(trimmed.size() == 0);
+    REQUIRE(trimmed.length() == 0);
+}
+
+TEST_CASE("Line trim with multiple atoms only trims first and last", "[Line][trim]") {
+    domain::Line line({
+        domain::Atom(domain::UTF8String("  A"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+        domain::Atom(domain::UTF8String("B C"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+        domain::Atom(domain::UTF8String("D  "), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
+    });
+
+    domain::Line trimmed = line.trim(domain::TrimDirection::Both);
+
+    REQUIRE(trimmed.size() == 3);
+    REQUIRE(trimmed.at(0).getContents().toString() == "A");
+    REQUIRE(trimmed.at(1).getContents().toString() == "B C");
+    REQUIRE(trimmed.at(2).getContents().toString() == "D");
+    REQUIRE(trimmed.toUTF8String().toString() == "AB CD");
+}
+
+TEST_CASE("Line trim left with non-whitespace first atom", "[Line][trim]") {
+    domain::Line line({
+        domain::Atom(domain::UTF8String("ABC"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+        domain::Atom(domain::UTF8String("DEF"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
+    });
+
+    domain::Line trimmed = line.trim(domain::TrimDirection::Left);
+
+    REQUIRE(trimmed.size() == 2);
+    REQUIRE(trimmed.toUTF8String().toString() == "ABCDEF");
+}

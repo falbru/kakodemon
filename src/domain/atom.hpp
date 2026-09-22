@@ -19,6 +19,8 @@ class Atom
     Atom slice(int start_index);
     Atom slice(int start_index, int length);
 
+    Atom trim(TrimDirection direction = TrimDirection::Both) const;
+
     UTF8String toUTF8String() const;
 
   private:

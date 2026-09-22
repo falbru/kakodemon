@@ -96,4 +96,36 @@ UTF8String Line::toUTF8String() const {
     return string;
 }
 
+Line Line::trim(TrimDirection direction) const {
+    if (m_atoms.empty()) {
+        return Line();
+    }
+
+    std::vector<Atom> result = m_atoms;
+
+    if (direction == TrimDirection::Left || direction == TrimDirection::Both) {
+        while (!result.empty()) {
+            Atom trimmed = result[0].trim(TrimDirection::Left);
+            if (trimmed.size() > 0) {
+                result[0] = trimmed;
+                break;
+            }
+            result.erase(result.begin());
+        }
+    }
+
+    if (direction == TrimDirection::Right || direction == TrimDirection::Both) {
+        while (!result.empty()) {
+            Atom trimmed = result.back().trim(TrimDirection::Right);
+            if (trimmed.size() > 0) {
+                result.back() = trimmed;
+                break;
+            }
+            result.pop_back();
+        }
+    }
+
+    return Line(result);
+}
+
 };

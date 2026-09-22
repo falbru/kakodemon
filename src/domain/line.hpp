@@ -20,6 +20,8 @@ class Line
     unsigned int size() const;
     unsigned int length() const;
 
+    Line trim(TrimDirection direction = TrimDirection::Both) const;
+
     UTF8String toUTF8String() const;
 
   private:

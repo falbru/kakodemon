@@ -41,4 +41,58 @@ float GlyphLine::height() const {
     return max_height;
 }
 
+void GlyphLine::truncate(float max_width, Font *font, FontManager *font_manager) {
+    if (width() <= max_width) return;
+
+    auto ellipsis_with_font = font_manager->getGlyphWithFont(0x2026, font);
+    const GlyphMetrics& ellipsis = ellipsis_with_font.glyph;
+
+    if (ellipsis.advance > max_width) {
+        m_atoms = {};
+        return;
+    }
+
+    std::vector<GlyphAtom> new_atoms;
+    float current_width = 0;
+    bool done = false;
+
+    for (const auto& atom : m_atoms) {
+        if (done) break;
+
+        std::vector<GlyphRun> new_runs;
+        for (const auto& run : atom.getRuns()) {
+            std::vector<GlyphMetrics> new_glyphs;
+            for (const auto& glyph : run.glyphs) {
+                if (current_width + glyph.advance + ellipsis.advance > max_width) {
+                    done = true;
+                    break;
+                }
+                new_glyphs.push_back(glyph);
+                current_width += glyph.advance;
+            }
+
+            if (!new_glyphs.empty()) {
+                new_runs.push_back({new_glyphs, run.font});
+            }
+
+            if (done) {
+                if (new_runs.empty() && new_atoms.size() > 0) {
+                    auto prev_runs = new_atoms.back().getRuns();
+                    prev_runs.push_back({std::vector<GlyphMetrics>{ellipsis}, ellipsis_with_font.font});
+                    new_atoms[new_atoms.size() - 1] = GlyphAtom(prev_runs, new_atoms.back().getFace());
+                }else {
+                    new_runs.push_back({std::vector<GlyphMetrics>{ellipsis}, ellipsis_with_font.font});
+                }
+                break;
+            }
+        }
+
+        if (!new_runs.empty()) {
+            new_atoms.push_back(GlyphAtom(new_runs, atom.getFace()));
+        }
+    }
+
+    m_atoms = new_atoms;
+}
+
 };

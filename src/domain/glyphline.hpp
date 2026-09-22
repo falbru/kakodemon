@@ -1,6 +1,7 @@
 #ifndef DOMAIN_GLYPHLINE_HPP_INCLUDED
 #define DOMAIN_GLYPHLINE_HPP_INCLUDED
 
+#include "domain/fontmanager.hpp"
 #include "domain/glyphatom.hpp"
 #include "domain/line.hpp"
 
@@ -18,6 +19,8 @@ class GlyphLine
 
     float width() const;
     float height() const;
+
+    void truncate(float max_width, Font *font, FontManager *font_manager);
 
   private:
     std::vector<GlyphAtom> m_atoms;

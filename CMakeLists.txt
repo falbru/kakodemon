@@ -70,7 +70,6 @@ set(SRC
     src/application/model/kakouneclient.cpp
     src/application/model/panelayout.cpp
     src/application/scene.cpp
-    src/application/view/glyphsequence.cpp
     src/application/view/infobox.cpp
     src/application/view/inlinemenu.cpp
     src/application/view/kakounecontentview.cpp

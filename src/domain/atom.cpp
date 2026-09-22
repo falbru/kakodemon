@@ -30,6 +30,10 @@ Atom Atom::slice(int start_index, int length) {
     return Atom(m_contents.substring(start_index, length), m_face);
 }
 
+Atom Atom::trim(TrimDirection direction) const {
+    return Atom(m_contents.trim(direction), m_face);
+}
+
 UTF8String Atom::toUTF8String() const {
     return UTF8String(m_contents);
 }

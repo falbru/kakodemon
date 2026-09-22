@@ -2,6 +2,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/Catch2 ${CMAKE_BINARY_DIR}/vendor/Ca
 add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/trompeloeil ${CMAKE_BINARY_DIR}/vendor/trompeloeil EXCLUDE_FROM_ALL)
 
 add_executable(tests
+    unit/test_glyphline.cpp
     unit/test_glyphlines.cpp
     unit/test_glyphlinesbuilder.cpp
     unit/test_utf8string.cpp
@@ -45,7 +46,6 @@ add_executable(tests
     ${CMAKE_SOURCE_DIR}/src/application/view/statusbar.cpp
     ${CMAKE_SOURCE_DIR}/src/application/view/kakounecontentview.cpp
     ${CMAKE_SOURCE_DIR}/src/application/view/rendercontext.cpp
-    ${CMAKE_SOURCE_DIR}/src/application/view/glyphsequence.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/ports/renderer.cpp
     ${CMAKE_SOURCE_DIR}/src/application/view/layoutmanager.cpp
     ${CMAKE_SOURCE_DIR}/src/application/view/multistyledmenu.cpp
