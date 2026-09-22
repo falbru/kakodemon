@@ -12,7 +12,7 @@ jobs:
           command: |
             export DEBIAN_FRONTEND=noninteractive
             apt-get update
-            apt-get install -y git ca-certificates wget cmake build-essential libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libwayland-dev libxkbcommon-dev libfreetype-dev libfontconfig-dev clang-format clang-tidy
+            apt-get install -y git ca-certificates just wget cmake build-essential libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libwayland-dev libxkbcommon-dev libfreetype-dev libfontconfig-dev clang-format clang-tidy
 
       - run:
           name: Initialize submodules
@@ -34,28 +34,19 @@ jobs:
 
       - run:
           name: Configure CMake
-          command: |
-            cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DBUILD_TESTS=ON
+          command: just configure-rel
 
       - run:
-          name: Build with CMake
-          command: |
-            cmake --build build --config Release
+          name: Build kakodemon
+          command: just build-rel
 
       - run:
           name: Run tests
-          command: |
-            cd build && ctest --output-on-failure
+          command: just test-all-rel
 
       - run:
-          name: Run clang-format check
-          command: |
-            find src/ test/ -name '*.cpp' -o -name '*.hpp' | xargs clang-format --style=Microsoft --dry-run --Werror
-
-      - run:
-          name: Run clang-tidy
-          command: |
-            find src/ test/ -name '*.cpp' -o -name '*.hpp' -exec clang-tidy -p build {} \;
+          name: Run format check
+          command: just format-check
 
 workflows:
   ci:
