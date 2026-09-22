@@ -2,7 +2,7 @@
 #define ATOM_HPP_INCLUDED
 
 #include "domain/atom.hpp"
-#include "domain/utf8string.hpp"
+#include "domain/codepointstring.hpp"
 #include "face.hpp"
 #include "nlohmann/json.hpp"
 
@@ -12,7 +12,7 @@ namespace kakoune
 struct Atom
 {
     Face face;
-    domain::UTF8String contents;
+    domain::CodepointString contents;
 };
 
 void to_json(nlohmann::json &j, const Atom &atom);

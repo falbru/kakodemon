@@ -3,7 +3,7 @@
 #include "domain/glyphatom.hpp"
 #include "domain/glyphline.hpp"
 #include "domain/glyphlinesbuilder.hpp"
-#include "domain/utf8string.hpp"
+#include "domain/codepointstring.hpp"
 #include "scrolledmenuitems.hpp"
 #include <optional>
 

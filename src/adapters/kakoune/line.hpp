@@ -15,7 +15,7 @@ struct Line
     std::vector<Atom> atoms;
 
     int size() const;
-    domain::UTF8String toUTF8String() const;
+    domain::CodepointString toCodepointString() const;
 };
 
 domain::Line toDomain(Line line);

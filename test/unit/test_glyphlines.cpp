@@ -3,7 +3,7 @@
 #include "domain/color.hpp"
 #include "domain/glyphlinesbuilder.hpp"
 #include "domain/lines.hpp"
-#include "domain/utf8string.hpp"
+#include "domain/codepointstring.hpp"
 #include "mock_font.hpp"
 
 TEST_CASE("GlyphLines handles empty line during wrap", "[GlyphLines][wrap][character]") {
@@ -30,7 +30,7 @@ TEST_CASE("GlyphLines preserves line that fits within max width", "[GlyphLines][
     FontMock font;
 
     domain::Lines lines = domain::Lines({
-        domain::Line({domain::Atom(domain::UTF8String("12345"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))})
+        domain::Line({domain::Atom(domain::CodepointString("12345"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))})
     });
 
     domain::GlyphLines glyph_lines = domain::GlyphLinesBuilder::build(lines, &font);
@@ -43,14 +43,14 @@ TEST_CASE("GlyphLines preserves line that fits within max width", "[GlyphLines][
 
     auto wrapped_lines = glyph_lines.toLines();
 
-    REQUIRE(wrapped_lines.at(0).toUTF8String() == domain::UTF8String("12345"));
+    REQUIRE(wrapped_lines.at(0).toCodepointString() == domain::CodepointString("12345"));
 }
 
 TEST_CASE("GlyphLines wraps exactly at max width boundary", "[GlyphLines][wrap][character]") {
     FontMock font;
 
     domain::Lines lines = domain::Lines({
-        domain::Line({domain::Atom(domain::UTF8String("1234567890ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))})
+        domain::Line({domain::Atom(domain::CodepointString("1234567890ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))})
     });
 
     domain::GlyphLines glyph_lines = domain::GlyphLinesBuilder::build(lines, &font);
@@ -67,7 +67,7 @@ TEST_CASE("GlyphLines wraps single atom exceeding max width into multiple lines"
     FontMock font;
 
     domain::Lines lines = domain::Lines({
-        domain::Line({domain::Atom(domain::UTF8String("1234567890123456789012345"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))})
+        domain::Line({domain::Atom(domain::CodepointString("1234567890123456789012345"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))})
     });
 
     domain::GlyphLines glyph_lines = domain::GlyphLinesBuilder::build(lines, &font);
@@ -84,17 +84,17 @@ TEST_CASE("GlyphLines wraps single atom exceeding max width into multiple lines"
     REQUIRE(wrapped_lines.at(1).length() == 10);
     REQUIRE(wrapped_lines.at(2).length() == 5);
 
-    REQUIRE(wrapped_lines.at(0).toUTF8String() == domain::UTF8String("1234567890"));
-    REQUIRE(wrapped_lines.at(1).toUTF8String() == domain::UTF8String("1234567890"));
-    REQUIRE(wrapped_lines.at(2).toUTF8String() == domain::UTF8String("12345"));
+    REQUIRE(wrapped_lines.at(0).toCodepointString() == domain::CodepointString("1234567890"));
+    REQUIRE(wrapped_lines.at(1).toCodepointString() == domain::CodepointString("1234567890"));
+    REQUIRE(wrapped_lines.at(2).toCodepointString() == domain::CodepointString("12345"));
 }
 
 TEST_CASE("GlyphLines wrapped lines are inserted before preceding lines", "[GlyphLines][wrap][character]") {
     FontMock font;
 
     domain::Lines lines = domain::Lines({
-        domain::Line({domain::Atom(domain::UTF8String("123456789012345"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))}),
-        domain::Line({domain::Atom(domain::UTF8String("ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))}),
+        domain::Line({domain::Atom(domain::CodepointString("123456789012345"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))}),
+        domain::Line({domain::Atom(domain::CodepointString("ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))}),
     });
 
     domain::GlyphLines glyph_lines = domain::GlyphLinesBuilder::build(lines, &font);
@@ -111,9 +111,9 @@ TEST_CASE("GlyphLines wrapped lines are inserted before preceding lines", "[Glyp
     REQUIRE(wrapped_lines.at(1).length() == 5);
     REQUIRE(wrapped_lines.at(2).length() == 5);
 
-    REQUIRE(wrapped_lines.at(0).toUTF8String() == domain::UTF8String("1234567890"));
-    REQUIRE(wrapped_lines.at(1).toUTF8String() == domain::UTF8String("12345"));
-    REQUIRE(wrapped_lines.at(2).toUTF8String() == domain::UTF8String("ABCDE"));
+    REQUIRE(wrapped_lines.at(0).toCodepointString() == domain::CodepointString("1234567890"));
+    REQUIRE(wrapped_lines.at(1).toCodepointString() == domain::CodepointString("12345"));
+    REQUIRE(wrapped_lines.at(2).toCodepointString() == domain::CodepointString("ABCDE"));
 }
 
 TEST_CASE("GlyphLines wraps multiple atoms across line boundary", "[GlyphLines][wrap][character]") {
@@ -121,10 +121,10 @@ TEST_CASE("GlyphLines wraps multiple atoms across line boundary", "[GlyphLines][
 
     domain::Lines lines = domain::Lines({
         domain::Line({
-            domain::Atom(domain::UTF8String("12345"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-            domain::Atom(domain::UTF8String("67890"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-            domain::Atom(domain::UTF8String("ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
-            domain::Atom(domain::UTF8String("FGHIJ"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
+            domain::Atom(domain::CodepointString("12345"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+            domain::Atom(domain::CodepointString("67890"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+            domain::Atom(domain::CodepointString("ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+            domain::Atom(domain::CodepointString("FGHIJ"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
         })
     });
 
@@ -144,8 +144,8 @@ TEST_CASE("GlyphLines wraps multiple atoms across line boundary", "[GlyphLines][
     REQUIRE(wrapped_lines.at(0).size() == 2);
     REQUIRE(wrapped_lines.at(1).size() == 2);
 
-    REQUIRE(wrapped_lines.at(0).toUTF8String() == domain::UTF8String("1234567890"));
-    REQUIRE(wrapped_lines.at(1).toUTF8String() == domain::UTF8String("ABCDEFGHIJ"));
+    REQUIRE(wrapped_lines.at(0).toCodepointString() == domain::CodepointString("1234567890"));
+    REQUIRE(wrapped_lines.at(1).toCodepointString() == domain::CodepointString("ABCDEFGHIJ"));
 }
 
 TEST_CASE("GlyphLines wraps at word boundaries when word wrap enabled", "[GlyphLines][wrap][word]") {
@@ -153,7 +153,7 @@ TEST_CASE("GlyphLines wraps at word boundaries when word wrap enabled", "[GlyphL
 
     domain::Lines lines = domain::Lines({
         domain::Line({
-            domain::Atom(domain::UTF8String("a long sentence"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+            domain::Atom(domain::CodepointString("a long sentence"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
         })
     });
 
@@ -170,8 +170,8 @@ TEST_CASE("GlyphLines wraps at word boundaries when word wrap enabled", "[GlyphL
     REQUIRE(wrapped_lines.at(0).length() == 6);
     REQUIRE(wrapped_lines.at(1).length() == 8);
 
-    REQUIRE(wrapped_lines.at(0).toUTF8String() == domain::UTF8String("a long"));
-    REQUIRE(wrapped_lines.at(1).toUTF8String() == domain::UTF8String("sentence"));
+    REQUIRE(wrapped_lines.at(0).toCodepointString() == domain::CodepointString("a long"));
+    REQUIRE(wrapped_lines.at(1).toCodepointString() == domain::CodepointString("sentence"));
 }
 
 TEST_CASE("GlyphLines word wrap falls back to character wrap when word exceeds max width", "[GlyphLines][wrap][word]") {
@@ -179,7 +179,7 @@ TEST_CASE("GlyphLines word wrap falls back to character wrap when word exceeds m
 
     domain::Lines lines = domain::Lines({
         domain::Line({
-            domain::Atom(domain::UTF8String("short 1234567890ABCDEFG rest"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+            domain::Atom(domain::CodepointString("short 1234567890ABCDEFG rest"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
         })
     });
 
@@ -196,10 +196,10 @@ TEST_CASE("GlyphLines word wrap falls back to character wrap when word exceeds m
     REQUIRE(wrapped_lines.at(2).length() == 7);
     REQUIRE(wrapped_lines.at(3).length() == 4);
 
-    REQUIRE(wrapped_lines.at(0).toUTF8String() == domain::UTF8String("short"));
-    REQUIRE(wrapped_lines.at(1).toUTF8String() == domain::UTF8String("1234567890"));
-    REQUIRE(wrapped_lines.at(2).toUTF8String() == domain::UTF8String("ABCDEFG"));
-    REQUIRE(wrapped_lines.at(3).toUTF8String() == domain::UTF8String("rest"));
+    REQUIRE(wrapped_lines.at(0).toCodepointString() == domain::CodepointString("short"));
+    REQUIRE(wrapped_lines.at(1).toCodepointString() == domain::CodepointString("1234567890"));
+    REQUIRE(wrapped_lines.at(2).toCodepointString() == domain::CodepointString("ABCDEFG"));
+    REQUIRE(wrapped_lines.at(3).toCodepointString() == domain::CodepointString("rest"));
 }
 
 TEST_CASE("GlyphLines word wrap handles multiple consecutive spaces", "[GlyphLines][wrap][word]") {
@@ -207,7 +207,7 @@ TEST_CASE("GlyphLines word wrap handles multiple consecutive spaces", "[GlyphLin
 
     domain::Lines lines = domain::Lines({
         domain::Line({
-            domain::Atom(domain::UTF8String("123   567890AB"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+            domain::Atom(domain::CodepointString("123   567890AB"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
         })
     });
 
@@ -228,8 +228,8 @@ TEST_CASE("GlyphLines wraps multiple atoms with different faces", "[GlyphLines][
 
     domain::Lines lines = domain::Lines({
         domain::Line({
-            domain::Atom(domain::UTF8String("1234567890"), face1),
-            domain::Atom(domain::UTF8String("ABCDEFGHIJ"), face2),
+            domain::Atom(domain::CodepointString("1234567890"), face1),
+            domain::Atom(domain::CodepointString("ABCDEFGHIJ"), face2),
         })
     });
 
@@ -249,7 +249,7 @@ TEST_CASE("GlyphLines wraps line ending with whitespace", "[GlyphLines][wrap][wo
 
     domain::Lines lines = domain::Lines({
         domain::Line({
-            domain::Atom(domain::UTF8String("123456 "), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+            domain::Atom(domain::CodepointString("123456 "), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
         })
     });
 
@@ -260,7 +260,7 @@ TEST_CASE("GlyphLines wraps line ending with whitespace", "[GlyphLines][wrap][wo
     auto wrapped_lines = glyph_lines.toLines();
 
     REQUIRE(wrapped_lines.size() == 1);
-    REQUIRE(wrapped_lines.at(0).toUTF8String() == domain::UTF8String("123456 "));
+    REQUIRE(wrapped_lines.at(0).toCodepointString() == domain::CodepointString("123456 "));
 }
 
 TEST_CASE("GlyphLines handles max_width smaller than single glyph width", "[GlyphLines][wrap][character]") {
@@ -268,7 +268,7 @@ TEST_CASE("GlyphLines handles max_width smaller than single glyph width", "[Glyp
 
     domain::Lines lines = domain::Lines({
         domain::Line({
-            domain::Atom(domain::UTF8String("ABC"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
+            domain::Atom(domain::CodepointString("ABC"), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
         })
     });
 
@@ -282,9 +282,9 @@ TEST_CASE("GlyphLines handles max_width smaller than single glyph width", "[Glyp
     REQUIRE(wrapped_lines.at(0).length() == 1);
     REQUIRE(wrapped_lines.at(1).length() == 1);
     REQUIRE(wrapped_lines.at(2).length() == 1);
-    REQUIRE(wrapped_lines.at(0).toUTF8String() == domain::UTF8String("A"));
-    REQUIRE(wrapped_lines.at(1).toUTF8String() == domain::UTF8String("B"));
-    REQUIRE(wrapped_lines.at(2).toUTF8String() == domain::UTF8String("C"));
+    REQUIRE(wrapped_lines.at(0).toCodepointString() == domain::CodepointString("A"));
+    REQUIRE(wrapped_lines.at(1).toCodepointString() == domain::CodepointString("B"));
+    REQUIRE(wrapped_lines.at(2).toCodepointString() == domain::CodepointString("C"));
 }
 
 TEST_CASE("GlyphLines handles atom with multiple glyph runs", "[GlyphLines][wrap][glyphruns]") {
@@ -322,7 +322,7 @@ TEST_CASE("GlyphLines wraps atom with single glyph run into multiple atoms", "[G
 
     domain::Lines lines = domain::Lines({
         domain::Line({
-            domain::Atom(domain::UTF8String("1234567890ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
+            domain::Atom(domain::CodepointString("1234567890ABCDE"), domain::Face(domain::DefaultColor(), domain::DefaultColor()))
         })
     });
 

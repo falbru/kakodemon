@@ -1,5 +1,5 @@
 #include "font.hpp"
-#include "domain/utf8string.hpp"
+#include "domain/codepointstring.hpp"
 #include "domain/ports/fontengine.hpp"
 
 opengl::Font::Font(domain::FontEngine* font_engine)

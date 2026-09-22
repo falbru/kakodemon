@@ -1,7 +1,7 @@
 #ifndef DOMAIN_KEY_HPP_INCLUDED
 #define DOMAIN_KEY_HPP_INCLUDED
 
-#include "utf8string.hpp"
+#include "codepointstring.hpp"
 #include <variant>
 
 namespace domain

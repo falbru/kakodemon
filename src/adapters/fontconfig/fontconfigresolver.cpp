@@ -1,5 +1,5 @@
 #include "domain/ports/fontresolver.hpp"
-#include "domain/utf8string.hpp"
+#include "domain/codepointstring.hpp"
 #include "spdlog/spdlog.h"
 #include "fontconfigresolver.hpp"
 #include <fontconfig/fontconfig.h>

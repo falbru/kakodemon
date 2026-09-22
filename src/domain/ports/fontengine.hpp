@@ -1,8 +1,8 @@
 #ifndef DOMAIN_FONTENGINE_HPP_INCLUDED
 #define DOMAIN_FONTENGINE_HPP_INCLUDED
 
+#include "domain/codepointstring.hpp"
 #include "domain/ports/font.hpp"
-#include "domain/utf8string.hpp"
 #include <optional>
 
 namespace domain

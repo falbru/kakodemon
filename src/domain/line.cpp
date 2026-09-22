@@ -1,5 +1,5 @@
 #include "line.hpp"
-#include "domain/utf8string.hpp"
+#include "domain/codepointstring.hpp"
 
 namespace domain {
 
@@ -83,15 +83,15 @@ unsigned int Line::length() const {
     return length;
 }
 
-UTF8String Line::toUTF8String() const {
-    UTF8String string;
+CodepointString Line::toCodepointString() const {
+    CodepointString string;
     size_t total_size = 0;
     for (int i = 0; i < m_atoms.size(); i++) {
         total_size += m_atoms[i].size();
     }
     string.reserve(total_size);
     for (int i = 0; i < m_atoms.size(); i++) {
-        string += m_atoms[i].toUTF8String();
+        string += m_atoms[i].toCodepointString();
     }
     return string;
 }

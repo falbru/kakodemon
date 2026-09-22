@@ -1,7 +1,7 @@
 #include "inputcontroller.hpp"
 #include "application/model/panelayout.hpp"
 #include "domain/keys.hpp"
-#include "domain/utf8string.hpp"
+#include "domain/codepointstring.hpp"
 #include "spdlog/spdlog.h"
 #include <algorithm>
 #include <string>

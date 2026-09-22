@@ -21,8 +21,8 @@ class GlyphLinesBuilder
     static GlyphAtom build(const Atom &atom, Font *font);
 
   private:
-    static std::vector<GlyphRun> buildGlyphRuns(const UTF8String &contents, Font *font, FontManager *font_manager);
-    static std::vector<GlyphRun> buildGlyphRuns(const UTF8String &contents, Font *font);
+    static std::vector<GlyphRun> buildGlyphRuns(const CodepointString &contents, Font *font, FontManager *font_manager);
+    static std::vector<GlyphRun> buildGlyphRuns(const CodepointString &contents, Font *font);
 };
 
 } // namespace domain

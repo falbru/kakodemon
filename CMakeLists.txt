@@ -104,7 +104,7 @@ set(SRC
     src/domain/ports/window.cpp
     src/domain/statusline.cpp
     src/domain/uioptions.cpp
-    src/domain/utf8string.cpp
+    src/domain/codepointstring.cpp
     src/main.cpp
     vendor/glad/src/glad.c
 )

@@ -1,13 +1,13 @@
-#include "utf8string.hpp"
+#include "codepointstring.hpp"
 #include <sstream>
 
 namespace domain {
 
-UTF8String::UTF8String()
+CodepointString::CodepointString()
 {
 }
 
-UTF8String::UTF8String(std::vector<Codepoint> codepoints) : m_codepoints(codepoints)
+CodepointString::CodepointString(std::vector<Codepoint> codepoints) : m_codepoints(codepoints)
 {
 }
 
@@ -43,7 +43,7 @@ std::string codePointToString(Codepoint codepoint) {
     return result;
 }
 
-UTF8String::UTF8String(std::string string)
+CodepointString::CodepointString(std::string string)
 {
     auto it = string.cbegin();
     auto end = string.cend();
@@ -90,7 +90,7 @@ UTF8String::UTF8String(std::string string)
     }
 }
 
-std::string UTF8String::toString() const
+std::string CodepointString::toString() const
 {
     std::string result;
 
@@ -102,27 +102,27 @@ std::string UTF8String::toString() const
     return result;
 }
 
-int UTF8String::size() const
+int CodepointString::size() const
 {
     return m_codepoints.size();
 }
 
-Codepoint UTF8String::at(unsigned int index) const
+Codepoint CodepointString::at(unsigned int index) const
 {
     return m_codepoints.at(index);
 }
 
-void UTF8String::addCodepoint(Codepoint codepoint)
+void CodepointString::addCodepoint(Codepoint codepoint)
 {
     m_codepoints.push_back(codepoint);
 }
 
-void UTF8String::insertCodepoint(int index, Codepoint codepoint)
+void CodepointString::insertCodepoint(int index, Codepoint codepoint)
 {
     m_codepoints.insert(m_codepoints.begin() + index, codepoint);
 }
 
-void UTF8String::reserve(size_t capacity)
+void CodepointString::reserve(size_t capacity)
 {
     m_codepoints.reserve(capacity);
 }
@@ -144,10 +144,10 @@ bool isEmoji(Codepoint codepoint)
     return codepoint >= 0x1F300;
 }
 
-UTF8String UTF8String::trim(TrimDirection direction) const
+CodepointString CodepointString::trim(TrimDirection direction) const
 {
     if (m_codepoints.empty())
-        return UTF8String();
+        return CodepointString();
 
     size_t start = 0;
     size_t end = m_codepoints.size();
@@ -170,15 +170,15 @@ UTF8String UTF8String::trim(TrimDirection direction) const
 
     if (start > 0 || end < m_codepoints.size())
     {
-        return UTF8String(std::vector<Codepoint>(m_codepoints.begin() + start, m_codepoints.begin() + end));
+        return CodepointString(std::vector<Codepoint>(m_codepoints.begin() + start, m_codepoints.begin() + end));
     }
 
-    return UTF8String(m_codepoints);
+    return CodepointString(m_codepoints);
 }
 
-UTF8String UTF8String::substring(size_t start, size_t length) const
+CodepointString CodepointString::substring(size_t start, size_t length) const
 {
-    UTF8String result;
+    CodepointString result;
 
     if (start >= m_codepoints.size())
     {
@@ -191,18 +191,18 @@ UTF8String UTF8String::substring(size_t start, size_t length) const
     return result;
 }
 
-UTF8String UTF8String::substring(size_t start) const
+CodepointString CodepointString::substring(size_t start) const
 {
     return substring(start, m_codepoints.size() - start);
 }
 
-UTF8String& UTF8String::operator+=(const UTF8String& string) {
+CodepointString& CodepointString::operator+=(const CodepointString& string) {
     m_codepoints.reserve(m_codepoints.size() + string.m_codepoints.size());
     m_codepoints.insert(m_codepoints.end(), string.m_codepoints.begin(), string.m_codepoints.end());
     return *this;
 }
 
-bool UTF8String::operator==(const UTF8String& other) const {
+bool CodepointString::operator==(const CodepointString& other) const {
     if (size() != other.size()) return false;
 
     for (int i = 0; i < size(); i++) {
@@ -213,16 +213,16 @@ bool UTF8String::operator==(const UTF8String& other) const {
     return true;
 }
 
-bool UTF8String::operator!=(const UTF8String& other) const {
+bool CodepointString::operator!=(const CodepointString& other) const {
     return !(*this == other);
 }
 
-std::ostream& operator<<(std::ostream& os, const UTF8String& str) {
+std::ostream& operator<<(std::ostream& os, const CodepointString& str) {
     os << str.toString();
     return os;
 }
 
-std::string to_string(const UTF8String& str) {
+std::string to_string(const CodepointString& str) {
     return str.toString();
 }
 

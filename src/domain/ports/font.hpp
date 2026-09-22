@@ -1,8 +1,8 @@
 #ifndef DOMAIN_FONT_HPP_INCLUDED
 #define DOMAIN_FONT_HPP_INCLUDED
 
+#include "domain/codepointstring.hpp"
 #include "domain/geometry.hpp"
-#include "domain/utf8string.hpp"
 
 namespace domain
 {

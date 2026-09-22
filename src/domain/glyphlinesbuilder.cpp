@@ -1,6 +1,6 @@
 #include "glyphlinesbuilder.hpp"
 #include "domain/face.hpp"
-#include "domain/utf8string.hpp"
+#include "domain/codepointstring.hpp"
 
 namespace domain
 {
@@ -59,7 +59,7 @@ GlyphAtom GlyphLinesBuilder::build(const Atom& atom, Font* font, FontManager* fo
     return GlyphAtom(runs, atom.getFace());
 }
 
-std::vector<GlyphRun> GlyphLinesBuilder::buildGlyphRuns(const UTF8String& contents, Font* font, FontManager* font_manager)
+std::vector<GlyphRun> GlyphLinesBuilder::buildGlyphRuns(const CodepointString& contents, Font* font, FontManager* font_manager)
 {
     std::vector<GlyphRun> runs;
 
@@ -100,7 +100,7 @@ std::vector<GlyphRun> GlyphLinesBuilder::buildGlyphRuns(const UTF8String& conten
     return runs;
 }
 
-std::vector<GlyphRun> GlyphLinesBuilder::buildGlyphRuns(const UTF8String& contents, Font* font)
+std::vector<GlyphRun> GlyphLinesBuilder::buildGlyphRuns(const CodepointString& contents, Font* font)
 {
     std::vector<GlyphMetrics> glyphs;
     glyphs.reserve(contents.size());

@@ -1,9 +1,9 @@
 #ifndef OPENGL_FONT_HPP_INCLUDED
 #define OPENGL_FONT_HPP_INCLUDED
 
+#include "domain/codepointstring.hpp"
 #include "domain/ports/font.hpp"
 #include "domain/ports/fontengine.hpp"
-#include "domain/utf8string.hpp"
 #include "opengl.hpp"
 #include <map>
 #include <set>

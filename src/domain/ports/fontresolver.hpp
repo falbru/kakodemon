@@ -1,7 +1,7 @@
 #ifndef DOMAIN_FONTRESOLVER_HPP_INCLUDED
 #define DOMAIN_FONTRESOLVER_HPP_INCLUDED
 
-#include "domain/utf8string.hpp"
+#include "domain/codepointstring.hpp"
 #include <optional>
 #include <string>
 

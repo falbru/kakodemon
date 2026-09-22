@@ -8,7 +8,7 @@
 #include "domain/line.hpp"
 #include "domain/ports/fontengine.hpp"
 #include "domain/ports/renderer.hpp"
-#include "domain/utf8string.hpp"
+#include "domain/codepointstring.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "opengl.hpp"
 

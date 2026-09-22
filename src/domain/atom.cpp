@@ -1,13 +1,13 @@
 #include "atom.hpp"
-#include "domain/utf8string.hpp"
+#include "domain/codepointstring.hpp"
 
 namespace domain {
 
-Atom::Atom(UTF8String contents, Face face) : m_contents(contents), m_face(face) {
+Atom::Atom(CodepointString contents, Face face) : m_contents(contents), m_face(face) {
 
 }
 
-const UTF8String& Atom::getContents() const {
+const CodepointString& Atom::getContents() const {
     return m_contents;
 }
 
@@ -34,8 +34,8 @@ Atom Atom::trim(TrimDirection direction) const {
     return Atom(m_contents.trim(direction), m_face);
 }
 
-UTF8String Atom::toUTF8String() const {
-    return UTF8String(m_contents);
+CodepointString Atom::toCodepointString() const {
+    return CodepointString(m_contents);
 }
 
 }

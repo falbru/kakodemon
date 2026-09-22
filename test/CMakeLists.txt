@@ -5,7 +5,7 @@ add_executable(tests
     unit/test_glyphline.cpp
     unit/test_glyphlines.cpp
     unit/test_glyphlinesbuilder.cpp
-    unit/test_utf8string.cpp
+    unit/test_codepointstring.cpp
     unit/test_cliparser.cpp
     unit/test_focusedclientstack.cpp
     unit/test_line.cpp
@@ -72,7 +72,7 @@ add_executable(tests
     ${CMAKE_SOURCE_DIR}/src/domain/ports/kakounesession.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/statusline.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/uioptions.cpp
-    ${CMAKE_SOURCE_DIR}/src/domain/utf8string.cpp
+    ${CMAKE_SOURCE_DIR}/src/domain/codepointstring.cpp
 )
 
 target_include_directories(tests PRIVATE mocks/ ${CMAKE_SOURCE_DIR}/src/ ${CMAKE_BINARY_DIR})

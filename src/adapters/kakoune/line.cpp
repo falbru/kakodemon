@@ -16,8 +16,8 @@ int kakoune::Line::size() const {
     return atoms.size();
 }
 
-domain::UTF8String kakoune::Line::toUTF8String() const {
-    domain::UTF8String string;
+domain::CodepointString kakoune::Line::toCodepointString() const {
+    domain::CodepointString string;
     size_t total_size = 0;
     for (int i = 0; i < atoms.size(); i++) {
         total_size += atoms[i].contents.size();

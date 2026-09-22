@@ -21,12 +21,12 @@ enum class TrimDirection
     Both
 };
 
-class UTF8String
+class CodepointString
 {
   public:
-    UTF8String();
-    UTF8String(std::vector<Codepoint>);
-    UTF8String(std::string string);
+    CodepointString();
+    CodepointString(std::vector<Codepoint>);
+    CodepointString(std::string string);
 
     std::string toString() const;
 
@@ -37,20 +37,20 @@ class UTF8String
     int size() const;
     Codepoint at(unsigned int index) const;
 
-    UTF8String substring(size_t start) const;
-    UTF8String substring(size_t start, size_t length) const;
-    UTF8String trim(TrimDirection direction = TrimDirection::Both) const;
+    CodepointString substring(size_t start) const;
+    CodepointString substring(size_t start, size_t length) const;
+    CodepointString trim(TrimDirection direction = TrimDirection::Both) const;
 
-    UTF8String &operator+=(const UTF8String &other);
-    bool operator==(const UTF8String &other) const;
-    bool operator!=(const UTF8String &other) const;
+    CodepointString &operator+=(const CodepointString &other);
+    bool operator==(const CodepointString &other) const;
+    bool operator!=(const CodepointString &other) const;
 
   private:
     std::vector<Codepoint> m_codepoints;
 };
 
-std::ostream &operator<<(std::ostream &os, const UTF8String &str);
-std::string to_string(const UTF8String &str);
+std::ostream &operator<<(std::ostream &os, const CodepointString &str);
+std::string to_string(const CodepointString &str);
 
 } // namespace domain
 

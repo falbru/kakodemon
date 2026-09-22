@@ -2,7 +2,7 @@
 #define DOMAIN_LINE_HPP_INCLUDED
 
 #include "domain/atom.hpp"
-#include "domain/utf8string.hpp"
+#include "domain/codepointstring.hpp"
 
 namespace domain
 {
@@ -22,7 +22,7 @@ class Line
 
     Line trim(TrimDirection direction = TrimDirection::Both) const;
 
-    UTF8String toUTF8String() const;
+    CodepointString toCodepointString() const;
 
   private:
     std::vector<Atom> m_atoms;
