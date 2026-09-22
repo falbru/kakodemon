@@ -1,13 +1,19 @@
 BUILD_DIR := "build"
 REL_DIR := "build_rel"
 
-build:
+configure:
     mkdir -p {{BUILD_DIR}}
-    cd {{BUILD_DIR}} && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=true -DBUILD_TESTS=true && make -j $(nproc)
+    cd {{BUILD_DIR}} && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=true -DBUILD_TESTS=true
 
-build-rel:
+configure-rel:
     mkdir -p {{REL_DIR}}
-    cd {{REL_DIR}} && cmake .. -DCMAKE_BUILD_TYPE=Release && make -j $(nproc)
+    cd {{REL_DIR}} && cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=true -DBUILD_TESTS=true
+
+build: configure
+    cd {{BUILD_DIR}} && make -j $(nproc)
+
+build-rel: configure-rel
+    cd {{REL_DIR}} && make -j $(nproc)
 
 run ARGS="": build
     ./{{BUILD_DIR}}/kakod {{ARGS}}
@@ -20,6 +26,12 @@ test-all: build
 
 test TEST: build
     cd {{BUILD_DIR}} && ctest --output-on-failure -R "^{{TEST}}$"
+
+test-all-rel: build-rel
+    cd {{REL_DIR}} && ctest --output-on-failure -j $(nproc)
+
+test-rel TEST: build-rel
+    cd {{REL_DIR}} && ctest --output-on-failure -R "^{{TEST}}$"
 
 format:
     find src/ test/ -name '*.cpp' -o -name '*.hpp' | xargs clang-format -i
