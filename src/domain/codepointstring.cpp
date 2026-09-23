@@ -129,6 +129,26 @@ void CodepointString::reserve(size_t capacity)
     m_codepoints.reserve(capacity);
 }
 
+std::vector<Codepoint>::iterator CodepointString::begin()
+{
+    return m_codepoints.begin();
+}
+
+std::vector<Codepoint>::iterator CodepointString::end()
+{
+    return m_codepoints.end();
+}
+
+std::vector<Codepoint>::const_iterator CodepointString::begin() const
+{
+    return m_codepoints.begin();
+}
+
+std::vector<Codepoint>::const_iterator CodepointString::end() const
+{
+    return m_codepoints.end();
+}
+
 bool isWhitespace(Codepoint cp)
 {
     return cp == 0x09 || cp == 0x0A || cp == 0x0B || cp == 0x0C || cp == 0x0D || cp == 0x20 || cp == 0x85 ||

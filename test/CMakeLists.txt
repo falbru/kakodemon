@@ -2,6 +2,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/Catch2 ${CMAKE_BINARY_DIR}/vendor/Ca
 add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/trompeloeil ${CMAKE_BINARY_DIR}/vendor/trompeloeil EXCLUDE_FROM_ALL)
 
 add_executable(tests
+    unit/test_renderline.cpp
     unit/test_glyphline.cpp
     unit/test_glyphlines.cpp
     unit/test_glyphlinesbuilder.cpp
@@ -13,6 +14,7 @@ add_executable(tests
     unit/test_masterclientcontroller.cpp
     unit/test_rectangle.cpp
     unit/test_infobox.cpp
+    mocks/mock_glyphresolver.cpp
     integration/test_fontconfigresolver.cpp
     integration/test_localsession.cpp
     integration/test_kakouneclientprocess.cpp
@@ -60,6 +62,9 @@ add_executable(tests
     ${CMAKE_SOURCE_DIR}/src/domain/fontmanager.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/geometry.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/glyphatom.cpp
+    ${CMAKE_SOURCE_DIR}/src/domain/glyphresolver.cpp
+    ${CMAKE_SOURCE_DIR}/src/domain/renderline.cpp
+    ${CMAKE_SOURCE_DIR}/src/domain/facespan.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/glyphline.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/glyphlines.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/glyphlinesbuilder.cpp

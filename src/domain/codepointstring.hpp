@@ -37,6 +37,11 @@ class CodepointString
     int size() const;
     Codepoint at(unsigned int index) const;
 
+    std::vector<Codepoint>::iterator begin();
+    std::vector<Codepoint>::iterator end();
+    std::vector<Codepoint>::const_iterator begin() const;
+    std::vector<Codepoint>::const_iterator end() const;
+
     CodepointString substring(size_t start) const;
     CodepointString substring(size_t start, size_t length) const;
     CodepointString trim(TrimDirection direction = TrimDirection::Both) const;
