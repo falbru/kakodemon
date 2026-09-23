@@ -3,7 +3,7 @@ REL_DIR := "build_rel"
 
 configure:
     mkdir -p {{BUILD_DIR}}
-    cd {{BUILD_DIR}} && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=true -DBUILD_TESTS=true
+    cd {{BUILD_DIR}} && cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=true -DBUILD_TESTS=true
 
 configure-rel:
     mkdir -p {{REL_DIR}}
