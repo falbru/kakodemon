@@ -27,11 +27,17 @@ install-rel: build-rel
 test-all: build
     cd {{BUILD_DIR}} && ctest --output-on-failure -j $(nproc)
 
+test-tag TAG: build
+    cd {{BUILD_DIR}} && ctest --output-on-failure -L "^{{TAG}}$"
+
 test TEST: build
     cd {{BUILD_DIR}} && ctest --output-on-failure -R "^{{TEST}}$"
 
 test-all-rel: build-rel
     cd {{REL_DIR}} && ctest --output-on-failure -j $(nproc)
+
+test-tag-rel TAG: build-rel
+    cd {{REL_DIR}} && ctest --output-on-failure -L "^{{TAG}}$"
 
 test-rel TEST: build-rel
     cd {{REL_DIR}} && ctest --output-on-failure -R "^{{TEST}}$"
