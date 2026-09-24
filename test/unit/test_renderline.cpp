@@ -362,3 +362,68 @@ TEST_CASE("RenderLine faceSpanIteratorFromIndex", "[RenderLine]")
     REQUIRE(render_line.faceSpanIteratorFromIndex(29).base() == &render_line.getFaceSpans()[6]);
     REQUIRE(render_line.faceSpanIteratorFromIndex(32).base() == &render_line.getFaceSpans()[7]);
 }
+
+TEST_CASE("RenderLine split", "[RenderLine]")
+{
+    GlyphResolverMock glyph_resolver(10);
+    auto face1 = domain::Face(domain::FixedColor::White, domain::FixedColor::Black, {});
+    auto face2 = domain::Face(domain::FixedColor::Red, domain::FixedColor::White, {});
+
+    domain::RenderLine line(domain::Line({domain::Atom(domain::CodepointString("HELLO"), face1),
+                                          domain::Atom(domain::CodepointString(" WORLD"), face2)}),
+                            glyph_resolver);
+
+    SECTION("If start is higher than length")
+    {
+        auto split = line.split(100, 150);
+
+        REQUIRE(split.size() == 0);
+        REQUIRE(split.getFaceSpans().size() == 0);
+    }
+
+    SECTION("If start is higher than end")
+    {
+        auto split = line.split(4, 3);
+
+        REQUIRE(split.size() == 0);
+        REQUIRE(split.getFaceSpans().size() == 0);
+
+        split = line.split(3, 3);
+
+        REQUIRE(split.size() == 0);
+        REQUIRE(split.getFaceSpans().size() == 0);
+    }
+
+    SECTION("Split to one glyph")
+    {
+        auto split = line.split(3, 4);
+
+        REQUIRE(split.size() == 1);
+        REQUIRE(split.getGlyphs()[0].codepoint == 'L');
+        REQUIRE(split.getFaceSpans().size() == 1);
+        REQUIRE(split.getFaceSpans()[0].start_index == 0);
+        REQUIRE(split.getFaceSpans()[0].face == face1);
+    }
+
+    SECTION("Split to the end")
+    {
+        auto split = line.split(2, line.size());
+
+        REQUIRE(split.size() == 9);
+        REQUIRE(split.getGlyphs()[0].codepoint == 'L');
+        REQUIRE(split.getFaceSpans().size() == 2);
+        REQUIRE(split.getFaceSpans()[0].start_index == 0);
+        REQUIRE(split.getFaceSpans()[1].start_index == 3);
+    }
+
+    SECTION("If end is greater than glyph size, cap to glyph size")
+    {
+        auto split = line.split(2, 100);
+
+        REQUIRE(split.size() == 9);
+        REQUIRE(split.getGlyphs()[0].codepoint == 'L');
+        REQUIRE(split.getFaceSpans().size() == 2);
+        REQUIRE(split.getFaceSpans()[0].start_index == 0);
+        REQUIRE(split.getFaceSpans()[1].start_index == 3);
+    }
+}

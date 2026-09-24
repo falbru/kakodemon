@@ -3,6 +3,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/trompeloeil ${CMAKE_BINARY_DIR}/vend
 
 add_executable(tests
     unit/test_renderline.cpp
+    unit/test_renderlines.cpp
     unit/test_glyphline.cpp
     unit/test_glyphlines.cpp
     unit/test_glyphlinesbuilder.cpp
@@ -64,6 +65,7 @@ add_executable(tests
     ${CMAKE_SOURCE_DIR}/src/domain/glyphatom.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/glyphresolver.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/renderline.cpp
+    ${CMAKE_SOURCE_DIR}/src/domain/renderlines.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/facespan.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/glyphline.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/glyphlines.cpp

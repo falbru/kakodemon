@@ -25,6 +25,8 @@ class RenderLine
 
     void truncate(float max_width, GlyphResolver &glyph_resolver);
 
+    RenderLine split(size_t start, size_t end) const;
+
     std::vector<FaceSpan>::const_iterator faceSpanIteratorFromIndex(int index) const;
 
   private:

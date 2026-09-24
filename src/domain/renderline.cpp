@@ -126,6 +126,41 @@ void RenderLine::truncate(float max_width, GlyphResolver &glyph_resolver)
     m_glyphs.push_back(ellipsis_glyph);
 }
 
+RenderLine RenderLine::split(size_t start, size_t end) const
+{
+    if (start >= m_glyphs.size())
+    {
+        return RenderLine({}, {});
+    }
+    if (end > m_glyphs.size())
+    {
+        end = m_glyphs.size();
+    }
+    if (start >= end)
+    {
+        return RenderLine({}, {});
+    }
+
+    std::vector<GlyphMetrics> new_glyphs(m_glyphs.begin() + start, m_glyphs.begin() + end);
+
+    auto start_it = faceSpanIteratorFromIndex(start);
+    auto end_it = faceSpanIteratorFromIndex(end - 1);
+    std::vector<FaceSpan> new_face_spans(start_it, end_it + 1);
+    for (int i = 0; i < new_face_spans.size(); i++)
+    {
+        if (new_face_spans[i].start_index < start)
+        {
+            new_face_spans[i].start_index = 0;
+        }
+        else
+        {
+            new_face_spans[i].start_index -= start;
+        }
+    }
+
+    return RenderLine(new_glyphs, new_face_spans);
+}
+
 std::vector<FaceSpan>::const_iterator RenderLine::faceSpanIteratorFromIndex(int index) const
 {
     if (m_face_spans.empty())
