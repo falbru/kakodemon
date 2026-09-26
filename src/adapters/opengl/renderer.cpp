@@ -7,6 +7,7 @@
 #include "domain/face.hpp"
 #include "domain/glyphlinesbuilder.hpp"
 #include "domain/line.hpp"
+#include "domain/ports/font.hpp"
 #include "domain/ports/fontengine.hpp"
 #include "domain/ports/renderer.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
@@ -97,6 +98,48 @@ void opengl::Renderer::renderLine(const domain::TextRenderConfig &config, const 
     glBindVertexArray(m_text_vao);
 
     _renderLine(config, line, default_face, x, y, alignment, RenderPass::Both);
+
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void opengl::Renderer::renderLine(const domain::TextRenderConfig &config, const domain::RenderLine &line,
+                                  const domain::Face &default_face, float x, float y,
+                                  const domain::Alignment &alignment) const
+{
+    m_shader_program->use();
+    glBindVertexArray(m_text_vao);
+
+    _renderLine(config, line, default_face, x, y, alignment, RenderPass::Both);
+
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void opengl::Renderer::renderLines(const domain::TextRenderConfig &config, const domain::RenderLines &lines,
+                                   const domain::Face &default_face, float x, float y) const
+{
+    opengl::Font *opengl_font = dynamic_cast<opengl::Font *>(config.font);
+
+    if (!opengl_font)
+        return;
+
+    m_shader_program->use();
+
+    float y_it = y;
+    for (const auto &line : lines.getLines())
+    {
+        _renderLine(config, line, default_face, x, y_it, domain::Alignment(), RenderPass::BackgroundOnly);
+        y_it += config.font->getLineHeight();
+    }
+
+    glBindVertexArray(m_text_vao);
+    y_it = y;
+    for (const auto &line : lines.getLines())
+    {
+        _renderLine(config, line, default_face, x, y_it, domain::Alignment(), RenderPass::TextOnly);
+        y_it += config.font->getLineHeight();
+    }
 
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -278,6 +321,134 @@ void opengl::Renderer::_renderLine(const domain::TextRenderConfig &config, const
                 _renderRect(atom.getFace().getFg(resolved_default_face, config.color_overrides), atom_x,
                             y_it + font->getUnderlineOffset(), x_it - atom_x, font->getUnderlineThickness());
             }
+        }
+    }
+}
+
+void opengl::Renderer::_renderLine(const domain::TextRenderConfig &config, const domain::RenderLine &line,
+                                   const domain::Face &default_face, float x, float y,
+                                   const domain::Alignment &alignment, RenderPass pass) const
+{
+    opengl::Font *font = dynamic_cast<opengl::Font *>(config.font);
+
+    const domain::Face resolved_default_face =
+        domain::Face(default_face.getBg(config.default_face, config.color_overrides),
+                     default_face.getFg(
+                         config.default_face,
+                         config.color_overrides)); // TODO change architecture/types such that this is already resolved
+
+    float start_x = x;
+    float start_y = y + font->getLineHeight();
+
+    float x_it = start_x;
+    float y_it = start_y + font->getDescender();
+
+    const std::vector<domain::GlyphMetrics> &glyphs = line.getGlyphs();
+    const std::vector<domain::Span<domain::Face>> &face_spans = line.getFaceSpans();
+    const std::vector<domain::Span<domain::Font *>> &font_spans = line.getFontSpans();
+
+    if (pass == RenderPass::BackgroundOnly || pass == RenderPass::Both)
+    {
+        float x_it = start_x;
+        float y_it = start_y;
+
+        int glyph_index = 0;
+        int face_span_index = 0;
+
+        float atom_start_x = 0;
+        for (; glyph_index < glyphs.size(); glyph_index++)
+        {
+            if (face_span_index < face_spans.size() - 1 && glyph_index == face_spans[face_span_index + 1].start_index)
+            {
+                const auto &face = face_spans[face_span_index].value;
+
+                _renderRect(face.getBg(resolved_default_face, config.color_overrides), atom_start_x,
+                            y_it - font->getLineHeight(), x_it - atom_start_x, font->getLineHeight());
+
+                face_span_index++;
+                atom_start_x = x_it;
+            }
+
+            const auto &glyph = glyphs[glyph_index];
+
+            x_it += glyph.advance;
+        }
+
+        if (x_it - atom_start_x > 0 && face_span_index < face_spans.size())
+        {
+            const auto &face = face_spans[face_span_index].value;
+
+            _renderRect(face.getBg(resolved_default_face, config.color_overrides), atom_start_x,
+                        y_it - font->getLineHeight(), x_it - atom_start_x, font->getLineHeight());
+        }
+    }
+
+    if (pass == RenderPass::TextOnly || pass == RenderPass::Both)
+    {
+        int glyph_index = 0;
+        int face_span_index = 0;
+        int font_span_index = 0;
+
+        float atom_start_x = 0;
+        for (; glyph_index < glyphs.size(); glyph_index++)
+        {
+            if (face_span_index < face_spans.size() - 1 && glyph_index == face_spans[face_span_index + 1].start_index)
+            {
+                const auto &current_face = face_spans[face_span_index].value;
+
+                if (current_face.hasAttribute(domain::Attribute::Underline) && font->getUnderlineThickness() > 0)
+                {
+                    _renderRect(current_face.getFg(resolved_default_face, config.color_overrides), atom_start_x,
+                                y_it + font->getUnderlineOffset(), x_it - atom_start_x, font->getUnderlineThickness());
+                }
+
+                face_span_index++;
+                atom_start_x = x_it;
+            }
+
+            if (font_span_index < font_spans.size() - 1 && glyph_index == font_spans[font_span_index + 1].start_index)
+            {
+                font_span_index++;
+            }
+
+            const auto &glyph = glyphs[glyph_index];
+            const auto &face = face_spans[face_span_index].value;
+            const opengl::Font *glyph_font = dynamic_cast<opengl::Font *>(font_spans[font_span_index].value);
+
+            if (domain::isControlCharacter(glyph.codepoint))
+                continue;
+
+            const opengl::Glyph &opengl_glyph = glyph_font->getGlyph(glyph.codepoint);
+
+            if (opengl_glyph.format == domain::PixelFormat::GRAYSCALE)
+            {
+                m_shader_program->setRenderType(RenderType::Text);
+            }
+            else
+            {
+                m_shader_program->setRenderType(RenderType::ColoredText);
+            }
+
+            domain::RGBAColor color = face.getFg(resolved_default_face, config.color_overrides);
+            m_shader_program->setVector4f("textColor", color.r, color.g, color.b, color.a);
+
+            float xpos = x_it + glyph.bearing.x;
+            float ypos = y_it - glyph.bearing.y;
+
+            float w = glyph.size.x;
+            float h = glyph.size.y;
+            float vertices[6][4] = {
+                {xpos, ypos, 0.0f, 0.0f}, {xpos, ypos + h, 0.0f, 1.0f},     {xpos + w, ypos + h, 1.0f, 1.0f},
+
+                {xpos, ypos, 0.0f, 0.0f}, {xpos + w, ypos + h, 1.0f, 1.0f}, {xpos + w, ypos, 1.0f, 0.0f}};
+
+            glBindVertexArray(m_text_vao);
+            glBindTexture(GL_TEXTURE_2D, opengl_glyph.texture_id);
+            glBindBuffer(GL_ARRAY_BUFFER, m_text_vbo);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            x_it += glyph.advance;
         }
     }
 }

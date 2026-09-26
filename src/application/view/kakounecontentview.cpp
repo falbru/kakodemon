@@ -1,6 +1,8 @@
 #include "kakounecontentview.hpp"
 #include "application/view/rendercontext.hpp"
 #include "domain/geometry.hpp"
+#include "domain/glyphresolver.hpp"
+#include "domain/renderlines.hpp"
 
 KakouneContentView::KakouneContentView()
 {
@@ -15,9 +17,13 @@ void KakouneContentView::init(domain::Renderer *renderer, domain::Window *window
 void KakouneContentView::render(const RenderContext &render_context, const domain::Lines &lines,
                                 const domain::Face &default_face, const domain::Rectangle &bounds)
 {
+    domain::GlyphResolver glyph_resolver(render_context.ui_options.font_content, render_context.font_manager);
+    auto render_lines =
+        domain::RenderLines(lines, glyph_resolver, render_context.ui_options.font_content->getLineHeight());
+
     m_renderer->addBounds(bounds.left(), bounds.top(), bounds.width(), bounds.height());
-    m_renderer->renderLines(render_context.textConfig(render_context.ui_options.font_content), lines, default_face,
-                            bounds.left(), bounds.top());
+    m_renderer->renderLines(render_context.textConfig(render_context.ui_options.font_content), render_lines,
+                            default_face, bounds.left(), bounds.top());
     m_renderer->popBounds();
 }
 

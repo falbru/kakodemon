@@ -6,6 +6,8 @@
 #include "domain/line.hpp"
 #include "domain/lines.hpp"
 #include "domain/ports/font.hpp"
+#include "domain/renderline.hpp"
+#include "domain/renderlines.hpp"
 #include <unordered_map>
 
 namespace domain
@@ -52,6 +54,11 @@ class Renderer
     virtual void renderLine(const TextRenderConfig &config, const Line &line, const Face &default_face, float x,
                             float y, const Alignment &alignment = Alignment()) const = 0;
     virtual void renderLines(const TextRenderConfig &config, const Lines &lines, const domain::Face &default_face,
+                             float x, float y) const = 0;
+
+    virtual void renderLine(const TextRenderConfig &config, const RenderLine &line, const Face &default_face, float x,
+                            float y, const Alignment &alignment = Alignment()) const = 0;
+    virtual void renderLines(const TextRenderConfig &config, const RenderLines &lines, const domain::Face &default_face,
                              float x, float y) const = 0;
 };
 

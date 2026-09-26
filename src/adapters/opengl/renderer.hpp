@@ -8,6 +8,8 @@
 #include "domain/color.hpp"
 #include "domain/fontmanager.hpp"
 #include "domain/ports/renderer.hpp"
+#include "domain/renderline.hpp"
+#include "domain/renderlines.hpp"
 #include "shaderprogram.hpp"
 
 namespace opengl
@@ -42,12 +44,20 @@ class Renderer : public domain::Renderer
                     float x, float y, const domain::Alignment &alignment = domain::Alignment()) const override;
     void renderLines(const domain::TextRenderConfig &config, const domain::Lines &lines,
                      const domain::Face &default_face, float x, float y) const override;
+    virtual void renderLine(const domain::TextRenderConfig &config, const domain::RenderLine &line,
+                            const domain::Face &default_face, float x, float y,
+                            const domain::Alignment &alignment = domain::Alignment()) const;
+    virtual void renderLines(const domain::TextRenderConfig &config, const domain::RenderLines &lines,
+                             const domain::Face &default_face, float x, float y) const;
 
     static domain::FontFactory getFontFactory();
 
   private:
     void _renderLine(const domain::TextRenderConfig &config, const domain::Line &line, const domain::Face &default_face,
                      float x, float y, const domain::Alignment &alignment, RenderPass pass) const;
+    void _renderLine(const domain::TextRenderConfig &config, const domain::RenderLine &line,
+                     const domain::Face &default_face, float x, float y, const domain::Alignment &alignment,
+                     RenderPass pass) const;
     void _renderShadow(const domain::RGBAColor color, float x, float y, float width, float height,
                        float shadowRadius) const;
     void _renderRect(const domain::RGBAColor color, float x, float y, float width, float height) const;
