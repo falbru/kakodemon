@@ -1,10 +1,11 @@
 #ifndef RENDERLINE_HPP_INCLUDED
 #define RENDERLINE_HPP_INCLUDED
 
-#include "domain/facespan.hpp"
 #include "domain/glyphresolver.hpp"
+
 #include "domain/line.hpp"
 #include "domain/ports/font.hpp"
+#include "domain/span.hpp"
 
 namespace domain
 {
@@ -12,12 +13,14 @@ namespace domain
 class RenderLine
 {
   public:
-    RenderLine(std::vector<GlyphMetrics> glyphs, std::vector<FaceSpan> face_spans);
+    RenderLine(std::vector<GlyphMetrics> glyphs, std::vector<Span<Face>> face_spans,
+               std::vector<Span<Font *>> font_spans);
     RenderLine(const Line &line, GlyphResolver &glyph_resolver);
     ~RenderLine();
 
     const std::vector<GlyphMetrics> &getGlyphs() const;
-    const std::vector<FaceSpan> &getFaceSpans() const;
+    const std::vector<Span<Face>> &getFaceSpans() const;
+    const std::vector<Span<Font *>> &getFontSpans() const;
     size_t size() const;
 
     float width() const;
@@ -27,11 +30,10 @@ class RenderLine
 
     RenderLine split(size_t start, size_t end) const;
 
-    std::vector<FaceSpan>::const_iterator faceSpanIteratorFromIndex(int index) const;
-
   private:
     std::vector<GlyphMetrics> m_glyphs;
-    std::vector<FaceSpan> m_face_spans;
+    std::vector<Span<Face>> m_face_spans;
+    std::vector<Span<Font *>> m_font_spans;
 };
 
 } // namespace domain

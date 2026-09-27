@@ -11,6 +11,7 @@ add_executable(tests
     unit/test_cliparser.cpp
     unit/test_focusedclientstack.cpp
     unit/test_line.cpp
+    unit/test_span.cpp
     unit/test_color.cpp
     unit/test_masterclientcontroller.cpp
     unit/test_rectangle.cpp
@@ -66,7 +67,6 @@ add_executable(tests
     ${CMAKE_SOURCE_DIR}/src/domain/glyphresolver.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/renderline.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/renderlines.cpp
-    ${CMAKE_SOURCE_DIR}/src/domain/facespan.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/glyphline.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/glyphlines.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/glyphlinesbuilder.cpp

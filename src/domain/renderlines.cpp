@@ -4,7 +4,6 @@
 #include "domain/renderline.hpp"
 
 #include <algorithm>
-#include <iostream>
 #include <stdexcept>
 
 namespace domain

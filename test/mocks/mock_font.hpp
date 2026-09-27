@@ -22,7 +22,7 @@ class FontMock : public domain::Font
 
     const domain::GlyphMetrics &getFallbackGlyphMetrics() const override
     {
-        static domain::GlyphMetrics fallback{.codepoint = 0xFFFD, .size = {10, 10}, .bearing = {0, 0}, .advance = 640};
+        static domain::GlyphMetrics fallback{.codepoint = 0xFFFD, .size = {10, 10}, .bearing = {0, 0}, .advance = 10};
         return fallback;
     }
 

@@ -90,7 +90,7 @@ set(SRC
     src/domain/fontmanager.cpp
     src/domain/geometry.cpp
     src/domain/renderline.cpp
-    src/domain/facespan.cpp
+    src/domain/renderlines.cpp
     src/domain/glyphatom.cpp
     src/domain/glyphresolver.cpp
     src/domain/glyphline.cpp

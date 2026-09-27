@@ -12,6 +12,7 @@ class GlyphResolver
     GlyphResolver(Font *primary_font, FontManager *font_manager);
 
     virtual const GlyphMetrics &resolveGlyph(Codepoint c);
+    virtual GlyphWithFont resolveGlyphWithFont(Codepoint c);
 
   private:
     Font *m_primary_font;

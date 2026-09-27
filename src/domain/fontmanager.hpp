@@ -14,7 +14,7 @@ namespace domain
 
 struct GlyphWithFont
 {
-    GlyphMetrics glyph;
+    const GlyphMetrics &glyph;
     Font *font;
 };
 

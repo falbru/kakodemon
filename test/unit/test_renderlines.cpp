@@ -3,15 +3,14 @@
 #include "domain/codepointstring.hpp"
 #include "domain/color.hpp"
 #include "domain/face.hpp"
-#include "domain/facespan.hpp"
 #include "domain/geometry.hpp"
-#include "domain/glyphlines.hpp"
-#include "domain/glyphresolver.hpp"
 #include "domain/line.hpp"
 #include "domain/lines.hpp"
 #include "domain/ports/font.hpp"
 #include "domain/renderline.hpp"
 #include "domain/renderlines.hpp"
+#include "domain/span.hpp"
+#include "mock_font.hpp"
 #include "mock_glyphresolver.hpp"
 
 TEST_CASE("RenderLines constructor with RenderLine vector argument", "[RenderLines]")
@@ -25,14 +24,19 @@ TEST_CASE("RenderLines constructor with RenderLine vector argument", "[RenderLin
 
     SECTION("Multiple lines")
     {
+        FontMock font1;
+
         domain::GlyphMetrics glyph = {
             .codepoint = 'a', .size = domain::UIVec2{20, 20}, .bearing = domain::IVec2{0, 0}, .advance = 20};
 
         domain::Face face1(domain::FixedColor::White, domain::FixedColor::Black, {});
 
         std::vector<domain::RenderLine> lines = {
-            domain::RenderLine({glyph, glyph}, {domain::FaceSpan(face1, 0)}),
-            domain::RenderLine({glyph, glyph, glyph}, {domain::FaceSpan(face1, 0), domain::FaceSpan(face1, 1)}),
+            domain::RenderLine({glyph, glyph}, {domain::Span<domain::Face>(face1, 0)},
+                               {domain::Span<domain::Font *>(&font1, 0)}),
+            domain::RenderLine({glyph, glyph, glyph},
+                               {domain::Span<domain::Face>(face1, 0), domain::Span<domain::Face>(face1, 1)},
+                               {domain::Span<domain::Font *>(&font1, 0)}),
         };
 
         domain::RenderLines render_lines(lines, 20.0f);
@@ -47,7 +51,8 @@ TEST_CASE("RenderLines constructor with RenderLine vector argument", "[RenderLin
 
 TEST_CASE("RenderLines constructor with Lines argument", "[RenderLines]")
 {
-    GlyphResolverMock glyph_resolver(20);
+    FontMock font1;
+    GlyphResolverMock glyph_resolver(20, &font1);
 
     SECTION("Empty")
     {
@@ -75,7 +80,8 @@ TEST_CASE("RenderLines constructor with Lines argument", "[RenderLines]")
 
 TEST_CASE("RenderLines size", "[RenderLines]")
 {
-    GlyphResolverMock glyph_resolver(10);
+    FontMock font1;
+    GlyphResolverMock glyph_resolver(10, &font1);
 
     SECTION("Empty")
     {
@@ -97,7 +103,8 @@ TEST_CASE("RenderLines size", "[RenderLines]")
 
 TEST_CASE("RenderLines width", "[RenderLines]")
 {
-    GlyphResolverMock glyph_resolver(10);
+    FontMock font1;
+    GlyphResolverMock glyph_resolver(10, &font1);
     domain::Face face1(domain::FixedColor::White, domain::FixedColor::Black, {});
 
     SECTION("Empty")
@@ -152,7 +159,8 @@ TEST_CASE("RenderLines width", "[RenderLines]")
 
 TEST_CASE("RenderLines height", "[RenderLines]")
 {
-    GlyphResolverMock glyph_resolver(10);
+    FontMock font1;
+    GlyphResolverMock glyph_resolver(10, &font1);
     domain::Face face1(domain::FixedColor::White, domain::FixedColor::Black, {});
 
     SECTION("Empty")
@@ -202,9 +210,21 @@ TEST_CASE("RenderLines height", "[RenderLines]")
 
 TEST_CASE("RenderLines wrap (WrapMode::CHARACTER)", "[RenderLines]")
 {
-    GlyphResolverMock glyph_resolver(10);
+    FontMock font1;
+    FontMock font2;
+    GlyphResolverMock glyph_resolver =
+        GlyphResolverMock(10, &font1).withResolveFont([&font1, &font2](domain::Codepoint c) {
+            if (c == 'X')
+            {
+                return &font2;
+            }
+            return &font1;
+        });
+
     domain::Face face1(domain::FixedColor::White, domain::FixedColor::Black, {});
-    domain::Line line1({domain::Atom(domain::CodepointString("HELLO"), face1)});
+    domain::Face face2(domain::FixedColor::Red, domain::FixedColor::Black, {});
+    domain::Line line1(
+        {domain::Atom(domain::CodepointString("HEX"), face1), domain::Atom(domain::CodepointString("XO"), face2)});
     domain::Line line2({domain::Atom(domain::CodepointString("WORLD!"), face1)});
     domain::Line line3({domain::Atom(domain::CodepointString("BYE"), face1)});
 
@@ -254,12 +274,79 @@ TEST_CASE("RenderLines wrap (WrapMode::CHARACTER)", "[RenderLines]")
 
     SECTION("Wrap a single line into two lines")
     {
+        domain::RenderLines render_lines(domain::Lines({line2}), glyph_resolver, 10.0f);
+
+        REQUIRE_NOTHROW(render_lines.wrap(33.0f, domain::RenderLinesWrapMode::CHARACTER));
+        REQUIRE(render_lines.size() == 2);
+
+        const auto &render_line1 = render_lines.getLines()[0];
+        const auto &render_line2 = render_lines.getLines()[1];
+
+        REQUIRE(render_line1.size() == 3);
+        REQUIRE(render_line2.size() == 3);
+
+        REQUIRE(render_line1.getFaceSpans().size() == 1);
+        REQUIRE(render_line2.getFaceSpans().size() == 1);
+        REQUIRE(render_line1.getFaceSpans()[0].start_index == 0);
+        REQUIRE(render_line1.getFaceSpans()[0].value == face1);
+        REQUIRE(render_line2.getFaceSpans()[0].start_index == 0);
+        REQUIRE(render_line2.getFaceSpans()[0].value == face1);
+
+        REQUIRE(render_line1.getFontSpans().size() == 1);
+        REQUIRE(render_line2.getFontSpans().size() == 1);
+        REQUIRE(render_line1.getFontSpans()[0].start_index == 0);
+        REQUIRE(render_line1.getFontSpans()[0].value == &font1);
+        REQUIRE(render_line2.getFontSpans()[0].start_index == 0);
+        REQUIRE(render_line2.getFontSpans()[0].value == &font1);
+        REQUIRE(render_lines.width() <= 33.0f);
+    }
+
+    SECTION("Wrap and divide a face span")
+    {
+        domain::RenderLines render_lines(domain::Lines({line1}), glyph_resolver, 10.0f);
+
+        REQUIRE_NOTHROW(render_lines.wrap(43.0f, domain::RenderLinesWrapMode::CHARACTER));
+        REQUIRE(render_lines.size() == 2);
+        REQUIRE(render_lines.getLines()[0].size() == 4);
+        REQUIRE(render_lines.getLines()[1].size() == 1);
+        REQUIRE(render_lines.getLines()[0].getFaceSpans().size() == 2);
+        REQUIRE(render_lines.getLines()[1].getFaceSpans().size() == 1);
+        REQUIRE(render_lines.getLines()[0].getFaceSpans()[0].start_index == 0);
+        REQUIRE(render_lines.getLines()[0].getFaceSpans()[1].start_index == 3);
+        REQUIRE(render_lines.getLines()[1].getFaceSpans()[0].start_index == 0);
+        REQUIRE(render_lines.width() <= 43.0f);
+    }
+
+    SECTION("Wrap and divide a font span")
+    {
         domain::RenderLines render_lines(domain::Lines({line1}), glyph_resolver, 10.0f);
 
         REQUIRE_NOTHROW(render_lines.wrap(33.0f, domain::RenderLinesWrapMode::CHARACTER));
         REQUIRE(render_lines.size() == 2);
-        REQUIRE(render_lines.getLines()[0].size() == 3);
-        REQUIRE(render_lines.getLines()[1].size() == 2);
+
+        auto render_line1 = render_lines.getLines()[0];
+        auto render_line2 = render_lines.getLines()[1];
+
+        REQUIRE(render_line1.size() == 3);
+        REQUIRE(render_line2.size() == 2);
+
+        REQUIRE(render_line1.getFaceSpans().size() == 1);
+        REQUIRE(render_line2.getFaceSpans().size() == 1);
+        REQUIRE(render_line1.getFaceSpans()[0].start_index == 0);
+        REQUIRE(render_line1.getFaceSpans()[0].value == face1);
+        REQUIRE(render_line2.getFaceSpans()[0].start_index == 0);
+        REQUIRE(render_line2.getFaceSpans()[0].value == face2);
+
+        REQUIRE(render_line1.getFontSpans().size() == 2);
+        REQUIRE(render_line2.getFontSpans().size() == 2);
+        REQUIRE(render_line1.getFontSpans()[0].start_index == 0);
+        REQUIRE(render_line1.getFontSpans()[0].value == &font1);
+        REQUIRE(render_line1.getFontSpans()[1].start_index == 2);
+        REQUIRE(render_line1.getFontSpans()[1].value == &font2);
+        REQUIRE(render_line2.getFontSpans()[0].start_index == 0);
+        REQUIRE(render_line2.getFontSpans()[0].value == &font2);
+        REQUIRE(render_line2.getFontSpans()[1].start_index == 1);
+        REQUIRE(render_line2.getFontSpans()[1].value == &font1);
         REQUIRE(render_lines.width() <= 33.0f);
     }
 
@@ -295,10 +382,23 @@ TEST_CASE("RenderLines wrap (WrapMode::CHARACTER)", "[RenderLines]")
 
 TEST_CASE("RenderLines wrap (WrapMode::WORD)", "[RenderLines]")
 {
-    GlyphResolverMock glyph_resolver(10);
+    FontMock font1;
+    FontMock font2;
+    GlyphResolverMock glyph_resolver =
+        GlyphResolverMock(10, &font1).withResolveFont([&font1, &font2](domain::Codepoint c) {
+            if (c == 'X')
+            {
+                return &font2;
+            }
+            return &font1;
+        });
+
     domain::Face face1(domain::FixedColor::White, domain::FixedColor::Black, {});
-    domain::Line line1({domain::Atom(domain::CodepointString("GOODBYE MEANS THAT"), face1)});
-    domain::Line line2({domain::Atom(domain::CodepointString("YOU'RE LOSING ME"), face1)});
+    domain::Face face2(domain::FixedColor::Red, domain::FixedColor::Black, {});
+
+    domain::Line line1({domain::Atom(domain::CodepointString("GOODBYE ME"), face1),
+                        domain::Atom(domain::CodepointString("ANS THAT"), face2)});
+    domain::Line line2({domain::Atom(domain::CodepointString("YOUXRE LOXXXG ME"), face1)});
     domain::Line line3({domain::Atom(domain::CodepointString("FOR LIFE"), face1)});
 
     domain::Lines lines(std::vector<domain::Line>{line1, line2, line3});
@@ -354,6 +454,50 @@ TEST_CASE("RenderLines wrap (WrapMode::WORD)", "[RenderLines]")
         REQUIRE(render_lines.getLines()[0].size() == 13);
         REQUIRE(render_lines.getLines()[1].size() == 4);
         REQUIRE(render_lines.width() <= 160.0f);
+    }
+
+    SECTION("Wrap and divide a face span")
+    {
+        domain::RenderLines render_lines(domain::Lines({line1}), glyph_resolver, 10.0f);
+
+        REQUIRE_NOTHROW(render_lines.wrap(160.0f, domain::RenderLinesWrapMode::WORD));
+        REQUIRE(render_lines.size() == 2);
+
+        const auto &render_line1 = render_lines.getLines()[0];
+        const auto &render_line2 = render_lines.getLines()[1];
+
+        REQUIRE(render_lines.getLines()[0].size() == 13);
+        REQUIRE(render_lines.getLines()[1].size() == 4);
+        REQUIRE(render_lines.getLines()[0].getFaceSpans().size() == 2);
+        REQUIRE(render_lines.getLines()[1].getFaceSpans().size() == 1);
+        REQUIRE(render_lines.getLines()[0].getFaceSpans()[0].start_index == 0);
+        REQUIRE(render_lines.getLines()[0].getFaceSpans()[0].value == face1);
+        REQUIRE(render_lines.getLines()[0].getFaceSpans()[1].start_index == 10);
+        REQUIRE(render_lines.getLines()[0].getFaceSpans()[1].value == face2);
+        REQUIRE(render_lines.getLines()[1].getFaceSpans()[0].start_index == 0);
+        REQUIRE(render_lines.getLines()[1].getFaceSpans()[0].value == face2);
+        REQUIRE(render_lines.width() <= 160.0f);
+    }
+
+    SECTION("Wrap and divide a font span")
+    {
+        domain::RenderLines render_lines(domain::Lines({line2}), glyph_resolver, 10.0f);
+
+        REQUIRE_NOTHROW(render_lines.wrap(100.0f, domain::RenderLinesWrapMode::WORD));
+
+        REQUIRE(render_lines.size() == 2);
+        REQUIRE(render_lines.getLines()[0].size() == 6);
+        REQUIRE(render_lines.getLines()[1].size() == 9);
+        REQUIRE(render_lines.getLines()[0].getGlyphs()[0].codepoint == 'Y');
+        REQUIRE(render_lines.getLines()[1].getGlyphs()[0].codepoint == 'L');
+        REQUIRE(render_lines.getLines()[0].getFontSpans().size() == 3);
+        REQUIRE(render_lines.getLines()[0].getFontSpans()[0].start_index == 0);
+        REQUIRE(render_lines.getLines()[0].getFontSpans()[1].start_index == 3);
+        REQUIRE(render_lines.getLines()[1].getFontSpans().size() == 3);
+        REQUIRE(render_lines.getLines()[1].getFontSpans()[0].start_index == 0);
+        REQUIRE(render_lines.getLines()[1].getFontSpans()[1].start_index == 2);
+        REQUIRE(render_lines.getLines()[1].getFontSpans()[2].start_index == 5);
+        REQUIRE(render_lines.width() <= 100.0f);
     }
 
     SECTION("Wrap multiple lines")

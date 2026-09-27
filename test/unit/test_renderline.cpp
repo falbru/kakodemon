@@ -4,10 +4,11 @@
 #include "domain/codepointstring.hpp"
 #include "domain/color.hpp"
 #include "domain/face.hpp"
-#include "domain/facespan.hpp"
 #include "domain/geometry.hpp"
 #include "domain/ports/font.hpp"
 #include "domain/renderline.hpp"
+#include "domain/span.hpp"
+#include "mock_font.hpp"
 #include "mock_glyphresolver.hpp"
 
 TEST_CASE("RenderLine constructor with glyphs and face_spans", "[RenderLine]")
@@ -31,26 +32,52 @@ TEST_CASE("RenderLine constructor with glyphs and face_spans", "[RenderLine]")
                                                     20,
                                                 }};
 
-    auto face1 = domain::Face(domain::FixedColor::White, domain::FixedColor::Black, {});
+    domain::Face face1(domain::FixedColor::White, domain::FixedColor::Black, {});
+    FontMock font1;
+
+    std::vector<domain::Span<domain::Face>> face_spans = {domain::Span<domain::Face>(face1, 0)};
+    std::vector<domain::Span<domain::Font *>> font_spans = {domain::Span<domain::Font *>(&font1, 0)};
+
+    SECTION("Empty")
+    {
+        REQUIRE_NOTHROW(domain::RenderLine({}, {}, {}));
+
+        domain::RenderLine render_line({}, {}, {});
+
+        REQUIRE(render_line.getGlyphs().size() == 0);
+        REQUIRE(render_line.getFaceSpans().size() == 0);
+        REQUIRE(render_line.getFontSpans().size() == 0);
+    }
 
     SECTION("Handle sorted face spans")
     {
-        std::vector<domain::FaceSpan> face_spans = {domain::FaceSpan(face1, 0)};
-        domain::RenderLine render_line(glyphs, face_spans);
+        domain::RenderLine render_line(glyphs, face_spans, font_spans);
 
         REQUIRE(render_line.getGlyphs().size() == 3);
         REQUIRE(render_line.getGlyphs()[0].codepoint == 'A');
         REQUIRE(render_line.getGlyphs()[1].codepoint == 'B');
         REQUIRE(render_line.getGlyphs()[2].codepoint == 'C');
         REQUIRE(render_line.getFaceSpans().size() == 1);
-        REQUIRE(render_line.getFaceSpans()[0].face == face1);
+        REQUIRE(render_line.getFaceSpans()[0].value == face1);
         REQUIRE(render_line.getFaceSpans()[0].start_index == 0);
+    }
+
+    SECTION("Throw when face size is empty for non-empty glyphs")
+    {
+        REQUIRE_THROWS(domain::RenderLine(glyphs, {}, font_spans));
+    }
+
+    SECTION("Throw when face size is non-empty for empty glyphs")
+    {
+        REQUIRE_THROWS(domain::RenderLine({}, face_spans, {}));
     }
 
     SECTION("Handle unsorted face spans")
     {
-        domain::RenderLine render_line(
-            glyphs, {domain::FaceSpan(face1, 2), domain::FaceSpan(face1, 0), domain::FaceSpan(face1, 1)});
+        domain::RenderLine render_line(glyphs,
+                                       {domain::Span<domain::Face>(face1, 2), domain::Span<domain::Face>(face1, 0),
+                                        domain::Span<domain::Face>(face1, 1)},
+                                       font_spans);
 
         REQUIRE(render_line.getFaceSpans().size() == 3);
         REQUIRE(render_line.getFaceSpans()[0].start_index == 0);
@@ -58,15 +85,57 @@ TEST_CASE("RenderLine constructor with glyphs and face_spans", "[RenderLine]")
         REQUIRE(render_line.getFaceSpans()[2].start_index == 2);
     }
 
-    SECTION("Handle face span start_index that exceeds glyph size")
+    SECTION("Throw when face span start_index that exceeds glyph size")
     {
-        REQUIRE_THROWS(domain::RenderLine(glyphs, {domain::FaceSpan(face1, 10), domain::FaceSpan(face1, 0)}));
+        REQUIRE_THROWS(domain::RenderLine(
+            glyphs, {domain::Span<domain::Face>(face1, 10), domain::Span<domain::Face>(face1, 0)}, font_spans));
+    }
+
+    SECTION("Throw when font size is empty for non-empty glyphs")
+    {
+        REQUIRE_THROWS(domain::RenderLine(glyphs, face_spans, {}));
+    }
+
+    SECTION("Throw when font size is non-empty for empty glyphs")
+    {
+        REQUIRE_THROWS(domain::RenderLine({}, {}, font_spans));
+    }
+
+    SECTION("Handle unsorted font spans")
+    {
+        domain::RenderLine render_line(glyphs, face_spans,
+                                       {domain::Span<domain::Font *>(&font1, 2),
+                                        domain::Span<domain::Font *>(&font1, 0),
+                                        domain::Span<domain::Font *>(&font1, 1)});
+
+        REQUIRE(render_line.getFontSpans().size() == 3);
+        REQUIRE(render_line.getFontSpans()[0].start_index == 0);
+        REQUIRE(render_line.getFontSpans()[1].start_index == 1);
+        REQUIRE(render_line.getFontSpans()[2].start_index == 2);
+    }
+
+    SECTION("Throw when font span start_index that exceeds glyph size")
+    {
+        REQUIRE_THROWS(domain::RenderLine(
+            glyphs, face_spans, {domain::Span<domain::Font *>(&font1, 10), domain::Span<domain::Font *>(&font1, 0)}));
     }
 }
 
 TEST_CASE("RenderLine constructor with line and glyph resolver", "[RenderLine]")
 {
-    auto glyph_resolver = GlyphResolverMock(10);
+    FontMock font1;
+    FontMock font2;
+
+    auto glyph_resolver = GlyphResolverMock(10, &font1).withResolveFont([&font1, &font2](domain::Codepoint c) {
+        if (c == 'X')
+        {
+            return &font2;
+        }
+        else
+        {
+            return &font1;
+        }
+    });
 
     auto face1 = domain::Face(domain::FixedColor::White, domain::FixedColor::Black, {});
     auto face2 = domain::Face(domain::FixedColor::Red, domain::FixedColor::Blue, {});
@@ -78,6 +147,7 @@ TEST_CASE("RenderLine constructor with line and glyph resolver", "[RenderLine]")
 
         REQUIRE(render_line.getGlyphs().size() == 0);
         REQUIRE(render_line.getFaceSpans().size() == 0);
+        REQUIRE(render_line.getFontSpans().size() == 0);
     }
 
     SECTION("Line with one atom")
@@ -90,8 +160,11 @@ TEST_CASE("RenderLine constructor with line and glyph resolver", "[RenderLine]")
         REQUIRE(render_line.getGlyphs()[1].codepoint == 'B');
         REQUIRE(render_line.getGlyphs()[2].codepoint == 'C');
         REQUIRE(render_line.getFaceSpans().size() == 1);
-        REQUIRE(render_line.getFaceSpans()[0].face == face1);
+        REQUIRE(render_line.getFaceSpans()[0].value == face1);
         REQUIRE(render_line.getFaceSpans()[0].start_index == 0);
+        REQUIRE(render_line.getFontSpans().size() == 1);
+        REQUIRE(render_line.getFontSpans()[0].value == &font1);
+        REQUIRE(render_line.getFontSpans()[0].start_index == 0);
     }
 
     SECTION("Line with multiple atoms")
@@ -108,10 +181,42 @@ TEST_CASE("RenderLine constructor with line and glyph resolver", "[RenderLine]")
         REQUIRE(render_line.getGlyphs()[4].codepoint == 'E');
         REQUIRE(render_line.getGlyphs()[5].codepoint == 'F');
         REQUIRE(render_line.getFaceSpans().size() == 2);
-        REQUIRE(render_line.getFaceSpans()[0].face == face1);
+        REQUIRE(render_line.getFaceSpans()[0].value == face1);
         REQUIRE(render_line.getFaceSpans()[0].start_index == 0);
-        REQUIRE(render_line.getFaceSpans()[1].face == face2);
+        REQUIRE(render_line.getFaceSpans()[1].value == face2);
         REQUIRE(render_line.getFaceSpans()[1].start_index == 3);
+        REQUIRE(render_line.getFontSpans().size() == 1);
+        REQUIRE(render_line.getFontSpans()[0].value == &font1);
+        REQUIRE(render_line.getFontSpans()[0].start_index == 0);
+    }
+
+    SECTION("Line with multiple fonts")
+    {
+        domain::Line line(
+            {domain::Atom(domain::CodepointString("ABX"), face1), domain::Atom(domain::CodepointString("XEX"), face2)});
+        domain::RenderLine render_line(line, glyph_resolver);
+
+        REQUIRE(render_line.getGlyphs().size() == 6);
+        REQUIRE(render_line.getGlyphs()[0].codepoint == 'A');
+        REQUIRE(render_line.getGlyphs()[1].codepoint == 'B');
+        REQUIRE(render_line.getGlyphs()[2].codepoint == 'X');
+        REQUIRE(render_line.getGlyphs()[3].codepoint == 'X');
+        REQUIRE(render_line.getGlyphs()[4].codepoint == 'E');
+        REQUIRE(render_line.getGlyphs()[5].codepoint == 'X');
+        REQUIRE(render_line.getFaceSpans().size() == 2);
+        REQUIRE(render_line.getFaceSpans()[0].value == face1);
+        REQUIRE(render_line.getFaceSpans()[0].start_index == 0);
+        REQUIRE(render_line.getFaceSpans()[1].value == face2);
+        REQUIRE(render_line.getFaceSpans()[1].start_index == 3);
+        REQUIRE(render_line.getFontSpans().size() == 4);
+        REQUIRE(render_line.getFontSpans()[0].value == &font1);
+        REQUIRE(render_line.getFontSpans()[0].start_index == 0);
+        REQUIRE(render_line.getFontSpans()[1].value == &font2);
+        REQUIRE(render_line.getFontSpans()[1].start_index == 2);
+        REQUIRE(render_line.getFontSpans()[2].value == &font1);
+        REQUIRE(render_line.getFontSpans()[2].start_index == 4);
+        REQUIRE(render_line.getFontSpans()[3].value == &font2);
+        REQUIRE(render_line.getFontSpans()[3].start_index == 5);
     }
 }
 
@@ -120,22 +225,25 @@ TEST_CASE("RenderLine size", "[RenderLine]")
     std::vector<domain::GlyphMetrics> glyphs = {domain::GlyphMetrics(), domain::GlyphMetrics(), domain::GlyphMetrics(),
                                                 domain::GlyphMetrics()};
     auto face1 = domain::Face(domain::FixedColor::White, domain::FixedColor::Black, {});
-    std::vector<domain::FaceSpan> face_spans = {domain::FaceSpan(face1, 0)};
+    std::vector<domain::Span<domain::Face>> face_spans = {domain::Span<domain::Face>(face1, 0)};
+
+    FontMock font1;
+    std::vector<domain::Span<domain::Font *>> font_spans = {domain::Span<domain::Font *>(&font1, 0)};
 
     SECTION("Empty RenderLine has size zero")
     {
-        REQUIRE(domain::RenderLine({}, {}).size() == 0);
+        REQUIRE(domain::RenderLine({}, {}, {}).size() == 0);
     }
 
     SECTION("RenderLine size is glyphs size not face_spans size")
     {
-        REQUIRE(domain::RenderLine(glyphs, face_spans).size() == 4);
+        REQUIRE(domain::RenderLine(glyphs, face_spans, font_spans).size() == 4);
     }
 }
 
 TEST_CASE("RenderLine width", "[RenderLine]")
 {
-    auto glyph_resolver = GlyphResolverMock(10);
+    auto glyph_resolver = GlyphResolverMock(10, nullptr);
 
     auto renderLineFromString = [&glyph_resolver](std::string string) {
         auto line = domain::Line({domain::Atom(
@@ -177,25 +285,38 @@ TEST_CASE("RenderLine height", "[RenderLine]")
                                                     20,
                                                 }};
 
-    std::vector<domain::FaceSpan> face_spans = {
-        domain::FaceSpan(domain::Face(domain::FixedColor::White, domain::FixedColor::Black, {}), 0)};
+    std::vector<domain::Span<domain::Face>> face_spans = {
+        domain::Span<domain::Face>(domain::Face(domain::FixedColor::White, domain::FixedColor::Black, {}), 0)};
+
+    FontMock font1;
+    std::vector<domain::Span<domain::Font *>> font_spans = {domain::Span<domain::Font *>(&font1, 0)};
 
     SECTION("Empty RenderLine has zero height")
     {
-        domain::RenderLine empty_render_line({}, {});
+        domain::RenderLine empty_render_line({}, {}, {});
         REQUIRE(empty_render_line.height() == 0);
     }
 
     SECTION("RenderLine with multiple glyphs")
     {
-        domain::RenderLine render_line(glyphs, face_spans);
+        domain::RenderLine render_line(glyphs, face_spans, font_spans);
         REQUIRE(render_line.height() == 50);
     }
 }
 
 TEST_CASE("RenderLine truncate", "[RenderLine]")
 {
-    auto glyph_resolver = GlyphResolverMock(10);
+    FontMock font1;
+    FontMock font2;
+
+    auto glyph_resolver = GlyphResolverMock(10, &font1).withResolveFont([&font1, &font2](domain::Codepoint c) {
+        if (c == 'X')
+        {
+            return &font1;
+        }
+
+        return &font2;
+    });
 
     auto face1 = domain::Face(domain::FixedColor::White, domain::FixedColor::Black, {});
     auto face2 = domain::Face(domain::FixedColor::Red, domain::FixedColor::Blue, {});
@@ -228,6 +349,7 @@ TEST_CASE("RenderLine truncate", "[RenderLine]")
         REQUIRE(render_line.size() == 5);
         REQUIRE(render_line.width() == 50.0f);
         REQUIRE(render_line.getFaceSpans().size() == 1);
+        REQUIRE(render_line.getFontSpans().size() == 1);
     }
 
     SECTION("max_width is less than a single glyph width")
@@ -240,6 +362,7 @@ TEST_CASE("RenderLine truncate", "[RenderLine]")
         REQUIRE(render_line.size() == 0);
         REQUIRE(render_line.width() == 0);
         REQUIRE(render_line.getFaceSpans().size() == 0);
+        REQUIRE(render_line.getFontSpans().size() == 0);
     }
 
     SECTION("only space for ellipsis")
@@ -253,6 +376,7 @@ TEST_CASE("RenderLine truncate", "[RenderLine]")
         REQUIRE(render_line.width() <= 15.0f);
         REQUIRE(render_line.getGlyphs()[0].codepoint == 0x2026);
         REQUIRE(render_line.getFaceSpans().size() == 1);
+        REQUIRE(render_line.getFontSpans().size() == 1);
     }
 
     SECTION("Single FaceSpan")
@@ -265,6 +389,7 @@ TEST_CASE("RenderLine truncate", "[RenderLine]")
         REQUIRE(render_line.size() == 3);
         REQUIRE(render_line.width() <= 35.0f);
         REQUIRE(render_line.getFaceSpans().size() == 1);
+        REQUIRE(render_line.getFontSpans().size() == 1);
     }
 
     SECTION("Multiple FaceSpan")
@@ -279,9 +404,10 @@ TEST_CASE("RenderLine truncate", "[RenderLine]")
         REQUIRE(render_line.width() <= 75.0f);
         REQUIRE(render_line.getGlyphs()[render_line.size() - 1].codepoint == 0x2026);
         REQUIRE(render_line.getFaceSpans().size() == 2);
+        REQUIRE(render_line.getFontSpans().size() == 1);
     }
 
-    SECTION("Multiple FaceSpan DELETE")
+    SECTION("FaceSpan gets deleted")
     {
         auto line = domain::Line({domain::Atom(domain::CodepointString("ABCDE"), face1),
                                   domain::Atom(domain::CodepointString("FGH"), face2)});
@@ -295,7 +421,7 @@ TEST_CASE("RenderLine truncate", "[RenderLine]")
         REQUIRE(render_line.getFaceSpans().size() == 1);
     }
 
-    SECTION("Multiple FaceSpans on border between FaceSpans")
+    SECTION("Truncate on border between FaceSpans")
     {
         auto line = domain::Line({domain::Atom(domain::CodepointString("ABCDE"), face1),
                                   domain::Atom(domain::CodepointString("FGH"), face2)});
@@ -307,6 +433,51 @@ TEST_CASE("RenderLine truncate", "[RenderLine]")
         REQUIRE(render_line.width() <= 50.0f);
         REQUIRE(render_line.getGlyphs()[render_line.size() - 1].codepoint == 0x2026);
         REQUIRE(render_line.getFaceSpans().size() == 1);
+    }
+
+    SECTION("Multiple FontSpan")
+    {
+        auto line = domain::Line({domain::Atom(domain::CodepointString("ABXXE"), face1),
+                                  domain::Atom(domain::CodepointString("FXH"), face2)});
+        auto render_line = domain::RenderLine(line, glyph_resolver);
+
+        render_line.truncate(75.0f, glyph_resolver);
+
+        REQUIRE(render_line.size() == 7);
+        REQUIRE(render_line.width() <= 75.0f);
+        REQUIRE(render_line.getGlyphs()[render_line.size() - 1].codepoint == 0x2026);
+        REQUIRE(render_line.getFaceSpans().size() == 2);
+        REQUIRE(render_line.getFontSpans().size() == 3);
+    }
+
+    SECTION("FontSpan gets deleted")
+    {
+        auto line = domain::Line({domain::Atom(domain::CodepointString("ABXXE"), face1),
+                                  domain::Atom(domain::CodepointString("FXH"), face2)});
+        auto render_line = domain::RenderLine(line, glyph_resolver);
+
+        render_line.truncate(45.0f, glyph_resolver);
+
+        REQUIRE(render_line.size() == 4);
+        REQUIRE(render_line.width() <= 45.0f);
+        REQUIRE(render_line.getGlyphs()[render_line.size() - 1].codepoint == 0x2026);
+        REQUIRE(render_line.getFaceSpans().size() == 1);
+        REQUIRE(render_line.getFontSpans().size() == 2);
+    }
+
+    SECTION("Truncate on border between FontSpans")
+    {
+        auto line = domain::Line({domain::Atom(domain::CodepointString("ABXXE"), face1),
+                                  domain::Atom(domain::CodepointString("FXH"), face2)});
+        auto render_line = domain::RenderLine(line, glyph_resolver);
+
+        render_line.truncate(35.0f, glyph_resolver);
+
+        REQUIRE(render_line.size() == 3);
+        REQUIRE(render_line.width() <= 35.0f);
+        REQUIRE(render_line.getGlyphs()[render_line.size() - 1].codepoint == 0x2026);
+        REQUIRE(render_line.getFaceSpans().size() == 1);
+        REQUIRE(render_line.getFontSpans().size() == 1);
     }
 
     SECTION("RenderLine.width() == max_width")
@@ -322,55 +493,25 @@ TEST_CASE("RenderLine truncate", "[RenderLine]")
         REQUIRE(render_line.getFaceSpans().size() == 1);
     }
 }
-TEST_CASE("RenderLine faceSpanIteratorFromIndex", "[RenderLine]")
-{
-
-    auto face1 = domain::Face(domain::FixedColor::White, domain::FixedColor::Black, {});
-    auto face2 = domain::Face(domain::FixedColor::Red, domain::FixedColor::Blue, {});
-
-    std::vector<domain::GlyphMetrics> glyphs;
-    glyphs.reserve(35);
-    for (int i = 0; i < 35; i++)
-    {
-        glyphs.emplace_back(domain::GlyphMetrics{
-            'A',
-            domain::UIVec2{20, 30},
-            domain::IVec2{0, 0},
-            20,
-        });
-    }
-
-    std::vector<domain::FaceSpan> spans({
-        domain::FaceSpan(face1, 0),
-        domain::FaceSpan(face1, 3),
-        domain::FaceSpan(face1, 5),
-        domain::FaceSpan(face1, 6),
-        domain::FaceSpan(face1, 10),
-        domain::FaceSpan(face1, 20),
-        domain::FaceSpan(face1, 25),
-        domain::FaceSpan(face1, 30),
-    });
-
-    domain::RenderLine render_line(glyphs, spans);
-
-    REQUIRE(render_line.faceSpanIteratorFromIndex(0).base() == &render_line.getFaceSpans()[0]);
-    REQUIRE(render_line.faceSpanIteratorFromIndex(2).base() == &render_line.getFaceSpans()[0]);
-    REQUIRE(render_line.faceSpanIteratorFromIndex(5).base() == &render_line.getFaceSpans()[2]);
-    REQUIRE(render_line.faceSpanIteratorFromIndex(5).base() == &render_line.getFaceSpans()[2]);
-    REQUIRE(render_line.faceSpanIteratorFromIndex(10).base() == &render_line.getFaceSpans()[4]);
-    REQUIRE(render_line.faceSpanIteratorFromIndex(21).base() == &render_line.getFaceSpans()[5]);
-    REQUIRE(render_line.faceSpanIteratorFromIndex(29).base() == &render_line.getFaceSpans()[6]);
-    REQUIRE(render_line.faceSpanIteratorFromIndex(32).base() == &render_line.getFaceSpans()[7]);
-}
 
 TEST_CASE("RenderLine split", "[RenderLine]")
 {
-    GlyphResolverMock glyph_resolver(10);
+    FontMock font1;
+    FontMock font2;
+
+    auto glyph_resolver = GlyphResolverMock(10, &font1).withResolveFont([&font1, &font2](domain::Codepoint c) {
+        if (c == 'X')
+        {
+            return &font2;
+        }
+        return &font1;
+    });
+
     auto face1 = domain::Face(domain::FixedColor::White, domain::FixedColor::Black, {});
     auto face2 = domain::Face(domain::FixedColor::Red, domain::FixedColor::White, {});
 
     domain::RenderLine line(domain::Line({domain::Atom(domain::CodepointString("HELLO"), face1),
-                                          domain::Atom(domain::CodepointString(" WORLD"), face2)}),
+                                          domain::Atom(domain::CodepointString("XWORLD"), face2)}),
                             glyph_resolver);
 
     SECTION("If start is higher than length")
@@ -379,6 +520,7 @@ TEST_CASE("RenderLine split", "[RenderLine]")
 
         REQUIRE(split.size() == 0);
         REQUIRE(split.getFaceSpans().size() == 0);
+        REQUIRE(split.getFontSpans().size() == 0);
     }
 
     SECTION("If start is higher than end")
@@ -392,6 +534,7 @@ TEST_CASE("RenderLine split", "[RenderLine]")
 
         REQUIRE(split.size() == 0);
         REQUIRE(split.getFaceSpans().size() == 0);
+        REQUIRE(split.getFontSpans().size() == 0);
     }
 
     SECTION("Split to one glyph")
@@ -402,7 +545,10 @@ TEST_CASE("RenderLine split", "[RenderLine]")
         REQUIRE(split.getGlyphs()[0].codepoint == 'L');
         REQUIRE(split.getFaceSpans().size() == 1);
         REQUIRE(split.getFaceSpans()[0].start_index == 0);
-        REQUIRE(split.getFaceSpans()[0].face == face1);
+        REQUIRE(split.getFaceSpans()[0].value == face1);
+        REQUIRE(split.getFontSpans().size() == 1);
+        REQUIRE(split.getFontSpans()[0].start_index == 0);
+        REQUIRE(split.getFontSpans()[0].value == &font1);
     }
 
     SECTION("Split to the end")
@@ -414,6 +560,13 @@ TEST_CASE("RenderLine split", "[RenderLine]")
         REQUIRE(split.getFaceSpans().size() == 2);
         REQUIRE(split.getFaceSpans()[0].start_index == 0);
         REQUIRE(split.getFaceSpans()[1].start_index == 3);
+        REQUIRE(split.getFontSpans().size() == 3);
+        REQUIRE(split.getFontSpans()[0].start_index == 0);
+        REQUIRE(split.getFontSpans()[0].value == &font1);
+        REQUIRE(split.getFontSpans()[1].start_index == 3);
+        REQUIRE(split.getFontSpans()[1].value == &font2);
+        REQUIRE(split.getFontSpans()[2].start_index == 4);
+        REQUIRE(split.getFontSpans()[2].value == &font1);
     }
 
     SECTION("If end is greater than glyph size, cap to glyph size")
@@ -425,5 +578,12 @@ TEST_CASE("RenderLine split", "[RenderLine]")
         REQUIRE(split.getFaceSpans().size() == 2);
         REQUIRE(split.getFaceSpans()[0].start_index == 0);
         REQUIRE(split.getFaceSpans()[1].start_index == 3);
+        REQUIRE(split.getFontSpans().size() == 3);
+        REQUIRE(split.getFontSpans()[0].start_index == 0);
+        REQUIRE(split.getFontSpans()[0].value == &font1);
+        REQUIRE(split.getFontSpans()[1].start_index == 3);
+        REQUIRE(split.getFontSpans()[1].value == &font2);
+        REQUIRE(split.getFontSpans()[2].start_index == 4);
+        REQUIRE(split.getFontSpans()[2].value == &font1);
     }
 }

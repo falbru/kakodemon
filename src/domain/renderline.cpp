@@ -1,23 +1,45 @@
 #include "renderline.hpp"
-#include "domain/facespan.hpp"
+#include "domain/face.hpp"
 #include "domain/glyphresolver.hpp"
+#include "domain/span.hpp"
 #include <algorithm>
 #include <stdexcept>
 
 namespace domain
 {
 
-RenderLine::RenderLine(std::vector<GlyphMetrics> glyphs, std::vector<FaceSpan> face_spans)
-    : m_glyphs(std::move(glyphs)), m_face_spans(std::move(face_spans))
+RenderLine::RenderLine(std::vector<GlyphMetrics> glyphs, std::vector<Span<Face>> face_spans,
+                       std::vector<Span<Font *>> font_spans)
+    : m_glyphs(std::move(glyphs)), m_face_spans(std::move(face_spans)), m_font_spans(std::move(font_spans))
 {
+    if (!(m_glyphs.empty() == m_face_spans.empty()))
+    {
+        throw std::invalid_argument("face spans can't be empty if glyphs exist");
+    }
+
+    if (!(m_glyphs.empty() == m_font_spans.empty()))
+    {
+        throw std::invalid_argument("font spans can't be empty if glyphs exist");
+    }
+
     if (!std::is_sorted(m_face_spans.begin(), m_face_spans.end()))
     {
         std::sort(m_face_spans.begin(), m_face_spans.end());
     }
 
+    if (!std::is_sorted(m_font_spans.begin(), m_font_spans.end()))
+    {
+        std::sort(m_font_spans.begin(), m_font_spans.end());
+    }
+
     if (m_face_spans.size() >= 1 && m_face_spans.at(m_face_spans.size() - 1).start_index >= m_glyphs.size())
     {
-        throw std::invalid_argument("start_index in FaceSpan exceeds glyphs size");
+        throw std::invalid_argument("start_index in face_spans exceeds glyphs size");
+    }
+
+    if (m_font_spans.size() >= 1 && m_font_spans.at(m_font_spans.size() - 1).start_index >= m_glyphs.size())
+    {
+        throw std::invalid_argument("start_index in font_spans exceeds glyphs size");
     }
 }
 
@@ -27,13 +49,24 @@ RenderLine::RenderLine(const Line &line, GlyphResolver &glyph_resolver)
     m_face_spans.reserve(line.size());
 
     int index = 0;
+
+    Font *prev_font = nullptr;
     for (const auto &atom : line.getAtoms())
     {
-        m_face_spans.push_back(FaceSpan(atom.getFace(), index));
+        m_face_spans.push_back(Span<Face>(atom.getFace(), index));
 
         for (const auto &codepoint : atom.getContents())
         {
-            m_glyphs.push_back(glyph_resolver.resolveGlyph(codepoint));
+            auto glyph_with_font = glyph_resolver.resolveGlyphWithFont(codepoint);
+
+            m_glyphs.push_back(glyph_with_font.glyph);
+
+            if (prev_font == nullptr || glyph_with_font.font != prev_font)
+            {
+                m_font_spans.push_back(Span<Font *>(glyph_with_font.font, index));
+                prev_font = glyph_with_font.font;
+            }
+
             index++;
         }
     }
@@ -48,9 +81,14 @@ const std::vector<GlyphMetrics> &RenderLine::getGlyphs() const
     return m_glyphs;
 }
 
-const std::vector<FaceSpan> &RenderLine::getFaceSpans() const
+const std::vector<Span<Face>> &RenderLine::getFaceSpans() const
 {
     return m_face_spans;
+}
+
+const std::vector<Span<Font *>> &RenderLine::getFontSpans() const
+{
+    return m_font_spans;
 }
 
 size_t RenderLine::size() const
@@ -92,6 +130,7 @@ void RenderLine::truncate(float max_width, GlyphResolver &glyph_resolver)
     {
         m_glyphs.clear();
         m_face_spans.clear();
+        m_font_spans.clear();
         return;
     }
 
@@ -112,14 +151,22 @@ void RenderLine::truncate(float max_width, GlyphResolver &glyph_resolver)
     {
         m_glyphs.clear();
         m_face_spans.erase(m_face_spans.begin() + 1, m_face_spans.end());
+        m_font_spans.erase(m_font_spans.begin() + 1, m_font_spans.end());
     }
     else
     {
-        auto face_span_it = faceSpanIteratorFromIndex(glyph_index);
+        auto face_span_it = spanIteratorFromIndex(m_face_spans, glyph_index);
         if (face_span_it != m_face_spans.end())
         {
             m_face_spans.erase(face_span_it + 1, m_face_spans.end());
         }
+
+        auto font_span_it = spanIteratorFromIndex(m_font_spans, glyph_index);
+        if (font_span_it != m_font_spans.end())
+        {
+            m_font_spans.erase(font_span_it + 1, m_font_spans.end());
+        }
+
         m_glyphs.erase(m_glyphs.begin() + glyph_index + 1, m_glyphs.end());
     }
 
@@ -130,7 +177,7 @@ RenderLine RenderLine::split(size_t start, size_t end) const
 {
     if (start >= m_glyphs.size())
     {
-        return RenderLine({}, {});
+        return RenderLine({}, {}, {});
     }
     if (end > m_glyphs.size())
     {
@@ -138,14 +185,14 @@ RenderLine RenderLine::split(size_t start, size_t end) const
     }
     if (start >= end)
     {
-        return RenderLine({}, {});
+        return RenderLine({}, {}, {});
     }
 
     std::vector<GlyphMetrics> new_glyphs(m_glyphs.begin() + start, m_glyphs.begin() + end);
 
-    auto start_it = faceSpanIteratorFromIndex(start);
-    auto end_it = faceSpanIteratorFromIndex(end - 1);
-    std::vector<FaceSpan> new_face_spans(start_it, end_it + 1);
+    auto face_start_it = spanIteratorFromIndex(m_face_spans, start);
+    auto face_end_it = spanIteratorFromIndex(m_face_spans, end - 1);
+    std::vector<Span<Face>> new_face_spans(face_start_it, face_end_it + 1);
     for (int i = 0; i < new_face_spans.size(); i++)
     {
         if (new_face_spans[i].start_index < start)
@@ -158,56 +205,22 @@ RenderLine RenderLine::split(size_t start, size_t end) const
         }
     }
 
-    return RenderLine(new_glyphs, new_face_spans);
-}
-
-std::vector<FaceSpan>::const_iterator RenderLine::faceSpanIteratorFromIndex(int index) const
-{
-    if (m_face_spans.empty())
+    auto font_start_it = spanIteratorFromIndex(m_font_spans, start);
+    auto font_end_it = spanIteratorFromIndex(m_font_spans, end - 1);
+    std::vector<Span<Font *>> new_font_spans(font_start_it, font_end_it + 1);
+    for (int i = 0; i < new_font_spans.size(); i++)
     {
-        return m_face_spans.end();
-    }
-
-    if (index < m_face_spans.front().start_index)
-    {
-        return m_face_spans.end();
-    }
-
-    if (index >= m_face_spans.back().start_index)
-    {
-        return m_face_spans.end() - 1;
-    }
-
-    size_t left = 0;
-    size_t right = m_face_spans.size() - 1;
-
-    while (left < right)
-    {
-        size_t mid = (left + right) / 2;
-
-        if (m_face_spans[mid].start_index <= index)
+        if (new_font_spans[i].start_index < start)
         {
-            if (mid + 1 < m_face_spans.size() && m_face_spans[mid + 1].start_index <= index)
-            {
-                left = mid + 1;
-            }
-            else
-            {
-                return m_face_spans.begin() + mid;
-            }
+            new_font_spans[i].start_index = 0;
         }
         else
         {
-            right = mid - 1;
+            new_font_spans[i].start_index -= start;
         }
     }
 
-    if (m_face_spans[left].start_index <= index)
-    {
-        return m_face_spans.begin() + left;
-    }
-
-    return m_face_spans.end();
+    return RenderLine(new_glyphs, new_face_spans, new_font_spans);
 }
 
 } // namespace domain
