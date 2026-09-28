@@ -2,7 +2,9 @@
 #include "application/view/layoutmanager.hpp"
 #include "application/view/styling.hpp"
 #include "domain/editor.hpp"
+#include "domain/glyphresolver.hpp"
 #include "domain/modeline.hpp"
+#include "domain/renderline.hpp"
 #include <variant>
 
 StatusBarView::StatusBarView()
@@ -28,8 +30,10 @@ void StatusBarView::render(const RenderContext &render_context, InputViewState &
 
     layout.pad(SPACING_SMALL);
 
-    m_renderer->renderLine(render_context.textConfig(render_context.ui_options.font_statusbar), mode_line.getModeLine(),
-                           mode_line.getDefaultFace(), layout.current().x + layout.current().width, layout.current().y,
+    domain::GlyphResolver glyph_resolver(render_context.ui_options.font_statusbar, render_context.font_manager);
+    m_renderer->renderLine(render_context.textConfig(render_context.ui_options.font_statusbar),
+                           domain::RenderLine(mode_line.getModeLine(), glyph_resolver), mode_line.getDefaultFace(),
+                           layout.current().x + layout.current().width, layout.current().y,
                            domain::Alignment::topRight());
 
     if (mode_line.getStatusLine().has_value())
