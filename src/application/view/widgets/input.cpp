@@ -1,6 +1,7 @@
 #include "input.hpp"
-#include "domain/glyphlinesbuilder.hpp"
+#include "domain/glyphresolver.hpp"
 #include "domain/line.hpp"
+#include "domain/renderline.hpp"
 
 Input::Input()
 {
@@ -10,14 +11,15 @@ void Input::render(domain::Renderer *renderer, const RenderContext &render_conte
                    const domain::StatusLine &input, const domain::Face &face, int cursor_column, InputViewState &state,
                    LayoutManager &layout)
 {
+    domain::GlyphResolver glyph_resolver(font, render_context.font_manager);
     auto input_layout = layout.sliceTop(height(font));
 
     if (input.getPrompt().size() > 0)
     {
-        auto prompt_layout = input_layout.sliceLeft(
-            domain::GlyphLinesBuilder::build(input.getPrompt(), font, render_context.font_manager).width());
+        domain::RenderLine prompt_render_line(input.getPrompt(), glyph_resolver);
+        auto prompt_layout = input_layout.sliceLeft(prompt_render_line.width());
 
-        renderer->renderLine(render_context.textConfig(font), input.getPrompt(), face, prompt_layout.current().x,
+        renderer->renderLine(render_context.textConfig(font), prompt_render_line, face, prompt_layout.current().x,
                              prompt_layout.current().y);
     }
 
@@ -28,24 +30,23 @@ void Input::render(domain::Renderer *renderer, const RenderContext &render_conte
     {
         domain::Line content_line = input.getContent();
 
-        float cursor_x =
-            domain::GlyphLinesBuilder::build(content_line.slice(0, cursor_column), font, render_context.font_manager)
-                .width();
+        domain::RenderLine content_partial_render_line(content_line.slice(0, cursor_column), glyph_resolver);
+        float cursor_x = content_partial_render_line.width();
         if (cursor_x < state.scroll_offset)
         {
             state.scroll_offset = cursor_x;
         }
 
-        float content_width = domain::GlyphLinesBuilder::build(content_line, font, render_context.font_manager).width();
+        domain::RenderLine content_full_render_line(content_line, glyph_resolver);
+        float content_width = content_full_render_line.width();
         float cursor_space = font->getGlyphMetrics(' ').advance;
         if (state.scroll_offset + input_layout.current().width > content_width + cursor_space)
         {
             state.scroll_offset = std::max(0.0f, content_width + cursor_space - input_layout.current().width);
         }
 
-        float cursor_x_right = domain::GlyphLinesBuilder::build(content_line.slice(0, cursor_column + 1), font,
-                                                                render_context.font_manager)
-                                   .width();
+        domain::RenderLine cursor_right_render_line(content_line.slice(0, cursor_column + 1), glyph_resolver);
+        float cursor_x_right = cursor_right_render_line.width();
         if (cursor_x_right - state.scroll_offset > input_layout.current().width)
         {
             state.scroll_offset = cursor_x_right - input_layout.current().width;
@@ -56,7 +57,8 @@ void Input::render(domain::Renderer *renderer, const RenderContext &render_conte
         state.scroll_offset = 0;
     }
 
-    renderer->renderLine(render_context.textConfig(font), input.getContent(), face,
+    domain::RenderLine content_render_line(input.getContent(), glyph_resolver);
+    renderer->renderLine(render_context.textConfig(font), content_render_line, face,
                          input_layout.current().x - state.scroll_offset, input_layout.current().y);
     renderer->popBounds();
 }

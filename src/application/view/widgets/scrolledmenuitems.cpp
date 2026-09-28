@@ -2,9 +2,9 @@
 #include "../styling.hpp"
 #include "domain/atom.hpp"
 #include "domain/codepointstring.hpp"
-#include "domain/glyphatom.hpp"
-#include "domain/glyphline.hpp"
-#include "domain/glyphlinesbuilder.hpp"
+#include "domain/glyphresolver.hpp"
+#include "domain/line.hpp"
+#include "domain/renderline.hpp"
 #include <optional>
 
 ScrolledMenuItems::ScrolledMenuItems(int max_visible_items) : m_max_visible_items(max_visible_items)
@@ -17,6 +17,7 @@ void ScrolledMenuItems::render(domain::Renderer *renderer, const RenderContext &
                                LayoutManager &layout)
 {
     domain::Font *font = render_context.ui_options.font_menu;
+    domain::GlyphResolver glyph_resolver(font, render_context.font_manager);
     auto items_layout = layout.copy();
     if (menu_items.items.size() > m_max_visible_items)
     {
@@ -43,21 +44,22 @@ void ScrolledMenuItems::render(domain::Renderer *renderer, const RenderContext &
             continue;
         }
 
-        auto item_left = domain::GlyphLinesBuilder::build(domain::Line({item.at(0)}).trim(domain::TrimDirection::Right),
-                                                          font, render_context.font_manager);
+        domain::Line item_left_line = domain::Line({item.at(0)}).trim(domain::TrimDirection::Right);
+        domain::RenderLine item_left_render_line(item_left_line, glyph_resolver);
 
-        std::optional<domain::GlyphLine> item_right =
-            item.getAtoms().size() > 1
-                ? std::make_optional(domain::GlyphLinesBuilder::build(
-                      domain::Line({item.at(item.getAtoms().size() - 1)}).trim(domain::TrimDirection::Left), font,
-                      render_context.font_manager))
-                : std::nullopt;
-
-        float item_right_width = item_right.has_value() ? item_right.value().width() : 0;
-
-        if (item_left.width() + item_right_width > items_layout.current().width)
+        std::optional<domain::RenderLine> item_right_render_line;
+        if (item.getAtoms().size() > 1)
         {
-            item_left.truncate(items_layout.current().width - item_right_width, font, render_context.font_manager);
+            domain::Line item_right_line =
+                domain::Line({item.at(item.getAtoms().size() - 1)}).trim(domain::TrimDirection::Left);
+            item_right_render_line = domain::RenderLine(item_right_line, glyph_resolver);
+        }
+
+        float item_right_width = item_right_render_line.has_value() ? item_right_render_line.value().width() : 0;
+
+        if (item_left_render_line.width() + item_right_width > items_layout.current().width)
+        {
+            item_left_render_line.truncate(items_layout.current().width - item_right_width, glyph_resolver);
         }
 
         if (i == selected_index)
@@ -70,13 +72,13 @@ void ScrolledMenuItems::render(domain::Renderer *renderer, const RenderContext &
         }
         domain::Face item_face = i == selected_index ? menu_items.selected_face : menu_items.face;
 
-        renderer->renderLine(render_context.textConfig(font), domain::GlyphLine({item_left}).toLine(), item_face,
+        renderer->renderLine(render_context.textConfig(font), item_left_render_line, item_face,
                              items_layout.current().x, items_layout.current().y);
-        if (item_right.has_value())
+        if (item_right_render_line.has_value())
         {
-            renderer->renderLine(render_context.textConfig(font), domain::GlyphLine({item_right.value()}).toLine(),
-                                 item_face, items_layout.current().x + items_layout.current().width,
-                                 items_layout.current().y, domain::Alignment::topRight());
+            renderer->renderLine(render_context.textConfig(font), item_right_render_line.value(), item_face,
+                                 items_layout.current().x + items_layout.current().width, items_layout.current().y,
+                                 domain::Alignment::topRight());
         }
 
         items_layout.sliceTop(font->getLineHeight());

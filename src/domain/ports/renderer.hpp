@@ -3,8 +3,6 @@
 
 #include "domain/alignment.hpp"
 #include "domain/color.hpp"
-#include "domain/line.hpp"
-#include "domain/lines.hpp"
 #include "domain/ports/font.hpp"
 #include "domain/renderline.hpp"
 #include "domain/renderlines.hpp"
@@ -51,10 +49,6 @@ class Renderer
                                    CornerRadius corner_radius) const = 0;
     virtual void renderRoundedRectWithShadow(const RGBAColor color, float x, float y, float width, float height,
                                              CornerRadius corner_radius, float shadow_radius) const = 0;
-    virtual void renderLine(const TextRenderConfig &config, const Line &line, const Face &default_face, float x,
-                            float y, const Alignment &alignment = Alignment()) const = 0;
-    virtual void renderLines(const TextRenderConfig &config, const Lines &lines, const domain::Face &default_face,
-                             float x, float y) const = 0;
 
     virtual void renderLine(const TextRenderConfig &config, const RenderLine &line, const Face &default_face, float x,
                             float y, const Alignment &alignment = Alignment()) const = 0;

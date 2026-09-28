@@ -40,15 +40,12 @@ class Renderer : public domain::Renderer
                            domain::CornerRadius corner_radius) const override;
     void renderRoundedRectWithShadow(const domain::RGBAColor color, float x, float y, float width, float height,
                                      domain::CornerRadius corner_radius, float shadow_radius) const override;
-    void renderLine(const domain::TextRenderConfig &config, const domain::Line &line, const domain::Face &default_face,
-                    float x, float y, const domain::Alignment &alignment = domain::Alignment()) const override;
-    void renderLines(const domain::TextRenderConfig &config, const domain::Lines &lines,
-                     const domain::Face &default_face, float x, float y) const override;
+
     virtual void renderLine(const domain::TextRenderConfig &config, const domain::RenderLine &line,
                             const domain::Face &default_face, float x, float y,
-                            const domain::Alignment &alignment = domain::Alignment()) const;
+                            const domain::Alignment &alignment = domain::Alignment()) const override;
     virtual void renderLines(const domain::TextRenderConfig &config, const domain::RenderLines &lines,
-                             const domain::Face &default_face, float x, float y) const;
+                             const domain::Face &default_face, float x, float y) const override;
 
     static domain::FontFactory getFontFactory();
 

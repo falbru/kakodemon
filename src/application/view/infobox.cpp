@@ -3,9 +3,8 @@
 #include "application/view/styling.hpp"
 #include "domain/editor.hpp"
 #include "domain/geometry.hpp"
-#include "domain/glyphline.hpp"
-#include "domain/glyphlines.hpp"
-#include "domain/glyphlinesbuilder.hpp"
+#include "domain/glyphresolver.hpp"
+#include "domain/renderlines.hpp"
 #include "infobox.hpp"
 #include <algorithm>
 #include <cstddef>
@@ -162,18 +161,18 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
                          const domain::Rectangle &bounds)
 {
     domain::Font *font = render_context.ui_options.font_infobox;
+    domain::GlyphResolver glyph_resolver(font, render_context.font_manager);
 
-    auto glyph_lines = domain::GlyphLinesBuilder::build(info_box.content, render_context.ui_options.font_infobox,
-                                                        render_context.font_manager);
-    glyph_lines.wrap(MAX_WIDTH, domain::WrapMode::WORD);
+    auto render_lines = domain::RenderLines(info_box.content, glyph_resolver, font->getLineHeight());
+    render_lines.wrap(MAX_WIDTH, domain::RenderLinesWrapMode::WORD);
+
+    domain::RenderLine title_render_line(info_box.title, glyph_resolver);
+    float title_width = title_render_line.width();
 
     int info_box_width =
-        static_cast<int>(std::max(
-            glyph_lines.width(),
-            domain::GlyphLinesBuilder::build(info_box.title, render_context.ui_options.font_infobox).width())) +
-        SPACING_MEDIUM * 2 + BORDER_THICKNESS * 2;
+        static_cast<int>(std::max(render_lines.width(), title_width)) + SPACING_MEDIUM * 2 + BORDER_THICKNESS * 2;
 
-    int info_box_height = (int)(glyph_lines.height() + SPACING_MEDIUM * 2 + BORDER_THICKNESS * 2);
+    int info_box_height = (int)(render_lines.height() + SPACING_MEDIUM * 2 + BORDER_THICKNESS * 2);
     if (info_box.title.size() > 0)
     {
         info_box_height += font->getLineHeight() + BORDER_THICKNESS + SPACING_SMALL + SPACING_MEDIUM;
@@ -207,7 +206,7 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
 
     if (info_box.title.size() > 0)
     {
-        m_renderer->renderLine(render_context.textConfig(font), info_box.title, info_box.default_face,
+        m_renderer->renderLine(render_context.textConfig(font), title_render_line, info_box.default_face,
                                layout.current().x, layout.current().y);
 
         layout.gapY(font->getLineHeight());
@@ -223,8 +222,7 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
     }
 
     float line_height = font->getLineHeight();
-    auto lines = glyph_lines.toLines();
-    int total_lines = lines.size();
+    int total_lines = render_lines.size();
     int visible_lines = static_cast<int>(placement->height() / line_height);
     bool needs_scroll = total_lines > visible_lines;
 
@@ -243,7 +241,7 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
     float y_pos = content_layout.current().y;
     for (int i = start_line; i < end_line; i++)
     {
-        m_renderer->renderLine(render_context.textConfig(font), lines.at(i), info_box.default_face,
+        m_renderer->renderLine(render_context.textConfig(font), render_lines.getLines().at(i), info_box.default_face,
                                content_layout.current().x, y_pos);
         y_pos += line_height;
     }

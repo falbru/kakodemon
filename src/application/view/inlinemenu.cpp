@@ -1,6 +1,7 @@
 #include "inlinemenu.hpp"
 #include "domain/color.hpp"
-#include "domain/glyphlinesbuilder.hpp"
+#include "domain/glyphresolver.hpp"
+#include "domain/renderline.hpp"
 #include "styling.hpp"
 #include "widgets/scrolledmenuitems.hpp"
 
@@ -42,6 +43,7 @@ void InlineMenuView::render(const RenderContext &render_context, MenuViewState &
         return;
 
     domain::Font *font = render_context.ui_options.font_menu;
+    domain::GlyphResolver glyph_resolver(font, render_context.font_manager);
     auto anchor = menu.getItems().anchor;
 
     auto menu_position = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, anchor,
@@ -50,7 +52,8 @@ void InlineMenuView::render(const RenderContext &render_context, MenuViewState &
     auto menu_item_width = 0.0f;
     for (const auto &item : menu.getItems().items)
     {
-        auto item_width = domain::GlyphLinesBuilder::build(item, font, render_context.font_manager).width();
+        domain::RenderLine item_render_line(item, glyph_resolver);
+        auto item_width = item_render_line.width();
         menu_item_width = std::max(menu_item_width, item_width);
     }
     m_width = std::min(menu_item_width + BORDER_THICKNESS * 2.0f + SPACING_MEDIUM * 2.0f +

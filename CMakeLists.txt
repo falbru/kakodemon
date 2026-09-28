@@ -91,11 +91,7 @@ set(SRC
     src/domain/geometry.cpp
     src/domain/renderline.cpp
     src/domain/renderlines.cpp
-    src/domain/glyphatom.cpp
     src/domain/glyphresolver.cpp
-    src/domain/glyphline.cpp
-    src/domain/glyphlines.cpp
-    src/domain/glyphlinesbuilder.cpp
     src/domain/line.cpp
     src/domain/lines.cpp
     src/domain/menu.cpp
