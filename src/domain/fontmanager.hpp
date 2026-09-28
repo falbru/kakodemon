@@ -27,13 +27,13 @@ class FontManager
   public:
     FontManager(std::unique_ptr<FontResolver> resolver, FontEngineFactory engine_factory, FontFactory font_factory);
 
-    virtual Font *getFontFromName(const std::string &pattern);
-    virtual Font *getDefaultFont(int size);
-    virtual Font *getFontForCodepoint(Codepoint c, Font *primary_font);
-    virtual Font *getFontStyleVariant(Font *base_font, FontStyle style);
+    Font *getFontFromName(const std::string &pattern);
+    Font *getDefaultFont(int size);
+    Font *getFontForCodepoint(Codepoint c, Font *primary_font);
+    Font *getFontStyleVariant(Font *base_font, FontStyle style);
 
-    virtual const GlyphMetrics &getGlyph(Codepoint c, Font *primary_font);
-    virtual GlyphWithFont getGlyphWithFont(Codepoint c, Font *primary_font);
+    const GlyphMetrics &getGlyph(Codepoint c, Font *primary_font);
+    GlyphWithFont getGlyphWithFont(Codepoint c, Font *primary_font);
 
   private:
     struct CachedFont
