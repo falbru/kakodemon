@@ -32,12 +32,14 @@ git clone --recurse-submodules https://github.com/falbru/kakodemon
 
 3. Build and install the project
 
+`cd` into the newly cloned kakodemon project.
+
 If you have [just](https://just.systems/) installed:
 ```sh
 sudo just install-rel
 ```
 
-Otherwise, `cd` into the newly cloned kakodemon project, then:
+Otherwise:
 
 ```sh
 mkdir build
