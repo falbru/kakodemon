@@ -163,7 +163,7 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
     domain::Font *font = render_context.ui_options.font_infobox;
     domain::GlyphResolver glyph_resolver(font, render_context.font_manager);
 
-    auto render_lines = domain::RenderLines(info_box.content, glyph_resolver, font->getLineHeight());
+    auto render_lines = domain::RenderLines(info_box.content, glyph_resolver, std::floor(font->getLineHeight() * render_context.ui_options.line_height_scale / 100.0f));
     render_lines.wrap(MAX_WIDTH, domain::RenderLinesWrapMode::WORD);
 
     domain::RenderLine title_render_line(info_box.title, glyph_resolver);
@@ -221,9 +221,8 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
         layout.gapY(SPACING_MEDIUM);
     }
 
-    float line_height = font->getLineHeight();
     int total_lines = render_lines.size();
-    int visible_lines = static_cast<int>(placement->height() / line_height);
+    int visible_lines = static_cast<int>(placement->height() / render_lines.getLineHeight());
     bool needs_scroll = total_lines > visible_lines;
 
     int max_scroll = std::max(0, total_lines - visible_lines);
@@ -243,7 +242,7 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
     {
         m_renderer->renderLine(render_context.textConfig(font), render_lines.getLines().at(i), info_box.default_face,
                                content_layout.current().x, y_pos);
-        y_pos += line_height;
+        y_pos += render_lines.getLineHeight();
     }
 
     if (needs_scroll)
