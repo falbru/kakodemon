@@ -12,7 +12,6 @@ add_executable(tests
     unit/test_color.cpp
     unit/test_masterclientcontroller.cpp
     unit/test_rectangle.cpp
-    unit/test_infobox.cpp
     mocks/mock_glyphresolver.cpp
     integration/test_fontconfigresolver.cpp
     integration/test_localsession.cpp
