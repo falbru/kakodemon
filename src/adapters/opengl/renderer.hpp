@@ -51,10 +51,10 @@ class Renderer : public domain::Renderer
 
   private:
     void _renderLine(const domain::TextRenderConfig &config, const domain::Line &line, const domain::Face &default_face,
-                     float x, float y, const domain::Alignment &alignment, RenderPass pass) const;
+                     float x, float y, float line_height, const domain::Alignment &alignment, RenderPass pass) const;
     void _renderLine(const domain::TextRenderConfig &config, const domain::RenderLine &line,
-                     const domain::Face &default_face, float x, float y, const domain::Alignment &alignment,
-                     RenderPass pass) const;
+                     const domain::Face &default_face, float x, float y, float line_height,
+                     const domain::Alignment &alignment, RenderPass pass) const;
     void _renderShadow(const domain::RGBAColor color, float x, float y, float width, float height,
                        float shadowRadius) const;
     void _renderRect(const domain::RGBAColor color, float x, float y, float width, float height) const;

@@ -25,6 +25,10 @@ void to_json(nlohmann::json &j, const UIOptions &ui_options)
     {
         j["kakodemon_font_content"] = ui_options.font_content.value();
     }
+    if (ui_options.line_height_scale.has_value())
+    {
+        j["kakodemon_line_height_scale"] = ui_options.line_height_scale.value();
+    }
     if (ui_options.color_border.has_value())
     {
         j["kakodemon_color_border"] = ui_options.color_border->color_string;
@@ -116,6 +120,10 @@ void from_json(const nlohmann::json &j, UIOptions &ui_options)
     if (j.contains("kakodemon_font_content"))
     {
         ui_options.font_content = j["kakodemon_font_content"];
+    }
+    if (j.contains("kakodemon_line_height_scale"))
+    {
+        ui_options.line_height_scale = j["kakodemon_line_height_scale"];
     }
     if (j.contains("kakodemon_color_border"))
     {

@@ -60,38 +60,37 @@ PlacementConfig InfoBoxView::placementConfigByInfoBoxStyle(const RenderContext &
         }
 
     case domain::InfoStyle::INLINE: {
-        auto pos = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, info_box.anchor,
-                                                         cursor_origin.x, cursor_origin.y);
-        return {AnchorPlacement{
-                    {static_cast<int>(pos.first), static_cast<int>(pos.second),
-                     static_cast<int>(m_kakoune_content_view->getCellWidth(render_context.ui_options.font_content)),
-                     static_cast<int>(m_kakoune_content_view->getCellHeight(render_context.ui_options.font_content))},
-                    {PlacementDirection::BELOW, PlacementDirection::ABOVE, PlacementDirection::RIGHT,
-                     PlacementDirection::LEFT}},
+        auto pos = m_kakoune_content_view->coordToPixels(render_context.ui_options, info_box.anchor, cursor_origin.x,
+                                                         cursor_origin.y);
+        float scaled_cell_height = m_kakoune_content_view->getCellHeight(render_context.ui_options);
+        return {AnchorPlacement{{static_cast<int>(pos.first), static_cast<int>(pos.second),
+                                 static_cast<int>(m_kakoune_content_view->getCellWidth(render_context.ui_options)),
+                                 static_cast<int>(scaled_cell_height)},
+                                {PlacementDirection::BELOW, PlacementDirection::ABOVE, PlacementDirection::RIGHT,
+                                 PlacementDirection::LEFT}},
                 false};
     }
 
     case domain::InfoStyle::INLINE_ABOVE: {
-        auto pos = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, info_box.anchor,
-                                                         cursor_origin.x, cursor_origin.y);
-
-        return {AnchorPlacement{
-                    {static_cast<int>(pos.first), static_cast<int>(pos.second),
-                     static_cast<int>(m_kakoune_content_view->getCellWidth(render_context.ui_options.font_content)),
-                     static_cast<int>(m_kakoune_content_view->getCellHeight(render_context.ui_options.font_content))},
-                    {PlacementDirection::ABOVE, PlacementDirection::BELOW, PlacementDirection::RIGHT,
-                     PlacementDirection::LEFT}},
+        auto pos = m_kakoune_content_view->coordToPixels(render_context.ui_options, info_box.anchor, cursor_origin.x,
+                                                         cursor_origin.y);
+        float scaled_cell_height = m_kakoune_content_view->getCellHeight(render_context.ui_options);
+        return {AnchorPlacement{{static_cast<int>(pos.first), static_cast<int>(pos.second),
+                                 static_cast<int>(m_kakoune_content_view->getCellWidth(render_context.ui_options)),
+                                 static_cast<int>(scaled_cell_height)},
+                                {PlacementDirection::ABOVE, PlacementDirection::BELOW, PlacementDirection::RIGHT,
+                                 PlacementDirection::LEFT}},
                 false};
     }
 
     case domain::InfoStyle::INLINE_BELOW: {
-        auto pos = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, info_box.anchor,
-                                                         cursor_origin.x, cursor_origin.y);
-        return {AnchorPlacement{
-                    {static_cast<int>(pos.first), static_cast<int>(pos.second), 0,
-                     static_cast<int>(m_kakoune_content_view->getCellHeight(render_context.ui_options.font_content))},
-                    {PlacementDirection::BELOW, PlacementDirection::ABOVE, PlacementDirection::RIGHT,
-                     PlacementDirection::LEFT}},
+        auto pos = m_kakoune_content_view->coordToPixels(render_context.ui_options, info_box.anchor, cursor_origin.x,
+                                                         cursor_origin.y);
+        float scaled_cell_height = m_kakoune_content_view->getCellHeight(render_context.ui_options);
+        return {AnchorPlacement{{static_cast<int>(pos.first), static_cast<int>(pos.second), 0,
+                                 static_cast<int>(scaled_cell_height)},
+                                {PlacementDirection::BELOW, PlacementDirection::ABOVE, PlacementDirection::RIGHT,
+                                 PlacementDirection::LEFT}},
                 false};
     }
 
@@ -142,11 +141,12 @@ std::optional<domain::Rectangle> InfoBoxView::placeInfoBox(const RenderContext &
     if (std::holds_alternative<domain::BufferContentPosition>(cursor_position))
     {
         std::pair<float, float> pos = m_kakoune_content_view->coordToPixels(
-            render_context.ui_options.font_content, std::get<domain::BufferContentPosition>(cursor_position).coord,
-            cursor_origin.x, cursor_origin.y);
+            render_context.ui_options, std::get<domain::BufferContentPosition>(cursor_position).coord, cursor_origin.x,
+            cursor_origin.y);
+        float scaled_cell_height = m_kakoune_content_view->getCellHeight(render_context.ui_options);
 
         cursor_line = domain::Rectangle(cursor_origin.x, cursor_origin.y + pos.second, 1000,
-                                        m_kakoune_content_view->getCellHeight(render_context.ui_options.font_content));
+                                        static_cast<int>(scaled_cell_height));
     }
 
     return placeWithoutOverlap(bounds, domain::IVec2{info_box_width, info_box_height}, anchor, preferred_directions,

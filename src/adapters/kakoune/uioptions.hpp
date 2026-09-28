@@ -16,6 +16,7 @@ struct UIOptions
     std::optional<std::string> font_infobox;
     std::optional<std::string> font_statusbar;
     std::optional<std::string> font_content;
+    std::optional<std::string> line_height_scale;
     std::optional<Color> color_border;
     std::optional<Color> color_black;
     std::optional<Color> color_red;

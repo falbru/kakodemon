@@ -19,6 +19,7 @@ struct UIOptions
     Font *font_content = nullptr;
     OptionalColor color_border;
     std::unordered_map<FixedColor, RGBAColor> color_overrides;
+    int line_height_scale = 100;
 
     bool operator==(const UIOptions &other) const;
 };

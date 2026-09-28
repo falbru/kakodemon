@@ -31,12 +31,13 @@ class KakouneContentView
     domain::ObserverId onMouseScroll(std::function<void(KakouneClient *, domain::Coord, int)> callback);
     void removeObserver(domain::ObserverId id);
 
-    float getCellWidth(domain::Font *font) const;
-    float getCellHeight(domain::Font *font) const;
+    float getCellWidth(const domain::UIOptions &ui_options) const;
+    float getCellHeight(const domain::UIOptions &ui_options) const;
 
-    std::pair<float, float> coordToPixels(domain::Font *font, const domain::Coord &coord, float origin_x,
-                                          float origin_y) const;
-    domain::Coord pixelToCoord(domain::Font *font, float x, float y, float origin_x, float origin_y) const;
+    std::pair<float, float> coordToPixels(const domain::UIOptions &ui_options, const domain::Coord &coord,
+                                          float origin_x, float origin_y) const;
+    domain::Coord pixelToCoord(const domain::UIOptions &ui_options, float x, float y, float origin_x,
+                               float origin_y) const;
 
   private:
     domain::Renderer *m_renderer;

@@ -3,6 +3,8 @@
 #include "domain/geometry.hpp"
 #include "domain/glyphresolver.hpp"
 #include "domain/renderlines.hpp"
+#include "domain/uioptions.hpp"
+#include <cmath>
 
 KakouneContentView::KakouneContentView()
 {
@@ -18,8 +20,7 @@ void KakouneContentView::render(const RenderContext &render_context, const domai
                                 const domain::Face &default_face, const domain::Rectangle &bounds)
 {
     domain::GlyphResolver glyph_resolver(render_context.ui_options.font_content, render_context.font_manager);
-    auto render_lines =
-        domain::RenderLines(lines, glyph_resolver, render_context.ui_options.font_content->getLineHeight());
+    auto render_lines = domain::RenderLines(lines, glyph_resolver, getCellHeight(render_context.ui_options));
 
     m_renderer->addBounds(bounds.left(), bounds.top(), bounds.width(), bounds.height());
     m_renderer->renderLines(render_context.textConfig(render_context.ui_options.font_content), render_lines,
@@ -30,20 +31,20 @@ void KakouneContentView::render(const RenderContext &render_context, const domai
 void KakouneContentView::handleMouseButton(KakouneClient *client, domain::MouseButtonEvent event,
                                            domain::Rectangle bounds)
 {
-    domain::Coord coord = pixelToCoord(client->uiOptions().font_content, event.x, event.y, bounds.left(), bounds.top());
+    domain::Coord coord = pixelToCoord(client->uiOptions(), event.x, event.y, bounds.left(), bounds.top());
     m_mouse_button_observers.notify(client, event, coord);
 }
 
 void KakouneContentView::handleMouseMove(KakouneClient *client, float x, float y, domain::Rectangle bounds)
 {
-    domain::Coord coord = pixelToCoord(client->uiOptions().font_content, x, y, bounds.left(), bounds.top());
+    domain::Coord coord = pixelToCoord(client->uiOptions(), x, y, bounds.left(), bounds.top());
     m_mouse_move_observers.notify(client, coord);
 }
 
 void KakouneContentView::handleMouseScroll(KakouneClient *client, float x, float y, domain::Rectangle bounds,
                                            int amount)
 {
-    domain::Coord coord = pixelToCoord(client->uiOptions().font_content, x, y, bounds.left(), bounds.top());
+    domain::Coord coord = pixelToCoord(client->uiOptions(), x, y, bounds.left(), bounds.top());
     m_mouse_scroll_observers.notify(client, coord, amount);
 }
 
@@ -70,28 +71,33 @@ void KakouneContentView::removeObserver(domain::ObserverId id)
     m_mouse_scroll_observers.removeObserver(id);
 }
 
-float KakouneContentView::getCellWidth(domain::Font *font) const
+float KakouneContentView::getCellWidth(const domain::UIOptions &ui_options) const
 {
-    return font->getGlyphMetrics('A').advance;
+    return ui_options.font_content->getGlyphMetrics('A').advance;
 }
 
-float KakouneContentView::getCellHeight(domain::Font *font) const
+float KakouneContentView::getCellHeight(const domain::UIOptions &ui_options) const
 {
-    return font->getLineHeight();
+    return std::floor(ui_options.font_content->getLineHeight() * (ui_options.line_height_scale / 100.0f));
 }
 
-std::pair<float, float> KakouneContentView::coordToPixels(domain::Font *font, const domain::Coord &coord,
-                                                          float origin_x, float origin_y) const
+std::pair<float, float> KakouneContentView::coordToPixels(const domain::UIOptions &ui_options,
+                                                          const domain::Coord &coord, float origin_x,
+                                                          float origin_y) const
 {
-    float x = origin_x + getCellWidth(font) * coord.column;
-    float y = origin_y + getCellHeight(font) * coord.line;
+    float cell_width = getCellWidth(ui_options);
+    float cell_height = getCellHeight(ui_options);
+    float x = origin_x + cell_width * coord.column;
+    float y = origin_y + cell_height * coord.line;
     return {x, y};
 }
 
-domain::Coord KakouneContentView::pixelToCoord(domain::Font *font, float x, float y, float origin_x,
+domain::Coord KakouneContentView::pixelToCoord(const domain::UIOptions &ui_options, float x, float y, float origin_x,
                                                float origin_y) const
 {
-    int column = static_cast<int>((x - origin_x) / getCellWidth(font));
-    int line = static_cast<int>((y - origin_y) / getCellHeight(font));
+    float cell_width = getCellWidth(ui_options);
+    float cell_height = getCellHeight(ui_options);
+    int column = static_cast<int>((x - origin_x) / cell_width);
+    int line = static_cast<int>((y - origin_y) / cell_height);
     return {line, column};
 }

@@ -196,6 +196,26 @@ domain::UIOptions JsonRpcKakouneInterface::getUIOptions(domain::FontManager *fon
         ui_options.font_content = ui_options.font;
     }
 
+    if (m_ui_options.line_height_scale.has_value())
+    {
+        try
+        {
+            int scale = std::stoi(m_ui_options.line_height_scale.value());
+            if (scale > 0)
+            {
+                ui_options.line_height_scale = scale;
+            }
+            else
+            {
+                spdlog::warn("line_height_scale must be positive, got: {}", scale);
+            }
+        }
+        catch (const std::exception &e)
+        {
+            spdlog::warn("Invalid line_height_scale value: {}", m_ui_options.line_height_scale.value());
+        }
+    }
+
     if (m_ui_options.color_border.has_value())
     {
         try

@@ -46,8 +46,8 @@ void InlineMenuView::render(const RenderContext &render_context, MenuViewState &
     domain::GlyphResolver glyph_resolver(font, render_context.font_manager);
     auto anchor = menu.getItems().anchor;
 
-    auto menu_position = m_kakoune_content_view->coordToPixels(render_context.ui_options.font_content, anchor,
-                                                               content_bounds.left(), content_bounds.top());
+    auto menu_position = m_kakoune_content_view->coordToPixels(render_context.ui_options, anchor, content_bounds.left(),
+                                                               content_bounds.top());
 
     auto menu_item_width = 0.0f;
     for (const auto &item : menu.getItems().items)

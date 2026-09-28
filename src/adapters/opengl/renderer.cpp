@@ -95,7 +95,8 @@ void opengl::Renderer::renderLine(const domain::TextRenderConfig &config, const 
     m_shader_program->use();
     glBindVertexArray(m_text_vao);
 
-    _renderLine(config, line, default_face, x, y, alignment, RenderPass::Both);
+    float line_height = std::floor(config.font->getLineHeight());
+    _renderLine(config, line, default_face, x, y, line_height, alignment, RenderPass::Both);
 
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -109,21 +110,23 @@ void opengl::Renderer::renderLines(const domain::TextRenderConfig &config, const
     if (!opengl_font)
         return;
 
+    const float line_height = std::floor(lines.getLineHeight());
+
     m_shader_program->use();
 
     float y_it = y;
     for (const auto &line : lines.getLines())
     {
-        _renderLine(config, line, default_face, x, y_it, domain::Alignment(), RenderPass::BackgroundOnly);
-        y_it += config.font->getLineHeight();
+        _renderLine(config, line, default_face, x, y_it, line_height, domain::Alignment(), RenderPass::BackgroundOnly);
+        y_it += line_height;
     }
 
     glBindVertexArray(m_text_vao);
     y_it = y;
     for (const auto &line : lines.getLines())
     {
-        _renderLine(config, line, default_face, x, y_it, domain::Alignment(), RenderPass::TextOnly);
-        y_it += config.font->getLineHeight();
+        _renderLine(config, line, default_face, x, y_it, line_height, domain::Alignment(), RenderPass::TextOnly);
+        y_it += line_height;
     }
 
     glBindVertexArray(0);
@@ -173,7 +176,7 @@ void opengl::Renderer::renderRoundedRectWithShadow(const domain::RGBAColor color
 }
 
 void opengl::Renderer::_renderLine(const domain::TextRenderConfig &config, const domain::RenderLine &line,
-                                   const domain::Face &default_face, float x, float y,
+                                   const domain::Face &default_face, float x, float y, float line_height,
                                    const domain::Alignment &alignment, RenderPass pass) const
 {
     opengl::Font *font = dynamic_cast<opengl::Font *>(config.font);
@@ -185,7 +188,7 @@ void opengl::Renderer::_renderLine(const domain::TextRenderConfig &config, const
                          config.color_overrides)); // TODO change architecture/types such that this is already resolved
 
     float start_x = x;
-    float start_y = y + font->getLineHeight();
+    float start_y = y + line_height;
 
     if (alignment.h == domain::Alignment::HorizontalAlignment::Right)
     {
@@ -198,15 +201,18 @@ void opengl::Renderer::_renderLine(const domain::TextRenderConfig &config, const
 
     if (alignment.v == domain::Alignment::VerticalAlignment::Bottom)
     {
-        start_y -= font->getLineHeight();
+        start_y -= line_height;
     }
     else if (alignment.v == domain::Alignment::VerticalAlignment::Center)
     {
-        start_y -= font->getLineHeight() / 2.0f;
+        start_y -= line_height / 2.0f;
     }
 
+    float font_line_height = font->getLineHeight();
+    float vertical_offset = std::floor((line_height - font_line_height) / 2.0f);
+
     float x_it = start_x;
-    float y_it = start_y + font->getDescender();
+    float y_it = start_y + font->getDescender() - vertical_offset;
 
     const std::vector<domain::GlyphMetrics> &glyphs = line.getGlyphs();
     const std::vector<domain::Span<domain::Face>> &face_spans = line.getFaceSpans();
@@ -227,8 +233,8 @@ void opengl::Renderer::_renderLine(const domain::TextRenderConfig &config, const
             {
                 const auto &face = face_spans[face_span_index].value;
 
-                _renderRect(face.getBg(resolved_default_face, config.color_overrides), atom_start_x,
-                            y_it - font->getLineHeight(), x_it - atom_start_x, font->getLineHeight());
+                _renderRect(face.getBg(resolved_default_face, config.color_overrides), atom_start_x, y_it - line_height,
+                            x_it - atom_start_x, line_height);
 
                 face_span_index++;
                 atom_start_x = x_it;
@@ -243,8 +249,8 @@ void opengl::Renderer::_renderLine(const domain::TextRenderConfig &config, const
         {
             const auto &face = face_spans[face_span_index].value;
 
-            _renderRect(face.getBg(resolved_default_face, config.color_overrides), atom_start_x,
-                        y_it - font->getLineHeight(), x_it - atom_start_x, font->getLineHeight());
+            _renderRect(face.getBg(resolved_default_face, config.color_overrides), atom_start_x, y_it - line_height,
+                        x_it - atom_start_x, line_height);
         }
     }
 

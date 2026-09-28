@@ -79,6 +79,10 @@ Kakodemon is configured by setting the option `ui_options` in Kakoune. The follo
   - Bright colors: `bright_black`, `bright_red`, `bright_green`, `bright_yellow`, `bright_blue`, `bright_magenta`, `bright_cyan`, `bright_white`
 - `kakodemon_color_border <color_value>`: Set the color of UI borders
 
+### Spacing Options
+
+- `kakodemon_line_height_scale`: Set the line height as a percentage (default: 100)
+
 ### Example Configuration
 
 ```kak
