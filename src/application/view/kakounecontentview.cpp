@@ -1,10 +1,12 @@
 #include "kakounecontentview.hpp"
 #include "application/view/rendercontext.hpp"
+#include "domain/faceresolver.hpp"
 #include "domain/geometry.hpp"
 #include "domain/glyphresolver.hpp"
 #include "domain/renderlines.hpp"
 #include "domain/uioptions.hpp"
 #include <cmath>
+#include <optional>
 
 KakouneContentView::KakouneContentView()
 {
@@ -17,14 +19,18 @@ void KakouneContentView::init(domain::Renderer *renderer, domain::Window *window
 }
 
 void KakouneContentView::render(const RenderContext &render_context, const domain::Lines &lines,
-                                const domain::Face &default_face, const domain::Rectangle &bounds)
+                                const domain::Rectangle &bounds)
 {
     domain::GlyphResolver glyph_resolver(render_context.ui_options.font_content, render_context.font_manager);
-    auto render_lines = domain::RenderLines(lines, glyph_resolver, getCellHeight(render_context.ui_options));
+    domain::FaceResolver face_resolver(std::nullopt, render_context.default_face,
+                                       render_context.ui_options.color_overrides);
+
+    auto render_lines =
+        domain::RenderLines(lines, glyph_resolver, face_resolver, getCellHeight(render_context.ui_options));
 
     m_renderer->addBounds(bounds.left(), bounds.top(), bounds.width(), bounds.height());
     m_renderer->renderLines(render_context.textConfig(render_context.ui_options.font_content), render_lines,
-                            default_face, bounds.left(), bounds.top());
+                            bounds.left(), bounds.top());
     m_renderer->popBounds();
 }
 

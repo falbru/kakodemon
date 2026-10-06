@@ -2,6 +2,8 @@
 #include "application/view/rendercontext.hpp"
 #include "application/view/styling.hpp"
 #include "domain/editor.hpp"
+#include "domain/face.hpp"
+#include "domain/faceresolver.hpp"
 #include "domain/geometry.hpp"
 #include "domain/glyphresolver.hpp"
 #include "domain/renderlines.hpp"
@@ -162,11 +164,18 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
 {
     domain::Font *font = render_context.ui_options.font_infobox;
     domain::GlyphResolver glyph_resolver(font, render_context.font_manager);
+    domain::FaceResolver face_resolver(info_box.default_face, render_context.default_face,
+                                       render_context.ui_options.color_overrides);
 
-    auto render_lines = domain::RenderLines(info_box.content, glyph_resolver, std::floor(font->getLineHeight() * render_context.ui_options.line_height_scale / 100.0f));
+    domain::ResolvedFace info_box_face =
+        info_box.default_face.resolve(render_context.default_face, render_context.ui_options.color_overrides);
+
+    auto render_lines =
+        domain::RenderLines(info_box.content, glyph_resolver, face_resolver,
+                            std::floor(font->getLineHeight() * render_context.ui_options.line_height_scale / 100.0f));
     render_lines.wrap(MAX_WIDTH, domain::RenderLinesWrapMode::WORD);
 
-    domain::RenderLine title_render_line(info_box.title, glyph_resolver);
+    domain::RenderLine title_render_line(info_box.title, glyph_resolver, face_resolver);
     float title_width = title_render_line.width();
 
     int info_box_width =
@@ -198,16 +207,15 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
 
     layout.pad(BORDER_THICKNESS);
 
-    m_renderer->renderRect(
-        info_box.default_face.getBg(render_context.default_face, render_context.ui_options.color_overrides),
-        layout.current().x, layout.current().y, layout.current().width, layout.current().height);
+    m_renderer->renderRect(info_box_face.getBg(), layout.current().x, layout.current().y, layout.current().width,
+                           layout.current().height);
 
     layout.pad(SPACING_MEDIUM);
 
     if (info_box.title.size() > 0)
     {
-        m_renderer->renderLine(render_context.textConfig(font), title_render_line, info_box.default_face,
-                               layout.current().x, layout.current().y);
+        m_renderer->renderLine(render_context.textConfig(font), title_render_line, layout.current().x,
+                               layout.current().y);
 
         layout.gapY(font->getLineHeight());
 
@@ -240,7 +248,7 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
     float y_pos = content_layout.current().y;
     for (int i = start_line; i < end_line; i++)
     {
-        m_renderer->renderLine(render_context.textConfig(font), render_lines.getLines().at(i), info_box.default_face,
+        m_renderer->renderLine(render_context.textConfig(font), render_lines.getLines().at(i),
                                content_layout.current().x, y_pos);
         y_pos += render_lines.getLineHeight();
     }
@@ -249,10 +257,7 @@ void InfoBoxView::render(const RenderContext &render_context, InfoBoxViewState &
     {
         int max_scroll = total_lines - visible_lines;
         m_scroll_bar->setValue(state.scroll_offset, max_scroll, visible_lines);
-        m_scroll_bar->render(
-            m_renderer,
-            info_box.default_face.getFg(render_context.default_face, render_context.ui_options.color_overrides),
-            layout);
+        m_scroll_bar->render(m_renderer, info_box_face.getFg(), layout);
     }
 }
 

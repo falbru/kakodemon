@@ -18,8 +18,7 @@ class KakouneContentView
 
     void init(domain::Renderer *renderer, domain::Window *window);
 
-    void render(const RenderContext &render_context, const domain::Lines &lines, const domain::Face &default_face,
-                const domain::Rectangle &bounds);
+    void render(const RenderContext &render_context, const domain::Lines &lines, const domain::Rectangle &bounds);
 
     void handleMouseButton(KakouneClient *client, domain::MouseButtonEvent event, domain::Rectangle bounds);
     void handleMouseMove(KakouneClient *client, float x, float y, domain::Rectangle bounds);

@@ -5,6 +5,7 @@
 #include "domain/glyphresolver.hpp"
 #include "domain/modeline.hpp"
 #include "domain/renderline.hpp"
+#include <optional>
 #include <variant>
 
 StatusBarView::StatusBarView()
@@ -25,14 +26,18 @@ void StatusBarView::render(const RenderContext &render_context, InputViewState &
     LayoutManager layout(bounds.left(), bounds.top() + bounds.height() - bar_height, bounds.width(), bar_height);
 
     m_renderer->addBounds(bounds.left(), bounds.top(), bounds.width(), bounds.height());
-    m_renderer->renderRect(mode_line.getDefaultFace().getBg(render_context.ui_options.color_overrides),
-                           layout.current().x, layout.current().y, layout.current().width, layout.current().height);
+    m_renderer->renderRect(
+        mode_line.getDefaultFace().resolveBg(render_context.default_face, render_context.ui_options.color_overrides),
+        layout.current().x, layout.current().y, layout.current().width, layout.current().height);
 
     layout.pad(SPACING_SMALL);
 
     domain::GlyphResolver glyph_resolver(render_context.ui_options.font_statusbar, render_context.font_manager);
+    domain::FaceResolver face_resolver(mode_line.getDefaultFace(), render_context.default_face,
+                                       render_context.ui_options.color_overrides);
+
     m_renderer->renderLine(render_context.textConfig(render_context.ui_options.font_statusbar),
-                           domain::RenderLine(mode_line.getModeLine(), glyph_resolver), mode_line.getDefaultFace(),
+                           domain::RenderLine(mode_line.getModeLine(), glyph_resolver, face_resolver),
                            layout.current().x + layout.current().width, layout.current().y,
                            domain::Alignment::topRight());
 

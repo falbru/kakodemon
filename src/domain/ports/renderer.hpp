@@ -17,8 +17,8 @@ struct TextRenderConfig
 {
     domain::Font *font;
     domain::FontManager *font_manager;
-    const domain::Face &default_face;
-    const std::unordered_map<domain::FixedColor, domain::RGBAColor> &color_overrides;
+    const domain::DefaultFace &default_face;
+    const std::unordered_map<domain::NamedColor, domain::RGBAColor> &color_overrides;
 };
 
 struct CornerRadius
@@ -50,10 +50,9 @@ class Renderer
     virtual void renderRoundedRectWithShadow(const RGBAColor color, float x, float y, float width, float height,
                                              CornerRadius corner_radius, float shadow_radius) const = 0;
 
-    virtual void renderLine(const TextRenderConfig &config, const RenderLine &line, const Face &default_face, float x,
-                            float y, const Alignment &alignment = Alignment()) const = 0;
-    virtual void renderLines(const TextRenderConfig &config, const RenderLines &lines, const domain::Face &default_face,
-                             float x, float y) const = 0;
+    virtual void renderLine(const TextRenderConfig &config, const RenderLine &line, float x, float y,
+                            const Alignment &alignment = Alignment()) const = 0;
+    virtual void renderLines(const TextRenderConfig &config, const RenderLines &lines, float x, float y) const = 0;
 };
 
 } // namespace domain

@@ -48,23 +48,23 @@ domain::OptionalColor kakoune::toDomain(Color c)
         return domain::DefaultColor();
     }
 
-    static const std::unordered_map<std::string, domain::FixedColor> NAMED_COLORS = {
-        {"black", domain::FixedColor::Black},
-        {"red", domain::FixedColor::Red},
-        {"green", domain::FixedColor::Green},
-        {"yellow", domain::FixedColor::Yellow},
-        {"blue", domain::FixedColor::Blue},
-        {"magenta", domain::FixedColor::Magenta},
-        {"cyan", domain::FixedColor::Cyan},
-        {"white", domain::FixedColor::White},
-        {"bright-black", domain::FixedColor::BrightBlack},
-        {"bright-red", domain::FixedColor::BrightRed},
-        {"bright-green", domain::FixedColor::BrightGreen},
-        {"bright-yellow", domain::FixedColor::BrightYellow},
-        {"bright-blue", domain::FixedColor::BrightBlue},
-        {"bright-magenta", domain::FixedColor::BrightMagenta},
-        {"bright-cyan", domain::FixedColor::BrightCyan},
-        {"bright-white", domain::FixedColor::BrightWhite},
+    static const std::unordered_map<std::string, domain::NamedColor> NAMED_COLORS = {
+        {"black", domain::NamedColor::Black},
+        {"red", domain::NamedColor::Red},
+        {"green", domain::NamedColor::Green},
+        {"yellow", domain::NamedColor::Yellow},
+        {"blue", domain::NamedColor::Blue},
+        {"magenta", domain::NamedColor::Magenta},
+        {"cyan", domain::NamedColor::Cyan},
+        {"white", domain::NamedColor::White},
+        {"bright-black", domain::NamedColor::BrightBlack},
+        {"bright-red", domain::NamedColor::BrightRed},
+        {"bright-green", domain::NamedColor::BrightGreen},
+        {"bright-yellow", domain::NamedColor::BrightYellow},
+        {"bright-blue", domain::NamedColor::BrightBlue},
+        {"bright-magenta", domain::NamedColor::BrightMagenta},
+        {"bright-cyan", domain::NamedColor::BrightCyan},
+        {"bright-white", domain::NamedColor::BrightWhite},
     };
 
     auto named_it = NAMED_COLORS.find(color_string);

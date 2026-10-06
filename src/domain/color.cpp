@@ -14,62 +14,62 @@ RGBAColor getDefaultBg()
     return RGBAColor{0.0f, 0.0f, 0.0f, 1.0f};
 }
 
-RGBAColor getRGBAColor(FixedColor color)
+RGBAColor getRGBAColor(NamedColor color)
 {
     switch (color)
     {
-    case FixedColor::Black:
+    case NamedColor::Black:
         return RGBAColor{0.0f, 0.0f, 0.0f, 1.0f};
         break;
-    case FixedColor::Red:
+    case NamedColor::Red:
         return RGBAColor{1.0f, 0.0f, 0.0f, 1.0f};
         break;
-    case FixedColor::Green:
+    case NamedColor::Green:
         return RGBAColor{0.0f, 0.502f, 0.0f, 1.0f};
         break;
-    case FixedColor::Yellow:
+    case NamedColor::Yellow:
         return RGBAColor{1.0f, 1.0f, 0.0f, 1.0f};
         break;
-    case FixedColor::Blue:
+    case NamedColor::Blue:
         return RGBAColor{0.0f, 0.0f, 1.0f, 1.0f};
         break;
-    case FixedColor::Magenta:
+    case NamedColor::Magenta:
         return RGBAColor{1.0f, 0.0f, 1.0f, 1.0f};
         break;
-    case FixedColor::Cyan:
+    case NamedColor::Cyan:
         return RGBAColor{0.0f, 1.0f, 1.0f, 1.0f};
         break;
-    case FixedColor::White:
+    case NamedColor::White:
         return RGBAColor{1.0f, 1.0f, 1.0f, 1.0f};
         break;
-    case FixedColor::BrightBlack:
+    case NamedColor::BrightBlack:
         return RGBAColor{0.502f, 0.502f, 0.502f, 1.0f};
         break;
-    case FixedColor::BrightRed:
+    case NamedColor::BrightRed:
         return RGBAColor{1.0f, 0.502f, 0.502f, 1.0f};
         break;
-    case FixedColor::BrightGreen:
+    case NamedColor::BrightGreen:
         return RGBAColor{0.502f, 1.0f, 0.502f, 1.0f};
         break;
-    case FixedColor::BrightYellow:
+    case NamedColor::BrightYellow:
         return RGBAColor{1.0f, 1.0f, 0.502f, 1.0f};
         break;
-    case FixedColor::BrightBlue:
+    case NamedColor::BrightBlue:
         return RGBAColor{0.502f, 0.502f, 1.0f, 1.0f};
         break;
-    case FixedColor::BrightMagenta:
+    case NamedColor::BrightMagenta:
         return RGBAColor{1.0f, 0.502f, 1.0f, 1.0f};
         break;
-    case FixedColor::BrightCyan:
+    case NamedColor::BrightCyan:
         return RGBAColor{0.502f, 1.0f, 1.0f, 1.0f};
         break;
-    case FixedColor::BrightWhite:
+    case NamedColor::BrightWhite:
         return RGBAColor{1.0f, 1.0f, 1.0f, 1.0f};
         break;
     }
 }
 
-RGBAColor getRGBAColor(FixedColor color, const std::unordered_map<FixedColor, RGBAColor> &overrides)
+RGBAColor getRGBAColor(NamedColor color, const std::unordered_map<NamedColor, RGBAColor> &overrides)
 {
     auto it = overrides.find(color);
     if (it != overrides.end())
@@ -85,9 +85,9 @@ RGBAColor getRGBAColor(OptionalColor color, RGBAColor fallback_color)
     {
         return std::get<RGBAColor>(color);
     }
-    else if (std::holds_alternative<FixedColor>(color))
+    else if (std::holds_alternative<NamedColor>(color))
     {
-        return getRGBAColor(std::get<FixedColor>(color));
+        return getRGBAColor(std::get<NamedColor>(color));
     }
     else
     {

@@ -10,6 +10,8 @@ namespace domain
 
 class FontManager;
 
+typedef std::unordered_map<NamedColor, RGBAColor> ColorOverrides;
+
 struct UIOptions
 {
     Font *font = nullptr;
@@ -18,7 +20,7 @@ struct UIOptions
     Font *font_statusbar = nullptr;
     Font *font_content = nullptr;
     OptionalColor color_border;
-    std::unordered_map<FixedColor, RGBAColor> color_overrides;
+    ColorOverrides color_overrides;
     int line_height_scale = 100;
 
     bool operator==(const UIOptions &other) const;

@@ -1,7 +1,7 @@
 #include "scrolledmenuitems.hpp"
 #include "../styling.hpp"
-#include "domain/atom.hpp"
 #include "domain/codepointstring.hpp"
+#include "domain/faceresolver.hpp"
 #include "domain/glyphresolver.hpp"
 #include "domain/line.hpp"
 #include "domain/renderline.hpp"
@@ -17,7 +17,13 @@ void ScrolledMenuItems::render(domain::Renderer *renderer, const RenderContext &
                                LayoutManager &layout)
 {
     domain::Font *font = render_context.ui_options.font_menu;
+
     domain::GlyphResolver glyph_resolver(font, render_context.font_manager);
+    domain::FaceResolver items_face_resolver(menu_items.face, render_context.default_face,
+                                             render_context.ui_options.color_overrides);
+    domain::FaceResolver selected_item_face_resolver(menu_items.selected_face, render_context.default_face,
+                                                     render_context.ui_options.color_overrides);
+
     auto items_layout = layout.copy();
     if (menu_items.items.size() > m_max_visible_items)
     {
@@ -44,15 +50,18 @@ void ScrolledMenuItems::render(domain::Renderer *renderer, const RenderContext &
             continue;
         }
 
+        const domain::FaceResolver &face_resolver =
+            i == selected_index ? selected_item_face_resolver : items_face_resolver;
+
         domain::Line item_left_line = domain::Line({item.at(0)}).trim(domain::TrimDirection::Right);
-        domain::RenderLine item_left_render_line(item_left_line, glyph_resolver);
+        domain::RenderLine item_left_render_line(item_left_line, glyph_resolver, face_resolver);
 
         std::optional<domain::RenderLine> item_right_render_line;
         if (item.getAtoms().size() > 1)
         {
             domain::Line item_right_line =
                 domain::Line({item.at(item.getAtoms().size() - 1)}).trim(domain::TrimDirection::Left);
-            item_right_render_line = domain::RenderLine(item_right_line, glyph_resolver);
+            item_right_render_line = domain::RenderLine(item_right_line, glyph_resolver, face_resolver);
         }
 
         float item_right_width = item_right_render_line.has_value() ? item_right_render_line.value().width() : 0;
@@ -64,19 +73,19 @@ void ScrolledMenuItems::render(domain::Renderer *renderer, const RenderContext &
 
         if (i == selected_index)
         {
-            renderer->renderRect(
-                menu_items.selected_face.getBg(render_context.default_face, render_context.ui_options.color_overrides),
-                items_layout.current().x - SPACING_MEDIUM, items_layout.current().y,
-                items_layout.current().width + SPACING_MEDIUM * 2 + getRightPadding(menu_items.items.size()),
-                font->getLineHeight());
+            renderer->renderRect(menu_items.selected_face.resolveBg(render_context.default_face,
+                                                                    render_context.ui_options.color_overrides),
+                                 items_layout.current().x - SPACING_MEDIUM, items_layout.current().y,
+                                 items_layout.current().width + SPACING_MEDIUM * 2 +
+                                     getRightPadding(menu_items.items.size()),
+                                 font->getLineHeight());
         }
-        domain::Face item_face = i == selected_index ? menu_items.selected_face : menu_items.face;
 
-        renderer->renderLine(render_context.textConfig(font), item_left_render_line, item_face,
-                             items_layout.current().x, items_layout.current().y);
+        renderer->renderLine(render_context.textConfig(font), item_left_render_line, items_layout.current().x,
+                             items_layout.current().y);
         if (item_right_render_line.has_value())
         {
-            renderer->renderLine(render_context.textConfig(font), item_right_render_line.value(), item_face,
+            renderer->renderLine(render_context.textConfig(font), item_right_render_line.value(),
                                  items_layout.current().x + items_layout.current().width, items_layout.current().y,
                                  domain::Alignment::topRight());
         }

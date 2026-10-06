@@ -10,9 +10,12 @@ add_executable(tests
     unit/test_line.cpp
     unit/test_span.cpp
     unit/test_color.cpp
+    unit/test_face.cpp
+    unit/test_faceresolver.cpp
     unit/test_masterclientcontroller.cpp
     unit/test_rectangle.cpp
     mocks/mock_glyphresolver.cpp
+    mocks/mock_faceresolver.cpp
     integration/test_fontconfigresolver.cpp
     integration/test_localsession.cpp
     integration/test_kakouneclientprocess.cpp
@@ -60,6 +63,7 @@ add_executable(tests
     ${CMAKE_SOURCE_DIR}/src/domain/fontmanager.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/geometry.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/glyphresolver.cpp
+    ${CMAKE_SOURCE_DIR}/src/domain/faceresolver.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/renderline.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/renderlines.cpp
     ${CMAKE_SOURCE_DIR}/src/domain/line.cpp

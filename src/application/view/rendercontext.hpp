@@ -9,7 +9,7 @@
 struct RenderContext
 {
     domain::FontManager *font_manager;
-    domain::Face default_face;
+    domain::DefaultFace default_face;
     domain::UIOptions ui_options;
 
     float screen_width;

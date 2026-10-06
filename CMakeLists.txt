@@ -92,6 +92,7 @@ set(SRC
     src/domain/renderline.cpp
     src/domain/renderlines.cpp
     src/domain/glyphresolver.cpp
+    src/domain/faceresolver.cpp
     src/domain/line.cpp
     src/domain/lines.cpp
     src/domain/menu.cpp

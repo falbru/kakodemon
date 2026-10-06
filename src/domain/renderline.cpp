@@ -1,5 +1,6 @@
 #include "renderline.hpp"
 #include "domain/face.hpp"
+#include "domain/faceresolver.hpp"
 #include "domain/glyphresolver.hpp"
 #include "domain/span.hpp"
 #include <algorithm>
@@ -8,7 +9,7 @@
 namespace domain
 {
 
-RenderLine::RenderLine(std::vector<GlyphMetrics> glyphs, std::vector<Span<Face>> face_spans,
+RenderLine::RenderLine(std::vector<GlyphMetrics> glyphs, std::vector<Span<ResolvedFace>> face_spans,
                        std::vector<Span<Font *>> font_spans)
     : m_glyphs(std::move(glyphs)), m_face_spans(std::move(face_spans)), m_font_spans(std::move(font_spans))
 {
@@ -43,7 +44,7 @@ RenderLine::RenderLine(std::vector<GlyphMetrics> glyphs, std::vector<Span<Face>>
     }
 }
 
-RenderLine::RenderLine(const Line &line, GlyphResolver &glyph_resolver)
+RenderLine::RenderLine(const Line &line, GlyphResolver &glyph_resolver, const FaceResolver &face_resolver)
 {
     m_glyphs.reserve(line.length());
     m_face_spans.reserve(line.size());
@@ -53,7 +54,7 @@ RenderLine::RenderLine(const Line &line, GlyphResolver &glyph_resolver)
     Font *prev_font = nullptr;
     for (const auto &atom : line.getAtoms())
     {
-        m_face_spans.push_back(Span<Face>(atom.getFace(), index));
+        m_face_spans.push_back(Span<ResolvedFace>(face_resolver.resolve(atom.getFace()), index));
 
         for (const auto &codepoint : atom.getContents())
         {
@@ -81,7 +82,7 @@ const std::vector<GlyphMetrics> &RenderLine::getGlyphs() const
     return m_glyphs;
 }
 
-const std::vector<Span<Face>> &RenderLine::getFaceSpans() const
+const std::vector<Span<ResolvedFace>> &RenderLine::getFaceSpans() const
 {
     return m_face_spans;
 }
@@ -192,7 +193,7 @@ RenderLine RenderLine::split(size_t start, size_t end) const
 
     auto face_start_it = spanIteratorFromIndex(m_face_spans, start);
     auto face_end_it = spanIteratorFromIndex(m_face_spans, end - 1);
-    std::vector<Span<Face>> new_face_spans(face_start_it, face_end_it + 1);
+    std::vector<Span<ResolvedFace>> new_face_spans(face_start_it, face_end_it + 1);
     for (int i = 0; i < new_face_spans.size(); i++)
     {
         if (new_face_spans[i].start_index < start)

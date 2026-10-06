@@ -38,6 +38,7 @@ void to_json(nlohmann::json &j, const Attribute &a);
 void from_json(const nlohmann::json &j, Attribute &a);
 
 domain::Face toDomain(kakoune::Face face);
+domain::DefaultFace toDomainAsDefaultFace(kakoune::Face face);
 
 } // namespace kakoune
 

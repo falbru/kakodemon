@@ -64,7 +64,7 @@ void Scene::render()
             static_cast<float>(bounds.height()),
         };
 
-        m_content_view->render(render_context, client->state.content, client->state.default_face, bounds);
+        m_content_view->render(render_context, client->state.content, bounds);
         m_status_bar_view->render(render_context, client->status_line_state, client->state.mode_line,
                                   client->state.cursor_position, bounds);
     }

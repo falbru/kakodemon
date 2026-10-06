@@ -44,6 +44,9 @@ void InlineMenuView::render(const RenderContext &render_context, MenuViewState &
 
     domain::Font *font = render_context.ui_options.font_menu;
     domain::GlyphResolver glyph_resolver(font, render_context.font_manager);
+    domain::FaceResolver items_face_resolver(menu.getItems().face, render_context.default_face,
+                                             render_context.ui_options.color_overrides);
+
     auto anchor = menu.getItems().anchor;
 
     auto menu_position = m_kakoune_content_view->coordToPixels(render_context.ui_options, anchor, content_bounds.left(),
@@ -52,7 +55,7 @@ void InlineMenuView::render(const RenderContext &render_context, MenuViewState &
     auto menu_item_width = 0.0f;
     for (const auto &item : menu.getItems().items)
     {
-        domain::RenderLine item_render_line(item, glyph_resolver);
+        domain::RenderLine item_render_line(item, glyph_resolver, items_face_resolver);
         auto item_width = item_render_line.width();
         menu_item_width = std::max(menu_item_width, item_width);
     }
@@ -82,14 +85,14 @@ void InlineMenuView::render(const RenderContext &render_context, MenuViewState &
     layout.pad(BORDER_THICKNESS);
 
     m_renderer->renderRect(
-        menu.getItems().face.getBg(render_context.default_face, render_context.ui_options.color_overrides),
+        menu.getItems().face.resolveBg(render_context.default_face, render_context.ui_options.color_overrides),
         layout.current().x, layout.current().y, layout.current().width, layout.current().height);
 
     layout.pad(0, SPACING_MEDIUM);
 
     m_scrolled_menu_items->render(
         m_renderer, render_context, state, menu.getItems(),
-        menu.getItems().face.getFg(render_context.default_face, render_context.ui_options.color_overrides), layout);
+        menu.getItems().face.resolveFg(render_context.default_face, render_context.ui_options.color_overrides), layout);
 }
 
 float InlineMenuView::scrolledItemsX() const

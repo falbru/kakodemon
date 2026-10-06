@@ -25,7 +25,7 @@ struct KakouneState
     ModeLine mode_line;
     std::optional<InfoBox> info_box;
     std::optional<Menu> menu;
-    Face default_face;
+    DefaultFace default_face;
 };
 
 struct FrameEvents

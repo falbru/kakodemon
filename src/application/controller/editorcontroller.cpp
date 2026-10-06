@@ -78,10 +78,7 @@ void EditorController::update()
         auto result = client->interface->getNextKakouneStateAndEvents();
         if (result.has_value())
         {
-            m_window->setNeedsRerender();
-
             client->state = result->first;
-            m_window->setClearColor(client->state.default_face.getBg());
 
             domain::FrameEvents events = result->second;
 
@@ -95,6 +92,9 @@ void EditorController::update()
                 m_multi_styled_menu->ensureItemVisible(
                     client->menu_state, client->state.menu->getItems().selected_index, *client->state.menu);
             }
+
+            m_window->setClearColor(client->state.default_face.resolveBg(client->uiOptions().color_overrides));
+            m_window->setNeedsRerender();
         }
     }
 }

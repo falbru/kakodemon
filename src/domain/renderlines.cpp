@@ -1,5 +1,6 @@
 #include "domain/renderlines.hpp"
 #include "domain/codepointstring.hpp"
+#include "domain/faceresolver.hpp"
 #include "domain/glyphresolver.hpp"
 #include "domain/renderline.hpp"
 
@@ -13,14 +14,15 @@ RenderLines::RenderLines(std::vector<RenderLine> lines, float line_height) : m_l
 {
 }
 
-RenderLines::RenderLines(const Lines &lines, GlyphResolver &glyph_resolver, float line_height)
+RenderLines::RenderLines(const Lines &lines, GlyphResolver &glyph_resolver, const FaceResolver &face_resolver,
+                         float line_height)
     : m_line_height(line_height)
 {
     m_lines.reserve(lines.size());
 
     for (const auto &line : lines.getLines())
     {
-        m_lines.push_back(RenderLine(line, glyph_resolver));
+        m_lines.push_back(RenderLine(line, glyph_resolver, face_resolver));
     }
 }
 

@@ -13,7 +13,7 @@ domain::KakouneState getEmptyState()
         domain::ModeLine(std::nullopt, domain::Line(), domain::Face(domain::DefaultColor(), domain::DefaultColor())),
         std::nullopt,
         std::nullopt,
-        domain::Face(domain::DefaultColor(), domain::DefaultColor())};
+        domain::DefaultFace(domain::DefaultColor(), domain::DefaultColor())};
 }
 
 KakouneClient::KakouneClient(domain::KakouneSession *session, std::unique_ptr<domain::KakouneInterface> interface)

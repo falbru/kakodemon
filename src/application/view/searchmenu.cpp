@@ -44,13 +44,13 @@ void SearchMenuView::render(const RenderContext &render_context, MenuViewState &
     if (items_size > 0)
     {
         m_renderer->renderRect(
-            menu.getInputFace().getBg(render_context.default_face, render_context.ui_options.color_overrides),
+            menu.getInputFace().resolveBg(render_context.default_face, render_context.ui_options.color_overrides),
             layout.current().x, layout.current().y, layout.current().width, 3 * SPACING_MEDIUM + m_input->height(font));
     }
     else
     {
         m_renderer->renderRoundedRect(
-            menu.getInputFace().getBg(render_context.default_face, render_context.ui_options.color_overrides),
+            menu.getInputFace().resolveBg(render_context.default_face, render_context.ui_options.color_overrides),
             layout.current().x, layout.current().y, layout.current().width, 4 * SPACING_MEDIUM + m_input->height(font),
             domain::CornerRadius(0, 0, CORNER_RADIUS, CORNER_RADIUS));
     }
@@ -71,13 +71,14 @@ void SearchMenuView::render(const RenderContext &render_context, MenuViewState &
         layout.gapY(BORDER_THICKNESS);
 
         m_renderer->renderRoundedRect(
-            menu.getItems().face.getBg(render_context.default_face, render_context.ui_options.color_overrides),
+            menu.getItems().face.resolveBg(render_context.default_face, render_context.ui_options.color_overrides),
             layout.current().x - SPACING_MEDIUM, layout.current().y, layout.current().width + SPACING_MEDIUM * 2,
             layout.current().height + SPACING_MEDIUM, domain::CornerRadius(0.0f, 0.0f, CORNER_RADIUS, CORNER_RADIUS));
 
         m_scrolled_menu_items->render(
             m_renderer, render_context, state, menu.getItems(),
-            menu.getItems().face.getFg(render_context.default_face, render_context.ui_options.color_overrides), layout);
+            menu.getItems().face.resolveFg(render_context.default_face, render_context.ui_options.color_overrides),
+            layout);
     }
 }
 

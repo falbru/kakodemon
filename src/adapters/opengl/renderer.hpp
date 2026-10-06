@@ -41,20 +41,16 @@ class Renderer : public domain::Renderer
     void renderRoundedRectWithShadow(const domain::RGBAColor color, float x, float y, float width, float height,
                                      domain::CornerRadius corner_radius, float shadow_radius) const override;
 
-    virtual void renderLine(const domain::TextRenderConfig &config, const domain::RenderLine &line,
-                            const domain::Face &default_face, float x, float y,
+    virtual void renderLine(const domain::TextRenderConfig &config, const domain::RenderLine &line, float x, float y,
                             const domain::Alignment &alignment = domain::Alignment()) const override;
-    virtual void renderLines(const domain::TextRenderConfig &config, const domain::RenderLines &lines,
-                             const domain::Face &default_face, float x, float y) const override;
+    virtual void renderLines(const domain::TextRenderConfig &config, const domain::RenderLines &lines, float x,
+                             float y) const override;
 
     static domain::FontFactory getFontFactory();
 
   private:
-    void _renderLine(const domain::TextRenderConfig &config, const domain::Line &line, const domain::Face &default_face,
-                     float x, float y, float line_height, const domain::Alignment &alignment, RenderPass pass) const;
-    void _renderLine(const domain::TextRenderConfig &config, const domain::RenderLine &line,
-                     const domain::Face &default_face, float x, float y, float line_height,
-                     const domain::Alignment &alignment, RenderPass pass) const;
+    void _renderLine(const domain::TextRenderConfig &config, const domain::RenderLine &line, float x, float y,
+                     float line_height, const domain::Alignment &alignment, RenderPass pass) const;
     void _renderShadow(const domain::RGBAColor color, float x, float y, float width, float height,
                        float shadowRadius) const;
     void _renderRect(const domain::RGBAColor color, float x, float y, float width, float height) const;

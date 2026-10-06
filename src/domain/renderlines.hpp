@@ -16,7 +16,8 @@ class RenderLines
 {
   public:
     RenderLines(std::vector<RenderLine> lines, float line_height);
-    RenderLines(const Lines &lines, GlyphResolver &glyph_resolver, float line_height);
+    RenderLines(const Lines &lines, GlyphResolver &glyph_resolver, const FaceResolver &face_resolver,
+                float line_height);
 
     const std::vector<RenderLine> &getLines() const;
     float getLineHeight() const;

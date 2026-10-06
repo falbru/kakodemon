@@ -12,7 +12,7 @@ struct DefaultColor
     bool operator==(const DefaultColor &) const;
 };
 
-enum class FixedColor
+enum class NamedColor
 {
     Black,
     Red,
@@ -39,14 +39,14 @@ struct RGBAColor
     bool operator==(const RGBAColor &other) const;
 };
 
-typedef std::variant<FixedColor, RGBAColor> ExplicitColor;
+typedef std::variant<NamedColor, RGBAColor> ExplicitColor;
 
-typedef std::variant<DefaultColor, FixedColor, RGBAColor> OptionalColor;
+typedef std::variant<DefaultColor, NamedColor, RGBAColor> OptionalColor;
 
 RGBAColor getDefaultBg();
 RGBAColor getDefaultFg();
-RGBAColor getRGBAColor(FixedColor color);
-RGBAColor getRGBAColor(FixedColor color, const std::unordered_map<FixedColor, RGBAColor> &overrides);
+RGBAColor getRGBAColor(NamedColor color);
+RGBAColor getRGBAColor(NamedColor color, const std::unordered_map<NamedColor, RGBAColor> &overrides);
 RGBAColor getRGBAColor(OptionalColor color, RGBAColor fallback_color);
 
 } // namespace domain

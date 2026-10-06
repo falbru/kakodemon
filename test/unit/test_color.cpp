@@ -17,64 +17,64 @@ TEST_CASE("toDomain converts named colors", "[Color][toDomain]")
     {
         kakoune::Color color{"black"};
         domain::OptionalColor result = kakoune::toDomain(color);
-        REQUIRE(std::holds_alternative<domain::FixedColor>(result));
-        REQUIRE(std::get<domain::FixedColor>(result) == domain::FixedColor::Black);
+        REQUIRE(std::holds_alternative<domain::NamedColor>(result));
+        REQUIRE(std::get<domain::NamedColor>(result) == domain::NamedColor::Black);
     }
 
     SECTION("red")
     {
         kakoune::Color color{"red"};
         domain::OptionalColor result = kakoune::toDomain(color);
-        REQUIRE(std::holds_alternative<domain::FixedColor>(result));
-        REQUIRE(std::get<domain::FixedColor>(result) == domain::FixedColor::Red);
+        REQUIRE(std::holds_alternative<domain::NamedColor>(result));
+        REQUIRE(std::get<domain::NamedColor>(result) == domain::NamedColor::Red);
     }
 
     SECTION("green")
     {
         kakoune::Color color{"green"};
         domain::OptionalColor result = kakoune::toDomain(color);
-        REQUIRE(std::holds_alternative<domain::FixedColor>(result));
-        REQUIRE(std::get<domain::FixedColor>(result) == domain::FixedColor::Green);
+        REQUIRE(std::holds_alternative<domain::NamedColor>(result));
+        REQUIRE(std::get<domain::NamedColor>(result) == domain::NamedColor::Green);
     }
 
     SECTION("yellow")
     {
         kakoune::Color color{"yellow"};
         domain::OptionalColor result = kakoune::toDomain(color);
-        REQUIRE(std::holds_alternative<domain::FixedColor>(result));
-        REQUIRE(std::get<domain::FixedColor>(result) == domain::FixedColor::Yellow);
+        REQUIRE(std::holds_alternative<domain::NamedColor>(result));
+        REQUIRE(std::get<domain::NamedColor>(result) == domain::NamedColor::Yellow);
     }
 
     SECTION("blue")
     {
         kakoune::Color color{"blue"};
         domain::OptionalColor result = kakoune::toDomain(color);
-        REQUIRE(std::holds_alternative<domain::FixedColor>(result));
-        REQUIRE(std::get<domain::FixedColor>(result) == domain::FixedColor::Blue);
+        REQUIRE(std::holds_alternative<domain::NamedColor>(result));
+        REQUIRE(std::get<domain::NamedColor>(result) == domain::NamedColor::Blue);
     }
 
     SECTION("magenta")
     {
         kakoune::Color color{"magenta"};
         domain::OptionalColor result = kakoune::toDomain(color);
-        REQUIRE(std::holds_alternative<domain::FixedColor>(result));
-        REQUIRE(std::get<domain::FixedColor>(result) == domain::FixedColor::Magenta);
+        REQUIRE(std::holds_alternative<domain::NamedColor>(result));
+        REQUIRE(std::get<domain::NamedColor>(result) == domain::NamedColor::Magenta);
     }
 
     SECTION("cyan")
     {
         kakoune::Color color{"cyan"};
         domain::OptionalColor result = kakoune::toDomain(color);
-        REQUIRE(std::holds_alternative<domain::FixedColor>(result));
-        REQUIRE(std::get<domain::FixedColor>(result) == domain::FixedColor::Cyan);
+        REQUIRE(std::holds_alternative<domain::NamedColor>(result));
+        REQUIRE(std::get<domain::NamedColor>(result) == domain::NamedColor::Cyan);
     }
 
     SECTION("white")
     {
         kakoune::Color color{"white"};
         domain::OptionalColor result = kakoune::toDomain(color);
-        REQUIRE(std::holds_alternative<domain::FixedColor>(result));
-        REQUIRE(std::get<domain::FixedColor>(result) == domain::FixedColor::White);
+        REQUIRE(std::holds_alternative<domain::NamedColor>(result));
+        REQUIRE(std::get<domain::NamedColor>(result) == domain::NamedColor::White);
     }
 }
 
@@ -84,64 +84,64 @@ TEST_CASE("toDomain converts bright named colors", "[Color][toDomain]")
     {
         kakoune::Color color{"bright-black"};
         domain::OptionalColor result = kakoune::toDomain(color);
-        REQUIRE(std::holds_alternative<domain::FixedColor>(result));
-        REQUIRE(std::get<domain::FixedColor>(result) == domain::FixedColor::BrightBlack);
+        REQUIRE(std::holds_alternative<domain::NamedColor>(result));
+        REQUIRE(std::get<domain::NamedColor>(result) == domain::NamedColor::BrightBlack);
     }
 
     SECTION("bright-red")
     {
         kakoune::Color color{"bright-red"};
         domain::OptionalColor result = kakoune::toDomain(color);
-        REQUIRE(std::holds_alternative<domain::FixedColor>(result));
-        REQUIRE(std::get<domain::FixedColor>(result) == domain::FixedColor::BrightRed);
+        REQUIRE(std::holds_alternative<domain::NamedColor>(result));
+        REQUIRE(std::get<domain::NamedColor>(result) == domain::NamedColor::BrightRed);
     }
 
     SECTION("bright-green")
     {
         kakoune::Color color{"bright-green"};
         domain::OptionalColor result = kakoune::toDomain(color);
-        REQUIRE(std::holds_alternative<domain::FixedColor>(result));
-        REQUIRE(std::get<domain::FixedColor>(result) == domain::FixedColor::BrightGreen);
+        REQUIRE(std::holds_alternative<domain::NamedColor>(result));
+        REQUIRE(std::get<domain::NamedColor>(result) == domain::NamedColor::BrightGreen);
     }
 
     SECTION("bright-yellow")
     {
         kakoune::Color color{"bright-yellow"};
         domain::OptionalColor result = kakoune::toDomain(color);
-        REQUIRE(std::holds_alternative<domain::FixedColor>(result));
-        REQUIRE(std::get<domain::FixedColor>(result) == domain::FixedColor::BrightYellow);
+        REQUIRE(std::holds_alternative<domain::NamedColor>(result));
+        REQUIRE(std::get<domain::NamedColor>(result) == domain::NamedColor::BrightYellow);
     }
 
     SECTION("bright-blue")
     {
         kakoune::Color color{"bright-blue"};
         domain::OptionalColor result = kakoune::toDomain(color);
-        REQUIRE(std::holds_alternative<domain::FixedColor>(result));
-        REQUIRE(std::get<domain::FixedColor>(result) == domain::FixedColor::BrightBlue);
+        REQUIRE(std::holds_alternative<domain::NamedColor>(result));
+        REQUIRE(std::get<domain::NamedColor>(result) == domain::NamedColor::BrightBlue);
     }
 
     SECTION("bright-magenta")
     {
         kakoune::Color color{"bright-magenta"};
         domain::OptionalColor result = kakoune::toDomain(color);
-        REQUIRE(std::holds_alternative<domain::FixedColor>(result));
-        REQUIRE(std::get<domain::FixedColor>(result) == domain::FixedColor::BrightMagenta);
+        REQUIRE(std::holds_alternative<domain::NamedColor>(result));
+        REQUIRE(std::get<domain::NamedColor>(result) == domain::NamedColor::BrightMagenta);
     }
 
     SECTION("bright-cyan")
     {
         kakoune::Color color{"bright-cyan"};
         domain::OptionalColor result = kakoune::toDomain(color);
-        REQUIRE(std::holds_alternative<domain::FixedColor>(result));
-        REQUIRE(std::get<domain::FixedColor>(result) == domain::FixedColor::BrightCyan);
+        REQUIRE(std::holds_alternative<domain::NamedColor>(result));
+        REQUIRE(std::get<domain::NamedColor>(result) == domain::NamedColor::BrightCyan);
     }
 
     SECTION("bright-white")
     {
         kakoune::Color color{"bright-white"};
         domain::OptionalColor result = kakoune::toDomain(color);
-        REQUIRE(std::holds_alternative<domain::FixedColor>(result));
-        REQUIRE(std::get<domain::FixedColor>(result) == domain::FixedColor::BrightWhite);
+        REQUIRE(std::holds_alternative<domain::NamedColor>(result));
+        REQUIRE(std::get<domain::NamedColor>(result) == domain::NamedColor::BrightWhite);
     }
 }
 

@@ -1,5 +1,6 @@
 #include "adapters/kakoune/jsonrpckakouneinterface.hpp"
 #include "adapters/kakoune/color.hpp"
+#include "adapters/kakoune/face.hpp"
 #include "adapters/kakoune/statusstyle.hpp"
 #include "domain/editor.hpp"
 #include "domain/menu.hpp"
@@ -21,8 +22,7 @@ namespace kakoune
 namespace
 {
 
-void applyColorOverride(std::unordered_map<domain::FixedColor, domain::RGBAColor> &overrides,
-                        domain::FixedColor fixed_color, const Color &color)
+void applyColorOverride(domain::ColorOverrides &overrides, domain::NamedColor fixed_color, const Color &color)
 {
     try
     {
@@ -120,7 +120,7 @@ domain::KakouneState JsonRpcKakouneInterface::convertFrameStateToKakouneState(co
             toDomain(frame_state.draw_status.mode_line), toDomain(frame_state.draw_status.default_face)),
         .info_box = info_box,
         .menu = menu,
-        .default_face = toDomain(frame_state.draw.default_face),
+        .default_face = toDomainAsDefaultFace(frame_state.draw.default_face),
     };
 }
 
@@ -229,44 +229,44 @@ domain::UIOptions JsonRpcKakouneInterface::getUIOptions(domain::FontManager *fon
     }
 
     if (m_ui_options.color_black.has_value())
-        applyColorOverride(ui_options.color_overrides, domain::FixedColor::Black, m_ui_options.color_black.value());
+        applyColorOverride(ui_options.color_overrides, domain::NamedColor::Black, m_ui_options.color_black.value());
     if (m_ui_options.color_red.has_value())
-        applyColorOverride(ui_options.color_overrides, domain::FixedColor::Red, m_ui_options.color_red.value());
+        applyColorOverride(ui_options.color_overrides, domain::NamedColor::Red, m_ui_options.color_red.value());
     if (m_ui_options.color_green.has_value())
-        applyColorOverride(ui_options.color_overrides, domain::FixedColor::Green, m_ui_options.color_green.value());
+        applyColorOverride(ui_options.color_overrides, domain::NamedColor::Green, m_ui_options.color_green.value());
     if (m_ui_options.color_yellow.has_value())
-        applyColorOverride(ui_options.color_overrides, domain::FixedColor::Yellow, m_ui_options.color_yellow.value());
+        applyColorOverride(ui_options.color_overrides, domain::NamedColor::Yellow, m_ui_options.color_yellow.value());
     if (m_ui_options.color_blue.has_value())
-        applyColorOverride(ui_options.color_overrides, domain::FixedColor::Blue, m_ui_options.color_blue.value());
+        applyColorOverride(ui_options.color_overrides, domain::NamedColor::Blue, m_ui_options.color_blue.value());
     if (m_ui_options.color_magenta.has_value())
-        applyColorOverride(ui_options.color_overrides, domain::FixedColor::Magenta, m_ui_options.color_magenta.value());
+        applyColorOverride(ui_options.color_overrides, domain::NamedColor::Magenta, m_ui_options.color_magenta.value());
     if (m_ui_options.color_cyan.has_value())
-        applyColorOverride(ui_options.color_overrides, domain::FixedColor::Cyan, m_ui_options.color_cyan.value());
+        applyColorOverride(ui_options.color_overrides, domain::NamedColor::Cyan, m_ui_options.color_cyan.value());
     if (m_ui_options.color_white.has_value())
-        applyColorOverride(ui_options.color_overrides, domain::FixedColor::White, m_ui_options.color_white.value());
+        applyColorOverride(ui_options.color_overrides, domain::NamedColor::White, m_ui_options.color_white.value());
     if (m_ui_options.color_bright_black.has_value())
-        applyColorOverride(ui_options.color_overrides, domain::FixedColor::BrightBlack,
+        applyColorOverride(ui_options.color_overrides, domain::NamedColor::BrightBlack,
                            m_ui_options.color_bright_black.value());
     if (m_ui_options.color_bright_red.has_value())
-        applyColorOverride(ui_options.color_overrides, domain::FixedColor::BrightRed,
+        applyColorOverride(ui_options.color_overrides, domain::NamedColor::BrightRed,
                            m_ui_options.color_bright_red.value());
     if (m_ui_options.color_bright_green.has_value())
-        applyColorOverride(ui_options.color_overrides, domain::FixedColor::BrightGreen,
+        applyColorOverride(ui_options.color_overrides, domain::NamedColor::BrightGreen,
                            m_ui_options.color_bright_green.value());
     if (m_ui_options.color_bright_yellow.has_value())
-        applyColorOverride(ui_options.color_overrides, domain::FixedColor::BrightYellow,
+        applyColorOverride(ui_options.color_overrides, domain::NamedColor::BrightYellow,
                            m_ui_options.color_bright_yellow.value());
     if (m_ui_options.color_bright_blue.has_value())
-        applyColorOverride(ui_options.color_overrides, domain::FixedColor::BrightBlue,
+        applyColorOverride(ui_options.color_overrides, domain::NamedColor::BrightBlue,
                            m_ui_options.color_bright_blue.value());
     if (m_ui_options.color_bright_magenta.has_value())
-        applyColorOverride(ui_options.color_overrides, domain::FixedColor::BrightMagenta,
+        applyColorOverride(ui_options.color_overrides, domain::NamedColor::BrightMagenta,
                            m_ui_options.color_bright_magenta.value());
     if (m_ui_options.color_bright_cyan.has_value())
-        applyColorOverride(ui_options.color_overrides, domain::FixedColor::BrightCyan,
+        applyColorOverride(ui_options.color_overrides, domain::NamedColor::BrightCyan,
                            m_ui_options.color_bright_cyan.value());
     if (m_ui_options.color_bright_white.has_value())
-        applyColorOverride(ui_options.color_overrides, domain::FixedColor::BrightWhite,
+        applyColorOverride(ui_options.color_overrides, domain::NamedColor::BrightWhite,
                            m_ui_options.color_bright_white.value());
 
     return ui_options;

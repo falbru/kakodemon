@@ -152,3 +152,37 @@ domain::Face kakoune::toDomain(kakoune::Face face)
 
     return domain::Face(bg, fg, std::move(attributes));
 }
+
+domain::DefaultFace kakoune::toDomainAsDefaultFace(kakoune::Face face)
+{
+    std::vector<domain::Attribute> attributes;
+    attributes.reserve(face.attributes.size());
+    for (const auto &attr : face.attributes)
+    {
+        attributes.push_back(::toDomain(attr));
+    }
+
+    domain::OptionalColor bg;
+    try
+    {
+        bg = toDomain(face.bg);
+    }
+    catch (const ColorConversionException &e)
+    {
+        spdlog::warn("{}", e.what());
+        bg = domain::DefaultColor();
+    }
+
+    domain::OptionalColor fg;
+    try
+    {
+        fg = toDomain(face.fg);
+    }
+    catch (const ColorConversionException &e)
+    {
+        spdlog::warn("{}", e.what());
+        fg = domain::DefaultColor();
+    }
+
+    return domain::DefaultFace(bg, fg, std::move(attributes));
+}

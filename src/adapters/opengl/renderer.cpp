@@ -88,22 +88,21 @@ void opengl::Renderer::popBounds()
     }
 }
 
-void opengl::Renderer::renderLine(const domain::TextRenderConfig &config, const domain::RenderLine &line,
-                                  const domain::Face &default_face, float x, float y,
-                                  const domain::Alignment &alignment) const
+void opengl::Renderer::renderLine(const domain::TextRenderConfig &config, const domain::RenderLine &line, float x,
+                                  float y, const domain::Alignment &alignment) const
 {
     m_shader_program->use();
     glBindVertexArray(m_text_vao);
 
     float line_height = std::floor(config.font->getLineHeight());
-    _renderLine(config, line, default_face, x, y, line_height, alignment, RenderPass::Both);
+    _renderLine(config, line, x, y, line_height, alignment, RenderPass::Both);
 
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void opengl::Renderer::renderLines(const domain::TextRenderConfig &config, const domain::RenderLines &lines,
-                                   const domain::Face &default_face, float x, float y) const
+void opengl::Renderer::renderLines(const domain::TextRenderConfig &config, const domain::RenderLines &lines, float x,
+                                   float y) const
 {
     opengl::Font *opengl_font = dynamic_cast<opengl::Font *>(config.font);
 
@@ -117,7 +116,7 @@ void opengl::Renderer::renderLines(const domain::TextRenderConfig &config, const
     float y_it = y;
     for (const auto &line : lines.getLines())
     {
-        _renderLine(config, line, default_face, x, y_it, line_height, domain::Alignment(), RenderPass::BackgroundOnly);
+        _renderLine(config, line, x, y_it, line_height, domain::Alignment(), RenderPass::BackgroundOnly);
         y_it += line_height;
     }
 
@@ -125,7 +124,7 @@ void opengl::Renderer::renderLines(const domain::TextRenderConfig &config, const
     y_it = y;
     for (const auto &line : lines.getLines())
     {
-        _renderLine(config, line, default_face, x, y_it, line_height, domain::Alignment(), RenderPass::TextOnly);
+        _renderLine(config, line, x, y_it, line_height, domain::Alignment(), RenderPass::TextOnly);
         y_it += line_height;
     }
 
@@ -175,17 +174,11 @@ void opengl::Renderer::renderRoundedRectWithShadow(const domain::RGBAColor color
     glBindVertexArray(0);
 }
 
-void opengl::Renderer::_renderLine(const domain::TextRenderConfig &config, const domain::RenderLine &line,
-                                   const domain::Face &default_face, float x, float y, float line_height,
-                                   const domain::Alignment &alignment, RenderPass pass) const
+void opengl::Renderer::_renderLine(const domain::TextRenderConfig &config, const domain::RenderLine &line, float x,
+                                   float y, float line_height, const domain::Alignment &alignment,
+                                   RenderPass pass) const
 {
     opengl::Font *font = dynamic_cast<opengl::Font *>(config.font);
-
-    const domain::Face resolved_default_face =
-        domain::Face(default_face.getBg(config.default_face, config.color_overrides),
-                     default_face.getFg(
-                         config.default_face,
-                         config.color_overrides)); // TODO change architecture/types such that this is already resolved
 
     float start_x = x;
     float start_y = y + line_height;
@@ -215,7 +208,7 @@ void opengl::Renderer::_renderLine(const domain::TextRenderConfig &config, const
     float y_it = start_y + font->getDescender() - vertical_offset;
 
     const std::vector<domain::GlyphMetrics> &glyphs = line.getGlyphs();
-    const std::vector<domain::Span<domain::Face>> &face_spans = line.getFaceSpans();
+    const std::vector<domain::Span<domain::ResolvedFace>> &face_spans = line.getFaceSpans();
     const std::vector<domain::Span<domain::Font *>> &font_spans = line.getFontSpans();
 
     if (pass == RenderPass::BackgroundOnly || pass == RenderPass::Both)
@@ -233,8 +226,7 @@ void opengl::Renderer::_renderLine(const domain::TextRenderConfig &config, const
             {
                 const auto &face = face_spans[face_span_index].value;
 
-                _renderRect(face.getBg(resolved_default_face, config.color_overrides), atom_start_x, y_it - line_height,
-                            x_it - atom_start_x, line_height);
+                _renderRect(face.getBg(), atom_start_x, y_it - line_height, x_it - atom_start_x, line_height);
 
                 face_span_index++;
                 atom_start_x = x_it;
@@ -249,8 +241,7 @@ void opengl::Renderer::_renderLine(const domain::TextRenderConfig &config, const
         {
             const auto &face = face_spans[face_span_index].value;
 
-            _renderRect(face.getBg(resolved_default_face, config.color_overrides), atom_start_x, y_it - line_height,
-                        x_it - atom_start_x, line_height);
+            _renderRect(face.getBg(), atom_start_x, y_it - line_height, x_it - atom_start_x, line_height);
         }
     }
 
@@ -269,8 +260,8 @@ void opengl::Renderer::_renderLine(const domain::TextRenderConfig &config, const
 
                 if (current_face.hasAttribute(domain::Attribute::Underline) && font->getUnderlineThickness() > 0)
                 {
-                    _renderRect(current_face.getFg(resolved_default_face, config.color_overrides), atom_start_x,
-                                y_it + font->getUnderlineOffset(), x_it - atom_start_x, font->getUnderlineThickness());
+                    _renderRect(current_face.getFg(), atom_start_x, y_it + font->getUnderlineOffset(),
+                                x_it - atom_start_x, font->getUnderlineThickness());
                 }
 
                 face_span_index++;
@@ -300,7 +291,7 @@ void opengl::Renderer::_renderLine(const domain::TextRenderConfig &config, const
                 m_shader_program->setRenderType(RenderType::ColoredText);
             }
 
-            domain::RGBAColor color = face.getFg(resolved_default_face, config.color_overrides);
+            domain::RGBAColor color = face.getFg();
             m_shader_program->setVector4f("textColor", color.r, color.g, color.b, color.a);
 
             float xpos = x_it + glyph.bearing.x;
